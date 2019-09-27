@@ -1,0 +1,178 @@
+##################   Provenance    #############
+int run
+int lumiblock
+Long64_t event
+int type
+bool stitch_met
+
+####################   Global   ###################
+int npv
+float ht
+float met
+float met_phi
+float met_calo
+float met_tru
+float met_tru_phi
+float mt
+float mt_tru
+float dphi1
+float dphi2
+float dphi3
+float dphi4
+bool low_dphi
+
+###################   Higgsinos   ##################
+int   higd_bin
+float higd_dm
+float higd_am
+float higd_drmax
+
+###################   Jets   ##################
+int njets
+int nbl
+int nbm
+int nbt
+
+vector<float> jets_pt
+vector<float> jets_eta
+vector<float> jets_phi
+vector<float> jets_m
+vector<float> jets_bdisc
+vector<bool>  jets_islep
+vector<int>   jets_hflavor
+vector<int>   jets_pflavor
+vector<bool>  jets_h1d
+vector<bool>  jets_h2d
+
+###################   ISR related   ##################
+
+int nisr
+
+float jetsys_pt
+float jetsys_eta
+float jetsys_phi
+float jetsys_m
+float jetsys_nob_pt
+float jetsys_nob_eta
+float jetsys_nob_phi
+float jetsys_nob_m
+
+##################   Leptons   ################
+int nleps
+int nleps_tm
+
+int nmus
+int nvmus
+vector<float> mus_pt
+vector<float> mus_eta
+vector<float> mus_phi
+vector<float> mus_miniso
+vector<float> mus_reliso
+vector<float> mus_dz
+vector<float> mus_d0
+vector<bool> mus_sig
+vector<bool> mus_sigid
+vector<bool> mus_tm
+vector<int> mus_charge
+
+int nels
+int nvels
+vector<float> els_pt
+vector<float> els_eta
+vector<float> els_sceta
+vector<float> els_phi
+vector<float> els_miniso
+vector<float> els_reliso
+vector<float> els_dz
+vector<float> els_d0
+vector<float> els_ip3d
+vector<bool> els_ispf
+vector<bool> els_tm
+vector<int> els_charge
+
+##################   Di-Leptons   ################
+float elel_m
+float elel_pt
+float elel_eta
+float elel_phi
+float elel_w
+
+float mumu_m
+float mumu_pt
+float mumu_eta
+float mumu_phi
+float mumu_w
+
+##################   Photons   ###################
+int nph
+vector<float> ph_pt
+vector<float> ph_eta
+vector<float> ph_phi
+vector<bool>  ph_tm
+vector<bool>  ph_ph90
+
+###################   Tracks    ##################
+int ntks
+
+vector<float> tks_pt
+vector<float> tks_eta
+vector<float> tks_phi
+vector<float> tks_d0
+vector<float> tks_dz
+vector<int> tks_pdg
+vector<float> tks_miniso
+vector<float> tks_reliso
+vector<float> tks_mt
+vector<bool> tks_tm
+
+###################   Quality   ##################
+bool pass_jets
+bool pass_hbhe
+bool pass_hbheiso
+bool pass_goodv
+bool pass_cschalo
+bool pass_cschalo_tight
+bool pass_eebadsc
+bool pass_ecaldeadcell
+bool pass_fsmet
+bool pass_fsjets
+bool pass_badpfmu
+bool pass
+bool pass_badcalib
+
+################  Truth   ##################
+int nisr_me
+float ht_isr_me
+float ptll_me
+vector<float> mc_pt
+vector<float> mc_eta
+vector<float> mc_phi
+vector<float> mc_mass
+vector<int>   mc_id
+vector<int>   mc_mom
+vector<int>   mc_momidx
+vector<int>   mc_num_dau
+vector<int>   mc_status
+vector<int>   mc_jetidx
+
+int ntruleps
+int ntrumus
+int ntruels
+int ntrutaush
+int ntrutausl
+float isr_tru_pt
+float isr_tru_eta
+float isr_tru_phi
+int mprod
+int mlsp
+
+################  Weights   ##################
+float weight
+float w_lumi
+float w_pu
+float w_btag
+float w_bhig
+float w_isr
+float w_lep
+float w_fs_lep
+float w_prefire

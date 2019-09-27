@@ -1,0 +1,49 @@
+# Generated on compilation
+*_tree.hpp
+*_tree.cpp
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.pyc
+*__init_*
+._*
+
+# Compiled Dynamic libraries
+*.so
+*.d
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+
+# Compiled executables
+*.exe
+
+# Generated source files
+bin/*
+
+# emacs backups
+*~
+*#
+# vim temporary
+*.swp
+# Other
+/*.root
+out/*.root
+*.log
+*.pdf
+*.eps
+*.tex
+*.aux
+gmon.out
+.DS_Store
+out
+/run
+logs
+archive
+.nfs*
+.#-emacs*
+sftp-config.json

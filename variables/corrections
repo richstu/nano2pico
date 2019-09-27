@@ -1,0 +1,20 @@
+# list of branches for which to calculate corrections
+# and some miscellaneous sum trackers for leptons and negative weights
+
+# require special treatment
+float weight
+float w_lumi
+float w_isr
+float w_lep
+float w_fs_lep
+
+# just need to add up 
+float w_btag_deep
+float w_bhig_deep
+
+# additional variables
+int neff
+int nent
+int nent_zlep
+float tot_weight_l0
+float tot_weight_l1
