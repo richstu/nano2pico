@@ -37,7 +37,7 @@ vector<float> jets_pt
 vector<float> jets_eta
 vector<float> jets_phi
 vector<float> jets_m
-vector<float> jets_bdisc
+vector<float> jets_deepcsv
 vector<bool>  jets_islep
 vector<int>   jets_hflavor
 vector<int>   jets_pflavor
@@ -79,6 +79,7 @@ int nels
 int nvels
 vector<float> els_pt
 vector<float> els_eta
+vector<float> els_scpt
 vector<float> els_sceta
 vector<float> els_phi
 vector<float> els_miniso
@@ -86,6 +87,7 @@ vector<float> els_reliso
 vector<float> els_dz
 vector<float> els_d0
 vector<float> els_ip3d
+vector<bool> els_sig
 vector<bool> els_ispf
 vector<bool> els_tm
 vector<int> els_charge

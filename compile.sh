@@ -4,7 +4,7 @@ exit_code=0;
 
 if [ $# -ne 0 ] && [ "$1" == "clean" ]
 then
-    rm -rf run/*.exe bin/*.o bin/*.a bin/*.d *.exe *.out inc/baby*hpp src/baby*cpp
+    rm -rf run/*.exe bin/*.o bin/*.a bin/*.d *.exe *.out inc/*_tree.hpp src/*_tree.cpp
     ./run/remove_backups.sh
     exit_code=$?
 else

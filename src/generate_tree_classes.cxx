@@ -248,7 +248,7 @@ void WriteNanoHeader(const vector<Variable> &vars){
 void WriteNanoSource(const vector<Variable> &vars){
 
   ofstream file("src/nano_tree.cpp");
-  file << "//File generated with generate_baby.exe\n\n";
+  file << "//File generated with generate_tree_classes.exe\n\n";
 
   file << "#include \"nano_tree.hpp\"\n\n";
 
@@ -456,7 +456,7 @@ void WriteHeader(const vector<Variable> &vars, const string name){
 void WriteSource(const vector<Variable> &vars, const string name){
 
   ofstream file("src/"+ name +"_tree.cpp");
-  file << "//File generated with generate_baby.exe\n\n";
+  file << "//File generated with generate_tree_classes.exe\n\n";
 
   file << "#include \""<< name <<"_tree.hpp\"\n\n";
 
