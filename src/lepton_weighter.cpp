@@ -115,13 +115,13 @@ LeptonWeighter::LeptonWeighter(int year){
 
 void LeptonWeighter::FullSim(pico_tree &pico, float &w_lep, vector<float> &sys_lep){
   pair<double, double> sf(1., 0.);
-  for(size_t i = 0; i < pico.out_mus_sig().size(); ++i){
-    if(pico.out_mus_sig().at(i)){
+  for(size_t i = 0; i < pico.out_mu_sig().size(); ++i){
+    if(pico.out_mu_sig().at(i)){
       sf = MergeSF(sf, GetMuonScaleFactor(pico, i));
     }
   }
-  for(size_t i = 0; i < pico.out_els_sig().size(); ++i){
-    if(pico.out_els_sig().at(i)){
+  for(size_t i = 0; i < pico.out_el_sig().size(); ++i){
+    if(pico.out_el_sig().at(i)){
       sf = MergeSF(sf, GetElectronScaleFactor(pico, i));
     }
   }
@@ -132,13 +132,13 @@ void LeptonWeighter::FullSim(pico_tree &pico, float &w_lep, vector<float> &sys_l
 
 void LeptonWeighter::FastSim(pico_tree &pico, float &w_fs_lep, vector<float> &sys_fs_lep){
   pair<double, double> sf(1., 0.);
-  for(size_t i = 0; i < pico.out_mus_sig().size(); ++i){
-    if(pico.out_mus_sig().at(i)){
+  for(size_t i = 0; i < pico.out_mu_sig().size(); ++i){
+    if(pico.out_mu_sig().at(i)){
       sf = MergeSF(sf, GetMuonScaleFactorFS(pico, i));
     }
   }
-  for(size_t i = 0; i < pico.out_els_sig().size(); ++i){
-    if(pico.out_els_sig().at(i)){
+  for(size_t i = 0; i < pico.out_el_sig().size(); ++i){
+    if(pico.out_el_sig().at(i)){
       sf = MergeSF(sf, GetElectronScaleFactorFS(pico, i));
     }
   }
@@ -151,8 +151,8 @@ std::pair<double, double> LeptonWeighter::GetMuonScaleFactor(pico_tree &pico, si
   //https://twiki.cern.ch/twiki/bin/view/CMS/SUSLeptonSF#Data_leading_order_FullSim_MC_co
   //ID, iso, tracking SFs applied
   //No stat error, 3% systematic from ID, iso
-  double pt = pico.out_mus_pt().at(imu);
-  double eta = pico.out_mus_eta().at(imu);
+  double pt = pico.out_mu_pt().at(imu);
+  double eta = pico.out_mu_eta().at(imu);
   double abseta = fabs(eta);
   vector<pair<double, double> > sfs;
   if (do_full_mu_med_) {
@@ -176,8 +176,8 @@ std::pair<double, double> LeptonWeighter::GetElectronScaleFactor(pico_tree &pico
   //ID iso systematics built-in
   //Tracking SFs from https://twiki.cern.ch/twiki/bin/view/CMS/EgammaIDRecipesRun2#Electron_efficiencies_and_scale
   //3% tracking systematic below 20 GeV
-  double pt = pico.out_els_scpt().at(iel);
-  double eta = pico.out_els_sceta().at(iel);
+  double pt = pico.out_el_scpt().at(iel);
+  double eta = pico.out_el_sceta().at(iel);
   // double abseta = fabs(eta);
   vector<pair<double, double> > sfs;
   //Axes swapped, asymmetric in eta
@@ -192,8 +192,8 @@ std::pair<double, double> LeptonWeighter::GetMuonScaleFactorFS(pico_tree &pico, 
   //https://twiki.cern.ch/twiki/bin/view/CMS/SUSLeptonSF#FullSim_FastSim_TTBar_MC_compari
   //ID, iso SFs applied
   //No stat error, 2% systematic from ID, iso
-  double pt = pico.out_mus_pt().at(imu);
-  double abseta = fabs(pico.out_mus_eta().at(imu));
+  double pt = pico.out_mu_pt().at(imu);
+  double abseta = fabs(pico.out_mu_eta().at(imu));
   vector<pair<double, double> > sfs;
   if (do_fast_mu_med_) {
     sfs.push_back(GetSF(sf_fast_mu_med_, pt, abseta, false));
@@ -210,8 +210,8 @@ std::pair<double, double> LeptonWeighter::GetElectronScaleFactorFS(pico_tree &pi
   //https://twiki.cern.ch/twiki/bin/view/CMS/SUSLeptonSF#FullSim_FastSim_TTBar_MC_com_AN1
   //ID, iso SFs applied
   //No stat error, 2% systematic from ID, iso
-  double pt = pico.out_els_scpt().at(iel);
-  double abseta = fabs(pico.out_els_sceta().at(iel));
+  double pt = pico.out_el_scpt().at(iel);
+  double abseta = fabs(pico.out_el_sceta().at(iel));
   vector<pair<double, double> > sfs;
   if (do_fast_el_med_) {
     sfs.push_back(GetSF(sf_fast_el_med_, pt, abseta, false));

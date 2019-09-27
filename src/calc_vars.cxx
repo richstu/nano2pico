@@ -11,6 +11,17 @@
 #include "corrections_tree.hpp"
 #include "utilities.hpp"
 #include "cross_sections.hpp"
+
+#include "mc_producer.hpp"
+#include "el_producer.hpp"
+#include "mu_producer.hpp"
+#include "dilep_producer.hpp"
+#include "tk_producer.hpp"
+#include "ph_producer.hpp"
+#include "jet_producer.hpp"
+#include "fjet_producer.hpp"
+#include "hig_producer.hpp"
+
 #include "btag_weighter.hpp"
 #include "lepton_weighter.hpp"
 
@@ -58,7 +69,17 @@ int main(int argc, char *argv[]){
   corr.out_tot_weight_l1() = 0.;
   corr.out_nent() = nentries;
 
-  //Initialize weight calculators
+  //Initialize object producers
+  GenParticleProducer mc_producer(year);
+  ElectronProducer el_producer(year);
+  MuonProducer mu_producer(year);
+  DileptonProducer dilep_producer(year);
+  IsoTrackProducer tk_producer(year);
+  PhotonProducer ph_producer(year);
+  JetProducer jet_producer(year);
+  FatJetProducer fjet_producer(year);
+  HigVarProducer hig_producer(year);
+
   BTagWeighter btw(isFastSim, year);
   LeptonWeighter lw(year);
   const string ctr = "central";
@@ -75,17 +96,20 @@ int main(int argc, char *argv[]){
       cout<<"Processing event: "<<entry<<endl;
     }
 
-    pico.out_njets() = 0;
-    pico.out_nbm() = 0;
-    for(int ijet(0); ijet<nano.nJet(); ++ijet){
-      if (nano.Jet_pt().at(ijet) > 20) {
-        pico.out_jets_pt().push_back(nano.Jet_pt()[ijet]);
-        pico.out_njets()++;
-        if (nano.Jet_btagDeepB().at(ijet) > 0.6324) {
-          pico.out_nbm()++;          
-        }
-      }
-    }
+    // N.B. Order in which producers are called matters! E.g. jets are not counted if overlapping 
+    // with signal lepton, thus jets must be processed only after leptons have been selected.
+    mc_producer.WriteGenParticles(nano, pico);
+
+    el_producer.WriteElectrons(nano, pico);
+    mu_producer.WriteMuons(nano, pico);
+    dilep_producer.WriteDileptons();
+    tk_producer.WriteIsoTracks(nano, pico);
+    ph_producer.WritePhotons(nano, pico);
+
+    jet_producer.WriteJets(nano, pico);
+    fjet_producer.WriteFatJets(nano, pico);
+
+    hig_producer.WriteHigVars();
 
     pico.Fill();
   } // loop over events

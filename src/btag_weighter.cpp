@@ -85,9 +85,9 @@ double BTagWeighter::EventWeight(pico_tree &pico, BTagEntry::OperatingPoint op,
                                  const string &bc_full_syst, const string &udsg_full_syst,
                                  const string &bc_fast_syst, const string &udsg_fast_syst) const{
   double product = 1.;
-  auto n_jets = pico.out_jets_islep().size();
+  auto n_jets = pico.out_jet_islep().size();
   for(size_t i = 0; i < n_jets; ++i){
-    if(!pico.out_jets_islep().at(i)){
+    if(!pico.out_jet_islep().at(i)){
       product *= JetBTagWeight(pico, i, op, bc_full_syst, udsg_full_syst, bc_fast_syst, udsg_fast_syst);
     }
   }
@@ -97,9 +97,9 @@ double BTagWeighter::EventWeight(pico_tree &pico, BTagEntry::OperatingPoint op,
 double BTagWeighter::EventWeight(pico_tree &pico, BTagEntry::OperatingPoint op,
                                  const string &bc_full_syst, const string &udsg_full_syst) const{
   double product = 1.;
-  auto n_jets = pico.out_jets_islep().size();
+  auto n_jets = pico.out_jet_islep().size();
   for(size_t i = 0; i < n_jets; ++i){
-    if(!pico.out_jets_islep().at(i)){
+    if(!pico.out_jet_islep().at(i)){
       product *= JetBTagWeight(pico, i, op, bc_full_syst, udsg_full_syst);
     }
   }
@@ -109,9 +109,9 @@ double BTagWeighter::EventWeight(pico_tree &pico, BTagEntry::OperatingPoint op,
 double BTagWeighter::EventWeight(pico_tree &pico, const vector<BTagEntry::OperatingPoint> &ops,
                                  const string &bc_full_syst, const string &udsg_full_syst) const{
   double product = 1.;
-  auto n_jets = pico.out_jets_islep().size();
+  auto n_jets = pico.out_jet_islep().size();
   for(size_t i = 0; i < n_jets; ++i){
-    if(!pico.out_jets_islep().at(i)){
+    if(!pico.out_jet_islep().at(i)){
       product *= JetBTagWeight(pico, i, ops,bc_full_syst, udsg_full_syst);
     }
   }
@@ -122,9 +122,9 @@ double BTagWeighter::EventWeight(pico_tree &pico, const vector<BTagEntry::Operat
                                  const string &bc_full_syst, const string &udsg_full_syst,
                                  const string &bc_fast_syst, const string &udsg_fast_syst) const{
   double product = 1.;
-  auto n_jets = pico.out_jets_islep().size();
+  auto n_jets = pico.out_jet_islep().size();
   for(size_t i = 0; i < n_jets; ++i){
-    if(!pico.out_jets_islep().at(i)){
+    if(!pico.out_jet_islep().at(i)){
       product *= JetBTagWeight(pico, i, ops, bc_full_syst, udsg_full_syst, bc_fast_syst, udsg_fast_syst);
     }
   }
@@ -154,7 +154,7 @@ double BTagWeighter::JetBTagWeight(pico_tree &pico, size_t ijet, const vector<BT
                                    const string &bc_full_syst, const string &udsg_full_syst,
                                    const string &bc_fast_syst, const string &udsg_fast_syst) const{
   // procedure from https://twiki.cern.ch/twiki/bin/view/CMS/BTagSFMethods#1a_Event_reweighting_using_scale
-  int hadronFlavour = abs(pico.out_jets_hflavor().at(ijet));
+  int hadronFlavour = abs(pico.out_jet_hflavor().at(ijet));
   BTagEntry::JetFlavor flav;
   string full_syst, fast_syst;
   switch(hadronFlavour){
@@ -183,7 +183,7 @@ double BTagWeighter::JetBTagWeight(pico_tree &pico, size_t ijet, const vector<BT
     else if (iop==BTagEntry::OP_TIGHT) opcuts.push_back(deep_csv_tight_);
   }
 
-  float csv = pico.out_jets_deepcsv().at(ijet);
+  float csv = pico.out_jet_deepcsv().at(ijet);
 
   int tag = -1;
   for (unsigned iop(0); iop<opcuts.size(); iop++) 
@@ -193,8 +193,8 @@ double BTagWeighter::JetBTagWeight(pico_tree &pico, size_t ijet, const vector<BT
 
   const map<BTagEntry::OperatingPoint, unique_ptr<BTagCalibrationReader> > *ireaders_fast = &readers_deep_fast_;
 
-  double jet_pt = pico.out_jets_pt().at(ijet);
-  double jet_eta = pico.out_jets_eta().at(ijet);
+  double jet_pt = pico.out_jet_pt().at(ijet);
+  double jet_eta = pico.out_jet_eta().at(ijet);
   double eff1(1), eff2(0), sf1(1), sf2(1), sf1_fs(1), sf2_fs(1);
   if (tag >= 0){
     BTagEntry::OperatingPoint iop = ops[tag];

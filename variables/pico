@@ -15,34 +15,45 @@ float met_tru
 float met_tru_phi
 float mt
 float mt_tru
+
+###################   Higgsinos   ##################
+int   hig_bin
+float hig_dm
+float hig_am
+float hig_drmax
 float dphi1
 float dphi2
 float dphi3
 float dphi4
 bool low_dphi
 
-###################   Higgsinos   ##################
-int   higd_bin
-float higd_dm
-float higd_am
-float higd_drmax
-
 ###################   Jets   ##################
-int njets
+int njet
 int nbl
 int nbm
 int nbt
 
-vector<float> jets_pt
-vector<float> jets_eta
-vector<float> jets_phi
-vector<float> jets_m
-vector<float> jets_deepcsv
-vector<bool>  jets_islep
-vector<int>   jets_hflavor
-vector<int>   jets_pflavor
-vector<bool>  jets_h1d
-vector<bool>  jets_h2d
+vector<float> jet_pt
+vector<float> jet_eta
+vector<float> jet_phi
+vector<float> jet_m
+vector<float> jet_deepcsv
+vector<bool>  jet_islep
+vector<int>   jet_hflavor
+vector<int>   jet_pflavor
+vector<bool>  jet_h1d
+vector<bool>  jet_h2d
+
+###################   AK8 Jets   ##################
+int nfjet
+
+vector<float> fjet_pt
+vector<float> fjet_eta
+vector<float> fjet_phi
+vector<float> fjet_m
+vector<float> fjet_ddb
+vector<bool>  fjet_h1d
+vector<bool>  fjet_h2d
 
 ###################   ISR related   ##################
 
@@ -58,39 +69,39 @@ float jetsys_nob_phi
 float jetsys_nob_m
 
 ##################   Leptons   ################
-int nleps
-int nleps_tm
+int nlep
+int nlep_tm
 
-int nmus
-int nvmus
-vector<float> mus_pt
-vector<float> mus_eta
-vector<float> mus_phi
-vector<float> mus_miniso
-vector<float> mus_reliso
-vector<float> mus_dz
-vector<float> mus_d0
-vector<bool> mus_sig
-vector<bool> mus_sigid
-vector<bool> mus_tm
-vector<int> mus_charge
+int nmu
+int nvmu
+vector<float> mu_pt
+vector<float> mu_eta
+vector<float> mu_phi
+vector<float> mu_miniso
+vector<float> mu_reliso
+vector<float> mu_dz
+vector<float> mu_d0
+vector<bool> mu_sig
+vector<bool> mu_sigid
+vector<bool> mu_tm
+vector<int> mu_charge
 
-int nels
-int nvels
-vector<float> els_pt
-vector<float> els_eta
-vector<float> els_scpt
-vector<float> els_sceta
-vector<float> els_phi
-vector<float> els_miniso
-vector<float> els_reliso
-vector<float> els_dz
-vector<float> els_d0
-vector<float> els_ip3d
-vector<bool> els_sig
-vector<bool> els_ispf
-vector<bool> els_tm
-vector<int> els_charge
+int nel
+int nvel
+vector<float> el_pt
+vector<float> el_eta
+vector<float> el_scpt
+vector<float> el_sceta
+vector<float> el_phi
+vector<float> el_miniso
+vector<float> el_reliso
+vector<float> el_dz
+vector<float> el_d0
+vector<float> el_ip3d
+vector<bool> el_sig
+vector<bool> el_ispf
+vector<bool> el_tm
+vector<int> el_charge
 
 ##################   Di-Leptons   ################
 float elel_m
@@ -114,18 +125,18 @@ vector<bool>  ph_tm
 vector<bool>  ph_ph90
 
 ###################   Tracks    ##################
-int ntks
+int ntk
 
-vector<float> tks_pt
-vector<float> tks_eta
-vector<float> tks_phi
-vector<float> tks_d0
-vector<float> tks_dz
-vector<int> tks_pdg
-vector<float> tks_miniso
-vector<float> tks_reliso
-vector<float> tks_mt
-vector<bool> tks_tm
+vector<float> tk_pt
+vector<float> tk_eta
+vector<float> tk_phi
+vector<float> tk_d0
+vector<float> tk_dz
+vector<int> tk_pdg
+vector<float> tk_miniso
+vector<float> tk_reliso
+vector<float> tk_mt
+vector<bool> tk_tm
 
 ###################   Quality   ##################
 bool pass_jets
@@ -157,11 +168,11 @@ vector<int>   mc_num_dau
 vector<int>   mc_status
 vector<int>   mc_jetidx
 
-int ntruleps
-int ntrumus
-int ntruels
-int ntrutaush
-int ntrutausl
+int ntrulep
+int ntrumu
+int ntruel
+int ntrutauh
+int ntrutaul
 float isr_tru_pt
 float isr_tru_eta
 float isr_tru_phi
