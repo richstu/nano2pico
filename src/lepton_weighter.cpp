@@ -176,8 +176,8 @@ std::pair<double, double> LeptonWeighter::GetElectronScaleFactor(pico_tree &pico
   //ID iso systematics built-in
   //Tracking SFs from https://twiki.cern.ch/twiki/bin/view/CMS/EgammaIDRecipesRun2#Electron_efficiencies_and_scale
   //3% tracking systematic below 20 GeV
-  double pt = pico.out_el_scpt().at(iel);
-  double eta = pico.out_el_sceta().at(iel);
+  double pt = pico.out_el_pt().at(iel);
+  double eta = pico.out_el_eta().at(iel);
   // double abseta = fabs(eta);
   vector<pair<double, double> > sfs;
   //Axes swapped, asymmetric in eta
@@ -210,8 +210,8 @@ std::pair<double, double> LeptonWeighter::GetElectronScaleFactorFS(pico_tree &pi
   //https://twiki.cern.ch/twiki/bin/view/CMS/SUSLeptonSF#FullSim_FastSim_TTBar_MC_com_AN1
   //ID, iso SFs applied
   //No stat error, 2% systematic from ID, iso
-  double pt = pico.out_el_scpt().at(iel);
-  double abseta = fabs(pico.out_el_sceta().at(iel));
+  double pt = pico.out_el_pt().at(iel);
+  double abseta = fabs(pico.out_el_eta().at(iel));
   vector<pair<double, double> > sfs;
   if (do_fast_el_med_) {
     sfs.push_back(GetSF(sf_fast_el_med_, pt, abseta, false));

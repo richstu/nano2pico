@@ -11,7 +11,8 @@ public:
   explicit DileptonProducer(int year);
   ~DileptonProducer();
 
-  void WriteDileptons();
+  void WriteDielectrons(nano_tree &nano, pico_tree &pico, std::vector<int> sig_el_nano_idx);
+  void WriteDimuons(nano_tree &nano, pico_tree &pico, std::vector<int> sig_mu_nano_idx);
 
 private:
   int year;

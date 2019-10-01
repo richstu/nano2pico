@@ -33,8 +33,10 @@ namespace {
   string pico_file = "";
   bool isFastSim = false;
   int year = 2016;
-  const size_t nent_test = 5;
+  int nent_test = -1;
 }
+
+void CopyTriggerDecisions(nano_tree& nano, pico_tree& pico);
 
 void GetOptions(int argc, char *argv[]);
 
@@ -100,16 +102,20 @@ int main(int argc, char *argv[]){
     // with signal lepton, thus jets must be processed only after leptons have been selected.
     mc_producer.WriteGenParticles(nano, pico);
 
-    el_producer.WriteElectrons(nano, pico);
-    mu_producer.WriteMuons(nano, pico);
-    dilep_producer.WriteDileptons();
-    tk_producer.WriteIsoTracks(nano, pico);
+    vector<int> sig_el_nano_idx = el_producer.WriteElectrons(nano, pico);
+    vector<int> sig_mu_nano_idx = mu_producer.WriteMuons(nano, pico);
+    dilep_producer.WriteDielectrons(nano, pico, sig_el_nano_idx);
+    dilep_producer.WriteDimuons(nano, pico, sig_mu_nano_idx);
+
+    vector<int> sig_tk_nano_idx = tk_producer.WriteIsoTracks(nano, pico);
     ph_producer.WritePhotons(nano, pico);
 
-    jet_producer.WriteJets(nano, pico);
+    jet_producer.WriteJets(nano, pico, sig_el_nano_idx, sig_mu_nano_idx);
     fjet_producer.WriteFatJets(nano, pico);
 
     hig_producer.WriteHigVars();
+
+    CopyTriggerDecisions(nano, pico);
 
     pico.Fill();
   } // loop over events
@@ -123,9 +129,45 @@ int main(int argc, char *argv[]){
   cout<<"Time passed: "<<hoursMinSec(difftime(endtime, begtime))<<endl<<endl;  
 }
 
+void CopyTriggerDecisions(nano_tree& nano, pico_tree& pico){
+  pico.out_HLT_IsoMu24() = nano.HLT_IsoMu24();
+  pico.out_HLT_IsoMu27() = nano.HLT_IsoMu27();
+  pico.out_HLT_Mu50() = nano.HLT_Mu50();
+  pico.out_HLT_Ele27_WPTight_Gsf() = nano.HLT_Ele27_WPTight_Gsf();
+  pico.out_HLT_Ele35_WPTight_Gsf() = nano.HLT_Ele35_WPTight_Gsf();
+  pico.out_HLT_Ele115_CaloIdVT_GsfTrkIdT() = nano.HLT_Ele115_CaloIdVT_GsfTrkIdT();
+
+  // Lepton HT cross-triggers
+  pico.out_HLT_Mu15_IsoVVVL_PFHT450() = nano.HLT_Mu15_IsoVVVL_PFHT450();
+  pico.out_HLT_Mu15_IsoVVVL_PFHT600() = nano.HLT_Mu15_IsoVVVL_PFHT600();
+  pico.out_HLT_Mu50_IsoVVVL_PFHT450() = nano.HLT_Mu50_IsoVVVL_PFHT450();
+  pico.out_HLT_Ele15_IsoVVVL_PFHT450() = nano.HLT_Ele15_IsoVVVL_PFHT450();
+  pico.out_HLT_Ele15_IsoVVVL_PFHT600() = nano.HLT_Ele15_IsoVVVL_PFHT600();
+  pico.out_HLT_Ele50_IsoVVVL_PFHT450() = nano.HLT_Ele50_IsoVVVL_PFHT450();
+
+  // MET triggers
+  pico.out_HLT_PFMET110_PFMHT110_IDTight() = nano.HLT_PFMET110_PFMHT110_IDTight();
+  pico.out_HLT_PFMET120_PFMHT120_IDTight() = nano.HLT_PFMET120_PFMHT120_IDTight();
+  pico.out_HLT_PFMETNoMu110_PFMHTNoMu110_IDTight() = nano.HLT_PFMETNoMu110_PFMHTNoMu110_IDTight();
+  pico.out_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight() = nano.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight();
+  pico.out_HLT_PFMET120_PFMHT120_IDTight_PFHT60() = nano.HLT_PFMET120_PFMHT120_IDTight_PFHT60();
+  pico.out_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60() = nano.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60();
+
+  // Jet trigger
+  pico.out_HLT_PFJet500() = nano.HLT_PFJet500();
+
+  // ZGamma triggers
+  pico.out_HLT_Mu17_Photon30_IsoCaloId() = nano.HLT_Mu17_Photon30_IsoCaloId();
+  pico.out_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ() = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ();
+  pico.out_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL();
+  pico.out_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ();
+  return;
+}
+
 void GetOptions(int argc, char *argv[]){
   while(true){
     static struct option long_options[] = {
+      {"nent", required_argument, 0, 0},
       {"nano_file", required_argument, 0, 'n'},
       {"wgt_sums_file", required_argument, 0, 'w'}, 
       {"pico_file", required_argument, 0, 'p'},
@@ -157,6 +199,8 @@ void GetOptions(int argc, char *argv[]){
       optname = long_options[option_index].name;
       if(optname == "fastsim"){
         isFastSim = true;
+      } else if(optname == "nent"){
+        nent_test = atoi(optarg);
       }else{
         printf("Bad option! Found option name %s\n", optname.c_str());
         exit(1);

@@ -38,6 +38,7 @@ vector<float> jet_eta
 vector<float> jet_phi
 vector<float> jet_m
 vector<float> jet_deepcsv
+vector<float> jet_deepflav
 vector<bool>  jet_islep
 vector<int>   jet_hflavor
 vector<int>   jet_pflavor
@@ -81,8 +82,8 @@ vector<float> mu_miniso
 vector<float> mu_reliso
 vector<float> mu_dz
 vector<float> mu_d0
+vector<float> mu_ip3d
 vector<bool> mu_sig
-vector<bool> mu_sigid
 vector<bool> mu_tm
 vector<int> mu_charge
 
@@ -90,8 +91,6 @@ int nel
 int nvel
 vector<float> el_pt
 vector<float> el_eta
-vector<float> el_scpt
-vector<float> el_sceta
 vector<float> el_phi
 vector<float> el_miniso
 vector<float> el_reliso
@@ -104,25 +103,24 @@ vector<bool> el_tm
 vector<int> el_charge
 
 ##################   Di-Leptons   ################
-float elel_m
-float elel_pt
-float elel_eta
-float elel_phi
-float elel_w
+vector<float> elel_m
+vector<float> elel_pt
+vector<float> elel_eta
+vector<float> elel_phi
 
-float mumu_m
-float mumu_pt
-float mumu_eta
-float mumu_phi
-float mumu_w
+vector<float> mumu_m
+vector<float> mumu_pt
+vector<float> mumu_eta
+vector<float> mumu_phi
 
 ##################   Photons   ###################
 int nph
 vector<float> ph_pt
 vector<float> ph_eta
 vector<float> ph_phi
+vector<float> ph_reliso
 vector<bool>  ph_tm
-vector<bool>  ph_ph90
+vector<bool>  ph_r9
 
 ###################   Tracks    ##################
 int ntk
@@ -132,9 +130,9 @@ vector<float> tk_eta
 vector<float> tk_phi
 vector<float> tk_d0
 vector<float> tk_dz
-vector<int> tk_pdg
-vector<float> tk_miniso
-vector<float> tk_reliso
+vector<int> tk_pdgid
+vector<float> tk_miniso_chg
+vector<float> tk_reliso_chg
 vector<float> tk_mt
 vector<bool> tk_tm
 
@@ -189,3 +187,37 @@ float w_isr
 float w_lep
 float w_fs_lep
 float w_prefire
+
+################  Triggers copy straight from Nano, same names   ##################
+# Single lepton triggers
+bool HLT_IsoMu24
+bool HLT_IsoMu27
+bool HLT_Mu50
+bool HLT_Ele27_WPTight_Gsf
+bool HLT_Ele35_WPTight_Gsf
+bool HLT_Ele115_CaloIdVT_GsfTrkIdT
+
+# Lepton HT cross-triggers
+bool HLT_Mu15_IsoVVVL_PFHT450
+bool HLT_Mu15_IsoVVVL_PFHT600
+bool HLT_Mu50_IsoVVVL_PFHT450
+bool HLT_Ele15_IsoVVVL_PFHT450
+bool HLT_Ele15_IsoVVVL_PFHT600
+bool HLT_Ele50_IsoVVVL_PFHT450
+
+# MET triggers
+bool HLT_PFMET110_PFMHT110_IDTight
+bool HLT_PFMET120_PFMHT120_IDTight
+bool HLT_PFMETNoMu110_PFMHTNoMu110_IDTight
+bool HLT_PFMETNoMu120_PFMHTNoMu120_IDTight
+bool HLT_PFMET120_PFMHT120_IDTight_PFHT60
+bool HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60
+
+# Jet trigger
+bool HLT_PFJet500
+
+# ZGamma triggers
+bool HLT_Mu17_Photon30_IsoCaloId
+bool HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ
+bool HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL
+bool HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ

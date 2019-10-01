@@ -12,9 +12,9 @@ public:
   ~PhotonProducer();
 
   // check what these should be in a relevant AN
-  const float SignalPhotonPtCut  = 20.0;
+  const float PhotonPtCut  = 15.0;
   const float PhotonEtaCut     = 2.5;
-  const float PhotonMiniIsoCut = 0.1;
+  const float PhotonRelIsoCut = 0.1; 
 
   void WritePhotons(nano_tree &nano, pico_tree &pico);
 
