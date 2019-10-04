@@ -20,6 +20,8 @@ public:
 
 private:
   int year;
+
+  bool idElectron_noIso(int bitmap, int level);
   
 };
 

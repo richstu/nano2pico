@@ -97,7 +97,9 @@ int main(int argc, char *argv[]){
     if (entry%100==0 || entry == nentries-1) {
       cout<<"Processing event: "<<entry<<endl;
     }
+    // if (nano.event()!=534935544) continue;
 
+    pico.out_event() = nano.event();
     // N.B. Order in which producers are called matters! E.g. jets are not counted if overlapping 
     // with signal lepton, thus jets must be processed only after leptons have been selected.
     mc_producer.WriteGenParticles(nano, pico);

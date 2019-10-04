@@ -157,6 +157,10 @@ int main(){
   WriteNanoHeader(nano_vars);
   WriteNanoSource(nano_vars);
 
+  vector<Variable> baby_vars = GetVariables("baby");  
+  WriteHeader(baby_vars, "baby");
+  WriteSource(baby_vars, "baby");
+
   vector<Variable> pico_vars = GetVariables("pico");  
   WriteHeader(pico_vars, "pico");
   WriteSource(pico_vars, "pico");

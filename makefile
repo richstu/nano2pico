@@ -58,7 +58,7 @@ $(EXEDIR)/%.exe: $(OBJDIR)/%.o $(LIBFILE)
 	$(LINK)
 
 # Auto-generated code
-.SECONDARY: dummy_nano_tree.all dummy_corrections_tree.all dummy_pico_tree.all 
+.SECONDARY: dummy_nano_tree.all dummy_corrections_tree.all dummy_pico_tree.all dummy_baby_tree.all
 .PRECIOUS: generate_tree_classes.o 
 
 $(SRCDIR)/nano_tree.cpp $(INCDIR)/nano_tree.hpp: dummy_nano_tree.all
@@ -71,6 +71,10 @@ dummy_corrections_tree.all: $(EXEDIR)/generate_tree_classes.exe
 
 $(SRCDIR)/pico_tree.cpp $(INCDIR)/pico_tree.hpp: dummy_pico_tree.all
 dummy_pico_tree.all: $(EXEDIR)/generate_tree_classes.exe 
+	./$< 
+
+$(SRCDIR)/baby_tree.cpp $(INCDIR)/baby_tree.hpp: dummy_baby_tree.all
+dummy_baby_tree.all: $(EXEDIR)/generate_tree_classes.exe 
 	./$< 
 
 .DELETE_ON_ERROR:

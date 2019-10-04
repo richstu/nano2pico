@@ -17,7 +17,6 @@ float mt
 float mt_tru
 
 ###################   Higgsinos   ##################
-int   hig_bin
 float hig_dm
 float hig_am
 float hig_drmax
@@ -52,7 +51,8 @@ vector<float> fjet_pt
 vector<float> fjet_eta
 vector<float> fjet_phi
 vector<float> fjet_m
-vector<float> fjet_ddb
+vector<float> fjet_md_hbb_btv
+vector<float> fjet_md_hbb_jme
 vector<bool>  fjet_h1d
 vector<bool>  fjet_h2d
 

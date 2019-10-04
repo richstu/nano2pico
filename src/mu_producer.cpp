@@ -19,9 +19,11 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico){
     if (!nano.Muon_mediumId()[imu]) continue;
     if (nano.Muon_pt()[imu] <= VetoMuonPtCut) continue;
     if (fabs(nano.Muon_eta()[imu]) > MuonEtaCut) continue;
-    if (nano.Muon_miniPFRelIso_all()[imu]==MuonMiniIsoCut) continue;
 
-    bool isSig = nano.Muon_pt()[imu] > SignalMuonPtCut;
+    bool isSig = false;
+    if (nano.Muon_pt()[imu] > SignalMuonPtCut &&
+      nano.Muon_miniPFRelIso_all()[imu] < MuonMiniIsoCut)
+      isSig = true;
 
     pico.out_mu_pt().push_back(nano.Muon_pt()[imu]);
     pico.out_mu_eta().push_back(nano.Muon_eta()[imu]);
