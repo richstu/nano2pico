@@ -11,7 +11,7 @@ MuonProducer::MuonProducer(int year_){
 MuonProducer::~MuonProducer(){
 }
 
-vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico){
+vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<int> &jet_islep_nano_idx){
 
   vector<int> sig_mu_nano_idx;
   pico.out_nmu() = 0; pico.out_nvmu() = 0;
@@ -43,6 +43,16 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico){
     if (isSig) {
       pico.out_nmu()++;
       sig_mu_nano_idx.push_back(imu);
+
+      // save indices of matching jets
+      if (nano.Muon_isPFcand()[imu] && nano.Muon_jetIdx()[imu]>=0) {
+        jet_islep_nano_idx.push_back(nano.Muon_jetIdx()[imu]);
+      } else {
+        for (int ijet(0); ijet<nano.nJet(); ijet++) {
+          if (dR(nano.Muon_eta()[imu], nano.Jet_eta()[ijet], nano.Muon_phi()[imu], nano.Jet_phi()[ijet])<0.4)
+            jet_islep_nano_idx.push_back(ijet);
+        }
+      }
     }
   }
   return sig_mu_nano_idx;

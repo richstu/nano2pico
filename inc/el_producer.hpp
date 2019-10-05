@@ -16,7 +16,7 @@ public:
   const float ElectronEtaCut     = 2.5;
   const float ElectronMiniIsoCut = 0.1;
 
-  std::vector<int> WriteElectrons(nano_tree &nano, pico_tree &pico);
+  std::vector<int> WriteElectrons(nano_tree &nano, pico_tree &pico, std::vector<int> &jet_islep_nano_idx);
 
 private:
   int year;

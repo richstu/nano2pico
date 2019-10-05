@@ -35,11 +35,14 @@ int main(int argc, char *argv[]){
   map<string, TH1D> histos;
   histos["nel"] = TH1D("nel","nel; dx(pico, baby)",6,-3,3);
   histos["nmu"] = TH1D("nmu","nmu",6,-3,3);
-  histos["mu_reliso"] = TH1D("mu_reliso","mu_reliso",40,-20,20);
-  histos["mu_miniso"] = TH1D("mu_miniso","mu_miniso",40,-5,5);
-  // histos[""] = TH1D("njet","njet; Jets dN(pico, baby)",6,-3,3));
-  // histos[""] = TH1D("jet_pt","jet_pt; Jets dPt(pico, baby) [GeV]",40,-2,2));
-  // histos[""] = TH1D("jet_eta","jet_eta; Jets deta(pico, baby)",40,-2,2));
+  histos["nvjet"] = TH1D("nvjet","nvjet; Jets dN(pico, baby)",8,-4,4);
+  histos["njet"] = TH1D("njet","njet; Jets dN(pico, baby)",8,-4,4);
+  histos["jet_pt"] = TH1D("jet_pt","jet_pt; Jets dPt(pico, baby) [GeV]",100,-1,1);
+  histos["jet_eta"] = TH1D("jet_eta","jet_eta; Jets deta(pico, baby)",40,-2,2);
+  histos["p_isele"] = TH1D("","",2,0,2);
+  histos["b_isele"] = TH1D("","",2,0,2);
+  histos["p_ismu"] = TH1D("","",2,0,2);
+  histos["b_ismu"] = TH1D("","",2,0,2);
 
   size_t nentries(nent_test>0 ? nent_test : pico.GetEntries());
   for(size_t entry(0); entry<nentries; ++entry){
@@ -47,22 +50,34 @@ int main(int argc, char *argv[]){
     baby.GetEntry(entry);
 
     histos["nel"].Fill(pico.nel()-baby.nels());
-
     histos["nmu"].Fill(pico.nmu()-baby.nmus());
-    size_t mu_pt_size = pico.mu_pt().size() < baby.mus_pt().size() ? pico.mu_pt().size() : baby.mus_pt().size(); 
-    for (size_t imu(0); imu<mu_pt_size; imu++) {
-      histos["mu_reliso"].Fill(pico.mu_reliso()[imu]*pico.mu_pt()[imu]-baby.mus_miniso()[imu]*baby.mus_pt()[imu]);
-      histos["mu_miniso"].Fill(pico.mu_miniso()[imu]-baby.mus_miniso()[imu]);
-    }
 
-    // size_t jet_pt_size = pico.jet_pt().size() < baby.jets_pt().size() ? pico.jet_pt().size() : baby.jets_pt().size(); 
-    // for (size_t ijet(0); ijet<jet_pt_size; ijet++) {
-    //   histos[4].Fill(pico.njet()-baby.njets());
-    //   histos[5].Fill(pico.jet_pt()[ijet]-baby.jets_pt()[ijet]);
-    //   histos[6].Fill(pico.jet_eta()[ijet]-baby.jets_eta()[ijet]);
-    // }
+    bool isele = (pico.nel()-baby.nels())==0 && pico.nmu()==0 && baby.nmus()==0;
+    bool ismu = (pico.nmu()-baby.nmus())==0 && pico.nel()==0 && baby.nels()==0;
+    
+    histos["njet"].Fill(pico.njet()-baby.njets());
+    histos["nvjet"].Fill(pico.jet_pt().size()-baby.jets_pt().size());
+    size_t jet_pt_size = pico.jet_pt().size() < baby.jets_pt().size() ? pico.jet_pt().size() : baby.jets_pt().size(); 
+    for (size_t ijet(0); ijet<jet_pt_size; ijet++) {
+      histos["jet_pt"].Fill(pico.jet_pt()[ijet]-baby.jets_pt()[ijet]);
+      histos["jet_eta"].Fill(pico.jet_eta()[ijet]-baby.jets_eta()[ijet]);
+      if (isele) {
+        histos["p_isele"].Fill(pico.jet_islep()[ijet]);
+        histos["b_isele"].Fill(baby.jets_islep()[ijet]);
+      } else if (ismu) {
+        histos["p_ismu"].Fill(pico.jet_islep()[ijet]);
+        histos["b_ismu"].Fill(baby.jets_islep()[ijet]);
+      }
+    }
   }
 
+  cout<<"Difference in number of signal electrons (total = "<<histos["nel"].GetEntries()<<")"
+      <<histos["nel"].GetMean()<<"+-"<<histos["nel"].GetRMS()<<endl;
+  cout<<"Mean+-rms of the nvjet disctribution is "<<histos["nvjet"].GetMean()<<"+-"<<histos["nvjet"].GetRMS()<<endl<<endl;
+  cout<<"Pico isele jets -> "<<histos["p_isele"].GetMean()<<"+-"<<histos["p_isele"].GetRMS()<<endl;
+  cout<<"Baby isele jets -> "<<histos["b_isele"].GetMean()<<"+-"<<histos["b_isele"].GetRMS()<<endl<<endl;
+  cout<<"Pico ismu jets -> "<<histos["p_ismu"].GetMean()<<"+-"<<histos["p_ismu"].GetRMS()<<endl;
+  cout<<"Baby ismu jets -> "<<histos["b_ismu"].GetMean()<<"+-"<<histos["b_ismu"].GetRMS()<<endl;
   TFile fhist("histos.root","recreate");
   for (auto &h: histos) h.second.Write();
   fhist.Close();

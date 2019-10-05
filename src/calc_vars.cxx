@@ -104,15 +104,16 @@ int main(int argc, char *argv[]){
     // with signal lepton, thus jets must be processed only after leptons have been selected.
     mc_producer.WriteGenParticles(nano, pico);
 
-    vector<int> sig_el_nano_idx = el_producer.WriteElectrons(nano, pico);
-    vector<int> sig_mu_nano_idx = mu_producer.WriteMuons(nano, pico);
+    vector<int> jet_islep_nano_idx = vector<int>();
+    vector<int> sig_el_nano_idx = el_producer.WriteElectrons(nano, pico, jet_islep_nano_idx);
+    vector<int> sig_mu_nano_idx = mu_producer.WriteMuons(nano, pico, jet_islep_nano_idx);
     dilep_producer.WriteDielectrons(nano, pico, sig_el_nano_idx);
     dilep_producer.WriteDimuons(nano, pico, sig_mu_nano_idx);
 
     vector<int> sig_tk_nano_idx = tk_producer.WriteIsoTracks(nano, pico);
     ph_producer.WritePhotons(nano, pico);
 
-    jet_producer.WriteJets(nano, pico, sig_el_nano_idx, sig_mu_nano_idx);
+    jet_producer.WriteJets(nano, pico, jet_islep_nano_idx);
     fjet_producer.WriteFatJets(nano, pico);
 
     hig_producer.WriteHigVars();
