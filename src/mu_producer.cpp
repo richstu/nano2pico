@@ -31,7 +31,7 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
     pico.out_mu_miniso().push_back(nano.Muon_miniPFRelIso_all()[imu]);
     pico.out_mu_reliso().push_back(nano.Muon_pfRelIso03_all()[imu]);
     pico.out_mu_dz().push_back(nano.Muon_dz()[imu]);
-    pico.out_mu_d0().push_back(nano.Muon_dxy()[imu]);
+    pico.out_mu_dxy().push_back(nano.Muon_dxy()[imu]);
     pico.out_mu_ip3d().push_back(nano.Muon_ip3d()[imu]);
     pico.out_mu_sig().push_back(isSig);
     pico.out_mu_charge().push_back(nano.Muon_charge()[imu]);

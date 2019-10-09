@@ -11,16 +11,14 @@ public:
   explicit IsoTrackProducer(int year);
   ~IsoTrackProducer();
 
-  const float IsoTrackEtaCut  = 2.5;
-  const float IsoTrackDzCut  = 0.1;
-  const float IsoTrackMtCut  = 0.1;
-  //dependent on track type
-  const float LeptonIsoTrackPtCut  = 10.0;
-  const float HadronIsoTrackPtCut    = 5.0;
-  const float LeptonIsoTrackRelIsoCut  = 0.2;
-  const float HadronIsoTrackRelIsoCut    = 0.1;
+  // track cuts a bit involved so see directly IsGoodTk for readability
 
-  std::vector<int> WriteIsoTracks(nano_tree &nano, pico_tree &pico);
+  void WriteIsoTracks(nano_tree &nano, pico_tree &pico, 
+                      std::vector<int> &sig_el_nano_idx,
+                      std::vector<int> &sig_mu_nano_idx);
+
+  bool IsGoodTk(pico_tree &pico, int pdgid, float pt, float eta, float phi, 
+                float miniso, float reliso, float d0, float dz, float mt);
 
 private:
   int year;

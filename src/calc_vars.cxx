@@ -110,7 +110,7 @@ int main(int argc, char *argv[]){
     dilep_producer.WriteDielectrons(nano, pico, sig_el_nano_idx);
     dilep_producer.WriteDimuons(nano, pico, sig_mu_nano_idx);
 
-    vector<int> sig_tk_nano_idx = tk_producer.WriteIsoTracks(nano, pico);
+    tk_producer.WriteIsoTracks(nano, pico, sig_el_nano_idx, sig_mu_nano_idx);
     ph_producer.WritePhotons(nano, pico);
 
     jet_producer.WriteJets(nano, pico, jet_islep_nano_idx);

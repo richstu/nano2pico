@@ -42,7 +42,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
     pico.out_el_miniso().push_back(nano.Electron_miniPFRelIso_all()[iel]);
     pico.out_el_reliso().push_back(nano.Electron_pfRelIso03_all()[iel]);
     pico.out_el_dz().push_back(nano.Electron_dz()[iel]);
-    pico.out_el_d0().push_back(nano.Electron_dxy()[iel]);
+    pico.out_el_dxy().push_back(nano.Electron_dxy()[iel]);
     pico.out_el_ip3d().push_back(nano.Electron_ip3d()[iel]);
     pico.out_el_sig().push_back(isSignal);
     pico.out_el_ispf().push_back(nano.Electron_isPFcand()[iel]);

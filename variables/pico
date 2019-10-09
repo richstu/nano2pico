@@ -81,7 +81,7 @@ vector<float> mu_phi
 vector<float> mu_miniso
 vector<float> mu_reliso
 vector<float> mu_dz
-vector<float> mu_d0
+vector<float> mu_dxy
 vector<float> mu_ip3d
 vector<bool> mu_sig
 vector<bool> mu_tm
@@ -95,7 +95,7 @@ vector<float> el_phi
 vector<float> el_miniso
 vector<float> el_reliso
 vector<float> el_dz
-vector<float> el_d0
+vector<float> el_dxy
 vector<float> el_ip3d
 vector<bool> el_sig
 vector<bool> el_ispf
@@ -128,7 +128,7 @@ int ntk
 vector<float> tk_pt
 vector<float> tk_eta
 vector<float> tk_phi
-vector<float> tk_d0
+vector<float> tk_dxy
 vector<float> tk_dz
 vector<int> tk_pdgid
 vector<float> tk_miniso_chg
