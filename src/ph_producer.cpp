@@ -18,7 +18,7 @@ void PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico){
       if (!nano.Photon_electronVeto()[iph]) continue;
       if (nano.Photon_pt()[iph] <= PhotonPtCut) continue;
       if (fabs(nano.Photon_eta()[iph]) > PhotonEtaCut) continue;
-      if (1.4442 <= fabs(nano.Photon_eta()[iph]) <= 1.566) continue; // exclude gap
+      if ((1.4442 <= fabs(nano.Photon_eta()[iph])) && (fabs(nano.Photon_eta()[iph]) <= 1.566)) continue; // exclude gap
       // if (nano.Photon_pfRelIso03_all()[iph]==PhotonRelIsoCut) continue; // no isolation cut in 2016...
 
       pico.out_ph_pt().push_back(nano.Photon_pt()[iph]);

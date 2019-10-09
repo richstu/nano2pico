@@ -1,6 +1,7 @@
 #include "tk_producer.hpp"
 
 #include "utilities.hpp"
+#include <algorithm>
 
 using namespace std;
 
