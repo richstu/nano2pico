@@ -35,6 +35,8 @@ int main(int argc, char *argv[]){
   map<string, TH1D> histos;
   histos["nel"] = TH1D("nel","nel; dx(pico, baby)",6,-3,3);
   histos["nmu"] = TH1D("nmu","nmu",6,-3,3);
+  histos["b_tk_id"] = TH1D("b_tk_id","b_tk_id",220,0,220);
+  histos["p_tk_id"] = TH1D("p_tk_id","p_tk_id",220,0,220);
   histos["nvjet"] = TH1D("nvjet","nvjet; Jets dN(pico, baby)",8,-4,4);
   histos["njet"] = TH1D("njet","njet; Jets dN(pico, baby)",8,-4,4);
   histos["jet_pt"] = TH1D("jet_pt","jet_pt; Jets dPt(pico, baby) [GeV]",100,-1,1);
@@ -51,6 +53,13 @@ int main(int argc, char *argv[]){
 
     histos["nel"].Fill(pico.nel()-baby.nels());
     histos["nmu"].Fill(pico.nmu()-baby.nmus());
+
+
+    for (int itk(0); itk<pico.ntk(); itk++)
+      histos["p_tk_id"].Fill(abs(pico.tk_pdgid()[itk]));
+    
+    for (int itk(0); itk<baby.ntks(); itk++)
+      histos["b_tk_id"].Fill(abs(baby.tks_pdg()[itk]));
 
     bool isele = (pico.nel()-baby.nels())==0 && pico.nmu()==0 && baby.nmus()==0;
     bool ismu = (pico.nmu()-baby.nmus())==0 && pico.nel()==0 && baby.nels()==0;
@@ -71,13 +80,15 @@ int main(int argc, char *argv[]){
     }
   }
 
-  cout<<"Difference in number of signal electrons (total = "<<histos["nel"].GetEntries()<<")"
+  cout<<"Difference in number of signal electrons (total = "<<histos["nel"].GetEntries()<<")   "
       <<histos["nel"].GetMean()<<"+-"<<histos["nel"].GetRMS()<<endl;
+
   cout<<"Mean+-rms of the nvjet disctribution is "<<histos["nvjet"].GetMean()<<"+-"<<histos["nvjet"].GetRMS()<<endl<<endl;
   cout<<"Pico isele jets -> "<<histos["p_isele"].GetMean()<<"+-"<<histos["p_isele"].GetRMS()<<endl;
   cout<<"Baby isele jets -> "<<histos["b_isele"].GetMean()<<"+-"<<histos["b_isele"].GetRMS()<<endl<<endl;
   cout<<"Pico ismu jets -> "<<histos["p_ismu"].GetMean()<<"+-"<<histos["p_ismu"].GetRMS()<<endl;
   cout<<"Baby ismu jets -> "<<histos["b_ismu"].GetMean()<<"+-"<<histos["b_ismu"].GetRMS()<<endl;
+
   TFile fhist("histos.root","recreate");
   for (auto &h: histos) h.second.Write();
   fhist.Close();

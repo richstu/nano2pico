@@ -31,11 +31,13 @@ namespace {
   string nano_file = "";
   string wgt_sums_file = "";
   string pico_file = "";
-  bool isFastSim = false;
+  bool isData = false;
+  bool isFastsim = false;
   int year = 2016;
   int nent_test = -1;
 }
 
+void WriteDataQualityFilters(nano_tree& nano, pico_tree& pico);
 void CopyTriggerDecisions(nano_tree& nano, pico_tree& pico);
 
 void GetOptions(int argc, char *argv[]);
@@ -57,7 +59,7 @@ int main(int argc, char *argv[]){
   size_t nentries(nent_test>0 ? nent_test : nano.GetEntries());
   cout << "Nano file: " << nano_file << endl;
   cout << "Input number of events: " << nentries << endl;
-  // cout << "Running on "<< (isFastSim ? "FastSim" : "FullSim") << endl;
+  // cout << "Running on "<< (isFastsim ? "FastSim" : "FullSim") << endl;
   // cout << "Calculating weights based on " << year << " scale factors." << endl;
 
   pico_tree pico("", pico_file);
@@ -82,7 +84,7 @@ int main(int argc, char *argv[]){
   FatJetProducer fjet_producer(year);
   HigVarProducer hig_producer(year);
 
-  BTagWeighter btw(isFastSim, year);
+  BTagWeighter btw(isFastsim, year);
   LeptonWeighter lw(year);
   const string ctr = "central";
   const string vup = "up";
@@ -118,6 +120,10 @@ int main(int argc, char *argv[]){
 
     hig_producer.WriteHigVars();
 
+    // N.B. Jets: pico.out_pass_jets() and pico.out_pass_fsjets() filled in jet_producer
+    // so this should be called after writeJets to allow computing overall pass variable
+    WriteDataQualityFilters(nano, pico);
+
     CopyTriggerDecisions(nano, pico);
 
     pico.Fill();
@@ -132,6 +138,43 @@ int main(int argc, char *argv[]){
   cout<<"Time passed: "<<hoursMinSec(difftime(endtime, begtime))<<endl<<endl;  
 }
 
+void WriteDataQualityFilters(nano_tree& nano, pico_tree& pico){
+
+  pico.out_pass_hbhe() = nano.Flag_HBHENoiseFilter();
+  pico.out_pass_hbheiso() = nano.Flag_HBHENoiseIsoFilter();
+  pico.out_pass_goodv() = nano.Flag_goodVertices();
+  pico.out_pass_cschalo_tight() = nano.Flag_globalSuperTightHalo2016Filter();
+  pico.out_pass_eebadsc() = nano.Flag_eeBadScFilter();
+  pico.out_pass_ecaldeadcell() = nano.Flag_EcalDeadCellTriggerPrimitiveFilter();
+  if (year==2016) {
+    pico.out_pass_badcalib() = true;
+    pico.out_pass_badpfmu() = nano.Flag_BadPFMuonSummer16Filter();
+    pico.out_pass_badchhad() = nano.Flag_BadChargedCandidateSummer16Filter();
+  } else {
+    pico.out_pass_badcalib() = nano.Flag_ecalBadCalibFilterV2();
+    pico.out_pass_badpfmu() = nano.Flag_BadPFMuonFilter();
+    pico.out_pass_badchhad() = nano.Flag_BadChargedCandidateFilter();
+  }
+  pico.out_pass_mubadtrk() = nano.Flag_muonBadTrackFilter();
+
+  // Combined pass variable
+  pico.out_pass() = pico.out_pass_ra2_badmu() && pico.out_pass_badpfmu() && 
+                    pico.out_met()/pico.out_met_calo()<5 &&
+                    pico.out_pass_goodv() &&
+                    pico.out_pass_hbhe() && pico.out_pass_hbheiso() && 
+                    pico.out_pass_ecaldeadcell() && pico.out_pass_badcalib();
+
+  if (isFastsim) {
+    pico.out_pass() = pico.out_pass() && pico.out_pass_fsjets();
+  } else {
+    pico.out_pass() = pico.out_pass() && pico.out_pass_jets() && pico.out_pass_cschalo_tight();
+    if (isData) 
+      pico.out_pass() = pico.out_pass() && pico.out_pass_eebadsc();
+  }
+  
+  return;
+}
+
 void CopyTriggerDecisions(nano_tree& nano, pico_tree& pico){
   pico.out_HLT_IsoMu24() = nano.HLT_IsoMu24();
   pico.out_HLT_IsoMu27() = nano.HLT_IsoMu27();
@@ -139,14 +182,6 @@ void CopyTriggerDecisions(nano_tree& nano, pico_tree& pico){
   pico.out_HLT_Ele27_WPTight_Gsf() = nano.HLT_Ele27_WPTight_Gsf();
   pico.out_HLT_Ele35_WPTight_Gsf() = nano.HLT_Ele35_WPTight_Gsf();
   pico.out_HLT_Ele115_CaloIdVT_GsfTrkIdT() = nano.HLT_Ele115_CaloIdVT_GsfTrkIdT();
-
-  // Lepton HT cross-triggers
-  pico.out_HLT_Mu15_IsoVVVL_PFHT450() = nano.HLT_Mu15_IsoVVVL_PFHT450();
-  pico.out_HLT_Mu15_IsoVVVL_PFHT600() = nano.HLT_Mu15_IsoVVVL_PFHT600();
-  pico.out_HLT_Mu50_IsoVVVL_PFHT450() = nano.HLT_Mu50_IsoVVVL_PFHT450();
-  pico.out_HLT_Ele15_IsoVVVL_PFHT450() = nano.HLT_Ele15_IsoVVVL_PFHT450();
-  pico.out_HLT_Ele15_IsoVVVL_PFHT600() = nano.HLT_Ele15_IsoVVVL_PFHT600();
-  pico.out_HLT_Ele50_IsoVVVL_PFHT450() = nano.HLT_Ele50_IsoVVVL_PFHT450();
 
   // MET triggers
   pico.out_HLT_PFMET110_PFMHT110_IDTight() = nano.HLT_PFMET110_PFMHT110_IDTight();
@@ -175,7 +210,8 @@ void GetOptions(int argc, char *argv[]){
       {"wgt_sums_file", required_argument, 0, 'w'}, 
       {"pico_file", required_argument, 0, 'p'},
       {"year", required_argument, 0, 'y'},  
-      {"fastsim", no_argument, 0, 0},       
+      {"isFastsim", no_argument, 0, 0},       
+      {"isData", no_argument, 0, 0},       
       {0, 0, 0, 0}
     };
 
@@ -200,8 +236,10 @@ void GetOptions(int argc, char *argv[]){
       break;
     case 0:
       optname = long_options[option_index].name;
-      if(optname == "fastsim"){
-        isFastSim = true;
+      if(optname == "isFastsim"){
+        isFastsim = true;
+      } if(optname == "isData"){
+        isData = true;
       } else if(optname == "nent"){
         nent_test = atoi(optarg);
       }else{
