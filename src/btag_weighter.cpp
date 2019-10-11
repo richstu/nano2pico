@@ -16,33 +16,41 @@ namespace{
   }
 }
 
-BTagWeighter::BTagWeighter(bool is_fast_sim, int year): is_fast_sim_(is_fast_sim){
+BTagWeighter::BTagWeighter(int year_, bool isFastsim_, bool doDeepFlav_, const vector<float> &btag_wpts): 
+  year(year_),
+  isFastsim(isFastsim_),
+  doDeepFlav(doDeepFlav_),
+  wp_loose(btag_wpts[0]),
+  wp_medium(btag_wpts[0]),
+  wp_tight(btag_wpts[0]){
 
   // setup SFs and WPs depending on the year
   btag_efficiencies_deep_ = vector<TH3D>(); btag_efficiencies_deep_.resize(op_pts_.size());
   TString beff_file = "";
   if (year==2016) {
-    calib_deep_full_ = unique_ptr<BTagCalibration>(new BTagCalibration("csvv2_deep", "data/DeepCSV_2016LegacySF_WP_V1.csv"));
-    calib_deep_fast_ = unique_ptr<BTagCalibration>(new BTagCalibration("csvv2_deep", "data/deepcsv_13TEV_16SL_18_3_2019.csv"));
-    deep_csv_loose_ = 0.2219;
-    deep_csv_medium_ = 0.6324;
-    deep_csv_tight_ = 0.8958;
-    beff_file = "data/btagEfficiency_deep_2016.root";
-  } else if (year==2017) {
-    calib_deep_full_ = unique_ptr<BTagCalibration>(new BTagCalibration("csvv2_deep", "data/DeepCSV_94XSF_WP_V4_B_F.csv"));
-    calib_deep_fast_ = unique_ptr<BTagCalibration>(new BTagCalibration("csvv2_deep", "data/deepcsv_13TEV_17SL_18_3_2019.csv"));
-    deep_csv_loose_ = 0.1522;
-    deep_csv_medium_ = 0.4941;
-    deep_csv_tight_ = 0.8001;
-    beff_file = "data/btagEfficiency_deep_2017.root";
+    if (doDeepFlav) {
+      cout<<"DeepFlavour calibration requires measuring the Deep Flavour b-tagging efficiency first!"<<endl;
+    } else {
+      calib_deep_full_ = unique_ptr<BTagCalibration>(new BTagCalibration("csvv2_deep", "data/DeepCSV_2016LegacySF_WP_V1.csv"));
+      calib_deep_fast_ = unique_ptr<BTagCalibration>(new BTagCalibration("csvv2_deep", "data/deepcsv_13TEV_16SL_18_3_2019.csv"));
+      beff_file = "data/btagEfficiency_deep_2016.root";
+    }
+  } else if (year==2017) {  
+    if (doDeepFlav) {
+      cout<<"DeepFlavour calibration requires measuring the Deep Flavour b-tagging efficiency first!"<<endl;
+    } else {
+      calib_deep_full_ = unique_ptr<BTagCalibration>(new BTagCalibration("csvv2_deep", "data/DeepCSV_94XSF_WP_V4_B_F.csv"));
+      calib_deep_fast_ = unique_ptr<BTagCalibration>(new BTagCalibration("csvv2_deep", "data/deepcsv_13TEV_17SL_18_3_2019.csv"));
+      beff_file = "data/btagEfficiency_deep_2017.root";
+    }
   } else {
-    calib_deep_full_ = unique_ptr<BTagCalibration>(new BTagCalibration("csvv2_deep", "data/DeepCSV_102XSF_WP_V1.csv")); 
-    calib_deep_fast_ = unique_ptr<BTagCalibration>(new BTagCalibration("csvv2_deep", "data/deepcsv_13TEV_18SL_7_5_2019.csv"));
-    cout<<"WARNING: Using on 2017 fastsim with 2017 WP and 2018 SF! Next step, change either to 2018 FastSim or use 2017 FS with 2018 WP and then update to the other SF file!"<<endl;
-    deep_csv_loose_ = 0.1241;
-    deep_csv_medium_ = 0.4184;
-    deep_csv_tight_ = 0.7527;
-    beff_file = "data/btagEfficiency_deep_2018.root";
+    if (doDeepFlav) {
+      cout<<"DeepFlavour calibration requires measuring the Deep Flavour b-tagging efficiency first!"<<endl;
+    } else {
+      calib_deep_full_ = unique_ptr<BTagCalibration>(new BTagCalibration("csvv2_deep", "data/DeepCSV_102XSF_WP_V1.csv")); 
+      calib_deep_fast_ = unique_ptr<BTagCalibration>(new BTagCalibration("csvv2_deep", "data/deepcsv_13TEV_18SL_7_5_2019.csv"));
+      beff_file = "data/btagEfficiency_deep_2018.root";
+    }
   }
 
   TFile file_deep(beff_file, "read");
@@ -178,9 +186,9 @@ double BTagWeighter::JetBTagWeight(pico_tree &pico, size_t ijet, const vector<BT
 
   vector<float> opcuts;
   for (auto &iop: ops) {
-    if (iop==BTagEntry::OP_LOOSE) opcuts.push_back(deep_csv_loose_);
-    else if (iop==BTagEntry::OP_MEDIUM) opcuts.push_back(deep_csv_medium_); 
-    else if (iop==BTagEntry::OP_TIGHT) opcuts.push_back(deep_csv_tight_);
+    if (iop==BTagEntry::OP_LOOSE) opcuts.push_back(wp_loose);
+    else if (iop==BTagEntry::OP_MEDIUM) opcuts.push_back(wp_medium); 
+    else if (iop==BTagEntry::OP_TIGHT) opcuts.push_back(wp_tight);
   }
 
   float csv = pico.out_jet_deepcsv().at(ijet);
@@ -200,13 +208,13 @@ double BTagWeighter::JetBTagWeight(pico_tree &pico, size_t ijet, const vector<BT
     BTagEntry::OperatingPoint iop = ops[tag];
     eff1 = GetMCTagEfficiency(hadronFlavour, jet_pt, jet_eta, iop);
     sf1 = ireaders_full->at(iop)->eval_auto_bounds(full_syst, flav, jet_eta, jet_pt);
-    if (is_fast_sim_) sf1_fs = ireaders_fast->at(iop)->eval_auto_bounds(fast_syst, flav, jet_eta, jet_pt);
+    if (isFastsim) sf1_fs = ireaders_fast->at(iop)->eval_auto_bounds(fast_syst, flav, jet_eta, jet_pt);
   }
   if (tag < int(ops.size())-1) {
     BTagEntry::OperatingPoint iop = ops[tag+1];
     eff2 = GetMCTagEfficiency(hadronFlavour, jet_pt, jet_eta, iop);
     sf2 = ireaders_full->at(iop)->eval_auto_bounds(full_syst, flav, jet_eta, jet_pt);
-    if (is_fast_sim_) sf2_fs = ireaders_fast->at(iop)->eval_auto_bounds(fast_syst, flav, jet_eta, jet_pt);
+    if (isFastsim) sf2_fs = ireaders_fast->at(iop)->eval_auto_bounds(fast_syst, flav, jet_eta, jet_pt);
   }
 
   double eff1_fs(eff1/sf1_fs), eff2_fs(eff2/sf2_fs);

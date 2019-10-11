@@ -32,6 +32,10 @@ int nbl
 int nbm
 int nbt
 
+int nbdfl
+int nbdfm
+int nbdft
+
 vector<float> jet_pt
 vector<float> jet_eta
 vector<float> jet_phi
@@ -135,7 +139,7 @@ vector<int> tk_pdgid
 vector<float> tk_miniso_chg
 vector<float> tk_reliso_chg
 vector<float> tk_mt
-vector<bool> tk_tm
+
 
 ###################   Quality   ##################
 bool pass_jets

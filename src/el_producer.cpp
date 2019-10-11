@@ -47,9 +47,8 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
     pico.out_el_sig().push_back(isSignal);
     pico.out_el_ispf().push_back(nano.Electron_isPFcand()[iel]);
     pico.out_el_charge().push_back(nano.Electron_charge()[iel]);
-
-    //to be filled in mc_producer
-    pico.out_el_tm().push_back(false);
+    
+    pico.out_el_tm().push_back(nano.Electron_genPartIdx()[iel]!=-1);
     
     pico.out_nvel()++;
     if (isSignal) {

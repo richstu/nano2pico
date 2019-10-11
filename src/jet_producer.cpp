@@ -12,8 +12,11 @@ JetProducer::JetProducer(int year_){
 JetProducer::~JetProducer(){
 }
 
-void JetProducer::WriteJets(nano_tree &nano, pico_tree &pico, vector<int> jet_islep_nano_idx){
+void JetProducer::WriteJets(nano_tree &nano, pico_tree &pico, vector<int> jet_islep_nano_idx,
+                            const vector<float> &btag_wpts, const vector<float> &btag_df_wpts){
   pico.out_njet() = 0; 
+  pico.out_nbl() = 0; pico.out_nbm() = 0; pico.out_nbt() = 0; 
+  pico.out_nbdfl() = 0; pico.out_nbdfm() = 0; pico.out_nbdft() = 0; 
   pico.out_pass_jets() = true;
   pico.out_pass_fsjets() = true;
   for(int ijet(0); ijet<nano.nJet(); ++ijet){
@@ -48,7 +51,16 @@ void JetProducer::WriteJets(nano_tree &nano, pico_tree &pico, vector<int> jet_is
     pico.out_jet_h1d().push_back(false);
     pico.out_jet_h2d().push_back(false);
 
-    if (!islep) pico.out_njet()++;
+    if (!islep) {
+      pico.out_njet()++;
+      if (nano.Jet_btagDeepB()[ijet] > btag_wpts[0]) pico.out_nbl()++; 
+      if (nano.Jet_btagDeepB()[ijet] > btag_wpts[1]) pico.out_nbm()++; 
+      if (nano.Jet_btagDeepB()[ijet] > btag_wpts[2]) pico.out_nbt()++;
+      if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[0]) pico.out_nbdfl()++; 
+      if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[1]) pico.out_nbdfm()++; 
+      if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[2]) pico.out_nbdft()++; 
+
+    }
   }
   return;
 }

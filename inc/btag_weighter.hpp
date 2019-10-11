@@ -13,7 +13,7 @@
 class BTagWeighter{
 public:
 
-  explicit BTagWeighter(bool is_fast_sim = false, int year = 2016);
+  BTagWeighter(int year_, bool isFastsim_, bool doDeepFlav_, const std::vector<float> &btag_wpts);
 
   double EventWeight(pico_tree &pico, BTagEntry::OperatingPoint op,
 		     const std::string &bc_full_syst, const std::string &udsg_full_syst,
@@ -55,9 +55,10 @@ private:
   std::map<BTagEntry::OperatingPoint, std::unique_ptr<BTagCalibrationReader> > readers_deep_fast_;
   std::vector<TH3D> btag_efficiencies_deep_;
 
-  double deep_csv_loose_, deep_csv_medium_, deep_csv_tight_;
-
-  bool is_fast_sim_;
+  const int year;
+  bool isFastsim;
+  bool doDeepFlav;
+  const float wp_loose, wp_medium, wp_tight;
 };
 
 #endif

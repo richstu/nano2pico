@@ -84,10 +84,7 @@ bool IsoTrackProducer::IsGoodTk(pico_tree &pico, int pdgid, float pt, float eta,
   pico.out_tk_reliso_chg().push_back(reliso_chg);
   pico.out_tk_dxy().push_back(dxy);
   pico.out_tk_dz().push_back(dz);
-  pico.out_tk_mt().push_back(mt);
-
-  // filled by mc_producer
-  pico.out_tk_tm().push_back(false);    
+  pico.out_tk_mt().push_back(mt); 
 
   pico.out_ntk()++;
   return true;

@@ -73,6 +73,18 @@ int main(int argc, char *argv[]){
   corr.out_tot_weight_l1() = 0.;
   corr.out_nent() = nentries;
 
+  // B-tag working points
+  map<int, vector<float>> btag_wpts{
+    {2016, vector<float>({0.2217, 0.6321, 0.8953})},
+    {2017, vector<float>({0.1522, 0.4941, 0.8001})},
+    {2018, vector<float>({0.1241, 0.4184, 0.7527})}
+  };
+  map<int, vector<float>> btag_df_wpts{
+    {2016, vector<float>({0.0614, 0.3093, 0.7221})},
+    {2017, vector<float>({0.0521, 0.3033, 0.7489})},
+    {2018, vector<float>({0.0494, 0.2770, 0.7264})}
+  };
+
   //Initialize object producers
   GenParticleProducer mc_producer(year);
   ElectronProducer el_producer(year);
@@ -84,8 +96,9 @@ int main(int argc, char *argv[]){
   FatJetProducer fjet_producer(year);
   HigVarProducer hig_producer(year);
 
-  BTagWeighter btw(isFastsim, year);
-  LeptonWeighter lw(year);
+  BTagWeighter btag_weighter(year, isFastsim, false, btag_wpts[year]);
+  // BTagWeighter btag_df_weighter(year, isFastsim, true, btag_df_wpts[year]);
+  LeptonWeighter lep_weighter(year);
   const string ctr = "central";
   const string vup = "up";
   const string vdown = "down";
@@ -102,6 +115,8 @@ int main(int argc, char *argv[]){
     // if (nano.event()!=534935544) continue;
 
     pico.out_event() = nano.event();
+    pico.out_lumiblock() = nano.luminosityBlock();
+    pico.out_run() = nano.run();
     // N.B. Order in which producers are called matters! E.g. jets are not counted if overlapping 
     // with signal lepton, thus jets must be processed only after leptons have been selected.
     mc_producer.WriteGenParticles(nano, pico);
@@ -109,13 +124,15 @@ int main(int argc, char *argv[]){
     vector<int> jet_islep_nano_idx = vector<int>();
     vector<int> sig_el_nano_idx = el_producer.WriteElectrons(nano, pico, jet_islep_nano_idx);
     vector<int> sig_mu_nano_idx = mu_producer.WriteMuons(nano, pico, jet_islep_nano_idx);
+    pico.out_nlep() = sig_el_nano_idx.size() + sig_mu_nano_idx.size();
+
     dilep_producer.WriteDielectrons(nano, pico, sig_el_nano_idx);
     dilep_producer.WriteDimuons(nano, pico, sig_mu_nano_idx);
 
     tk_producer.WriteIsoTracks(nano, pico, sig_el_nano_idx, sig_mu_nano_idx);
     ph_producer.WritePhotons(nano, pico);
 
-    jet_producer.WriteJets(nano, pico, jet_islep_nano_idx);
+    jet_producer.WriteJets(nano, pico, jet_islep_nano_idx, btag_wpts[year], btag_df_wpts[year]);
     fjet_producer.WriteFatJets(nano, pico);
 
     hig_producer.WriteHigVars();
