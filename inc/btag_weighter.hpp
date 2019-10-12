@@ -16,32 +16,32 @@ public:
   BTagWeighter(int year_, bool isFastsim_, bool doDeepFlav_, const std::vector<float> &btag_wpts);
 
   double EventWeight(pico_tree &pico, BTagEntry::OperatingPoint op,
-		     const std::string &bc_full_syst, const std::string &udsg_full_syst,
-		     const std::string &bc_fast_syst, const std::string &udsg_fast_syst) const;
+                     const std::string &bc_full_syst, const std::string &udsg_full_syst,
+                     const std::string &bc_fast_syst, const std::string &udsg_fast_syst) const;
 
   double EventWeight(pico_tree &pico, BTagEntry::OperatingPoint op,
-		     const std::string &bc_full_syst, const std::string &udsg_full_syst) const;
+                     const std::string &bc_full_syst, const std::string &udsg_full_syst) const;
 
   double EventWeight(pico_tree &pico, const std::vector<BTagEntry::OperatingPoint> &ops,
-		     const std::string &bc_full_syst, const std::string &udsg_full_syst) const;
+                     const std::string &bc_full_syst, const std::string &udsg_full_syst) const;
 
   double EventWeight(pico_tree &pico, const std::vector<BTagEntry::OperatingPoint> &ops,
-		     const std::string &bc_full_syst, const std::string &udsg_full_syst,
-		     const std::string &bc_fast_syst, const std::string &udsg_fast_syst) const;
+                     const std::string &bc_full_syst, const std::string &udsg_full_syst,
+                     const std::string &bc_fast_syst, const std::string &udsg_fast_syst) const;
 
   double JetBTagWeight(pico_tree &pico, std::size_t ijet, BTagEntry::OperatingPoint op,
-		       const std::string &bc_full_syst, const std::string &udsg_full_syst,
-		       const std::string &bc_fast_syst, const std::string &udsg_fast_syst) const;
+                       const std::string &bc_full_syst, const std::string &udsg_full_syst,
+                       const std::string &bc_fast_syst, const std::string &udsg_fast_syst) const;
 
   double JetBTagWeight(pico_tree &pico, std::size_t ijet, BTagEntry::OperatingPoint op,
-		       const std::string &bc_full_syst, const std::string &udsg_full_syst) const;
+                       const std::string &bc_full_syst, const std::string &udsg_full_syst) const;
 
   double JetBTagWeight(pico_tree &pico, std::size_t ijet, const std::vector<BTagEntry::OperatingPoint> &ops,
-		       const std::string &bc_full_syst, const std::string &udsg_full_syst) const;
+                       const std::string &bc_full_syst, const std::string &udsg_full_syst) const;
 
   double JetBTagWeight(pico_tree &pico, std::size_t ijet, const std::vector<BTagEntry::OperatingPoint> &ops,
-		       const std::string &bc_full_syst, const std::string &udsg_full_syst,
-		       const std::string &bc_fast_syst, const std::string &udsg_fast_syst) const;
+                       const std::string &bc_full_syst, const std::string &udsg_full_syst,
+                       const std::string &bc_fast_syst, const std::string &udsg_fast_syst) const;
 
 private:
   double GetMCTagEfficiency(int pdgId, float pT, float eta, BTagEntry::OperatingPoint op) const;
