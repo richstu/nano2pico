@@ -18,7 +18,7 @@ public:
   // child_map[mom_index] = [child_index]
   std::map<int, std::vector<int> > GetChildMap(nano_tree & nano);
   int GetFirstCopyIdx(nano_tree & nano, int imc);
-	// Returns id to mother not being itself.
+  // Returns id to mother not being itself.
   int GetMotherIdx(nano_tree & nano, int imc);
 private:
   int year;

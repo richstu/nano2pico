@@ -12,7 +12,7 @@
 
 namespace backward {
 
-backward::SignalHandling sh;
+  backward::SignalHandling sh;
 
 } // namespace backward
 
@@ -92,37 +92,11 @@ int GenParticleProducer::GetFirstCopyIdx(nano_tree & nano, int imc)
   return imc;
 }
 
-// imc:0 -> -1
-// mc_mom_idx:0 -> -1
 int GenParticleProducer::GetMotherIdx(nano_tree & nano, int imc)
 {
   if (imc == 0) return -1;
   int mc_mom_index = nano.GenPart_genPartIdxMother().at(imc);
   return GetFirstCopyIdx(nano, mc_mom_index);
-
-  ////cout<<"1"<<endl;
-  //if (imc == 0) return -1;
-  ////cout<<"2"<<endl;
-  ////cout<<"imc: "<<imc<<endl;
-  //int mc_mom_index = nano.GenPart_genPartIdxMother().at(imc);
-  ////cout<<"3"<<endl;
-  //if (mc_mom_index == -1) return -1;
-  //int mc_mom_id = nano.GenPart_pdgId().at(mc_mom_index);
-  ////cout<<"4"<<endl;
-  //int mc_grandmom_index = -1;
-  //int mc_grandmom_id = -2;
-  ////cout<<"mon_index: "<<mc_mom_index<<endl;
-  //if (mc_mom_index >= 0) mc_grandmom_index = nano.GenPart_genPartIdxMother().at(mc_mom_index);
-  ////cout<<"grandmon_index: "<<mc_grandmom_index<<endl;
-  //if (mc_grandmom_index >= 0) {
-  //  //cout<<"5"<<endl;
-  //  mc_grandmom_id = nano.GenPart_genPartIdxMother().at(mc_grandmom_index);
-  //}
-  ////cout<<"7"<<endl;
-  //cout<<"imc: "<<imc<<" mc_mom_index: "<<mc_mom_index<<" mc_grandmom_index: "<<mc_grandmom_index<<endl;
-  //if (mc_mom_id == mc_grandmom_id) GetMotherIdx(nano, mc_mom_index);
-  ////cout<<"8"<<endl;
-  //return mc_mom_index;
 }
 
 void GenParticleProducer::WriteGenParticles(nano_tree &nano, pico_tree &pico){
@@ -137,12 +111,12 @@ void GenParticleProducer::WriteGenParticles(nano_tree &nano, pico_tree &pico){
   // Saves if isTauDecayProduct and isFirstCopy
   // e, mu, tau
   vector<int> interested_lepton_ids = {11, 13, 15};
-	int ntrulep = 0;
-	int ntrumu = 0;
-	int ntruel = 0;
-	int ntrutau = 0;
-	int ntrutaul = 0;
-	int ntrutauh = 0;
+  int ntrulep = 0;
+  int ntrumu = 0;
+  int ntruel = 0;
+  int ntrutau = 0;
+  int ntrutaul = 0;
+  int ntrutauh = 0;
 
   // Collect interesting particle indices
   vector<int> interested_mc_indices;
@@ -152,7 +126,7 @@ void GenParticleProducer::WriteGenParticles(nano_tree &nano, pico_tree &pico){
     bool is_interesting = IsInteresting(interested_mc_ids, interested_mc_ids_range, mc_id);
     bool lepton_interesting = IsInteresting(interested_lepton_ids, {}, mc_id);
     bool save_index = false;
-		bool is_tauDecayProduct = false;
+    bool is_tauDecayProduct = false;
     if (is_interesting) {
       // 0: isPrompt, 12: isFirstCopy, 
       if (mc_statusFlags[0]==1 && mc_statusFlags[12]==1) save_index = true;
@@ -162,22 +136,22 @@ void GenParticleProducer::WriteGenParticles(nano_tree &nano, pico_tree &pico){
       if (mc_statusFlags[0]==1 && mc_statusFlags[12]==1) save_index = true;
       // 2: isTauDecayProduct, 12: isFirstCopy, 
       if (mc_statusFlags[2]==1 && mc_statusFlags[12]==1) {
-				save_index = true;
-				is_tauDecayProduct = true;
-			}
+        save_index = true;
+        is_tauDecayProduct = true;
+      }
     }
-		// store information
+    // store information
     if (save_index) {
-			interested_mc_indices.push_back(imc);
-			if (abs(mc_id) == 11 && !is_tauDecayProduct) ntruel++;
-			if (abs(mc_id) == 13 && !is_tauDecayProduct) ntrumu++;
-			if (abs(mc_id) == 11 && is_tauDecayProduct) ntrutaul++;
-			if (abs(mc_id) == 13 && is_tauDecayProduct) ntrutaul++;
+      interested_mc_indices.push_back(imc);
+      if (abs(mc_id) == 11 && !is_tauDecayProduct) ntruel++;
+      if (abs(mc_id) == 13 && !is_tauDecayProduct) ntrumu++;
+      if (abs(mc_id) == 11 && is_tauDecayProduct) ntrutaul++;
+      if (abs(mc_id) == 13 && is_tauDecayProduct) ntrutaul++;
       if (abs(mc_id) == 15) ntrutau++;
-		}
+    }
   }
-	ntrulep = ntrumu + ntruel;
-	ntrutauh = ntrutau - ntrutaul;
+  ntrulep = ntrumu + ntruel;
+  ntrutauh = ntrutau - ntrutaul;
 
   // Find relation between indices
   // mc_index_to_interested_index[imc] = interested_index
@@ -216,11 +190,11 @@ void GenParticleProducer::WriteGenParticles(nano_tree &nano, pico_tree &pico){
     pico.out_mc_mom().push_back(mc_mom);
     pico.out_mc_momidx().push_back(mc_mom_idx);
     pico.out_mc_status().push_back(mc_status);
-		pico.out_ntrulep() = ntrulep;
-		pico.out_ntruel() = ntruel;
-		pico.out_ntrumu() = ntrumu;
-		pico.out_ntrutaul() = ntrutaul;
-		pico.out_ntrutauh() = ntrutauh;
+    pico.out_ntrulep() = ntrulep;
+    pico.out_ntruel() = ntruel;
+    pico.out_ntrumu() = ntrumu;
+    pico.out_ntrutaul() = ntrutaul;
+    pico.out_ntrutauh() = ntrutauh;
   }
 
   return;
