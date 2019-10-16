@@ -5,16 +5,14 @@
 #define BACKWARD_HAS_UNWIND 0
 #define BACKWARD_HAS_BACKTRACE 0
 #define BACKWARD_HAS_DW 0
-#include "backward.h"
+// #include "backward.h"
 #include "utilities.hpp"
 #include <bitset>
 #include <algorithm>
 
-namespace backward {
-
-  backward::SignalHandling sh;
-
-} // namespace backward
+// namespace backward {
+//   backward::SignalHandling sh;
+// } // namespace backward
 
 using namespace std;
 
