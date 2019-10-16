@@ -12,3 +12,9 @@ Step 1. Write out raw pico ntuple, adding `--isFastsim` and `--isData` if applic
         --nano_file /Users/ana/code/sandbox/data/TTJets_TuneCP5_13TeV-madgraphMLM-pythia8_Nano1June2019_102X_upgrade2018_realistic_v19-v1.root \
         --wgt_sums_file out/wgt_sums/wgt_sums_TTJets_TuneCP5_13TeV-madgraphMLM-pythia8_Nano1June2019_102X_upgrade2018_realistic_v19-v1.root \
         --pico_file out/raw_pico/pico_TTJets_TuneCP5_13TeV-madgraphMLM-pythia8_Nano1June2019_102X_upgrade2018_realistic_v19-v1.root
+
+#### Calculating b-tagging efficiencies
+
+Use `parameterize_efficiency.cxx`, giving the directory with all the MC files and the year as arguments. Below is an example run for 2016 MC.
+
+    ./compile.sh && ./run/parameterize_efficiency.exe -i /mnt/hadoop/jbkim/2019_09_30/2016/mc/ -y 2016
