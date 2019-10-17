@@ -29,8 +29,8 @@ BTagWeighter::BTagWeighter(int year_, bool isFastsim_, bool doDeepFlav_, const v
   TString beff_file = "";
   if (year==2016) {
     if (doDeepFlav) {
-      calib_deep_full_ = unique_ptr<BTagCalibration>(new BTagCalibration("csvv2_deep", "data/DeepJet_2016LegacySF_WP_V1.csv"));
-      calib_deep_fast_ = unique_ptr<BTagCalibration>(new BTagCalibration("csvv2_deep", "data/DeepFlav_13TEV_16SL_18_3_2019.csv"));
+      calib_deep_full_ = unique_ptr<BTagCalibration>(new BTagCalibration("deep_flavor", "data/DeepJet_2016LegacySF_WP_V1.csv"));
+      calib_deep_fast_ = unique_ptr<BTagCalibration>(new BTagCalibration("deep_flavor", "data/DeepFlav_13TEV_16SL_18_3_2019.csv"));
       beff_file = "data/btagEfficiency_DeepFlavor_2016.root";
     } else {
       calib_deep_full_ = unique_ptr<BTagCalibration>(new BTagCalibration("csvv2_deep", "data/DeepCSV_2016LegacySF_WP_V1.csv"));
@@ -39,8 +39,8 @@ BTagWeighter::BTagWeighter(int year_, bool isFastsim_, bool doDeepFlav_, const v
     }
   } else if (year==2017) {  
     if (doDeepFlav) {
-      calib_deep_full_ = unique_ptr<BTagCalibration>(new BTagCalibration("csvv2_deep", "data/DeepFlavour_94XSF_WP_V3_B_F.csv"));
-      calib_deep_fast_ = unique_ptr<BTagCalibration>(new BTagCalibration("csvv2_deep", "data/DeepFlav_13TEV_17SL_18_3_2019.csv"));
+      calib_deep_full_ = unique_ptr<BTagCalibration>(new BTagCalibration("deep_flavor", "data/DeepFlavour_94XSF_WP_V3_B_F.csv"));
+      calib_deep_fast_ = unique_ptr<BTagCalibration>(new BTagCalibration("deep_flavor", "data/DeepFlav_13TEV_17SL_18_3_2019.csv"));
       beff_file = "data/btagEfficiency_DeepFlavor_2017.root";
     } else {
       calib_deep_full_ = unique_ptr<BTagCalibration>(new BTagCalibration("csvv2_deep", "data/DeepCSV_94XSF_WP_V4_B_F.csv"));
@@ -49,8 +49,8 @@ BTagWeighter::BTagWeighter(int year_, bool isFastsim_, bool doDeepFlav_, const v
     }
   } else {
     if (doDeepFlav) {
-      calib_deep_full_ = unique_ptr<BTagCalibration>(new BTagCalibration("csvv2_deep", "data/DeepJet_102XSF_WP_V1.csv"));
-      calib_deep_fast_ = unique_ptr<BTagCalibration>(new BTagCalibration("csvv2_deep", "data/DeepFlav_13TEV_18SL_7_5_2019.csv"));
+      calib_deep_full_ = unique_ptr<BTagCalibration>(new BTagCalibration("deep_flavor", "data/DeepJet_102XSF_WP_V1.csv"));
+      calib_deep_fast_ = unique_ptr<BTagCalibration>(new BTagCalibration("deep_flavor", "data/DeepFlav_13TEV_18SL_7_5_2019.csv"));
       beff_file = "data/btagEfficiency_DeepFlavor_2018.root";
     } else {
       calib_deep_full_ = unique_ptr<BTagCalibration>(new BTagCalibration("csvv2_deep", "data/DeepCSV_102XSF_WP_V1.csv")); 
@@ -76,16 +76,25 @@ BTagWeighter::BTagWeighter(int year_, bool isFastsim_, bool doDeepFlav_, const v
     string hist_deep;
     switch(op){
     case BTagEntry::OP_LOOSE:
-      hist_deep = "btagEfficiency_deep_loose";
+      if(doDeepFlav)
+        hist_deep = "btagEfficiency_DeepFlavor_loose";
+      else
+        hist_deep = "btagEfficiency_DeepCSV_loose";
       break;
     case BTagEntry::OP_MEDIUM:
-      hist_deep = "btagEfficiency_deep_medium";
+      if(doDeepFlav)
+        hist_deep = "btagEfficiency_DeepFlavor_medium";
+      else
+        hist_deep = "btagEfficiency_DeepCSV_medium";
       break;
     case BTagEntry::OP_TIGHT:
-      hist_deep = "btagEfficiency_deep_tight";
+      if(doDeepFlav)
+        hist_deep = "btagEfficiency_DeepFlavor_tight";
+      else
+        hist_deep = "btagEfficiency_DeepCSV_tight";
       break;
     case BTagEntry::OP_RESHAPING:
-      hist_deep = "btagEfficiency_deep_reshaping";
+      hist_deep = "btagEfficiency_DeepCSV_reshaping";
       break;
     default:
       hist_deep = "btagEfficiency";
