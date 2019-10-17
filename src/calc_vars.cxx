@@ -17,10 +17,11 @@
 #include "mu_producer.hpp"
 #include "dilep_producer.hpp"
 #include "tk_producer.hpp"
-#include "ph_producer.hpp"
+#include "photon_producer.hpp"
 #include "jet_producer.hpp"
 #include "fjet_producer.hpp"
 #include "hig_producer.hpp"
+#include "zgamma_producer.hpp"
 
 #include "btag_weighter.hpp"
 #include "lepton_weighter.hpp"
@@ -33,6 +34,7 @@ namespace {
   string pico_file = "";
   bool isData = false;
   bool isFastsim = false;
+  bool doSystematics = false;
   int year = 2016;
   int nent_test = -1;
 }
@@ -54,25 +56,6 @@ int main(int argc, char *argv[]){
     exit(0);
   }
 
-  // Initialize trees
-  nano_tree nano(nano_file);
-  size_t nentries(nent_test>0 ? nent_test : nano.GetEntries());
-  cout << "Nano file: " << nano_file << endl;
-  cout << "Input number of events: " << nentries << endl;
-  // cout << "Running on "<< (isFastsim ? "FastSim" : "FullSim") << endl;
-  // cout << "Calculating weights based on " << year << " scale factors." << endl;
-
-  pico_tree pico("", pico_file);
-  cout << "Writing output to: " << pico_file << endl;
-
-  corrections_tree corr("", wgt_sums_file);
-  cout << "Writing sum-of-weights to: " << wgt_sums_file << endl;
-
-  corr.out_nent_zlep() = 0.;
-  corr.out_tot_weight_l0() = 0.;
-  corr.out_tot_weight_l1() = 0.;
-  corr.out_nent() = nentries;
-
   // B-tag working points
   map<int, vector<float>> btag_wpts{
     {2016, vector<float>({0.2217, 0.6321, 0.8953})},
@@ -91,34 +74,58 @@ int main(int argc, char *argv[]){
   MuonProducer mu_producer(year);
   DileptonProducer dilep_producer(year);
   IsoTrackProducer tk_producer(year);
-  PhotonProducer ph_producer(year);
+  PhotonProducer photon_producer(year);
   JetProducer jet_producer(year);
   FatJetProducer fjet_producer(year);
   HigVarProducer hig_producer(year);
+  ZGammaVarProducer zgamma_producer(year);
 
-  BTagWeighter btag_weighter(year, isFastsim, false, btag_wpts[year]);
-  // BTagWeighter btag_df_weighter(year, isFastsim, true, btag_df_wpts[year]);
-  LeptonWeighter lep_weighter(year);
+  //Initialize scale factor tools
   const string ctr = "central";
-  const string vup = "up";
-  const string vdown = "down";
-  // const auto op_loose = BTagEntry::OP_LOOSE;
-  // const auto op_med = BTagEntry::OP_MEDIUM;
-  // const auto op_tight = BTagEntry::OP_TIGHT;
+  const vector<string> updn = {"up","down"};
   const vector<BTagEntry::OperatingPoint> op_all = {BTagEntry::OP_LOOSE, BTagEntry::OP_MEDIUM, BTagEntry::OP_TIGHT};
+  BTagWeighter btag_weighter(year, isFastsim, false, btag_wpts[year]);
+  BTagWeighter btag_df_weighter(year, isFastsim, true, btag_df_wpts[year]);
+  LeptonWeighter lep_weighter(year);
+
+  // Initialize trees
+  nano_tree nano(nano_file);
+  size_t nentries(nent_test>0 ? nent_test : nano.GetEntries());
+  cout << "Nano file: " << nano_file << endl;
+  cout << "Input number of events: " << nentries << endl;
+  // cout << "Running on "<< (isFastsim ? "FastSim" : "FullSim") << endl;
+  // cout << "Calculating weights based on " << year << " scale factors." << endl;
+
+  pico_tree pico("", pico_file);
+  cout << "Writing output to: " << pico_file << endl;
+
+  corrections_tree corr("", wgt_sums_file);
+  cout << "Writing sum-of-weights to: " << wgt_sums_file << endl;
+
+  corr.out_neff() = 0;
+  corr.out_nent_zlep() = 0;
+  corr.out_tot_weight_l0() = 0.;
+  corr.out_tot_weight_l1() = 0.;
+  corr.out_nent() = nentries;
 
   for(size_t entry(0); entry<nentries; ++entry){
     nano.GetEntry(entry);
-    if (entry%100==0 || entry == nentries-1) {
+    if (entry%1000==0 || entry == nentries-1) {
       cout<<"Processing event: "<<entry<<endl;
     }
-    // if (nano.event()!=534935544) continue;
 
+    // event info
     pico.out_event() = nano.event();
     pico.out_lumiblock() = nano.luminosityBlock();
     pico.out_run() = nano.run();
+    // number of reconstructed primary vertices
+    pico.out_npv() = nano.PV_npvs();
+
+    // ----------------------------------------------------------------------------------------------
+    //            *** Writing physics objects ***
     // N.B. Order in which producers are called matters! E.g. jets are not counted if overlapping 
     // with signal lepton, thus jets must be processed only after leptons have been selected.
+    //-----------------------------------------------------------------------------------------------
     mc_producer.WriteGenParticles(nano, pico);
 
     vector<int> jet_islep_nano_idx = vector<int>();
@@ -126,22 +133,143 @@ int main(int argc, char *argv[]){
     vector<int> sig_mu_nano_idx = mu_producer.WriteMuons(nano, pico, jet_islep_nano_idx);
     pico.out_nlep() = sig_el_nano_idx.size() + sig_mu_nano_idx.size();
 
-    dilep_producer.WriteDielectrons(nano, pico, sig_el_nano_idx);
-    dilep_producer.WriteDimuons(nano, pico, sig_mu_nano_idx);
+    vector<int> jet_isphoton_nano_idx = vector<int>();
+    vector<int> sig_ph_nano_idx = photon_producer.WritePhotons(nano, pico, jet_isphoton_nano_idx);
 
     tk_producer.WriteIsoTracks(nano, pico, sig_el_nano_idx, sig_mu_nano_idx);
-    ph_producer.WritePhotons(nano, pico);
+
+    dilep_producer.WriteDielectrons(nano, pico, sig_el_nano_idx);
+    dilep_producer.WriteDimuons(nano, pico, sig_mu_nano_idx);
 
     jet_producer.WriteJets(nano, pico, jet_islep_nano_idx, btag_wpts[year], btag_df_wpts[year]);
     fjet_producer.WriteFatJets(nano, pico);
 
+    // might need as input sig_el_nano_idx, sig_mu_nano_idx, sig_ph_nano_idx
+    zgamma_producer.WriteZGammaVars();
+
     hig_producer.WriteHigVars();
+
+    // Copy MET directly from NanoAOD
+    pico.out_met() = nano.MET_pt();
+    pico.out_met_phi() = nano.MET_phi();
+    pico.out_met_calo() = nano.CaloMET_pt();
+    pico.out_met_tru() = nano.GenMET_pt();
+    pico.out_met_tru_phi() = nano.GenMET_phi();
+ 
+    // calculate mT only for single lepton events
+    pico.out_mt() = -999; 
+    if (pico.out_nlep()==1) {
+      if (sig_el_nano_idx.size()>0) {
+        pico.out_mt() = GetMT(nano.MET_pt(), nano.MET_phi(), 
+          nano.Electron_pt()[sig_el_nano_idx[0]], nano.Electron_phi()[sig_el_nano_idx[0]]);
+      } else {
+        pico.out_mt() = GetMT(nano.MET_pt(), nano.MET_phi(), 
+          nano.Muon_pt()[sig_mu_nano_idx[0]], nano.Muon_phi()[sig_mu_nano_idx[0]]);
+      }
+    } 
 
     // N.B. Jets: pico.out_pass_jets() and pico.out_pass_fsjets() filled in jet_producer
     // so this should be called after writeJets to allow computing overall pass variable
     WriteDataQualityFilters(nano, pico);
 
     CopyTriggerDecisions(nano, pico);
+
+    // ----------------------------------------------------------------------------------------------
+    //              *** Calculating weight branches ***
+    // ----------------------------------------------------------------------------------------------
+
+    float w_lep(1.), w_fs_lep(1.);
+    vector<float> sys_lep(2,1.), sys_fs_lep(2,1.);
+    lep_weighter.FullSim(pico, w_lep, sys_lep);
+    if(isFastsim) lep_weighter.FastSim(pico, w_fs_lep, sys_fs_lep);
+    pico.out_w_lep() = w_lep;
+    pico.out_w_fs_lep() = w_fs_lep;
+    if (doSystematics) { // don't worry about systematics just yet
+      pico.out_sys_lep() = sys_lep; 
+      pico.out_sys_fs_lep() = sys_fs_lep;
+    }
+
+    pico.out_w_btag() = btag_weighter.EventWeight(pico, BTagEntry::OP_MEDIUM, ctr, ctr);
+    pico.out_w_btag_df() = btag_df_weighter.EventWeight(pico, BTagEntry::OP_MEDIUM, ctr, ctr);
+    pico.out_w_bhig() = btag_weighter.EventWeight(pico, op_all, ctr, ctr);
+    pico.out_w_bhig_df() = btag_df_weighter.EventWeight(pico, op_all, ctr, ctr);
+    if (doSystematics) { // don't worry about systematics just yet
+      for(size_t i = 0; i<2; ++i){ 
+        pico.out_sys_bctag()[i] = btag_weighter.EventWeight(pico, BTagEntry::OP_MEDIUM, updn[i], ctr);
+        pico.out_sys_bchig()[i] = btag_weighter.EventWeight(pico, op_all, updn[i], ctr);
+        pico.out_sys_udsgtag()[i] = btag_weighter.EventWeight(pico, BTagEntry::OP_MEDIUM, ctr, updn[i]);
+        pico.out_sys_udsghig()[i] = btag_weighter.EventWeight(pico, op_all, ctr, updn[i]);
+      }
+    }
+
+    // will be assigned in subsequent step? 
+    int neff_dataset(100e3); // @todo, if want to run in 1 step, need to get neff for full sample in advance
+    double xsec(0.); 
+    if (Contains(nano_file, "TChiHH")){
+      double exsec(0.);
+      int mchi = 100;//GetGluinoMass(nano_file); @todo
+      xsec::higgsinoCrossSection(mchi, xsec, exsec);
+    }else{
+      xsec = xsec::crossSection(nano_file, (year==2016));  
+    }
+    const float lumi = 1000.; // calc. weight for 1fb-1 of total lumi
+    pico.out_w_lumi() = xsec*lumi/neff_dataset; 
+
+    // @todo, copy weights from babymaker
+    pico.out_w_pu() = 1.;
+
+    // pico.out_w_isr() = ;
+
+    // N.B. out_w_prefire should not be renormalized because it models an inefficiency, 
+    // i.e. we SHOULD get less events!
+    // This is on the @todo list, to be implemented based on: 
+    // https://github.com/cms-nanoAOD/nanoAOD-tools/blob/master/python/postprocessing/modules/common/PrefireCorr.py
+    pico.out_w_prefire() = 1.;
+
+    pico.out_weight() = nano.Generator_weight() * pico.out_w_lumi() * w_lep *
+                        (isFastsim ? w_fs_lep : 1.) * pico.out_w_bhig() * pico.out_w_pu();
+    if (year==2016 || isFastsim)
+      pico.out_weight() *= pico.out_w_isr();
+
+    // ----------------------------------------------------------------------------------------------
+    //              *** Add up weights to save for renormalization step ***
+    // ----------------------------------------------------------------------------------------------
+
+    // taking care of samples with negative weights
+    corr.out_neff() += nano.Generator_weight()>0 ? 1:-1;
+
+    // leptons, keeping track of 0l and 1l totals separately to determine the SF for 0l events
+    if(pico.out_nlep()==0){
+      corr.out_nent_zlep() += 1.;
+      corr.out_tot_weight_l0() += pico.out_weight();
+    }else{
+      corr.out_tot_weight_l1() += pico.out_weight();
+      corr.out_w_lep() += w_lep;
+      if(isFastsim) corr.out_w_fs_lep() += w_fs_lep;
+      for(size_t i = 0; i<pico.out_sys_lep().size(); ++i){
+        corr.out_sys_lep().at(i) += sys_lep.at(i);
+        if(isFastsim) corr.out_sys_fs_lep().at(i) += sys_fs_lep.at(i);
+      }
+    }
+
+    // b-tag weights
+    corr.out_w_btag() += pico.out_w_btag();
+    corr.out_w_btag_df() += pico.out_w_btag_df();
+    corr.out_w_bhig() += pico.out_w_bhig();
+    corr.out_w_bhig_df() += pico.out_w_bhig_df();
+    if (doSystematics) { // don't worry about systematics just yet
+      for(size_t i = 0; i<2; ++i){ 
+        corr.out_sys_bctag()[i] += pico.out_sys_bctag()[i];
+        corr.out_sys_bchig()[i] += pico.out_sys_bchig()[i];
+        corr.out_sys_udsgtag()[i] += pico.out_sys_udsgtag()[i];
+        corr.out_sys_udsghig()[i] += pico.out_sys_udsghig()[i];
+      }
+    }
+
+    // general event vars
+    corr.out_weight() += pico.out_weight();
+    corr.out_w_isr() += pico.out_w_isr();
+    corr.out_w_pu() += pico.out_w_pu();
 
     pico.Fill();
   } // loop over events
@@ -156,6 +284,8 @@ int main(int argc, char *argv[]){
 }
 
 void WriteDataQualityFilters(nano_tree& nano, pico_tree& pico){
+
+  pico.out_pass_ra2_badmu() = true; //@todo
 
   pico.out_pass_hbhe() = nano.Flag_HBHENoiseFilter();
   pico.out_pass_hbheiso() = nano.Flag_HBHENoiseIsoFilter();

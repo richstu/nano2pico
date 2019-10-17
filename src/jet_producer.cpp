@@ -14,7 +14,7 @@ JetProducer::~JetProducer(){
 
 void JetProducer::WriteJets(nano_tree &nano, pico_tree &pico, vector<int> jet_islep_nano_idx,
                             const vector<float> &btag_wpts, const vector<float> &btag_df_wpts){
-  pico.out_njet() = 0; 
+  pico.out_njet() = 0; pico.out_ht() = 0; 
   pico.out_nbl() = 0; pico.out_nbm() = 0; pico.out_nbt() = 0; 
   pico.out_nbdfl() = 0; pico.out_nbdfm() = 0; pico.out_nbdft() = 0; 
   pico.out_pass_jets() = true;
@@ -53,6 +53,7 @@ void JetProducer::WriteJets(nano_tree &nano, pico_tree &pico, vector<int> jet_is
 
     if (!islep) {
       pico.out_njet()++;
+      pico.out_ht() += nano.Jet_pt()[ijet];
       if (nano.Jet_btagDeepB()[ijet] > btag_wpts[0]) pico.out_nbl()++; 
       if (nano.Jet_btagDeepB()[ijet] > btag_wpts[1]) pico.out_nbm()++; 
       if (nano.Jet_btagDeepB()[ijet] > btag_wpts[2]) pico.out_nbt()++;

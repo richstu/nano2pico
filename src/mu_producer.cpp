@@ -35,8 +35,7 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
     pico.out_mu_ip3d().push_back(nano.Muon_ip3d()[imu]);
     pico.out_mu_sig().push_back(isSig);
     pico.out_mu_charge().push_back(nano.Muon_charge()[imu]);
-
-    pico.out_mu_tm().push_back(nano.Muon_genPartIdx()[imu]!=-1);
+    pico.out_mu_pflavor().push_back(nano.Muon_genPartFlav()[imu]);
 
     pico.out_nvmu()++;
     if (isSig) {

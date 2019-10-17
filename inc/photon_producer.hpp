@@ -1,5 +1,5 @@
-#ifndef H_PH_PRODUCER
-#define H_PH_PRODUCER
+#ifndef H_PHOTON_PRODUCER
+#define H_PHOTON_PRODUCER
 
 
 #include "nano_tree.hpp"
@@ -16,7 +16,7 @@ public:
   const float PhotonEtaCut     = 2.5;
   const float PhotonRelIsoCut = 0.1; 
 
-  void WritePhotons(nano_tree &nano, pico_tree &pico);
+  std::vector<int> WritePhotons(nano_tree &nano, pico_tree &pico, std::vector<int> &jet_isphoton_nano_idx);
 
 private:
   int year;

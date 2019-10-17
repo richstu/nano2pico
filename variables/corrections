@@ -9,8 +9,29 @@ float w_lep
 float w_fs_lep
 
 # just need to add up 
-float w_btag_deep
-float w_bhig_deep
+float w_pu
+float w_btag
+float w_btag_df
+float w_bhig
+float w_bhig_df
+
+vector<float> sys_mur
+vector<float> sys_muf
+vector<float> sys_murf
+vector<float> sys_bctag
+vector<float> sys_bchig
+vector<float> sys_udsgtag
+vector<float> sys_udsghig
+
+vector<float> sys_lep
+vector<float> sys_fs_lep
+
+vector<float> sys_prefire
+vector<float> sys_isr
+
+
+vector<float> sys_trig
+vector<float> sys_pu
 
 # additional variables
 int neff
