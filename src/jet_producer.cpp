@@ -47,7 +47,7 @@ void JetProducer::WriteJets(nano_tree &nano, pico_tree &pico, vector<int> jet_is
     pico.out_jet_islep().push_back(islep);
     pico.out_jet_id().push_back(nano.Jet_jetId()[ijet]);
 
-    //this will be filled in hig_producer or later
+    //the jets for the higgs pair with smallest dm will be set to true in hig_producer
     pico.out_jet_h1d().push_back(false);
     pico.out_jet_h2d().push_back(false);
 

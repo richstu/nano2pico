@@ -144,11 +144,6 @@ int main(int argc, char *argv[]){
     jet_producer.WriteJets(nano, pico, jet_islep_nano_idx, btag_wpts[year], btag_df_wpts[year]);
     fjet_producer.WriteFatJets(nano, pico);
 
-    // might need as input sig_el_nano_idx, sig_mu_nano_idx, sig_ph_nano_idx
-    zgamma_producer.WriteZGammaVars();
-
-    hig_producer.WriteHigVars();
-
     // Copy MET directly from NanoAOD
     pico.out_met() = nano.MET_pt();
     pico.out_met_phi() = nano.MET_phi();
@@ -167,6 +162,12 @@ int main(int argc, char *argv[]){
           nano.Muon_pt()[sig_mu_nano_idx[0]], nano.Muon_phi()[sig_mu_nano_idx[0]]);
       }
     } 
+
+    // might need as input sig_el_nano_idx, sig_mu_nano_idx, sig_ph_nano_idx
+    zgamma_producer.WriteZGammaVars();
+
+    hig_producer.WriteHigVars(pico, false);
+    hig_producer.WriteDPhiVars();
 
     // N.B. Jets: pico.out_pass_jets() and pico.out_pass_fsjets() filled in jet_producer
     // so this should be called after writeJets to allow computing overall pass variable

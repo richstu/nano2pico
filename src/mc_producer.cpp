@@ -132,8 +132,8 @@ void GenParticleProducer::WriteGenParticles(nano_tree &nano, pico_tree &pico){
     if (lepton_interesting) {
       // 0: isPrompt, 12: isFirstCopy, 
       if (mc_statusFlags[0]==1 && mc_statusFlags[12]==1) save_index = true;
-      // 2: isTauDecayProduct, 12: isFirstCopy, 
-      if (mc_statusFlags[2]==1 && mc_statusFlags[12]==1) {
+      // 5: isDirectPromptTauDecayProduct, 12: isFirstCopy, 
+      if (mc_statusFlags[5]==1 && mc_statusFlags[12]==1) {
         save_index = true;
         is_tauDecayProduct = true;
       }
@@ -148,7 +148,7 @@ void GenParticleProducer::WriteGenParticles(nano_tree &nano, pico_tree &pico){
       if (abs(mc_id) == 15) ntrutau++;
     }
   }
-  ntrulep = ntrumu + ntruel;
+  ntrulep = ntrumu + ntruel + ntrutaul;
   ntrutauh = ntrutau - ntrutaul;
 
   // Find relation between indices

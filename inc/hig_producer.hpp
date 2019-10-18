@@ -11,7 +11,8 @@ public:
   explicit HigVarProducer(int year);
   ~HigVarProducer();
 
-  void WriteHigVars();
+  void WriteHigVars(pico_tree& pico, bool doDeepFlav);
+  void WriteDPhiVars();
 
 private:
   int year;

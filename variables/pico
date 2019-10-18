@@ -17,9 +17,9 @@ float mt
 float mt_tru
 
 ###################   Higgsinos   ##################
-float hig_dm
-float hig_am
-float hig_drmax
+vector<float> hig_cand_dm
+vector<float> hig_cand_am
+vector<float> hig_cand_drmax
 float dphi1
 float dphi2
 float dphi3
@@ -158,9 +158,6 @@ bool pass_badcalib
 bool pass
 
 ################  Truth   ##################
-int nisr_me
-float ht_isr_me
-float ptll_me
 vector<float> mc_pt
 vector<float> mc_eta
 vector<float> mc_phi
@@ -168,15 +165,14 @@ vector<float> mc_mass
 vector<int>   mc_id
 vector<int>   mc_mom
 vector<int>   mc_momidx
-vector<int>   mc_num_dau
 vector<int>   mc_status
-vector<int>   mc_jetidx
 
 int ntrulep
 int ntrumu
 int ntruel
 int ntrutauh
 int ntrutaul
+
 float isr_tru_pt
 float isr_tru_eta
 float isr_tru_phi
