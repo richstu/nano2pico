@@ -25,6 +25,7 @@
 
 #include "btag_weighter.hpp"
 #include "lepton_weighter.hpp"
+#include "event_tools.hpp"
 
 using namespace std;
 
@@ -88,6 +89,10 @@ int main(int argc, char *argv[]){
   BTagWeighter btag_df_weighter(year, isFastsim, true, btag_df_wpts[year]);
   LeptonWeighter lep_weighter(year);
 
+  // Event tools
+  EventTools event_tools(nano_file, year);
+  int event_type = event_tools.GetEventType();
+
   // Initialize trees
   nano_tree nano(nano_file);
   size_t nentries(nent_test>0 ? nent_test : nano.GetEntries());
@@ -118,6 +123,8 @@ int main(int argc, char *argv[]){
     pico.out_event() = nano.event();
     pico.out_lumiblock() = nano.luminosityBlock();
     pico.out_run() = nano.run();
+    pico.out_type() = event_type;
+    pico.out_stitch() = isData ? true: event_tools.GetStitch(nano);
     // number of reconstructed primary vertices
     pico.out_npv() = nano.PV_npvs();
 
@@ -127,6 +134,7 @@ int main(int argc, char *argv[]){
     // with signal lepton, thus jets must be processed only after leptons have been selected.
     //-----------------------------------------------------------------------------------------------
     mc_producer.WriteGenParticles(nano, pico);
+    mc_producer.WriteGenInfo(nano, pico);
 
     vector<int> jet_islep_nano_idx = vector<int>();
     vector<int> sig_el_nano_idx = el_producer.WriteElectrons(nano, pico, jet_islep_nano_idx);
@@ -141,7 +149,9 @@ int main(int argc, char *argv[]){
     dilep_producer.WriteDielectrons(nano, pico, sig_el_nano_idx);
     dilep_producer.WriteDimuons(nano, pico, sig_mu_nano_idx);
 
-    jet_producer.WriteJets(nano, pico, jet_islep_nano_idx, btag_wpts[year], btag_df_wpts[year]);
+    vector<int> sig_jet_nano_idx = jet_producer.WriteJets(nano, pico, jet_islep_nano_idx, 
+                                                          btag_wpts[year], btag_df_wpts[year]);
+    jet_producer.WriteJetSys(nano, pico, sig_jet_nano_idx, btag_wpts[year][1]); // usually w.r.t. medium WP
     fjet_producer.WriteFatJets(nano, pico);
 
     // Copy MET directly from NanoAOD
@@ -162,18 +172,28 @@ int main(int argc, char *argv[]){
           nano.Muon_pt()[sig_mu_nano_idx[0]], nano.Muon_phi()[sig_mu_nano_idx[0]]);
       }
     } 
+    if (pico.out_ntrulep()==1) {
+      for (unsigned imc(0); imc<pico.out_mc_id().size(); imc++){
+        if (abs(pico.out_mc_id()[imc])==11 || abs(pico.out_mc_id()[imc])==13) {
+          pico.out_mt_tru() = GetMT(pico.out_met_tru(), pico.out_met_tru_phi(), 
+                                pico.out_mc_pt()[imc], pico.out_mc_phi()[imc]);
+          break;
+        }
+      }
+    } 
 
     // might need as input sig_el_nano_idx, sig_mu_nano_idx, sig_ph_nano_idx
     zgamma_producer.WriteZGammaVars();
 
-    hig_producer.WriteHigVars(pico, false);
+    //save higgs variables using DeepCSV and DeepFlavor
+    hig_producer.WriteHigVars(pico, /*DeepFlavor*/ false);
+    hig_producer.WriteHigVars(pico, true);
     hig_producer.WriteDPhiVars();
 
     // N.B. Jets: pico.out_pass_jets() and pico.out_pass_fsjets() filled in jet_producer
-    // so this should be called after writeJets to allow computing overall pass variable
-    WriteDataQualityFilters(nano, pico);
-
-    CopyTriggerDecisions(nano, pico);
+    event_tools.WriteDataQualityFilters(nano, pico, sig_jet_nano_idx, isData, isFastsim);
+    
+    event_tools.CopyTriggerDecisions(nano, pico);
 
     // ----------------------------------------------------------------------------------------------
     //              *** Calculating weight branches ***
@@ -282,72 +302,6 @@ int main(int argc, char *argv[]){
   cout<<endl;
   time(&endtime); 
   cout<<"Time passed: "<<hoursMinSec(difftime(endtime, begtime))<<endl<<endl;  
-}
-
-void WriteDataQualityFilters(nano_tree& nano, pico_tree& pico){
-
-  pico.out_pass_ra2_badmu() = true; //@todo
-
-  pico.out_pass_hbhe() = nano.Flag_HBHENoiseFilter();
-  pico.out_pass_hbheiso() = nano.Flag_HBHENoiseIsoFilter();
-  pico.out_pass_goodv() = nano.Flag_goodVertices();
-  pico.out_pass_cschalo_tight() = nano.Flag_globalSuperTightHalo2016Filter();
-  pico.out_pass_eebadsc() = nano.Flag_eeBadScFilter();
-  pico.out_pass_ecaldeadcell() = nano.Flag_EcalDeadCellTriggerPrimitiveFilter();
-  if (year==2016) {
-    pico.out_pass_badcalib() = true;
-    pico.out_pass_badpfmu() = nano.Flag_BadPFMuonSummer16Filter();
-    pico.out_pass_badchhad() = nano.Flag_BadChargedCandidateSummer16Filter();
-  } else {
-    pico.out_pass_badcalib() = nano.Flag_ecalBadCalibFilterV2();
-    pico.out_pass_badpfmu() = nano.Flag_BadPFMuonFilter();
-    pico.out_pass_badchhad() = nano.Flag_BadChargedCandidateFilter();
-  }
-  pico.out_pass_mubadtrk() = nano.Flag_muonBadTrackFilter();
-
-  // Combined pass variable
-  pico.out_pass() = pico.out_pass_ra2_badmu() && pico.out_pass_badpfmu() && 
-                    pico.out_met()/pico.out_met_calo()<5 &&
-                    pico.out_pass_goodv() &&
-                    pico.out_pass_hbhe() && pico.out_pass_hbheiso() && 
-                    pico.out_pass_ecaldeadcell() && pico.out_pass_badcalib();
-
-  if (isFastsim) {
-    pico.out_pass() = pico.out_pass() && pico.out_pass_fsjets();
-  } else {
-    pico.out_pass() = pico.out_pass() && pico.out_pass_jets() && pico.out_pass_cschalo_tight();
-    if (isData) 
-      pico.out_pass() = pico.out_pass() && pico.out_pass_eebadsc();
-  }
-  
-  return;
-}
-
-void CopyTriggerDecisions(nano_tree& nano, pico_tree& pico){
-  pico.out_HLT_IsoMu24() = nano.HLT_IsoMu24();
-  pico.out_HLT_IsoMu27() = nano.HLT_IsoMu27();
-  pico.out_HLT_Mu50() = nano.HLT_Mu50();
-  pico.out_HLT_Ele27_WPTight_Gsf() = nano.HLT_Ele27_WPTight_Gsf();
-  pico.out_HLT_Ele35_WPTight_Gsf() = nano.HLT_Ele35_WPTight_Gsf();
-  pico.out_HLT_Ele115_CaloIdVT_GsfTrkIdT() = nano.HLT_Ele115_CaloIdVT_GsfTrkIdT();
-
-  // MET triggers
-  pico.out_HLT_PFMET110_PFMHT110_IDTight() = nano.HLT_PFMET110_PFMHT110_IDTight();
-  pico.out_HLT_PFMET120_PFMHT120_IDTight() = nano.HLT_PFMET120_PFMHT120_IDTight();
-  pico.out_HLT_PFMETNoMu110_PFMHTNoMu110_IDTight() = nano.HLT_PFMETNoMu110_PFMHTNoMu110_IDTight();
-  pico.out_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight() = nano.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight();
-  pico.out_HLT_PFMET120_PFMHT120_IDTight_PFHT60() = nano.HLT_PFMET120_PFMHT120_IDTight_PFHT60();
-  pico.out_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60() = nano.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60();
-
-  // Jet trigger
-  pico.out_HLT_PFJet500() = nano.HLT_PFJet500();
-
-  // ZGamma triggers
-  pico.out_HLT_Mu17_Photon30_IsoCaloId() = nano.HLT_Mu17_Photon30_IsoCaloId();
-  pico.out_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ() = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ();
-  pico.out_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL();
-  pico.out_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ();
-  return;
 }
 
 void GetOptions(int argc, char *argv[]){

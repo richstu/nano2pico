@@ -12,6 +12,7 @@ public:
   ~GenParticleProducer();
 
   void WriteGenParticles(nano_tree &nano, pico_tree &pico);
+  void WriteGenInfo(nano_tree &nano, pico_tree &pico);
   bool IsInteresting(std::vector<int> const & interested_mc_ids, std::vector<std::pair<int, int> > const & interested_mc_ids_range, int mc_id);
   bool IsLastCopyBeforeFSR_or_LastCopy(nano_tree & nano, int mc_index);
   // Makes child_map

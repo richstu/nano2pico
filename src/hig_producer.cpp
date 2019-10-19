@@ -64,22 +64,33 @@ void HigVarProducer::WriteHigVars(pico_tree &pico, bool doDeepFlav){
 
     // insert them in order of increasing hig_dm
     unsigned pos = 0;
-    for (unsigned i(0); i< pico.out_hig_cand_dm().size(); i++){
-      if (idm > pico.out_hig_cand_dm()[i]) pos = i+1;
-    }
-    pico.out_hig_cand_dm().insert(pico.out_hig_cand_dm().begin()+pos, idm);
-    pico.out_hig_cand_am().insert(pico.out_hig_cand_am().begin()+pos, iam);
-    pico.out_hig_cand_drmax().insert(pico.out_hig_cand_drmax().begin()+pos, idrmax);
+    if (doDeepFlav) {
+      for (unsigned i(0); i< pico.out_hig_df_cand_dm().size(); i++){
+        if (idm > pico.out_hig_df_cand_dm()[i]) pos = i+1;
+      }
+      pico.out_hig_df_cand_dm().insert(pico.out_hig_df_cand_dm().begin()+pos, idm);
+      pico.out_hig_df_cand_am().insert(pico.out_hig_df_cand_am().begin()+pos, iam);
+      pico.out_hig_df_cand_drmax().insert(pico.out_hig_df_cand_drmax().begin()+pos, idrmax);
+    } else {
+      for (unsigned i(0); i< pico.out_hig_cand_dm().size(); i++){
+        if (idm > pico.out_hig_cand_dm()[i]) pos = i+1;
+      }
+      pico.out_hig_cand_dm().insert(pico.out_hig_cand_dm().begin()+pos, idm);
+      pico.out_hig_cand_am().insert(pico.out_hig_cand_am().begin()+pos, iam);
+      pico.out_hig_cand_drmax().insert(pico.out_hig_cand_drmax().begin()+pos, idrmax);
 
-    //save index of jet combination with smallest dm
-    if (pos==0) icomb_min_dm = ic;
+      //save index of jet combination with smallest dm in order to mark the utilized jets (DeepCSV only)
+      if (pos==0) icomb_min_dm = ic;
+    }
   }
 
-  // set the jet h1d/h2d variables indicating that the jet was used in the hig pair with smallest dm
-  pico.out_jet_h1d()[ordered_by_discr[hcombs[icomb_min_dm][0]].first] = true;
-  pico.out_jet_h1d()[ordered_by_discr[hcombs[icomb_min_dm][1]].first] = true;
-  pico.out_jet_h2d()[ordered_by_discr[hcombs[icomb_min_dm][2]].first] = true;
-  pico.out_jet_h2d()[ordered_by_discr[hcombs[icomb_min_dm][3]].first] = true;
+  if (!doDeepFlav){
+    // set the jet h1d/h2d variables indicating that the jet was used in the hig pair with smallest dm
+    pico.out_jet_h1d()[ordered_by_discr[hcombs[icomb_min_dm][0]].first] = true;
+    pico.out_jet_h1d()[ordered_by_discr[hcombs[icomb_min_dm][1]].first] = true;
+    pico.out_jet_h2d()[ordered_by_discr[hcombs[icomb_min_dm][2]].first] = true;
+    pico.out_jet_h2d()[ordered_by_discr[hcombs[icomb_min_dm][3]].first] = true;
+  }
 
   return;
 }

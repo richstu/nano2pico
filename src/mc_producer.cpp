@@ -10,6 +10,8 @@
 #include <bitset>
 #include <algorithm>
 
+#include "TLorentzVector.h"
+
 // namespace backward {
 //   backward::SignalHandling sh;
 // } // namespace backward
@@ -194,6 +196,40 @@ void GenParticleProducer::WriteGenParticles(nano_tree &nano, pico_tree &pico){
     pico.out_ntrutaul() = ntrutaul;
     pico.out_ntrutauh() = ntrutauh;
   }
+
+  return;
+}
+
+void GenParticleProducer::WriteGenInfo(nano_tree &nano, pico_tree &pico) {
+  TLorentzVector isr_p4;
+  float mprod(-999), mlsp(-999);
+  for(int imc(0); imc<nano.nGenPart(); ++imc) {
+    if (IsLastCopyBeforeFSR_or_LastCopy(nano, imc)) {
+      int mc_absid = abs(nano.GenPart_pdgId().at(imc));
+      //types defined in event tools
+      TLorentzVector mc_v4; 
+      mc_v4.SetPtEtaPhiM(nano.GenPart_pt()[imc], nano.GenPart_eta()[imc], nano.GenPart_phi()[imc], nano.GenPart_mass()[imc]);
+      if (mc_absid==6 && pico.out_type()>=1000 && pico.out_type()<2000) isr_p4 -= mc_v4;
+      else if (mc_absid==23 && pico.out_type()>=6000 && pico.out_type()<7000) isr_p4 -= mc_v4;
+      else if (pico.out_type()==100e3 || pico.out_type()==102e3 || pico.out_type()==104e3) {
+        if (mc_absid==1000021) {
+          isr_p4 -= mc_v4;
+          mprod = nano.GenPart_mass()[imc];
+        } else if (mc_absid==1000022) {
+          mlsp = nano.GenPart_mass()[imc];
+        }
+      } else if ((mc_absid==1000023 || mc_absid==1000025) && pico.out_type()==106e3) {
+        isr_p4 -= mc_v4;
+        mprod = nano.GenPart_mass()[imc];
+        mlsp = 1.;
+      }
+    }
+  }
+  pico.out_isr_tru_pt() = isr_p4.Pt();
+  pico.out_isr_tru_eta() = isr_p4.Eta();
+  pico.out_isr_tru_phi() = isr_p4.Phi();
+  pico.out_mprod() = mprod;
+  pico.out_mlsp() = mlsp;
 
   return;
 }

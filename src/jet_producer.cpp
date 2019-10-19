@@ -1,7 +1,10 @@
 #include "jet_producer.hpp"
 
-#include "utilities.hpp"
 #include <algorithm>
+
+#include "TLorentzVector.h"
+
+#include "utilities.hpp"
 
 using namespace std;
 
@@ -12,8 +15,9 @@ JetProducer::JetProducer(int year_){
 JetProducer::~JetProducer(){
 }
 
-void JetProducer::WriteJets(nano_tree &nano, pico_tree &pico, vector<int> jet_islep_nano_idx,
+vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico, vector<int> jet_islep_nano_idx,
                             const vector<float> &btag_wpts, const vector<float> &btag_df_wpts){
+  vector<int> sig_jet_nano_idx;
   pico.out_njet() = 0; pico.out_ht() = 0; 
   pico.out_nbl() = 0; pico.out_nbm() = 0; pico.out_nbt() = 0; 
   pico.out_nbdfl() = 0; pico.out_nbdfm() = 0; pico.out_nbdft() = 0; 
@@ -52,6 +56,7 @@ void JetProducer::WriteJets(nano_tree &nano, pico_tree &pico, vector<int> jet_is
     pico.out_jet_h2d().push_back(false);
 
     if (!islep) {
+      sig_jet_nano_idx.push_back(ijet);
       pico.out_njet()++;
       pico.out_ht() += nano.Jet_pt()[ijet];
       if (nano.Jet_btagDeepB()[ijet] > btag_wpts[0]) pico.out_nbl()++; 
@@ -60,7 +65,38 @@ void JetProducer::WriteJets(nano_tree &nano, pico_tree &pico, vector<int> jet_is
       if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[0]) pico.out_nbdfl()++; 
       if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[1]) pico.out_nbdfm()++; 
       if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[2]) pico.out_nbdft()++; 
+    }
+  } // end jet loop
 
+  return sig_jet_nano_idx;
+}
+
+void JetProducer::WriteJetSys(nano_tree &nano, pico_tree &pico, 
+                              vector<int> &sig_jet_nano_idx, const float &btag_wpt) {
+
+  TLorentzVector jetsys_v4, jetsys_nob_v4;
+  int njet_nob(0);
+  for (auto &idx: sig_jet_nano_idx) {
+    TLorentzVector ijet_v4;
+    ijet_v4.SetPtEtaPhiM(nano.Jet_pt()[idx], nano.Jet_eta()[idx], nano.Jet_phi()[idx], nano.Jet_mass()[idx]);
+    jetsys_v4 += ijet_v4;
+
+    if (nano.Jet_btagDeepB()[idx] <= btag_wpt){
+      njet_nob++;
+      jetsys_nob_v4 += ijet_v4;
+    }
+  }
+
+  if (sig_jet_nano_idx.size()>0) {
+    pico.out_jetsys_pt() = jetsys_v4.Pt();
+    pico.out_jetsys_eta() = jetsys_v4.Eta();
+    pico.out_jetsys_phi() = jetsys_v4.Phi();
+    pico.out_jetsys_m() = jetsys_v4.M();
+    if (njet_nob>0) {
+      pico.out_jetsys_nob_pt() = jetsys_nob_v4.Pt();
+      pico.out_jetsys_nob_eta() = jetsys_nob_v4.Eta();
+      pico.out_jetsys_nob_phi() = jetsys_nob_v4.Phi();
+      pico.out_jetsys_nob_m() = jetsys_nob_v4.M();
     }
   }
   return;

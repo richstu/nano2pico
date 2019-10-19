@@ -3,7 +3,7 @@ int run
 int lumiblock
 Long64_t event
 int type
-bool stitch_met
+bool stitch
 
 ####################   Global   ###################
 int npv
@@ -20,6 +20,11 @@ float mt_tru
 vector<float> hig_cand_dm
 vector<float> hig_cand_am
 vector<float> hig_cand_drmax
+
+vector<float> hig_df_cand_dm
+vector<float> hig_df_cand_am
+vector<float> hig_df_cand_drmax
+
 float dphi1
 float dphi2
 float dphi3
