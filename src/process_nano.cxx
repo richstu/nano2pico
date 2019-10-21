@@ -26,6 +26,7 @@
 #include "btag_weighter.hpp"
 #include "lepton_weighter.hpp"
 #include "event_tools.hpp"
+#include "isr_tools.hpp"
 
 using namespace std;
 
@@ -89,9 +90,11 @@ int main(int argc, char *argv[]){
   BTagWeighter btag_df_weighter(year, isFastsim, true, btag_df_wpts[year]);
   LeptonWeighter lep_weighter(year);
 
-  // Event tools
+  // Other tools
   EventTools event_tools(nano_file, year);
   int event_type = event_tools.GetEventType();
+
+  ISRTools isr_tools(nano_file, year);
 
   // Initialize trees
   nano_tree nano(nano_file);
@@ -134,7 +137,7 @@ int main(int argc, char *argv[]){
     // with signal lepton, thus jets must be processed only after leptons have been selected.
     //-----------------------------------------------------------------------------------------------
     mc_producer.WriteGenParticles(nano, pico);
-    mc_producer.WriteGenInfo(nano, pico);
+    isr_tools.WriteISRSystemPt(nano, pico);
 
     vector<int> jet_islep_nano_idx = vector<int>();
     vector<int> sig_el_nano_idx = el_producer.WriteElectrons(nano, pico, jet_islep_nano_idx);
@@ -152,6 +155,8 @@ int main(int argc, char *argv[]){
     vector<int> sig_jet_nano_idx = jet_producer.WriteJets(nano, pico, jet_islep_nano_idx, 
                                                           btag_wpts[year], btag_df_wpts[year]);
     jet_producer.WriteJetSys(nano, pico, sig_jet_nano_idx, btag_wpts[year][1]); // usually w.r.t. medium WP
+    isr_tools.WriteISRJetMultiplicity(nano, pico);
+
     fjet_producer.WriteFatJets(nano, pico);
 
     // Copy MET directly from NanoAOD
@@ -239,7 +244,7 @@ int main(int argc, char *argv[]){
     // @todo, copy weights from babymaker
     pico.out_w_pu() = 1.;
 
-    // pico.out_w_isr() = ;
+    isr_tools.WriteISRWeights(pico);
 
     // N.B. out_w_prefire should not be renormalized because it models an inefficiency, 
     // i.e. we SHOULD get less events!
