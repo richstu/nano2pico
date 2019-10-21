@@ -19,7 +19,6 @@
 #include "tk_producer.hpp"
 #include "photon_producer.hpp"
 #include "jet_producer.hpp"
-#include "fjet_producer.hpp"
 #include "hig_producer.hpp"
 #include "zgamma_producer.hpp"
 
@@ -78,7 +77,6 @@ int main(int argc, char *argv[]){
   IsoTrackProducer tk_producer(year);
   PhotonProducer photon_producer(year);
   JetProducer jet_producer(year);
-  FatJetProducer fjet_producer(year);
   HigVarProducer hig_producer(year);
   ZGammaVarProducer zgamma_producer(year);
 
@@ -154,10 +152,9 @@ int main(int argc, char *argv[]){
 
     vector<int> sig_jet_nano_idx = jet_producer.WriteJets(nano, pico, jet_islep_nano_idx, 
                                                           btag_wpts[year], btag_df_wpts[year]);
-    jet_producer.WriteJetSys(nano, pico, sig_jet_nano_idx, btag_wpts[year][1]); // usually w.r.t. medium WP
+    jet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year][1]); // usually w.r.t. medium WP
+    jet_producer.WriteFatJets(nano, pico);
     isr_tools.WriteISRJetMultiplicity(nano, pico);
-
-    fjet_producer.WriteFatJets(nano, pico);
 
     // Copy MET directly from NanoAOD
     pico.out_met() = nano.MET_pt();
@@ -193,7 +190,8 @@ int main(int argc, char *argv[]){
     //save higgs variables using DeepCSV and DeepFlavor
     hig_producer.WriteHigVars(pico, /*DeepFlavor*/ false);
     hig_producer.WriteHigVars(pico, true);
-    hig_producer.WriteDPhiVars();
+    pico.out_low_dphi() = pico.out_jet_met_dphi()[0]<0.5 || pico.out_jet_met_dphi()[1]<0.5 ||
+                          pico.out_jet_met_dphi()[2]<0.3 || pico.out_jet_met_dphi()[3]<0.3;
 
     // N.B. Jets: pico.out_pass_jets() and pico.out_pass_fsjets() filled in jet_producer
     event_tools.WriteDataQualityFilters(nano, pico, sig_jet_nano_idx, isData, isFastsim);

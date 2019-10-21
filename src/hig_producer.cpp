@@ -94,10 +94,3 @@ void HigVarProducer::WriteHigVars(pico_tree &pico, bool doDeepFlav){
 
   return;
 }
-
-void HigVarProducer::WriteDPhiVars(){
-
-
-
-  return;
-}

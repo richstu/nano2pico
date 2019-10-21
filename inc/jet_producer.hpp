@@ -16,7 +16,8 @@ public:
 
   std::vector<int> WriteJets(nano_tree &nano, pico_tree &pico, std::vector<int> jet_islep_nano_idx,
                  const std::vector<float> &btag_wpts, const std::vector<float> &btag_df_wpts);
-  void WriteJetSys(nano_tree &nano, pico_tree &pico, 
+  void WriteFatJets(nano_tree &nano, pico_tree &pico);
+  void WriteJetSystemPt(nano_tree &nano, pico_tree &pico, 
                               std::vector<int> &sig_jet_nano_idx, const float &btag_wpt);
 private:
   int year;

@@ -46,10 +46,15 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico, vector<int>
     pico.out_jet_m().push_back(nano.Jet_mass()[ijet]);
     pico.out_jet_deepcsv().push_back(nano.Jet_btagDeepB()[ijet]);
     pico.out_jet_deepflav().push_back(nano.Jet_btagDeepFlavB()[ijet]);
+    pico.out_jet_qgl().push_back(nano.Jet_qgl()[ijet]);
     pico.out_jet_hflavor().push_back(nano.Jet_hadronFlavour()[ijet]);
     pico.out_jet_pflavor().push_back(nano.Jet_partonFlavour()[ijet]);
     pico.out_jet_islep().push_back(islep);
     pico.out_jet_id().push_back(nano.Jet_jetId()[ijet]);
+    pico.out_jet_met_dphi().push_back(DeltaPhi(nano.Jet_pt()[ijet], nano.MET_pt()));
+    
+    // will be overwritten with the overlapping fat jet index, if such exists, in WriteFatJets
+    pico.out_jet_fjet_idx().push_back(-999);
 
     //the jets for the higgs pair with smallest dm will be set to true in hig_producer
     pico.out_jet_h1d().push_back(false);
@@ -71,7 +76,35 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico, vector<int>
   return sig_jet_nano_idx;
 }
 
-void JetProducer::WriteJetSys(nano_tree &nano, pico_tree &pico, 
+void JetProducer::WriteFatJets(nano_tree &nano, pico_tree &pico){
+
+  pico.out_nfjet() = 0; 
+  for(int ifjet(0); ifjet<nano.nFatJet(); ++ifjet){
+    // if (nano.FatJet_pt()[ifjet] <= FatJetPtCut) continue;
+    if (fabs(nano.FatJet_eta()[ifjet]) > JetEtaCut) continue;
+
+    pico.out_fjet_pt().push_back(nano.FatJet_pt()[ifjet]);
+    pico.out_fjet_eta().push_back(nano.FatJet_eta()[ifjet]);
+    pico.out_fjet_phi().push_back(nano.FatJet_phi()[ifjet]);
+    pico.out_fjet_m().push_back(nano.FatJet_mass()[ifjet]);
+    pico.out_fjet_msoftdrop().push_back(nano.FatJet_msoftdrop()[ifjet]);
+    // Mass-decorrelated Deep Double B, H->bb vs QCD discriminator, endorsed by BTV
+    pico.out_fjet_deep_md_hbb_btv().push_back(nano.FatJet_btagDDBvL()[ifjet]);
+    pico.out_fjet_mva_hbb_btv().push_back(nano.FatJet_btagHbb()[ifjet]);
+    // Mass-decorrelated DeepAk8, H->bb vs QCD discriminator, endorsed by JME
+    pico.out_fjet_deep_md_hbb_jme().push_back(nano.FatJet_deepTagMD_HbbvsQCD()[ifjet]);
+
+    for(unsigned ijet(0); ijet<pico.out_jet_pt().size(); ++ijet){
+      if (dR(pico.out_jet_eta()[ijet], nano.FatJet_eta()[ifjet], pico.out_jet_phi()[ijet], nano.FatJet_phi()[ifjet])<0.8)
+        pico.out_jet_fjet_idx()[ijet] = ifjet;
+    }
+
+    pico.out_nfjet()++;
+  }
+  return;
+}
+
+void JetProducer::WriteJetSystemPt(nano_tree &nano, pico_tree &pico, 
                               vector<int> &sig_jet_nano_idx, const float &btag_wpt) {
 
   TLorentzVector jetsys_v4, jetsys_nob_v4;
