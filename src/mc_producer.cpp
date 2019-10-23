@@ -45,8 +45,7 @@ int GenParticleProducer::GetFirstCopyIdx(nano_tree & nano, int imc)
   int mc_mom_index = nano.GenPart_genPartIdxMother().at(imc);
   if (mc_mom_index == -1) {
     // Found that initial particles isFirstCopy is 0. Do not use below check.
-    //if (bitset<15>(nano.GenPart_statusFlags().at(imc))[12] != 1) 
-    //{
+    //if (bitset<15>(nano.GenPart_statusFlags().at(imc))[12] != 1) {
     //  cout<<"[Error] 1 GenParticleProducer::GetFirstCopyIdx is not firstCopy."<<endl;
     //  cout<<"  imc:"<<imc<<" mc_id:"<<mc_id<<endl;
     //}
@@ -55,11 +54,11 @@ int GenParticleProducer::GetFirstCopyIdx(nano_tree & nano, int imc)
   int mc_mom_id = nano.GenPart_pdgId().at(mc_mom_index);
   //cout<<mc_id<<":"<<mc_mom_index<<" mc_id:"<<mc_id<<" mc_mom_id: "<<mc_mom_id<<endl;
   if (mc_id == mc_mom_id) return GetFirstCopyIdx(nano, mc_mom_index);
-  if (bitset<15>(nano.GenPart_statusFlags().at(imc))[12] != 1) 
-  {
-    cout<<"[Error] GenParticleProducer::GetFirstCopyIdx is not firstCopy."<<endl;
-    cout<<"  imc:"<<imc<<" mc_id:"<<mc_id<<endl;
-  }
+  // if (bitset<15>(nano.GenPart_statusFlags().at(imc))[12] != 1) 
+  // {
+  //   cout<<"[Error] GenParticleProducer::GetFirstCopyIdx is not firstCopy."<<endl;
+  //   cout<<"  imc:"<<imc<<" mc_id:"<<mc_id<<endl;
+  // }
   return imc;
 }
 

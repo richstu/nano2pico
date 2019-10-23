@@ -13,10 +13,7 @@ ISRTools::ISRTools(const string &name_, int year_):
   isGluino(false),
   isTChi(false){
 
-  if((Contains(name, "TTJets_SingleLeptFromT_Tune") || 
-    Contains(name, "TTJets_SingleLeptFromTbar_Tune") || 
-    Contains(name, "TTJets_DiLept_Tune"))
-    && Contains(name, "madgraphMLM")) 
+  if(Contains(name, "TTJets_") && Contains(name, "madgraphMLM")) 
     isTTJets_LO = true;
 
   if(Contains(name, "SMS-T1") || Contains(name, "SMS-T5")) 

@@ -35,14 +35,14 @@ namespace {
   string pico_file = "";
   bool isData = false;
   bool isFastsim = false;
-  bool doSystematics = false;
   int year = 2016;
   int nent_test = -1;
+  bool debug = false;
 }
 
 void WriteDataQualityFilters(nano_tree& nano, pico_tree& pico);
 void CopyTriggerDecisions(nano_tree& nano, pico_tree& pico);
-
+void Initialize(corrections_tree& sum_of_wgts);
 void GetOptions(int argc, char *argv[]);
 
 int main(int argc, char *argv[]){
@@ -105,14 +105,10 @@ int main(int argc, char *argv[]){
   pico_tree pico("", pico_file);
   cout << "Writing output to: " << pico_file << endl;
 
-  corrections_tree corr("", wgt_sums_file);
+  corrections_tree sum_of_wgts("", wgt_sums_file);
   cout << "Writing sum-of-weights to: " << wgt_sums_file << endl;
-
-  corr.out_neff() = 0;
-  corr.out_nent_zlep() = 0;
-  corr.out_tot_weight_l0() = 0.;
-  corr.out_tot_weight_l1() = 0.;
-  corr.out_nent() = nentries;
+  Initialize(sum_of_wgts);
+  sum_of_wgts.out_nent() = nentries;
 
   for(size_t entry(0); entry<nentries; ++entry){
     nano.GetEntry(entry);
@@ -134,9 +130,11 @@ int main(int argc, char *argv[]){
     // N.B. Order in which producers are called matters! E.g. jets are not counted if overlapping 
     // with signal lepton, thus jets must be processed only after leptons have been selected.
     //-----------------------------------------------------------------------------------------------
+    if (debug) cout<<"INFO:: Writing gen particles"<<endl;
     mc_producer.WriteGenParticles(nano, pico);
     isr_tools.WriteISRSystemPt(nano, pico);
 
+    if (debug) cout<<"INFO:: Writing leptons, photons and tracks"<<endl;
     vector<int> jet_islep_nano_idx = vector<int>();
     vector<int> sig_el_nano_idx = el_producer.WriteElectrons(nano, pico, jet_islep_nano_idx);
     vector<int> sig_mu_nano_idx = mu_producer.WriteMuons(nano, pico, jet_islep_nano_idx);
@@ -150,6 +148,7 @@ int main(int argc, char *argv[]){
     dilep_producer.WriteDielectrons(nano, pico, sig_el_nano_idx);
     dilep_producer.WriteDimuons(nano, pico, sig_mu_nano_idx);
 
+    if (debug) cout<<"INFO:: Writing jets, MET and ISR vars"<<endl;
     vector<int> sig_jet_nano_idx = jet_producer.WriteJets(nano, pico, jet_islep_nano_idx, 
                                                           btag_wpts[year], btag_df_wpts[year]);
     jet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year][1]); // usually w.r.t. medium WP
@@ -184,6 +183,7 @@ int main(int argc, char *argv[]){
       }
     } 
 
+    if (debug) cout<<"INFO:: Writing analysis specific variables"<<endl;
     // might need as input sig_el_nano_idx, sig_mu_nano_idx, sig_ph_nano_idx
     zgamma_producer.WriteZGammaVars();
 
@@ -193,6 +193,7 @@ int main(int argc, char *argv[]){
     pico.out_low_dphi() = pico.out_jet_met_dphi()[0]<0.5 || pico.out_jet_met_dphi()[1]<0.5 ||
                           pico.out_jet_met_dphi()[2]<0.3 || pico.out_jet_met_dphi()[3]<0.3;
 
+    if (debug) cout<<"INFO:: Writing filters and triggers"<<endl;
     // N.B. Jets: pico.out_pass_jets() and pico.out_pass_fsjets() filled in jet_producer
     event_tools.WriteDataQualityFilters(nano, pico, sig_jet_nano_idx, isData, isFastsim);
     
@@ -201,56 +202,44 @@ int main(int argc, char *argv[]){
     // ----------------------------------------------------------------------------------------------
     //              *** Calculating weight branches ***
     // ----------------------------------------------------------------------------------------------
-
+    if (debug) cout<<"INFO:: Calculating weights"<<endl;
     float w_lep(1.), w_fs_lep(1.);
     vector<float> sys_lep(2,1.), sys_fs_lep(2,1.);
     lep_weighter.FullSim(pico, w_lep, sys_lep);
     if(isFastsim) lep_weighter.FastSim(pico, w_fs_lep, sys_fs_lep);
     pico.out_w_lep() = w_lep;
     pico.out_w_fs_lep() = w_fs_lep;
-    if (doSystematics) { // don't worry about systematics just yet
-      pico.out_sys_lep() = sys_lep; 
-      pico.out_sys_fs_lep() = sys_fs_lep;
-    }
+    pico.out_sys_lep() = sys_lep; 
+    pico.out_sys_fs_lep() = sys_fs_lep;
 
     pico.out_w_btag() = btag_weighter.EventWeight(pico, BTagEntry::OP_MEDIUM, ctr, ctr);
     pico.out_w_btag_df() = btag_df_weighter.EventWeight(pico, BTagEntry::OP_MEDIUM, ctr, ctr);
     pico.out_w_bhig() = btag_weighter.EventWeight(pico, op_all, ctr, ctr);
     pico.out_w_bhig_df() = btag_df_weighter.EventWeight(pico, op_all, ctr, ctr);
-    if (doSystematics) { // don't worry about systematics just yet
-      for(size_t i = 0; i<2; ++i){ 
-        pico.out_sys_bctag()[i] = btag_weighter.EventWeight(pico, BTagEntry::OP_MEDIUM, updn[i], ctr);
-        pico.out_sys_bchig()[i] = btag_weighter.EventWeight(pico, op_all, updn[i], ctr);
-        pico.out_sys_udsgtag()[i] = btag_weighter.EventWeight(pico, BTagEntry::OP_MEDIUM, ctr, updn[i]);
-        pico.out_sys_udsghig()[i] = btag_weighter.EventWeight(pico, op_all, ctr, updn[i]);
+    pico.out_sys_bchig().resize(2,0); pico.out_sys_udsghig().resize(2,0);
+    pico.out_sys_fs_bchig().resize(2,0); pico.out_sys_fs_udsghig().resize(2,0);
+    for(size_t i = 0; i<2; ++i){ 
+      pico.out_sys_bchig()[i] = btag_weighter.EventWeight(pico, op_all, updn[i], ctr);
+      pico.out_sys_udsghig()[i] = btag_weighter.EventWeight(pico, op_all, ctr, updn[i]);
+      if (isFastsim) {
+        pico.out_sys_fs_bchig()[i] = btag_weighter.EventWeight(pico, op_all, ctr, ctr, updn[i], ctr);
+        pico.out_sys_fs_udsghig()[i] = btag_weighter.EventWeight(pico, op_all, ctr, ctr, ctr, updn[i]);
       }
     }
 
-    // will be assigned in subsequent step? 
-    int neff_dataset(100e3); // @todo, if want to run in 1 step, need to get neff for full sample in advance
-    double xsec(0.); 
-    if (Contains(nano_file, "TChiHH")){
-      double exsec(0.);
-      int mchi = 100;//GetGluinoMass(nano_file); @todo
-      xsec::higgsinoCrossSection(mchi, xsec, exsec);
-    }else{
-      xsec = xsec::crossSection(nano_file, (year==2016));  
-    }
-    const float lumi = 1000.; // calc. weight for 1fb-1 of total lumi
-    pico.out_w_lumi() = xsec*lumi/neff_dataset; 
-
     // @todo, copy weights from babymaker
     pico.out_w_pu() = 1.;
+    pico.out_sys_pu().resize(2, 1.);
 
     isr_tools.WriteISRWeights(pico);
 
     // N.B. out_w_prefire should not be renormalized because it models an inefficiency, 
     // i.e. we SHOULD get less events!
     // This is on the @todo list, to be implemented based on: 
-    // https://github.com/cms-nanoAOD/nanoAOD-tools/blob/master/python/postprocessing/modules/common/PrefireCorr.py
+    // https://github.com/cms-nanoAOD/nanoAOD-tools/blob/master/python/postprocessing/modules/common/Prefiresum_of_wgts.py
     pico.out_w_prefire() = 1.;
 
-    pico.out_weight() = nano.Generator_weight() * pico.out_w_lumi() * w_lep *
+    pico.out_weight() = nano.Generator_weight() * w_lep * // * pico.out_w_lumi()
                         (isFastsim ? w_fs_lep : 1.) * pico.out_w_bhig() * pico.out_w_pu();
     if (year==2016 || isFastsim)
       pico.out_weight() *= pico.out_w_isr();
@@ -258,53 +247,78 @@ int main(int argc, char *argv[]){
     // ----------------------------------------------------------------------------------------------
     //              *** Add up weights to save for renormalization step ***
     // ----------------------------------------------------------------------------------------------
-
+    if (debug) cout<<"INFO:: Writing sum of weights"<<endl;
+    sum_of_wgts.out_weight() += pico.out_weight();
     // taking care of samples with negative weights
-    corr.out_neff() += nano.Generator_weight()>0 ? 1:-1;
+    sum_of_wgts.out_neff() += nano.Generator_weight()>0 ? 1:-1;
 
     // leptons, keeping track of 0l and 1l totals separately to determine the SF for 0l events
     if(pico.out_nlep()==0){
-      corr.out_nent_zlep() += 1.;
-      corr.out_tot_weight_l0() += pico.out_weight();
+      sum_of_wgts.out_nent_zlep() += 1.;
+      sum_of_wgts.out_tot_weight_l0() += pico.out_weight();
     }else{
-      corr.out_tot_weight_l1() += pico.out_weight();
-      corr.out_w_lep() += w_lep;
-      if(isFastsim) corr.out_w_fs_lep() += w_fs_lep;
+      sum_of_wgts.out_tot_weight_l1() += pico.out_weight();
+      sum_of_wgts.out_w_lep() += w_lep;
+      if(isFastsim) sum_of_wgts.out_w_fs_lep() += w_fs_lep;
       for(size_t i = 0; i<pico.out_sys_lep().size(); ++i){
-        corr.out_sys_lep().at(i) += sys_lep.at(i);
-        if(isFastsim) corr.out_sys_fs_lep().at(i) += sys_fs_lep.at(i);
+        sum_of_wgts.out_sys_lep()[i] += sys_lep[i];
+        sum_of_wgts.out_sys_fs_lep()[i] += sys_fs_lep[i];
       }
     }
+    sum_of_wgts.out_w_btag() += pico.out_w_btag();
+    sum_of_wgts.out_w_btag_df() += pico.out_w_btag_df();
+    sum_of_wgts.out_w_bhig() += pico.out_w_bhig();
+    sum_of_wgts.out_w_bhig_df() += pico.out_w_bhig_df();
+    sum_of_wgts.out_w_isr() += pico.out_w_isr();
+    sum_of_wgts.out_w_pu() += pico.out_w_pu();
 
-    // b-tag weights
-    corr.out_w_btag() += pico.out_w_btag();
-    corr.out_w_btag_df() += pico.out_w_btag_df();
-    corr.out_w_bhig() += pico.out_w_bhig();
-    corr.out_w_bhig_df() += pico.out_w_bhig_df();
-    if (doSystematics) { // don't worry about systematics just yet
-      for(size_t i = 0; i<2; ++i){ 
-        corr.out_sys_bctag()[i] += pico.out_sys_bctag()[i];
-        corr.out_sys_bchig()[i] += pico.out_sys_bchig()[i];
-        corr.out_sys_udsgtag()[i] += pico.out_sys_udsgtag()[i];
-        corr.out_sys_udsghig()[i] += pico.out_sys_udsghig()[i];
-      }
+    for(size_t i = 0; i<2; ++i){ 
+      sum_of_wgts.out_sys_bchig()[i] += pico.out_sys_bchig()[i];
+      sum_of_wgts.out_sys_udsghig()[i] += pico.out_sys_udsghig()[i];
+      sum_of_wgts.out_sys_fs_bchig()[i] += pico.out_sys_fs_bchig()[i];
+      sum_of_wgts.out_sys_fs_udsghig()[i] += pico.out_sys_fs_udsghig()[i];
+      sum_of_wgts.out_sys_isr()[i] += pico.out_sys_isr()[i];
+      sum_of_wgts.out_sys_pu()[i] += pico.out_sys_pu()[i];
     }
-
-    // general event vars
-    corr.out_weight() += pico.out_weight();
-    corr.out_w_isr() += pico.out_w_isr();
-    corr.out_w_pu() += pico.out_w_pu();
 
     pico.Fill();
   } // loop over events
 
-  corr.Fill();
-  corr.Write();
+  sum_of_wgts.Fill();
+  sum_of_wgts.Write();
   pico.Write();
 
   cout<<endl;
   time(&endtime); 
   cout<<"Time passed: "<<hoursMinSec(difftime(endtime, begtime))<<endl<<endl;  
+}
+
+void Initialize(corrections_tree &sum_of_wgts){
+  sum_of_wgts.out_neff() = 0;
+  sum_of_wgts.out_nent_zlep() = 0;
+  sum_of_wgts.out_tot_weight_l0() = 0.;
+  sum_of_wgts.out_tot_weight_l1() = 0.;
+
+  sum_of_wgts.out_weight() = 0.;
+  sum_of_wgts.out_w_lumi() = 0.;
+  sum_of_wgts.out_w_lep() = 0.;
+  sum_of_wgts.out_w_fs_lep() = 0.;
+  sum_of_wgts.out_w_btag() = 0.;
+  sum_of_wgts.out_w_btag_df() = 0.;
+  sum_of_wgts.out_w_bhig() = 0.;
+  sum_of_wgts.out_w_bhig_df() = 0.;
+  sum_of_wgts.out_w_isr() = 0.;
+  sum_of_wgts.out_w_pu() = 0.;
+  // w_prefire should not be normalized!!
+
+  sum_of_wgts.out_sys_lep().resize(2,0);
+  sum_of_wgts.out_sys_fs_lep().resize(2,0);
+  sum_of_wgts.out_sys_bchig().resize(2,0);
+  sum_of_wgts.out_sys_udsghig().resize(2,0);
+  sum_of_wgts.out_sys_fs_bchig().resize(2,0);
+  sum_of_wgts.out_sys_fs_udsghig().resize(2,0);
+  sum_of_wgts.out_sys_isr().resize(2,0);
+  sum_of_wgts.out_sys_pu().resize(2,0);
 }
 
 void GetOptions(int argc, char *argv[]){
