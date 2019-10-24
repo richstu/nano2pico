@@ -49,9 +49,13 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
     pico.out_el_charge().push_back(nano.Electron_charge()[iel]);
     pico.out_el_pflavor().push_back(nano.Electron_genPartFlav()[iel]);
     
-    if (nano.Electron_miniPFRelIso_all()[iel] < ElectronMiniIsoCut) pico.out_nvel()++;
+    if (nano.Electron_miniPFRelIso_all()[iel] < ElectronMiniIsoCut) {
+      pico.out_nvel()++;
+      pico.out_nvlep()++;
+    }
     if (isSignal) {
       pico.out_nel()++;
+      pico.out_nlep()++;
       sig_el_nano_idx.push_back(iel);
 
       // save indices of matching jets

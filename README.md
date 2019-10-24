@@ -7,10 +7,10 @@ Utility package for converting NanoAOD to "pico" analysis-ready ntuples.
 Step 1. Produce raw pico ntuple from a nano input file, adding `--isFastsim` and `--isData` if applicable:
 
 ~~~~bash
-./compile.sh && ./run/process_nano.exe --in_file ../data/nano10k_TTJets_SingleLeptFromT_genMET-150_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv3_PUMoriond17_94X_mcRun2_asymptotic_v3-v2.root --wgt_sums_file dummy.root --out_file pico10k.root
+./compile.sh && ./run/process_nano.exe --in_file INFILE --wgt_sums_file WGT_SUMS_FILE --out_file OUTFILE
 ~~~~
 
-:bangbang: Code functionality relies on the input NanoAOD filename! Specifically, `$INFILE` is parsed for:
+:bangbang: Code functionality relies on the input NanoAOD filename! Specifically, `INFILE` is parsed for:
 
 * flag `isData = infile.Contains("Run201") ? true : false;`
 * flag `isFastsim = infile.Contains("Fast") ? true : false;`
@@ -18,19 +18,16 @@ Step 1. Produce raw pico ntuple from a nano input file, adding `--isFastsim` and
 * output branch `type` is set based on the presence of dataset name substrings (see event_tools.cpp)
 * branches related on ISR also depend on the presence of dataset name substrings
 
-Step 2. For each dataset, add up the sums of weights obtained for each file in step 1 and calculate the corrections needed to normalize each individual weight as well as the total weight. Output to `$CORR_FILE`. Note that the order of options is fixed with the last argument being the input files in order to allow arbitrary number of input files.
+Step 2. For each dataset, add up the sums of weights obtained for each file in step 1 and calculate the corrections needed to normalize each individual weight as well as the total weight. Output to `CORR_FILE`. Note that the order of options is fixed with the last argument being the input files in order to allow arbitrary number of input files.
 
 ~~~~bash
-./compile.sh && ./run/merge_corrections.exe \
-    $YYYY \
-    $CORR_FILE \
-    $WGT_SUMS_FILE1 $WGT_SUMS_FILE2 $WGT_SUMS_FILE3 ...
+./compile.sh && ./run/merge_corrections.exe YYYY CORR_FILE WGT_SUMS_FILE1 WGT_SUMS_FILE2 ...
 ~~~~
 
 Step 3. Using the pico file from step 1 and the corrections file from step 2 as input, we can renormalize the weight branches as follows:
 
 ~~~~bash
-./compile.sh && ./run/apply_corr.exe --in_file $PICO_STEP1 --corr_file $CORR_STEP2 --out_file $OUTFILE
+./compile.sh && ./run/apply_corr.exe --in_file PICO_STEP1 --corr_file CORR_STEP2 --out_file OUTFILE
 ~~~~
 
 ### Calculating b-tagging efficiencies

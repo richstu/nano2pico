@@ -80,7 +80,7 @@ float jetsys_nob_m
 
 ##################   Leptons   ################
 int nlep
-int nlep_tm
+int nvlep
 
 int nmu
 int nvmu
