@@ -1,6 +1,7 @@
 #include "event_tools.hpp"
 
 #include "utilities.hpp"
+#include "hig_trig_eff.hpp"
 
 using namespace std;
 
@@ -310,4 +311,14 @@ int EventTools::GetEventType(){
     }
     return code;
   }
+}
+
+void EventTools::WriteTriggerEfficiency(pico_tree &pico) {
+  // trigger efficiency and uncertainty - @todo, needs to be updated to full Run 2 trig eff. measurement
+  pico.out_eff_trig() = hig_trig_eff::eff(pico);
+  float effunc = hig_trig_eff::eff_unc(pico);
+  pico.out_sys_trig().resize(2,0);
+  pico.out_sys_trig()[0] = 1+effunc;
+  pico.out_sys_trig()[1] = 1-effunc;
+
 }

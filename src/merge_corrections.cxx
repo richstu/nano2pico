@@ -9,14 +9,14 @@
 using namespace std;
 
 template<typename T, typename U>
-void CopySize(const vector<T> &sum_of_wgts, vector<U> &corr){
-  corr = vector<U>(sum_of_wgts.size(), static_cast<U>(0.));
+void CopySize(const vector<T> &wgt_sums, vector<U> &corr){
+  corr = vector<U>(wgt_sums.size(), static_cast<U>(0.));
 }
 
 template<typename T, typename U>
-void VecAdd(const vector<T> &sum_of_wgts, vector<U> &corr){
-  for(size_t i = 0; i < sum_of_wgts.size(); ++i){
-    corr.at(i) += sum_of_wgts.at(i);
+void VecAdd(const vector<T> &wgt_sums, vector<U> &corr){
+  for(size_t i = 0; i < wgt_sums.size(); ++i){
+    corr.at(i) += wgt_sums.at(i);
   }
 }
 
@@ -30,8 +30,8 @@ void Normalize(vector<T> &v, double nent){
   for(auto &x: v) x = x ? nent/x : 1.;
 }
 
-void Initialize(corrections_tree &sum_of_wgts, corrections_tree &corr);
-void AddEntry(corrections_tree &sum_of_wgts, corrections_tree &corr);
+void Initialize(corrections_tree &wgt_sums, corrections_tree &corr);
+void AddEntry(corrections_tree &wgt_sums, corrections_tree &corr);
 int GetGluinoMass(const string &path);
 void FixLumi(corrections_tree &corr, const string &corr_path, int year);
 void FixISR(corrections_tree &corr, const string &corr_path, int year);
@@ -50,22 +50,22 @@ int main(int argc, char *argv[]){
   vector<string> input_paths(argv+3, argv+argc);
 
   corrections_tree corr("", output_path.c_str());
-  corrections_tree sum_of_wgts(input_paths.front().c_str());
+  corrections_tree wgt_sums(input_paths.front().c_str());
   for(size_t i = 1; i < input_paths.size(); ++i){
-    sum_of_wgts.intree_->Add(input_paths.at(i).c_str());
+    wgt_sums.intree_->Add(input_paths.at(i).c_str());
   }
 
-  size_t num_entries = sum_of_wgts.GetEntries();
+  size_t num_entries = wgt_sums.GetEntries();
   if(num_entries <= 0){
     cout << "No entries in input files!" << endl;
     return 1;
   } 
-  sum_of_wgts.GetEntry(0);
-  Initialize(sum_of_wgts, corr);
+  wgt_sums.GetEntry(0);
+  Initialize(wgt_sums, corr);
 
   for(size_t i = 0; i < num_entries; ++i){
-    sum_of_wgts.GetEntry(i);
-    AddEntry(sum_of_wgts, corr);
+    wgt_sums.GetEntry(i);
+    AddEntry(wgt_sums, corr);
   }
 
   FixLumi(corr, output_path, year);
@@ -79,7 +79,7 @@ int main(int argc, char *argv[]){
   cout << "Wrote output to " << output_path << endl;
 }
 
-void Initialize(corrections_tree &sum_of_wgts, corrections_tree &corr){
+void Initialize(corrections_tree &wgt_sums, corrections_tree &corr){
   corr.out_weight() = 0.;
   corr.out_w_lumi() = 0.;
   corr.out_w_lep() = 0.;
@@ -98,52 +98,52 @@ void Initialize(corrections_tree &sum_of_wgts, corrections_tree &corr){
   corr.out_tot_weight_l0() = 0.;
   corr.out_tot_weight_l1() = 0.;
 
-  CopySize(sum_of_wgts.sys_lep(),                corr.out_sys_lep());
-  CopySize(sum_of_wgts.sys_fs_lep(),             corr.out_sys_fs_lep());
-  CopySize(sum_of_wgts.sys_bchig(),              corr.out_sys_bchig());
-  CopySize(sum_of_wgts.sys_udsghig(),            corr.out_sys_udsghig());
-  CopySize(sum_of_wgts.sys_fs_bchig(),           corr.out_sys_fs_bchig());
-  CopySize(sum_of_wgts.sys_fs_udsghig(),         corr.out_sys_fs_udsghig());
-  CopySize(sum_of_wgts.sys_isr(),                corr.out_sys_isr());
-  CopySize(sum_of_wgts.sys_pu(),                 corr.out_sys_pu());
-  // CopySize(sum_of_wgts.sys_muf(),                corr.out_sys_muf());
-  // CopySize(sum_of_wgts.sys_mur(),                corr.out_sys_mur());
-  // CopySize(sum_of_wgts.sys_murf(),               corr.out_sys_murf());
-  // CopySize(sum_of_wgts.w_pdf(),                  corr.out_w_pdf());
-  // CopySize(sum_of_wgts.sys_pdf(),                corr.out_sys_pdf());
+  CopySize(wgt_sums.sys_lep(),                corr.out_sys_lep());
+  CopySize(wgt_sums.sys_fs_lep(),             corr.out_sys_fs_lep());
+  CopySize(wgt_sums.sys_bchig(),              corr.out_sys_bchig());
+  CopySize(wgt_sums.sys_udsghig(),            corr.out_sys_udsghig());
+  CopySize(wgt_sums.sys_fs_bchig(),           corr.out_sys_fs_bchig());
+  CopySize(wgt_sums.sys_fs_udsghig(),         corr.out_sys_fs_udsghig());
+  CopySize(wgt_sums.sys_isr(),                corr.out_sys_isr());
+  CopySize(wgt_sums.sys_pu(),                 corr.out_sys_pu());
+  // CopySize(wgt_sums.sys_muf(),                corr.out_sys_muf());
+  // CopySize(wgt_sums.sys_mur(),                corr.out_sys_mur());
+  // CopySize(wgt_sums.sys_murf(),               corr.out_sys_murf());
+  // CopySize(wgt_sums.w_pdf(),                  corr.out_w_pdf());
+  // CopySize(wgt_sums.sys_pdf(),                corr.out_sys_pdf());
 }
 
 
-void AddEntry(corrections_tree &sum_of_wgts, corrections_tree &corr){
-  corr.out_neff() += sum_of_wgts.neff();
-  corr.out_nent() += sum_of_wgts.nent();
-  corr.out_nent_zlep() += sum_of_wgts.nent_zlep();
-  corr.out_tot_weight_l0() += sum_of_wgts.tot_weight_l0();
-  corr.out_tot_weight_l1() += sum_of_wgts.tot_weight_l1();
+void AddEntry(corrections_tree &wgt_sums, corrections_tree &corr){
+  corr.out_neff() += wgt_sums.neff();
+  corr.out_nent() += wgt_sums.nent();
+  corr.out_nent_zlep() += wgt_sums.nent_zlep();
+  corr.out_tot_weight_l0() += wgt_sums.tot_weight_l0();
+  corr.out_tot_weight_l1() += wgt_sums.tot_weight_l1();
 
-  corr.out_weight()            += sum_of_wgts.weight();
-  corr.out_w_lep()             += sum_of_wgts.w_lep();
-  corr.out_w_fs_lep()          += sum_of_wgts.w_fs_lep();
-  corr.out_w_bhig()            += sum_of_wgts.w_bhig();
-  corr.out_w_btag()            += sum_of_wgts.w_btag();
-  corr.out_w_bhig_df()         += sum_of_wgts.w_bhig_df();
-  corr.out_w_btag_df()         += sum_of_wgts.w_btag_df();
-  corr.out_w_isr()             += sum_of_wgts.w_isr();
-  corr.out_w_pu()              += sum_of_wgts.w_pu();
+  corr.out_weight()            += wgt_sums.weight();
+  corr.out_w_lep()             += wgt_sums.w_lep();
+  corr.out_w_fs_lep()          += wgt_sums.w_fs_lep();
+  corr.out_w_bhig()            += wgt_sums.w_bhig();
+  corr.out_w_btag()            += wgt_sums.w_btag();
+  corr.out_w_bhig_df()         += wgt_sums.w_bhig_df();
+  corr.out_w_btag_df()         += wgt_sums.w_btag_df();
+  corr.out_w_isr()             += wgt_sums.w_isr();
+  corr.out_w_pu()              += wgt_sums.w_pu();
 
-  VecAdd(sum_of_wgts.sys_lep(),           corr.out_sys_lep());
-  VecAdd(sum_of_wgts.sys_fs_lep(),        corr.out_sys_fs_lep());
-  VecAdd(sum_of_wgts.sys_bchig(),         corr.out_sys_bchig());
-  VecAdd(sum_of_wgts.sys_udsghig(),       corr.out_sys_udsghig());
-  VecAdd(sum_of_wgts.sys_fs_bchig(),      corr.out_sys_fs_bchig());
-  VecAdd(sum_of_wgts.sys_fs_udsghig(),    corr.out_sys_fs_udsghig());
-  VecAdd(sum_of_wgts.sys_isr(),           corr.out_sys_isr());
-  VecAdd(sum_of_wgts.sys_pu(),            corr.out_sys_pu());
-  // VecAdd(sum_of_wgts.sys_muf(),           corr.out_sys_muf());
-  // VecAdd(sum_of_wgts.sys_mur(),           corr.out_sys_mur());
-  // VecAdd(sum_of_wgts.sys_murf(),          corr.out_sys_murf());
-  // VecAdd(sum_of_wgts.w_pdf(),             corr.out_w_pdf());
-  // VecAdd(sum_of_wgts.sys_pdf(),           corr.out_sys_pdf());
+  VecAdd(wgt_sums.sys_lep(),           corr.out_sys_lep());
+  VecAdd(wgt_sums.sys_fs_lep(),        corr.out_sys_fs_lep());
+  VecAdd(wgt_sums.sys_bchig(),         corr.out_sys_bchig());
+  VecAdd(wgt_sums.sys_udsghig(),       corr.out_sys_udsghig());
+  VecAdd(wgt_sums.sys_fs_bchig(),      corr.out_sys_fs_bchig());
+  VecAdd(wgt_sums.sys_fs_udsghig(),    corr.out_sys_fs_udsghig());
+  VecAdd(wgt_sums.sys_isr(),           corr.out_sys_isr());
+  VecAdd(wgt_sums.sys_pu(),            corr.out_sys_pu());
+  // VecAdd(wgt_sums.sys_muf(),           corr.out_sys_muf());
+  // VecAdd(wgt_sums.sys_mur(),           corr.out_sys_mur());
+  // VecAdd(wgt_sums.sys_murf(),          corr.out_sys_murf());
+  // VecAdd(wgt_sums.w_pdf(),             corr.out_w_pdf());
+  // VecAdd(wgt_sums.sys_pdf(),           corr.out_sys_pdf());
 }
 
 int GetGluinoMass(const string &path){
