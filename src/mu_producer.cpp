@@ -37,7 +37,7 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
     pico.out_mu_charge().push_back(nano.Muon_charge()[imu]);
     pico.out_mu_pflavor().push_back(nano.Muon_genPartFlav()[imu]);
 
-    pico.out_nvmu()++;
+    if (nano.Muon_miniPFRelIso_all()[imu] < MuonMiniIsoCut) pico.out_nvmu()++;
     if (isSig) {
       pico.out_nmu()++;
       sig_mu_nano_idx.push_back(imu);

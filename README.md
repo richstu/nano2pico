@@ -7,10 +7,7 @@ Utility package for converting NanoAOD to "pico" analysis-ready ntuples.
 Step 1. Produce raw pico ntuple from a nano input file, adding `--isFastsim` and `--isData` if applicable:
 
 ~~~~bash
-./compile.sh && ./run/process_nano.exe \
-    --in_file $INFILE \
-    --wgt_sums_file $SUM_OF_WGTS \
-    --out_file $OUTFILE
+./compile.sh && ./run/process_nano.exe --in_file ../data/nano10k_TTJets_SingleLeptFromT_genMET-150_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv3_PUMoriond17_94X_mcRun2_asymptotic_v3-v2.root --wgt_sums_file dummy.root --out_file pico10k.root
 ~~~~
 
 :bangbang: Code functionality relies on the input NanoAOD filename! Specifically, `$INFILE` is parsed for:

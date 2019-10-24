@@ -49,7 +49,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
     pico.out_el_charge().push_back(nano.Electron_charge()[iel]);
     pico.out_el_pflavor().push_back(nano.Electron_genPartFlav()[iel]);
     
-    pico.out_nvel()++;
+    if (nano.Electron_miniPFRelIso_all()[iel] < ElectronMiniIsoCut) pico.out_nvel()++;
     if (isSignal) {
       pico.out_nel()++;
       sig_el_nano_idx.push_back(iel);
@@ -84,7 +84,7 @@ bool ElectronProducer::idElectron_noIso(int bitmap, int level){
   bool pass = true;
   // cout<<std::bitset<8*sizeof(bitmap)>(bitmap)<<endl;
   for (int i(0); i<10; i++){
-    if (i==5) continue;
+    if (i==7) continue;
     if ( ((bitmap >> i*3) & 0x7) < level) pass = false;
   }
   return pass;
