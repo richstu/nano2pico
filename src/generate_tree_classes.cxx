@@ -537,7 +537,7 @@ void WriteSource(const vector<Variable> &vars, const string name){
   file << "  }\n\n";
   
   file << "  if (!readOnly_) {\n";
-  file << "    outfile_ = new TFile(outfile, \"recreate\");\n";
+  file << "    outfile_ = new TFile(outfile, \"recreate\", outfile, 209); // compression LZMA level 9 \n";
   file << "    if(!outfile_->IsOpen()) cout << \"Could not open output file \"<<outfile.Data()<<endl;\n";
   file << "    outfile_->cd();\n";
   file << "    if (!writeOnly_) {\n";

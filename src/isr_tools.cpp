@@ -1,5 +1,7 @@
 #include "isr_tools.hpp"
 
+#include <bitset>
+
 #include "TLorentzVector.h"
 
 #include "utilities.hpp"

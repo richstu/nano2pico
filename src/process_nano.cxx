@@ -31,8 +31,8 @@ using namespace std;
 
 namespace {
   string in_file = "";
-  string wgt_sums_file = "";
-  string out_file = "";
+  string in_dir = "";
+  string out_dir = "";
   int nent_test = -1;
   bool debug = false;
 }
@@ -46,17 +46,21 @@ int main(int argc, char *argv[]){
   // gErrorIgnoreLevel=6000; // Turns off ROOT errors due to missing branches       
   GetOptions(argc, argv);
 
+  if(in_file=="" || in_dir=="" || out_dir == "") {
+    cout<<"ERROR: Input file, sum-of-weights and/or output directory not specified. Exit."<<endl;
+    exit(0);
+  }
+
+  string in_path = in_dir+"/"+in_file;
+  string wgt_sums_path = out_dir+"/wgt_sums/wgt_sums_"+in_file;
+  string out_path = out_dir+"/raw_pico/raw_pico_"+in_file;
+
   bool isData = Contains(in_file, "Run201") ? true : false;
   bool isFastsim = Contains(in_file, "Fast") ? true : false;
   int year = Contains(in_file, "RunIISummer16") ? 2016 : (Contains(in_file, "RunIIFall17") ? 2017 : 2018);
 
   time_t begtime, endtime;
   time(&begtime);
-
-  if(in_file=="" || wgt_sums_file == "" || out_file == "") {
-    cout<<"ERROR: Input file, sum-of-weights and/or output directory not specified. Exit."<<endl;
-    exit(0);
-  }
 
   // B-tag working points
   map<int, vector<float>> btag_wpts{
@@ -90,24 +94,24 @@ int main(int argc, char *argv[]){
   LeptonWeighter lep_weighter(year);
 
   // Other tools
-  EventTools event_tools(in_file, year);
+  EventTools event_tools(in_path, year);
   int event_type = event_tools.GetEventType();
 
-  ISRTools isr_tools(in_file, year);
+  ISRTools isr_tools(in_path, year);
 
   // Initialize trees
-  nano_tree nano(in_file);
+  nano_tree nano(in_path);
   size_t nentries(nent_test>0 ? nent_test : nano.GetEntries());
-  cout << "Nano file: " << in_file << endl;
+  cout << "Nano file: " << in_path << endl;
   cout << "Input number of events: " << nentries << endl;
   // cout << "Running on "<< (isFastsim ? "FastSim" : "FullSim") << endl;
   // cout << "Calculating weights based on " << year << " scale factors." << endl;
 
-  pico_tree pico("", out_file);
-  cout << "Writing output to: " << out_file << endl;
+  pico_tree pico("", out_path);
+  cout << "Writing output to: " << out_path << endl;
 
-  corrections_tree wgt_sums("", wgt_sums_file);
-  cout << "Writing sum-of-weights to: " << wgt_sums_file << endl;
+  corrections_tree wgt_sums("", wgt_sums_path);
+  cout << "Writing sum-of-weights to: " << wgt_sums_path << endl;
   Initialize(wgt_sums);
   wgt_sums.out_nent() = nentries;
 
@@ -330,28 +334,28 @@ void Initialize(corrections_tree &wgt_sums){
 void GetOptions(int argc, char *argv[]){
   while(true){
     static struct option long_options[] = {
-      {"in_file", required_argument, 0, 'i'},
-      {"wgt_sums_file", required_argument, 0, 'w'}, 
-      {"out_file", required_argument, 0, 'o'},
+      {"in_file", required_argument, 0, 'f'}, 
+      {"in_dir", required_argument, 0, 'i'},
+      {"out_dir", required_argument, 0, 'o'},
       {"nent", required_argument, 0, 0},
       {0, 0, 0, 0}
     };
 
     char opt = -1;
     int option_index;
-    opt = getopt_long(argc, argv, "i:w:o:", long_options, &option_index);
+    opt = getopt_long(argc, argv, "f:i:o:", long_options, &option_index);
     if(opt == -1) break;
 
     string optname;
     switch(opt){
-    case 'i':
+    case 'f':
       in_file = optarg;
       break;
-    case 'w':
-      wgt_sums_file = optarg;
+    case 'i':
+      in_dir = optarg;
       break;
     case 'o':
-      out_file = optarg;
+      out_dir = optarg;
       break;
     case 0:
       optname = long_options[option_index].name;
