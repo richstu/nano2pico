@@ -12,9 +12,9 @@
 using namespace std;
 
 namespace {
-  string corr_file = "";
   string in_file = "";
-  string out_file = "";
+  string in_dir = "";
+  string corr_file = "";
 }
 
 void GetOptions(int argc, char *argv[]);
@@ -26,9 +26,11 @@ int main(int argc, char *argv[]){
   time_t begtime, endtime;
   time(&begtime);
 
-  pico_tree pico(in_file, out_file);
-  long nent = pico.GetEntries();
-  cout<<"Running on input file: "<<in_file<<" with "<<nent<<endl;
+  string in_file_path = in_dir+"/"+in_file;
+  cout<<"Running on input file: "<<in_file_path<<endl;
+
+  string out_file = CopyReplaceAll(in_dir, "/raw_pico/","/unskimmed/") + CopyReplaceAll(in_file, "raw_","");
+  corr_file = CopyReplaceAll(in_dir, "/raw_pico/","/corrections/")+corr_file;
 
   cout<<"Corrections file: "<<corr_file<<endl;
   corrections_tree corr(corr_file);
@@ -38,7 +40,8 @@ int main(int argc, char *argv[]){
   }
   corr.GetEntry(0);
 
-  for(long entry(0); entry<nent; entry++){
+  pico_tree pico(in_file_path, out_file);
+  for(long entry(0); entry<pico.GetEntries(); entry++){
 
     pico.GetEntry(entry);
     if (entry%100000==0) {
@@ -111,27 +114,27 @@ int main(int argc, char *argv[]){
 void GetOptions(int argc, char *argv[]){
   while(true){
     static struct option long_options[] = {
-      {"in_file", required_argument, 0, 'i'},  
+      {"in_file", required_argument, 0, 'f'},  
+      {"in_dir", required_argument, 0, 'i'},  
       {"corr_file", required_argument, 0, 'c'},
-      {"out_file", required_argument, 0, 'o'}, 
       {0, 0, 0, 0}
     };
 
     char opt = -1;
     int option_index;
-    opt = getopt_long(argc, argv, "i:c:o:", long_options, &option_index);
+    opt = getopt_long(argc, argv, "f:i:c:", long_options, &option_index);
     if(opt == -1) break;
 
     string optname;
     switch(opt){
-    case 'i':
+    case 'f':
       in_file = optarg;
+      break;
+    case 'i':
+      in_dir = optarg;
       break;
     case 'c':
       corr_file = optarg;
-      break;
-    case 'o':
-      out_file = optarg;
       break;
     case 0:
       break;

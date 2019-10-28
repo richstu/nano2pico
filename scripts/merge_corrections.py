@@ -21,9 +21,8 @@ def ensureDir(path):
 def getTag(path):
   tag = path.split("/")[-1]
   tag = tag.split("RunIISummer16NanoAODv5")[0]
-  tag = tag.replace("pico_","")
+  tag = tag.replace("wgt_sums_","")
   tag = tag.strip("_")
-  tag = tag.split("__")[0]
   return tag
 
 def mergeCorrections(wgt_dir, corr_dir, year):
@@ -54,9 +53,9 @@ def mergeCorrections(wgt_dir, corr_dir, year):
 if __name__ == "__main__":
   parser = argparse.ArgumentParser(description="Merges multiple sum-of-weights files into one corrections file per tag.",
                                    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-  parser.add_argument("-w", "--wgt_dir", default=os.getenv("$PWD$")+"/sum_of_weights/",
+  parser.add_argument("-w", "--wgt_dir", default=os.getcwd()+"/wgt_sums/",
                       help="Directory from which to read sum-of-weights files")
-  parser.add_argument("-c", "--corr_dir", default=os.getenv("$PWD$")+"/corrections/",
+  parser.add_argument("-c", "--corr_dir", default=os.getcwd()+"/corrections/",
                       help="Directory in which to store corrections files")
   parser.add_argument("-y","--year", type=int, default=2016, help="Sample year.")
   args = parser.parse_args()

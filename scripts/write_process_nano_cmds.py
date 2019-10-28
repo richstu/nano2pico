@@ -25,23 +25,34 @@ with open(args.datasets_file) as f:
   datasets = f.readlines()
 
 
+wanted_file_substr = []
+for ds in datasets:
+  if ds[0]!="/": # in case of empty lines or comments
+    continue
+  tmp_ = ds.split("/")
+  wanted_file_substr.append(tmp_[1]+'__'+tmp_[2].replace("NanoAODv5-","NanoAODv5__"))
+
+all_file_paths = glob(os.path.join(in_dir,'*.root'))
+in_file_paths = []
+for istr in wanted_file_substr:
+  for ifile in all_file_paths:
+    if (istr in ifile):
+      in_file_paths.append(ifile)
+
+print("Found {} input files.\n".format(len(in_file_paths)))
+
+
 cmdfile = open(args.out_cmd_file,'w')
 cmdfile.write('#!/bin/env python\n')
-
-for ds in datasets:
-  tmp_ = ds.split("/")
-  if len(tmp) > 1: # in case of empty lines in file
-    ds = tmp_[1]
-  in_file_paths = glob(os.path.join(in_dir,'*'+ds+'*.root'))
-  for ifile_path in in_file_paths:
-    ifile = os.path.basename(os.path.realpath(ifile_path))
-    cmd = '{}/run/process_nano.exe -f {} -i {} -o {}'.format(os.getcwd(), ifile, in_dir, out_base_dir)
-    cmdfile.write('print(\"'+cmd+'\")\n')
+for ifile_path in in_file_paths:
+  ifile = os.path.basename(os.path.realpath(ifile_path))
+  cmd = '{}/run/process_nano.exe -f {} -i {} -o {}'.format(os.getcwd(), ifile, in_dir, out_base_dir)
+  cmdfile.write('print(\"'+cmd+'\")\n')
 
 cmdfile.close()
 os.chmod(args.out_cmd_file, 0o755)
 
 print("To generate job json and submit jobs do: ")
-print('convert_cl_to_jobs_info.py '+cmdfile+' '+production+'.json')
+print('convert_cl_to_jobs_info.py '+args.out_cmd_file+' '+production+'.json')
 print('auto_submit_jobs.py '+production+'.json')
   

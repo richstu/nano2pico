@@ -88,7 +88,7 @@ int GetArrayLength(const std::string var_name){
   else if (var_type == "Tau") return 10;
   else if (var_type == "IsoTrack") return 20;
   else if (var_type == "Photon") return 20;
-  else if (var_type == "Jet") return 30;
+  else if (var_type == "Jet") return 40;
   else if (var_type == "SoftActivityJet") return 30;
   else if (var_type == "FatJet") return 20;
   else if (var_type == "SubJet") return 30;

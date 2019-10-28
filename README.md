@@ -7,8 +7,10 @@ Utility package for converting NanoAOD to "pico" analysis-ready ntuples.
 Step 1. Produce raw pico ntuple from a nano input file, adding `--isFastsim` and `--isData` if applicable:
 
 ~~~~bash
-./compile.sh && ./run/process_nano.exe --in_file INFILE --wgt_sums_file WGT_SUMS_FILE --out_file OUTFILE
+./compile.sh && ./run/process_nano.exe --in_file INFILE --in_dir INDIR --out_dir OUTDIR
 ~~~~
+
+Note that for interactive jobs, you need to ensure that the output directory subfolders `wgt_sums` and `raw_pico` exist.
 
 :bangbang: Code functionality relies on the input NanoAOD filename! Specifically, `INFILE` is parsed for:
 
@@ -27,7 +29,54 @@ Step 2. For each dataset, add up the sums of weights obtained for each file in s
 Step 3. Using the pico file from step 1 and the corrections file from step 2 as input, we can renormalize the weight branches as follows:
 
 ~~~~bash
-./compile.sh && ./run/apply_corr.exe --in_file PICO_STEP1 --corr_file CORR_STEP2 --out_file OUTFILE
+./compile.sh && ./run/apply_corr.exe --in_file PICO_STEP1 --in_dir INDIR --corr_file CORR_STEP2
+~~~~
+
+### Batch system
+
+Setup Jaebak's queue system:
+
+~~~~bash
+CMSSW=/net/top/homes/jbkim/analysis/CMSSW
+RELEASE=CMSSW_10_2_11_patch1
+
+. /cvmfs/cms.cern.ch/cmsset_default.sh;
+cd $CMSSW/$RELEASE/src;
+eval `scramv1 runtime -sh`;
+cd -;
+
+cd ../
+git clone --recurse-submodules https://github.com/richstu/copydataset
+cd copydatasets
+source set_env.sh
+cd ../nano2pico
+~~~~
+
+Step 1. Converting Nano to Pico:
+Generate a python file that prints the commands to be run in the batch (input for the queue system):
+
+~~~~bash 
+./scripts/write_cmd_file.py --in_dir /mnt/hadoop/pico/NanoAODv5/nano/2016/mc/ --production higgsino_angeles --datasets_file datasets/higgsino_2016_mc_dataset_paths.txt --out_dir --out_cmd_file cmds.py
+~~~~
+
+Submit the jobs with a script that compares the input and output number of entries. Note the check can be performed later if one needs to detach the session. Or this command can be started in screen:
+
+~~~~bash 
+convert_cl_to_jobs_info.py cmds.py higgsino_angeles.json
+auto_submit_jobs.py higgsino_angeles.json -c scripts/check_process_nano_job.py
+~~~~
+
+To check the jobs later on:
+
+~~~~bash 
+check_jobs.py auto_higgsino_angeles.json -c scripts/check_process_nano_job.py
+~~~~
+
+The json file here is the most recent trusted record of the status of the jobs. To resubmit failed jobs:
+
+~~~~bash 
+select_resubmit_jobs.py checked_auto_higgsino_angeles.json -c scripts/check_process_nano_job.py 
+auto_submit_jobs.py resubmit_checked_auto_higgsino_angeles.json -c scripts/check_process_nano_job.py 
 ~~~~
 
 ### Calculating b-tagging efficiencies

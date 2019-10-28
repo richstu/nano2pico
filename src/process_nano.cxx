@@ -116,6 +116,7 @@ int main(int argc, char *argv[]){
   wgt_sums.out_nent() = nentries;
 
   for(size_t entry(0); entry<nentries; ++entry){
+    if (entry < 502000) continue;
     nano.GetEntry(entry);
     if (entry%1000==0 || entry == nentries-1) {
       cout<<"Processing event: "<<entry<<endl;
@@ -195,8 +196,11 @@ int main(int argc, char *argv[]){
     //save higgs variables using DeepCSV and DeepFlavor
     hig_producer.WriteHigVars(pico, /*DeepFlavor*/ false);
     hig_producer.WriteHigVars(pico, true);
-    pico.out_low_dphi() = pico.out_jet_met_dphi()[0]<0.5 || pico.out_jet_met_dphi()[1]<0.5 ||
-                          pico.out_jet_met_dphi()[2]<0.3 || pico.out_jet_met_dphi()[3]<0.3;
+    pico.out_low_dphi() = false;
+    if (pico.out_jet_met_dphi().size()>3) {
+      pico.out_low_dphi() = pico.out_jet_met_dphi()[0]<0.5 || pico.out_jet_met_dphi()[1]<0.5 ||
+                            pico.out_jet_met_dphi()[2]<0.3 || pico.out_jet_met_dphi()[3]<0.3;
+    }
 
     if (debug) cout<<"INFO:: Writing filters and triggers"<<endl;
     // N.B. Jets: pico.out_pass_jets() and pico.out_pass_fsjets() filled in jet_producer
