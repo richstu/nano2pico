@@ -89,8 +89,10 @@ int main(int argc, char *argv[]){
   const string ctr = "central";
   const vector<string> updn = {"up","down"};
   const vector<BTagEntry::OperatingPoint> op_all = {BTagEntry::OP_LOOSE, BTagEntry::OP_MEDIUM, BTagEntry::OP_TIGHT};
-  BTagWeighter btag_weighter(year, isFastsim, false, btag_wpts[year]);
-  BTagWeighter btag_df_weighter(year, isFastsim, true, btag_df_wpts[year]);
+  BTagWeighter btag_weighter(year, false, false, btag_wpts[year]); // not applying the FastSim scale factors for now since they seem to have NaN's...
+  BTagWeighter btag_df_weighter(year, false, true, btag_df_wpts[year]);
+  // BTagWeighter btag_weighter(year, isFastsim, false, btag_wpts[year]);
+  // BTagWeighter btag_df_weighter(year, isFastsim, true, btag_df_wpts[year]);
   LeptonWeighter lep_weighter(year);
 
   // Other tools
@@ -116,7 +118,6 @@ int main(int argc, char *argv[]){
   wgt_sums.out_nent() = nentries;
 
   for(size_t entry(0); entry<nentries; ++entry){
-    if (entry < 502000) continue;
     nano.GetEntry(entry);
     if (entry%1000==0 || entry == nentries-1) {
       cout<<"Processing event: "<<entry<<endl;

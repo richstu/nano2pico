@@ -14,8 +14,6 @@ parser = argparse.ArgumentParser(description="Submits batch jobs to apply new SF
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument("-i","--in_dir", default="/net/cms29/cms29r0/pico/NanoAODv5/higgsino_angeles/2016/mc/raw_pico/",
                     help="Directory where the raw pico files are")
-parser.add_argument("-d","--datasets_file", default="datasets/higgsino_2016_mc_dataset_paths.txt",
-                    help="File with the list of dataset names as they appear in DAS")
 parser.add_argument("-o","--out_cmd_file", default="cmds.py",
                     help="File with list of commands for batch system.")
 args = parser.parse_args()

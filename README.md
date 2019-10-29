@@ -52,32 +52,56 @@ source set_env.sh
 cd ../nano2pico
 ~~~~
 
-Step 1. Converting Nano to Pico:
+# Step 1. Converting Nano to Pico:
 Generate a python file that prints the commands to be run in the batch (input for the queue system):
 
 ~~~~bash 
-./scripts/write_cmd_file.py --in_dir /mnt/hadoop/pico/NanoAODv5/nano/2016/mc/ --production higgsino_angeles --datasets_file datasets/higgsino_2016_mc_dataset_paths.txt --out_dir --out_cmd_file cmds.py
+./scripts/write_process_nano_cmds.py --in_dir /mnt/hadoop/pico/NanoAODv5/nano/2016/mc/ \
+                                      --production higgsino_angeles \
+                                      --dataset_list datasets/higgsino_2016_mc_dataset_list.txt
 ~~~~
 
-Submit the jobs with a script that compares the input and output number of entries. Note the check can be performed later if one needs to detach the session. Or this command can be started in screen:
+or for signal, just specify the appropriate input folder and omit the `--dataset_list` argument to run on all files in the input folder.
+
+This produces the commands in `cmds.py`. You can perform a last check by running one of the commands interactively. Next, submit the jobs to the batch system. Note the -c option which allows to attach a script that compares the input and output number of entries when each job is done. Note the check can be performed later if one needs to detach the session. Alternatively, this command can be started in screen:
 
 ~~~~bash 
 convert_cl_to_jobs_info.py cmds.py higgsino_angeles.json
 auto_submit_jobs.py higgsino_angeles.json -c scripts/check_process_nano_job.py
 ~~~~
 
-To check the jobs later on:
+To check whether the jobs were successful later on do something like, where `auto_higgsino_angeles.json` is generated earlier by the `auto_submit_jobs.py` command:
 
 ~~~~bash 
 check_jobs.py auto_higgsino_angeles.json -c scripts/check_process_nano_job.py
 ~~~~
 
-The json file here is the most recent trusted record of the status of the jobs. To resubmit failed jobs:
+This command will result in `checked_auto_higgsino_angeles.json`, which can then be used to resubmit failed jobs if any:
 
 ~~~~bash 
 select_resubmit_jobs.py checked_auto_higgsino_angeles.json -c scripts/check_process_nano_job.py 
 auto_submit_jobs.py resubmit_checked_auto_higgsino_angeles.json -c scripts/check_process_nano_job.py 
 ~~~~
+
+# Step 2. Merge sums of weights
+
+For example:
+
+~~~~bash 
+./scripts/merge_corrections.py --wgt_dir /net/cms29/cms29r0/pico/NanoAODv5/higgsino_angeles/2016/mc/wgt_sums/ \
+                               --corr_dir /net/cms29/cms29r0/pico/NanoAODv5/higgsino_angeles/2016/mc/corrections/ \
+                               --year 2016
+~~~~
+
+# Step 3. Submit the weight correction jobs
+
+To generate the commands use:
+
+~~~~bash 
+./scripts/write_apply_corrections_cmds.py --in_dir /net/cms29/cms29r0/pico/NanoAODv5/nano/2016/mc/raw_pico/
+~~~~
+
+Follow similar process as in Step 1 to submit the commands as batch jobs. 
 
 ### Calculating b-tagging efficiencies
 
