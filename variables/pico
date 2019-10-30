@@ -92,6 +92,8 @@ vector<float> mu_reliso
 vector<float> mu_dz
 vector<float> mu_dxy
 vector<float> mu_ip3d
+vector<float> mu_sip3d
+vector<bool> mu_id
 vector<bool> mu_sig
 vector<int> mu_charge
 vector<int> mu_pflavor
