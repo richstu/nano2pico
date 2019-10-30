@@ -147,7 +147,7 @@ void AddEntry(corrections_tree &wgt_sums, corrections_tree &corr){
 }
 
 int GetGluinoMass(const string &path){
-  string key = "_mGluino-";
+  string key = "_mChi-";
   // if (Contains(path, "T2tt")) key = "_mStop-"; 
   auto pos1 = path.rfind(key)+key.size();
   auto pos2 = path.find("_", pos1);

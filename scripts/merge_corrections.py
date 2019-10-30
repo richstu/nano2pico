@@ -6,8 +6,6 @@ import argparse
 import subprocess
 import os
 
-import ROOT
-
 def fullPath(path):
   return os.path.realpath(os.path.abspath(os.path.expanduser(path)))
 

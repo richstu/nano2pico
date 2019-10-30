@@ -98,7 +98,7 @@ For example:
 To generate the commands use:
 
 ~~~~bash 
-./scripts/write_apply_corrections_cmds.py --in_dir /net/cms29/cms29r0/pico/NanoAODv5/nano/2016/mc/raw_pico/
+./scripts/write_apply_corrections_cmds.py --in_dir /net/cms29/cms29r0/pico/NanoAODv5/higgsino_angeles/2016/mc/raw_pico/
 ~~~~
 
 Follow similar process as in Step 1 to submit the commands as batch jobs. 
