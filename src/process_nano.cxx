@@ -146,7 +146,7 @@ int main(int argc, char *argv[]){
     if (debug) cout<<"INFO:: Writing leptons, photons and tracks"<<endl;
     vector<int> jet_islep_nano_idx = vector<int>();
     pico.out_nlep() = 0; pico.out_nvlep() = 0; // filled by lepton producers
-    vector<int> sig_el_nano_idx = el_producer.WriteElectrons(nano, pico, jet_islep_nano_idx);
+    vector<int> sig_el_nano_idx = el_producer.WriteElectrons(nano, pico, jet_islep_nano_idx, isZgamma);
     vector<int> sig_mu_nano_idx = mu_producer.WriteMuons(nano, pico, jet_islep_nano_idx);
 
     vector<int> jet_isphoton_nano_idx = vector<int>();

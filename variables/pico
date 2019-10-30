@@ -106,6 +106,9 @@ vector<float> el_reliso
 vector<float> el_dz
 vector<float> el_dxy
 vector<float> el_ip3d
+vector<float> el_sip3d
+vector<float> el_idmva
+vector<bool> el_id
 vector<bool> el_sig
 vector<bool> el_ispf
 vector<int> el_charge
