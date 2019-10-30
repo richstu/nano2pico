@@ -2,6 +2,11 @@
 
 Utility package for converting NanoAOD to "pico" analysis-ready ntuples.
 
+### Environment setting
+
+    git clone --recurse-submodules https://github.com/richstu/nano2pico
+    source set_env.sh
+
 ### Interactive test
 
 Step 1. Produce raw pico ntuple from a nano input file, adding `--isFastsim` and `--isData` if applicable:
@@ -33,24 +38,6 @@ Step 3. Using the pico file from step 1 and the corrections file from step 2 as 
 ~~~~
 
 ### Batch system
-
-Setup Jaebak's queue system:
-
-~~~~bash
-CMSSW=/net/top/homes/jbkim/analysis/CMSSW
-RELEASE=CMSSW_10_2_11_patch1
-
-. /cvmfs/cms.cern.ch/cmsset_default.sh;
-cd $CMSSW/$RELEASE/src;
-eval `scramv1 runtime -sh`;
-cd -;
-
-cd ../
-git clone --recurse-submodules https://github.com/richstu/copydataset
-cd copydatasets
-source set_env.sh
-cd ../nano2pico
-~~~~
 
 # Step 1. Converting Nano to Pico:
 Generate a python file that prints the commands to be run in the batch (input for the queue system):

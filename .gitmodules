@@ -1,0 +1,6 @@
+[submodule "modules/queue_system"]
+	path = modules/queue_system
+	url = https://github.com/richstu/queue_system
+[submodule "modules/jb_utils"]
+	path = modules/jb_utils
+	url = https://github.com/richstu/jb_utils
