@@ -7,6 +7,8 @@ Utility package for converting NanoAOD to "pico" analysis-ready ntuples.
     git clone --recurse-submodules https://github.com/richstu/nano2pico
     source set_env.sh
 
+Also setup CMSSW and the UCSB job environment variables (JOBBIN, JOBS, LOG, PATH).
+
 ### Interactive test
 
 Step 1. Produce raw pico ntuple from a nano input file, adding `--isFastsim` and `--isData` if applicable:
