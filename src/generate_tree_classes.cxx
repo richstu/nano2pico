@@ -474,6 +474,7 @@ void WriteSource(const vector<Variable> &vars, const string name){
   file << "#include \"TBranch.h\"\n";
   file << "#include \"TChain.h\"\n";
   file << "#include \"TString.h\"\n";
+  file << "#include \"TObject.h\"\n";
 
   file << "using namespace std;\n\n";
 
@@ -572,18 +573,18 @@ void WriteSource(const vector<Variable> &vars, const string name){
   file << "  }\n\n";
   file << "  outtree_->Fill();\n";
 
-  // file << "  //Resetting input tree variables\n";
-  // file << "  if (!writeOnly_) {\n";
-  // for(vector<Variable>::const_iterator var = vars.begin(); var != vars.end(); ++var){
-  //   if(Contains(var->type_, "vector")){
-  //     file << "    " << var->name_ << "_.clear();\n";
-  //   }else if(Contains(var->type_, "tring")){
-  //     file << "    " << var->name_ << "_ = \"\";\n";
-  //   }else{
-  //     file << "    " << var->name_ << "_ = static_cast<" << var->type_ << ">(bad_val_);\n";
-  //   }
-  // }
-  // file << "  }\n";
+  file << "  //Resetting input tree variables\n";
+  file << "  if (!writeOnly_) {\n";
+  for(vector<Variable>::const_iterator var = vars.begin(); var != vars.end(); ++var){
+    if(Contains(var->type_, "vector")){
+      file << "    " << var->name_ << "_.clear();\n";
+    }else if(Contains(var->type_, "tring")){
+      file << "    " << var->name_ << "_ = \"\";\n";
+    }else{
+      file << "    " << var->name_ << "_ = static_cast<" << var->type_ << ">(bad_val_);\n";
+    }
+  }
+  file << "  }\n";
 
   file << "  //Resetting output tree variables\n";
   file << "  if (!readOnly_) {\n";
@@ -606,7 +607,7 @@ void WriteSource(const vector<Variable> &vars, const string name){
 
   file << "void "<< name <<"_tree::Write(){\n";
   file << "  outfile_->cd();\n";
-  file << "  outtree_->Write();\n";
+  file << "  outtree_->Write(\"\",TObject::kWriteDelete);\n"; //kWriteDelete to avoid writing multiple trees
   file << "}\n\n";
 
   file << name <<"_tree::~"<< name <<"_tree(){\n";
