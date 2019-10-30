@@ -59,6 +59,8 @@ int main(int argc, char *argv[]){
   bool isFastsim = Contains(in_file, "Fast") ? true : false;
   int year = Contains(in_file, "RunIISummer16") ? 2016 : (Contains(in_file, "RunIIFall17") ? 2017 : 2018);
 
+  bool isZgamma = Contains(out_dir, "zgamma");
+
   time_t begtime, endtime;
   time(&begtime);
 
@@ -148,7 +150,9 @@ int main(int argc, char *argv[]){
     vector<int> sig_mu_nano_idx = mu_producer.WriteMuons(nano, pico, jet_islep_nano_idx);
 
     vector<int> jet_isphoton_nano_idx = vector<int>();
-    vector<int> sig_ph_nano_idx = photon_producer.WritePhotons(nano, pico, jet_isphoton_nano_idx);
+    if(isZgamma)
+      vector<int> sig_ph_nano_idx = photon_producer.WritePhotons(nano, pico, jet_isphoton_nano_idx,
+                                                                 sig_el_nano_idx, sig_mu_nano_idx);
 
     tk_producer.WriteIsoTracks(nano, pico, sig_el_nano_idx, sig_mu_nano_idx);
 

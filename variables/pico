@@ -128,8 +128,12 @@ vector<float> photon_pt
 vector<float> photon_eta
 vector<float> photon_phi
 vector<float> photon_reliso
-vector<float>  photon_r9
+vector<float> photon_r9
+vector<float> photon_drmin
 vector<int>  photon_pflavor
+vector<bool> photon_id
+vector<bool> photon_elveto
+vector<bool> photon_sig
 
 ###################   Tracks    ##################
 int ntk
