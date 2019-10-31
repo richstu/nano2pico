@@ -2,14 +2,15 @@
 
 Utility package for converting NanoAOD to "pico" analysis-ready ntuples.
 
-### Environment setting
+## Environment setting
 
     git clone --recurse-submodules https://github.com/richstu/nano2pico
+    git submodule update --init --recursive
     source set_env.sh
 
 Also setup CMSSW and the UCSB job environment variables (JOBBIN, JOBS, LOG, PATH).
 
-### Interactive test
+## Interactive test
 
 Step 1. Produce raw pico ntuple from a nano input file, adding `--isFastsim` and `--isData` if applicable:
 
@@ -39,9 +40,13 @@ Step 3. Using the pico file from step 1 and the corrections file from step 2 as 
 ./compile.sh && ./run/apply_corr.exe --in_file PICO_STEP1 --in_dir INDIR --corr_file CORR_STEP2
 ~~~~
 
-### Batch system
+## Batch system
 
-# Step 1. Converting Nano to Pico:
+### Step 0. Setup environment
+
+  source set_env.sh
+
+### Step 1. Converting Nano to Pico:
 Generate a python file that prints the commands to be run in the batch (input for the queue system):
 
 ~~~~bash 
@@ -72,7 +77,7 @@ select_resubmit_jobs.py checked_auto_higgsino_angeles.json -c scripts/check_proc
 auto_submit_jobs.py resubmit_checked_auto_higgsino_angeles.json -c scripts/check_process_nano_job.py 
 ~~~~
 
-# Step 2. Merge sums of weights
+### Step 2. Merge sums of weights
 
 For example:
 
@@ -82,7 +87,7 @@ For example:
                                --year 2016
 ~~~~
 
-# Step 3. Submit the weight correction jobs
+### Step 3. Submit the weight correction jobs
 
 To generate the commands use:
 
@@ -92,7 +97,7 @@ To generate the commands use:
 
 Follow similar process as in Step 1 to submit the commands as batch jobs. 
 
-### Calculating b-tagging efficiencies
+## Calculating b-tagging efficiencies
 
 Use `parameterize_efficiency.cxx`, giving the directory with all the MC files and the year as arguments. Below is an example run for 2016 MC.
 

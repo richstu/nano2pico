@@ -14,21 +14,10 @@ if __name__ == '__main__':
   parser.add_argument("-o","--out_cmd_filename", default="cmds.py",
                       help="File with list of commands for batch system.")
   args = parser.parse_args()
-  
-  #mass_points = [127]
-  #mass_points = [1025, 1050, 1075,
-  #               1100, 1125, 1150, 1175,
-  #               1200, 1225, 1250, 1275,
-  #               1300, 1325, 1350, 1375,
-  #               1400, 1425, 1450, 1475,
-  #               1500
-  #               ]
-  
+ 
   source_directory = args.in_dir
-  #target_directory = '/net/cms29/cms29r0/pico/NanoAODv5/nano/2016/TChiHH'
   target_directory = args.target_dir
-  #source_directory = 'root_files/'
-  #target_directory = 'root_files/'
+
   if not os.path.exists(target_directory):
     os.makedirs(target_directory)
   
@@ -53,7 +42,7 @@ mass_points = [127, 150, 175,
                ]
 
 for mass in mass_points:
-  print("'''+os.getcwd()+'''/scripts/split_mass_points.py "+str(mass)+" \\""+source_directory+"'''+args.dataset_filenames+'''\\" "+target_directory)
+  print("'''+os.getcwd()+'''/scripts/skim_file.py -m "+str(mass)+" -i \\""+source_directory+"'''+args.dataset_filenames+'''\\" -o "+target_directory)
 '''
 
   with open(args.out_cmd_filename, 'w') as out_cmd_file:
