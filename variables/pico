@@ -45,6 +45,7 @@ vector<float> jet_deepcsv
 vector<float> jet_deepflav
 vector<float> jet_qgl
 vector<bool>  jet_islep
+vector<bool>  jet_isphoton
 vector<bool>  jet_id
 vector<int>   jet_hflavor
 vector<int>   jet_pflavor

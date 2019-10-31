@@ -106,6 +106,7 @@ int main(int argc, char *argv[]){
   // Initialize trees
   nano_tree nano(in_path);
   size_t nentries(nent_test>0 ? nent_test : nano.GetEntries());
+  nentries = 20000;
   cout << "Nano file: " << in_path << endl;
   cout << "Input number of events: " << nentries << endl;
   // cout << "Running on "<< (isFastsim ? "FastSim" : "FullSim") << endl;
@@ -126,11 +127,11 @@ int main(int argc, char *argv[]){
     }
 
     // event info
-    pico.out_event() = nano.event();
+    pico.out_event()     = nano.event();
     pico.out_lumiblock() = nano.luminosityBlock();
-    pico.out_run() = nano.run();
-    pico.out_type() = event_type;
-    pico.out_stitch() = isData ? true: event_tools.GetStitch(nano);
+    pico.out_run()       = nano.run();
+    pico.out_type()      = event_type;
+    pico.out_stitch()    = isData ? true: event_tools.GetStitch(nano);
     // number of reconstructed primary vertices
     pico.out_npv() = nano.PV_npvs();
 
@@ -153,24 +154,23 @@ int main(int argc, char *argv[]){
     if(isZgamma)
       vector<int> sig_ph_nano_idx = photon_producer.WritePhotons(nano, pico, jet_isphoton_nano_idx,
                                                                  sig_el_nano_idx, sig_mu_nano_idx);
-
     tk_producer.WriteIsoTracks(nano, pico, sig_el_nano_idx, sig_mu_nano_idx);
 
     dilep_producer.WriteDielectrons(nano, pico, sig_el_nano_idx);
     dilep_producer.WriteDimuons(nano, pico, sig_mu_nano_idx);
 
     if (debug) cout<<"INFO:: Writing jets, MET and ISR vars"<<endl;
-    vector<int> sig_jet_nano_idx = jet_producer.WriteJets(nano, pico, jet_islep_nano_idx, 
-                                                          btag_wpts[year], btag_df_wpts[year]);
+    vector<int> sig_jet_nano_idx = jet_producer.WriteJets(nano, pico, jet_islep_nano_idx, jet_isphoton_nano_idx,
+                                                          btag_wpts[year], btag_df_wpts[year], isZgamma);
     jet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year][1]); // usually w.r.t. medium WP
     jet_producer.WriteFatJets(nano, pico);
     isr_tools.WriteISRJetMultiplicity(nano, pico);
 
     // Copy MET directly from NanoAOD
-    pico.out_met() = nano.MET_pt();
-    pico.out_met_phi() = nano.MET_phi();
-    pico.out_met_calo() = nano.CaloMET_pt();
-    pico.out_met_tru() = nano.GenMET_pt();
+    pico.out_met()         = nano.MET_pt();
+    pico.out_met_phi()     = nano.MET_phi();
+    pico.out_met_calo()    = nano.CaloMET_pt();
+    pico.out_met_tru()     = nano.GenMET_pt();
     pico.out_met_tru_phi() = nano.GenMET_phi();
  
     // calculate mT only for single lepton events
@@ -223,23 +223,32 @@ int main(int argc, char *argv[]){
     vector<float> sys_lep(2,1.), sys_fs_lep(2,1.);
     lep_weighter.FullSim(pico, w_lep, sys_lep);
     if(isFastsim) lep_weighter.FastSim(pico, w_fs_lep, sys_fs_lep);
-    pico.out_w_lep() = w_lep;
-    pico.out_w_fs_lep() = w_fs_lep;
-    pico.out_sys_lep() = sys_lep; 
+    pico.out_w_lep()      = w_lep;
+    pico.out_w_fs_lep()   = w_fs_lep;
+    pico.out_sys_lep()    = sys_lep; 
     pico.out_sys_fs_lep() = sys_fs_lep;
-
-    pico.out_w_btag() = btag_weighter.EventWeight(pico, BTagEntry::OP_MEDIUM, ctr, ctr);
-    pico.out_w_btag_df() = btag_df_weighter.EventWeight(pico, BTagEntry::OP_MEDIUM, ctr, ctr);
-    pico.out_w_bhig() = btag_weighter.EventWeight(pico, op_all, ctr, ctr);
-    pico.out_w_bhig_df() = btag_df_weighter.EventWeight(pico, op_all, ctr, ctr);
-    pico.out_sys_bchig().resize(2,0); pico.out_sys_udsghig().resize(2,0);
-    pico.out_sys_fs_bchig().resize(2,0); pico.out_sys_fs_udsghig().resize(2,0);
-    for(size_t i = 0; i<2; ++i){ 
-      pico.out_sys_bchig()[i] = btag_weighter.EventWeight(pico, op_all, updn[i], ctr);
-      pico.out_sys_udsghig()[i] = btag_weighter.EventWeight(pico, op_all, ctr, updn[i]);
-      if (isFastsim) {
-        pico.out_sys_fs_bchig()[i] = btag_weighter.EventWeight(pico, op_all, ctr, ctr, updn[i], ctr);
-        pico.out_sys_fs_udsghig()[i] = btag_weighter.EventWeight(pico, op_all, ctr, ctr, ctr, updn[i]);
+    if(isZgamma) {
+      pico.out_w_btag()    = 1.; 
+      pico.out_w_btag_df() = 1.; 
+      pico.out_w_bhig()    = 1.; 
+      pico.out_w_bhig_df() = 1.; 
+      pico.out_sys_bchig().resize(2,0); pico.out_sys_udsghig().resize(2,0);
+      pico.out_sys_fs_bchig().resize(2,0); pico.out_sys_fs_udsghig().resize(2,0);
+    }
+    else {
+      pico.out_w_btag()    = btag_weighter.EventWeight(pico, BTagEntry::OP_MEDIUM, ctr, ctr);
+      pico.out_w_btag_df() = btag_df_weighter.EventWeight(pico, BTagEntry::OP_MEDIUM, ctr, ctr);
+      pico.out_w_bhig()    = btag_weighter.EventWeight(pico, op_all, ctr, ctr);
+      pico.out_w_bhig_df() = btag_df_weighter.EventWeight(pico, op_all, ctr, ctr);
+      pico.out_sys_bchig().resize(2,0); pico.out_sys_udsghig().resize(2,0);
+      pico.out_sys_fs_bchig().resize(2,0); pico.out_sys_fs_udsghig().resize(2,0);
+      for(size_t i = 0; i<2; ++i){ 
+        pico.out_sys_bchig()[i]   = btag_weighter.EventWeight(pico, op_all, updn[i], ctr);
+        pico.out_sys_udsghig()[i] = btag_weighter.EventWeight(pico, op_all, ctr, updn[i]);
+        if (isFastsim) {
+          pico.out_sys_fs_bchig()[i]   = btag_weighter.EventWeight(pico, op_all, ctr, ctr, updn[i], ctr);
+          pico.out_sys_fs_udsghig()[i] = btag_weighter.EventWeight(pico, op_all, ctr, ctr, ctr, updn[i]);
+        }
       }
     }
 
@@ -284,20 +293,20 @@ int main(int argc, char *argv[]){
         wgt_sums.out_sys_fs_lep()[i] += sys_fs_lep[i];
       }
     }
-    wgt_sums.out_w_btag() += pico.out_w_btag();
+    wgt_sums.out_w_btag()    += pico.out_w_btag();
     wgt_sums.out_w_btag_df() += pico.out_w_btag_df();
-    wgt_sums.out_w_bhig() += pico.out_w_bhig();
+    wgt_sums.out_w_bhig()    += pico.out_w_bhig();
     wgt_sums.out_w_bhig_df() += pico.out_w_bhig_df();
-    wgt_sums.out_w_isr() += pico.out_w_isr();
-    wgt_sums.out_w_pu() += pico.out_w_pu();
+    wgt_sums.out_w_isr()     += pico.out_w_isr();
+    wgt_sums.out_w_pu()      += pico.out_w_pu();
 
     for(size_t i = 0; i<2; ++i){ 
-      wgt_sums.out_sys_bchig()[i] += pico.out_sys_bchig()[i];
-      wgt_sums.out_sys_udsghig()[i] += pico.out_sys_udsghig()[i];
-      wgt_sums.out_sys_fs_bchig()[i] += pico.out_sys_fs_bchig()[i];
+      wgt_sums.out_sys_bchig()[i]      += pico.out_sys_bchig()[i];
+      wgt_sums.out_sys_udsghig()[i]    += pico.out_sys_udsghig()[i];
+      wgt_sums.out_sys_fs_bchig()[i]   += pico.out_sys_fs_bchig()[i];
       wgt_sums.out_sys_fs_udsghig()[i] += pico.out_sys_fs_udsghig()[i];
-      wgt_sums.out_sys_isr()[i] += pico.out_sys_isr()[i];
-      wgt_sums.out_sys_pu()[i] += pico.out_sys_pu()[i];
+      wgt_sums.out_sys_isr()[i]        += pico.out_sys_isr()[i];
+      wgt_sums.out_sys_pu()[i]         += pico.out_sys_pu()[i];
     }
 
     pico.Fill();
@@ -313,21 +322,21 @@ int main(int argc, char *argv[]){
 }
 
 void Initialize(corrections_tree &wgt_sums){
-  wgt_sums.out_neff() = 0;
-  wgt_sums.out_nent_zlep() = 0;
+  wgt_sums.out_neff()          = 0;
+  wgt_sums.out_nent_zlep()     = 0;
   wgt_sums.out_tot_weight_l0() = 0.;
   wgt_sums.out_tot_weight_l1() = 0.;
 
-  wgt_sums.out_weight() = 0.;
-  wgt_sums.out_w_lumi() = 0.;
-  wgt_sums.out_w_lep() = 0.;
-  wgt_sums.out_w_fs_lep() = 0.;
-  wgt_sums.out_w_btag() = 0.;
+  wgt_sums.out_weight()    = 0.;
+  wgt_sums.out_w_lumi()    = 0.;
+  wgt_sums.out_w_lep()     = 0.;
+  wgt_sums.out_w_fs_lep()  = 0.;
+  wgt_sums.out_w_btag()    = 0.;
   wgt_sums.out_w_btag_df() = 0.;
-  wgt_sums.out_w_bhig() = 0.;
+  wgt_sums.out_w_bhig()    = 0.;
   wgt_sums.out_w_bhig_df() = 0.;
-  wgt_sums.out_w_isr() = 0.;
-  wgt_sums.out_w_pu() = 0.;
+  wgt_sums.out_w_isr()     = 0.;
+  wgt_sums.out_w_pu()      = 0.;
   // w_prefire should not be normalized!!
 
   wgt_sums.out_sys_lep().resize(2,0);
@@ -343,10 +352,10 @@ void Initialize(corrections_tree &wgt_sums){
 void GetOptions(int argc, char *argv[]){
   while(true){
     static struct option long_options[] = {
-      {"in_file", required_argument, 0, 'f'}, 
-      {"in_dir", required_argument, 0, 'i'},
-      {"out_dir", required_argument, 0, 'o'},
-      {"nent", required_argument, 0, 0},
+      {"in_file", required_argument, 0,'f'}, 
+      {"in_dir",  required_argument, 0,'i'},
+      {"out_dir", required_argument, 0,'o'},
+      {"nent",    required_argument, 0, 0},
       {0, 0, 0, 0}
     };
 

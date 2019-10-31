@@ -15,8 +15,10 @@ JetProducer::JetProducer(int year_){
 JetProducer::~JetProducer(){
 }
 
-vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico, vector<int> jet_islep_nano_idx,
-                            const vector<float> &btag_wpts, const vector<float> &btag_df_wpts){
+vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
+                                   vector<int> jet_islep_nano_idx, vector<int> jet_isphoton_nano_idx,
+                                   const vector<float> &btag_wpts, const vector<float> &btag_df_wpts, 
+                                   bool isZgamma){
   vector<int> sig_jet_nano_idx;
   pico.out_njet() = 0; pico.out_ht() = 0; 
   pico.out_nbl() = 0; pico.out_nbm() = 0; pico.out_nbt() = 0; 
@@ -24,22 +26,21 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico, vector<int>
   pico.out_pass_jets() = true;
   pico.out_pass_fsjets() = true;
   for(int ijet(0); ijet<nano.nJet(); ++ijet){
-    // check overlap with signal leptons
+    // check overlap with signal leptons (or photons)
     bool islep = find(jet_islep_nano_idx.begin(), jet_islep_nano_idx.end(), ijet) != jet_islep_nano_idx.end();
-
+    bool isphoton = find(jet_isphoton_nano_idx.begin(), jet_isphoton_nano_idx.end(), ijet) != jet_isphoton_nano_idx.end();
     // Fastsim: veto if certain central jets have no matching GenJet as per SUSY recommendation:
     // https://twiki.cern.ch/twiki/bin/view/CMS/SUSRecommendations18#Cleaning_up_of_fastsim_jets_from
     if(nano.Jet_pt()[ijet] > 20 && fabs(nano.Jet_eta()[ijet])>2.5 && 
       nano.Jet_chHEF()[ijet] < 0.1 && nano.Jet_genJetIdx()[ijet]<0) 
       pico.out_pass_fsjets() = false;
-
     // Fullsim: require just loosest possible ID for now (for all jets, not just central!)
     if (nano.Jet_pt()[ijet] > JetPtCut && nano.Jet_jetId()[ijet] < 1) 
       pico.out_pass_jets() = false;
 
     if (nano.Jet_pt()[ijet] <= JetPtCut) continue;
-    if (fabs(nano.Jet_eta()[ijet]) > JetEtaCut) continue;
-
+    // Use a different eta cut for Zgamma production
+    if (fabs(nano.Jet_eta()[ijet])  > (isZgamma ? ZgJetEtaCut:JetEtaCut)) continue;
     pico.out_jet_pt().push_back(nano.Jet_pt()[ijet]);
     pico.out_jet_eta().push_back(nano.Jet_eta()[ijet]);
     pico.out_jet_phi().push_back(nano.Jet_phi()[ijet]);
@@ -50,8 +51,9 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico, vector<int>
     pico.out_jet_hflavor().push_back(nano.Jet_hadronFlavour()[ijet]);
     pico.out_jet_pflavor().push_back(nano.Jet_partonFlavour()[ijet]);
     pico.out_jet_islep().push_back(islep);
+    pico.out_jet_isphoton().push_back(isphoton);
     pico.out_jet_id().push_back(nano.Jet_jetId()[ijet]);
-    pico.out_jet_met_dphi().push_back(DeltaPhi(nano.Jet_pt()[ijet], nano.MET_pt()));
+    pico.out_jet_met_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], nano.MET_phi()));
     
     // will be overwritten with the overlapping fat jet index, if such exists, in WriteFatJets
     pico.out_jet_fjet_idx().push_back(-999);
@@ -60,7 +62,7 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico, vector<int>
     pico.out_jet_h1d().push_back(false);
     pico.out_jet_h2d().push_back(false);
 
-    if (!islep) {
+    if (!islep && !isphoton) {
       sig_jet_nano_idx.push_back(ijet);
       pico.out_njet()++;
       pico.out_ht() += nano.Jet_pt()[ijet];
@@ -105,7 +107,7 @@ void JetProducer::WriteFatJets(nano_tree &nano, pico_tree &pico){
 }
 
 void JetProducer::WriteJetSystemPt(nano_tree &nano, pico_tree &pico, 
-                              vector<int> &sig_jet_nano_idx, const float &btag_wpt) {
+                                   vector<int> &sig_jet_nano_idx, const float &btag_wpt) {
 
   TLorentzVector jetsys_v4, jetsys_nob_v4;
   int njet_nob(0);
