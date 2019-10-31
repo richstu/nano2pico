@@ -106,7 +106,6 @@ int main(int argc, char *argv[]){
   // Initialize trees
   nano_tree nano(in_path);
   size_t nentries(nent_test>0 ? nent_test : nano.GetEntries());
-  nentries = 20000;
   cout << "Nano file: " << in_path << endl;
   cout << "Input number of events: " << nentries << endl;
   // cout << "Running on "<< (isFastsim ? "FastSim" : "FullSim") << endl;

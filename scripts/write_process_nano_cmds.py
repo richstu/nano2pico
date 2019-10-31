@@ -59,5 +59,5 @@ os.chmod(args.out_cmd_file, 0o755)
 
 print("To generate job json and submit jobs do: ")
 print('convert_cl_to_jobs_info.py '+args.out_cmd_file+' '+args.production+'.json')
-print('auto_submit_jobs.py '+args.production+'.json')
+print('auto_submit_jobs.py '+args.production+'.json -c scripts/check_process_nano_job.py')
   
