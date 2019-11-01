@@ -70,8 +70,8 @@ namespace xsec{
         // Cross sections from https://twiki.cern.ch/twiki/bin/view/LHCPhysics/SingleTopRefXsec
         // multiplied by BF(W->mu,e,tau) = 0.324
         if (file.Contains("ST_s-channel_4f_leptonDecays"))     xsec = 3.34;
-        if (file.Contains("ST_t-channel_antitop_4f_inclusiveDecays")) xsec = 80.95;
-        if (file.Contains("ST_t-channel_top_4f_inclusiveDecays")) xsec = 136.02;
+        if (file.Contains("ST_t-channel_antitop_4f_InclusiveDecays")) xsec = 80.95;
+        if (file.Contains("ST_t-channel_top_4f_InclusiveDecays")) xsec = 136.02;
         if (file.Contains("ST_tW_antitop_5f_NoFullyHadronicDecays"))     xsec = 35.85*0.543;
         if (file.Contains("ST_tW_top_5f_NoFullyHadronicDecays"))     xsec = 35.85*0.543; 
 

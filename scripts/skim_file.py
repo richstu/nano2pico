@@ -18,7 +18,7 @@ def get_cuts(skim_name):
   pass_1l_trig40 = '(Max$(el_pt*el_sig)>40 || Max$(mu_pt*mu_sig)>40)' # use for 1L CR
   pass_1l_trig30 = '(Max$(el_pt*el_sig)>30 || Max$(mu_pt*mu_sig)>30)' # use for 2L CR, can lower the cut since two leps!
   mllcut = '&&'.join(['(mumu_m*(mumu_m>0)+elel_m*(elel_m>0))>80','(mumu_m*(mumu_m>0)+elel_m*(elel_m>0))<100'])
-  nbcut = '(nbt>=2 || nbdft>=2)'
+  nb_or_fjet_cut = '(nbt>=2 || nbdft>=2 || Sum$(fjet_pt>300 && fjet_msoftdrop>50)>0)'
   sys_nbcut = 'max(nbdft,Max$(sys_nbdft))>=2'
   njcut = 'njet>=4&&njet<=5'
   # sys_njcut = '(njet==4||sys_njet[1]==4||sys_njet[2]==4||njet==5||sys_njet[1]==5||sys_njet[2]==5)'
@@ -35,7 +35,7 @@ def get_cuts(skim_name):
 
   # Higgsino
   if(skim_name=='higqcd'):  cuts = '&&'.join([njcut, 'met>150 && nvlep==0'])
-  if(skim_name=='higloose'): cuts = '&&'.join([njcut, nbcut, 'met>150', 'nvlep==0'])
+  if(skim_name=='higloose'): cuts = '&&'.join([nb_or_fjet_cut, 'met>150', 'nvlep==0'])
   if(skim_name=='higtight'): cuts = '&&'.join([njcut, nbcut, 'met>150', 'nvlep==0', 'ntks==0','!low_dphi', higtrim])
   if(skim_name=='higsys'):   cuts = '&&'.join([sys_njcut, sys_nbcut, 'max(met,Max$(sys_met))>150', 'nvlep==0', 'ntk==0', '!low_dphi', sys_higtrim])
   if(skim_name=='higlep1'):  cuts = '&&'.join([njcut, nbcut, 'nleps==1', pass_1l_trig40])
