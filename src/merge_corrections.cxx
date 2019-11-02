@@ -45,9 +45,10 @@ int main(int argc, char *argv[]){
     return 1;
   }
 
-  int year = atoi(argv[1]);
-  string output_path = argv[2];
-  vector<string> input_paths(argv+3, argv+argc);
+  string output_path = argv[1];
+  vector<string> input_paths(argv+2, argv+argc);
+  int year = Contains(input_paths[0], "RunIISummer16") ? 2016 : (Contains(input_paths[0], "RunIIFall17") ? 2017 : 2018);
+  cout << "Running with settings for year = "<<year<<"."<<endl; 
 
   corrections_tree corr("", output_path.c_str());
   corrections_tree wgt_sums(input_paths.front().c_str());

@@ -40,7 +40,6 @@ out/*.root
 *.aux
 gmon.out
 .DS_Store
-out
 /run
 logs
 archive

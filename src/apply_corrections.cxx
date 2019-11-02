@@ -71,12 +71,12 @@ int main(int argc, char *argv[]){
     pico.out_w_pu()       = pico.w_pu()*corr.w_pu();
 
 
-    pico.out_w_lumi() = pico.weight()>0 ? 1. : -1.; //get the generator weight sign
-    pico.out_w_lumi() = pico.w_lumi()*corr.w_lumi();
+    pico.out_w_lumi() = pico.w_lumi()>0 ? 1. : -1.; //get the generator weight sign
+    pico.out_w_lumi() *= corr.w_lumi();
 
-    pico.out_weight() = corr.weight() *pico.out_w_lumi() 
-                     *pico.out_w_lep() *pico.out_w_fs_lep() //post-corr values in order for 0l to be correct
-                     *pico.w_bhig() *pico.w_isr() *pico.w_pu() *pico.w_prefire();
+    pico.out_weight() = corr.weight() * pico.out_w_lumi() *
+                     pico.out_w_lep() * pico.out_w_fs_lep() * //post-corr values in order for 0l to be correct
+                     pico.w_bhig() * pico.w_isr() *pico.w_pu() * pico.w_prefire();
 
     pico.out_sys_bchig().resize(2); pico.out_sys_fs_bchig().resize(2);
     pico.out_sys_udsghig().resize(2); pico.out_sys_fs_udsghig().resize(2);

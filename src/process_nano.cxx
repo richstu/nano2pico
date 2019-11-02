@@ -252,7 +252,7 @@ int main(int argc, char *argv[]){
     }
 
     // to be calculated in Step 2: merge_corrections
-    pico.out_w_lumi() = 1.;
+    pico.out_w_lumi() = nano.Generator_weight();
 
     // @todo, copy weights from babymaker
     pico.out_w_pu() = 1.;
@@ -267,8 +267,8 @@ int main(int argc, char *argv[]){
     pico.out_w_prefire() = 1.;
 
     // do not include w_prefire, or anything that should not be renormalized! Will be set again in Step 3
-    pico.out_weight() = nano.Generator_weight() * pico.out_w_lumi() *
-                        w_lep * w_fs_lep* pico.out_w_bhig() *
+    pico.out_weight() = pico.out_w_lumi() *
+                        w_lep * w_fs_lep * pico.out_w_bhig() *
                         pico.out_w_isr() * pico.out_w_pu();
 
     // ----------------------------------------------------------------------------------------------

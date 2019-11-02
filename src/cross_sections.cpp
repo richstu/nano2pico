@@ -8,7 +8,7 @@ using namespace std;
 namespace xsec{
 
   float crossSection(const TString &file, bool is2016){
-    float xsec(999999.), Htobb(0.5824);
+    float xsec(-999999.), Htobb(0.5824);
 
     if (is2016) {
         //  Cross-section taken from https://twiki.cern.ch/twiki/bin/view/LHCPhysics/TtbarNNLO
@@ -226,7 +226,7 @@ namespace xsec{
         if(file.Contains("WH_HToBB_WToLNu_M125"))     xsec = 1.373*Htobb*(0.1071+0.1063+0.1138);
 
     }
-    if(xsec<=0) std::cout<<"INFO: Cross section not found for "<<file<<std::endl;
+    if(xsec<=0) std::cout<<"ERROR:: Cross section not found for "<<file<<std::endl;
 
     return xsec;
   }

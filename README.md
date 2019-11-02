@@ -1,6 +1,6 @@
 # nano2pico
 
-Utility package for converting NanoAOD to "pico" analysis-ready ntuples.
+Utility package for converting CMS NanoAOD to analysis-ready ntuples called "pico".
 
 ## Environment setting
 
@@ -10,12 +10,37 @@ Utility package for converting NanoAOD to "pico" analysis-ready ntuples.
 
 Also setup CMSSW and the UCSB job environment variables (JOBBIN, JOBS, LOG, PATH).
 
+## Intro
+
+Variables stored in the pico can be seen in [variables/pico](variables/pico). For an overview of the available branches, see the dedicated section at the bottom of this README.
+
+The Nano -> pico conversion is done in three steps in order to allow parallelizing the production at the sub-dataset level:
+  1. All variables and event weights (except normalization) are calculated using [src/process_nano.cxx](src/process_nano.cxx). This step also keeps a tally of the weights for all events in the file being run over as input to the next step.
+  2. The sums of weights from step 1 are further aggregate to get the total per dataset. A correction is then calculated to ensure that the weights do not change the total expected number of events for the dataset. This is done in [src/merge_corrections.cxx](src/merge_corrections.cxx). The luminosity normalization weight `w_lumi` to be applied to get the yield in 1fb-1 is also calculated for each dataset in this step.
+  3. The `raw_pico` files from step 1 are corrected by the per-dataset correction factors derived in step 2 and written to the `unskimmed` folder.
+
+At this point, various skims can be made as defined in [scripts/skim_file.py](scripts/skim_file.py).
+
+The current Higgsino production nicknamed "Angeles" can be found at:
+  /net/cms2/cms2r0/pico/NanoAODv5/higgsino_angeles/2016/mc/
+  /net/cms2/cms2r0/pico/NanoAODv5/higgsino_angeles/2016/TChiHH/
+
+To see the sizes and number of files, one can do:
+  ./scripts/count_root_files.py -f /net/cms29/cms29r0/pico/NanoAODv5/higgsino_angeles/2016/mc/
+
 ## Interactive test
+
+Define some paths, e.g.:
+
+~~~~bash
+export INDIR=/net/cms29/cms29r0/pico/NanoAODv5/nano/2016/TChiHH/
+export INFILE=SMS-TChiHH_mChi-1000_mLSP-1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISummer16NanoAODv5__PUSummer16v3Fast_94X_mcRun2_asymptotic_v3-v1.root
+~~~~
 
 Step 1. Produce raw pico ntuple from a nano input file, adding `--isFastsim` and `--isData` if applicable:
 
 ~~~~bash
-./compile.sh && ./run/process_nano.exe --in_file INFILE --in_dir INDIR --out_dir OUTDIR
+./compile.sh && ./run/process_nano.exe --in_file $INFILE --in_dir $INDIR --out_dir out/ --nent 10000
 ~~~~
 
 Note that for interactive jobs, you need to ensure that the output directory subfolders `wgt_sums` and `raw_pico` exist.
@@ -28,16 +53,16 @@ Note that for interactive jobs, you need to ensure that the output directory sub
 * output branch `type` is set based on the presence of dataset name substrings (see event_tools.cpp)
 * branches related on ISR also depend on the presence of dataset name substrings
 
-Step 2. For each dataset, add up the sums of weights obtained for each file in step 1 and calculate the corrections needed to normalize each individual weight as well as the total weight. Output to `CORR_FILE`. Note that the order of options is fixed with the last argument being the input files in order to allow arbitrary number of input files.
+Step 2. For each dataset, add up the sums of weights obtained for each file in step 1 and calculate the corrections needed to normalize each individual weight as well as the total weight. Note that the order of options is fixed with the arguments after the first being the input files. This is to allow arbitrary number of input files. Note that again functionality depends on the naming, e.g. correction file name is used to decide what cross-section to use.
 
 ~~~~bash
-./compile.sh && ./run/merge_corrections.exe YYYY CORR_FILE WGT_SUMS_FILE1 WGT_SUMS_FILE2 ...
+./compile.sh && ./run/merge_corrections.exe out/corrections/corr_$INFILE out/wgt_sums/wgt_sums_$INFILE
 ~~~~
 
 Step 3. Using the pico file from step 1 and the corrections file from step 2 as input, we can renormalize the weight branches as follows:
 
 ~~~~bash
-./compile.sh && ./run/apply_corr.exe --in_file PICO_STEP1 --in_dir INDIR --corr_file CORR_STEP2
+./compile.sh && ./run/apply_corrections.exe --in_file raw_pico_$INFILE --in_dir out/raw_pico/ --corr_file corr_$INFILE
 ~~~~
 
 ## Batch system
