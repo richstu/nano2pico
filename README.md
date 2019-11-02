@@ -121,8 +121,7 @@ For example:
 
 ~~~~bash 
 ./scripts/merge_corrections.py --wgt_dir /net/cms29/cms29r0/pico/NanoAODv5/higgsino_angeles/2016/mc/wgt_sums/ \
-                               --corr_dir /net/cms29/cms29r0/pico/NanoAODv5/higgsino_angeles/2016/mc/corrections/ \
-                               --year 2016
+                               --corr_dir /net/cms29/cms29r0/pico/NanoAODv5/higgsino_angeles/2016/mc/corrections/ 
 ~~~~
 
 ### Step 3. Submit the weight correction jobs
@@ -147,6 +146,8 @@ Use `parameterize_efficiency.cxx`, giving the directory with all the MC files an
 ## Description of pico branches
 
 These refer to the branches obtained with `ZGamma = false`, i.e. higgsino production!
+
+:blue_book: Documentation of the Nano variables used as input throughout the code can be found [here](https://cms-nanoaod-integration.web.cern.ch/integration/master-102X/mc102X_doc.html).
 
 ####   Global
 * `run, lumiblock, event` - as expected
