@@ -146,7 +146,9 @@ Use `parameterize_efficiency.cxx`, giving the directory with all the MC files an
 
 ## Description of pico branches
 
-#####   Global
+These refer to the branches obtained with `ZGamma = false`, i.e. higgsino production!
+
+####   Global
 * `run, lumiblock, event` - as expected
 * `type` - integer encoding the physics process, see [here](https://github.com/richstu/nano2pico/blob/5e62c553fb306f6c1f27bccafee037fb939c0f75/src/event_tools.cpp#L124).
 * `stitch` - include this variable in order to run on an inclusive sample together with an overlapping slice in a different dataset, e.g. stitch = false for events with GenMET > 150 in the inclusive TTJets sample, in order to remove them when using the inclusive sample together with the deidicated *genMET-150* samples, see [here](https://github.com/richstu/nano2pico/blob/f4b99417bd65c134796b703552522a7de5429f19/src/event_tools.cpp#L31-L45).
@@ -156,7 +158,7 @@ Use `parameterize_efficiency.cxx`, giving the directory with all the MC files an
 * `mt` - transverse mass, only calculated for nlep==1
 * `mt_tru` - transverse mass at truth level, only calculated for ntrulep==1
 
-#####   Higgsino variables
+####   Higgsino variables
 Using the 4-jet with highest DeepCSV, calculate the higgsino variables for the three possible pairings. The 0th index stores the pairing with smalled Delta m
 * `hig_cand_dm` - Mass difference between the two Higgs candidates
 * `hig_cand_am` - Average mass between the two Higgs candidates
@@ -167,7 +169,7 @@ Same variables using the 4-jet with highest DeepFlavour discriminant value are s
 
 * `low_dphi` - require dPhi(jet, MET) be less than 0.5 for jets 1,2 and less than 0.3 for jets 3,4
 
-#####   Jets
+####   Jets
 
 Filled in `jet_producer`:
 * `nbl, nbm, nbt` - number of loose, medium and tight tagged jets according to DeepCSV tagger
@@ -182,7 +184,7 @@ Filled in `jet_producer`:
   * `fjet_deep_md_hbb_btv` - Mass-decorrelated Deep Double B, H->bb vs QCD discriminator, endorsed by BTV
   * `fjet_deep_md_hbb_jme` - Mass-decorrelated DeepAk8, H->bb vs QCD discriminator, endorsed by JME
 
-##### Leptons 
+#### Leptons 
 
 * `nlep = nel + nmu`
 * `nvlep = nvel + nvmu`
@@ -200,32 +202,32 @@ Calculated in [el_producer](src/el_producer.cpp):
 Calculated in [dilep_producer](src/dilep_producer.cpp):
 * `elel_*, mumu_*` - variables relating to the dilepton system (all combinations stored if more than 2 leptons)
 
-##### Photons 
+#### Photons 
 
 These are not really used in Higgsino, but just in case...Calculated in [photon_producer](src/photon_producer.cpp):
 * `nphoton` - number of signal photons
 * `photon_*` - photon variables
 
-##### Tracks 
+#### Tracks 
 
 Calculated in [tk_producer](src/tk_producer.cpp):
 * `ntk` - number of tracks passing criteria for resolved Higgsino analysis
 * `tk_*` - track variables
 
-##### Quality 
+#### Quality 
 
 * `pass_*` - recommended MET filters
 * `pass_jets` - set to false if any of the jets fails loose ID
 * `pass` - combination of all required filters and `pass_jets`
 
-##### Truth 
+#### Truth 
 
 * `mc_*` - information for a set of the generator particles in the hard process
 * `ntrumu,ntruel,ntrutauh,ntrutaul` - # of true leptons of particular type, where tauh is hadronically decaying taus and taul is leptonically decaying taus
 * `ntrulep = ntrumu + ntruel + ntrutaul` 
 * `mprod, mlsp` - higgsino and lsp mass, with lsp mass always equal to one for the higgsino model
 
-#####   ISR
+####   ISR
 
 * `nisr` - number of ISR jets according to matching to truth, used for ISR reweighting used by the SUS PAG for strong production
 * `isr_tru_*` - MC truth, hadronic recoil, used for ISR reweighting used by the SUS PAG for weak production
@@ -233,11 +235,11 @@ Calculated in [tk_producer](src/tk_producer.cpp):
 * `jetsys_*` - hadronic recoil, i.e. vector sum of all jets, used in V+jets ISR studies
 * `jetsys_nob_*` - hadronic recoil, i.e. vector sum of all jets that are not b-tagged, used in 2L tt+jets ISR studies
 
-##### Weights 
+#### Weights 
 
 Calculated in [process_nano](src/process_nano.cxx) and then re-normalized in subsequent production steps:
 * `weight` - product of all the individual weights below
-* `w_lumi` - weight to be applied to get the expected yield in 1 fb-1. :beetle: Due to bug in the Angeles production this weight is always positive, so to get the right yield for samples with negative weights, one needs to use `w_lumi*weight/fabs(weight)`
+* `w_lumi` - weight to be applied to get the expected yield in 1 fb-1. 
 * `w_lep` - product of fullsim lepton SFs for leptons with > 20 GeV
 * `w_fs_lep` - product of fastsim lepton SFs for leptons with > 20 GeV
 * `w_btag` - product of fullsim and fastsim b-tag SFs if counting _medium tags only_, DeepCSV tagger
@@ -248,7 +250,7 @@ Calculated in [process_nano](src/process_nano.cxx) and then re-normalized in sub
 * `w_pu` - currently just set 1.
 * `w_prefire` - currently just set 1.
 
-##### Other
+#### Other
 
 * `HLT_*` - trigger decisions
 * `sys_*` - systematic variations of weights up=0, down=1
