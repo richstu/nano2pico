@@ -8,10 +8,12 @@ if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Submits batch jobs to apply new SFs and compute sum-of-weights',
                                    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
   parser.add_argument('-i','--in_dir', required=True, 
-                      default='/net/cms29/cms29r0/pico/NanoAODv5/higgsino_angeles/2016/mc/raw_pico/',
+                      default='/net/cms29/cms29r0/pico/NanoAODv5/higgsino_angeles/2016/mc/unskimmed/',
                       help='Directory where the raw pico files are')
   parser.add_argument('-k','--skim_name', required=True, default='',
                       help='Plain text name for the skim. Output folder name will be named according to this.')
+  parser.add_argument("--overwrite", default=False,
+                    help="Process all input files regardless whether output exists.")
   args = vars(parser.parse_args())
 
   skim_name = args['skim_name']
@@ -29,6 +31,9 @@ if __name__ == '__main__':
   cmdfile = open(cmdfile_name,'w')
   cmdfile.write('#!/bin/env python\n')
   for ifile_path in in_file_paths:
+    outfile_path = ifile_path.replace(in_dir,out_dir).replace('/pico_','/pico_'+skim_name+'_')
+    if not args['overwrite'] and os.path.exists(outfile_path):
+      continue
     cmd = '{}/scripts/skim_file.py -k {} -i {} -o {}'.format(os.getcwd(), skim_name, ifile_path, out_dir)
     cmdfile.write('print(\''+cmd+'\')\n')
 
@@ -40,7 +45,7 @@ if __name__ == '__main__':
   print('cat '+cmdfile_name+' | tail -n 1')
   print('To generate job json and submit jobs:')
   print('convert_cl_to_jobs_info.py '+cmdfile_name+' '+json_name)
-  print('auto_submit_jobs.py '+json_name+' -c scripts/check_apply_corrections_job.py')
+  print('auto_submit_jobs.py '+json_name)
 
 
 
