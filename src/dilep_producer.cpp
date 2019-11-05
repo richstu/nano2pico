@@ -13,50 +13,6 @@ DileptonProducer::DileptonProducer(int year_){
 DileptonProducer::~DileptonProducer(){
 }
 
-
-void DileptonProducer::WriteDielectrons(nano_tree &nano, pico_tree &pico, std::vector<int> sig_el_nano_idx){
-
-  if (pico.out_nel()<2) return;
-
-  for (unsigned i(0); i<sig_el_nano_idx.size(); i++){
-    TLorentzVector el1; 
-    el1.SetPtEtaPhiM(nano.Electron_pt()[i], nano.Electron_eta()[i], nano.Electron_phi()[i], nano.Electron_mass()[i]);
-    for (unsigned j(i+1); j<sig_el_nano_idx.size(); j++){
-      TLorentzVector diel; 
-      diel.SetPtEtaPhiM(nano.Electron_pt()[j], nano.Electron_eta()[j], nano.Electron_phi()[j], nano.Electron_mass()[j]); 
-      diel += el1;
-      pico.out_elel_pt().push_back(diel.Pt());
-      pico.out_elel_eta().push_back(diel.Eta());
-      pico.out_elel_phi().push_back(diel.Phi());
-      pico.out_elel_m().push_back(diel.M());
-    }
-  }
-  
-  return;
-}
-
-
-void DileptonProducer::WriteDimuons(nano_tree &nano, pico_tree &pico, std::vector<int> sig_mu_nano_idx){
-
-  if (pico.out_nmu()<2) return;
-
-  for (unsigned i(0); i<sig_mu_nano_idx.size(); i++){
-    TLorentzVector mu1; 
-    mu1.SetPtEtaPhiM(nano.Muon_pt()[i], nano.Muon_eta()[i], nano.Muon_phi()[i], nano.Muon_mass()[i]);
-    for (unsigned j(i+1); j<sig_mu_nano_idx.size(); j++){
-      TLorentzVector dimu; 
-      dimu.SetPtEtaPhiM(nano.Muon_pt()[j], nano.Muon_eta()[j], nano.Muon_phi()[j], nano.Muon_mass()[j]); 
-      dimu += mu1;
-      pico.out_mumu_pt().push_back(dimu.Pt());
-      pico.out_mumu_eta().push_back(dimu.Eta());
-      pico.out_mumu_phi().push_back(dimu.Phi());
-      pico.out_mumu_m().push_back(dimu.M());
-    }
-  }
-
-  return;
-}
-
 void DileptonProducer::WriteDileptons(nano_tree &nano, pico_tree &pico, 
                                       std::vector<int> sig_el_nano_idx, std::vector<int> sig_mu_nano_idx) {
   if (pico.out_nmu()<2 && pico.out_nel()<2) return;
@@ -77,6 +33,8 @@ void DileptonProducer::WriteDileptons(nano_tree &nano, pico_tree &pico,
           pico.out_ll_phi().push_back(dimu.Phi());
           pico.out_ll_m().push_back(dimu.M());
           pico.out_ll_dr().push_back(mu1.DeltaR(mu2));
+          pico.out_ll_dphi().push_back(fabs(mu1.DeltaPhi(mu2)));
+          pico.out_ll_deta().push_back(fabs(mu1.Eta()-mu2.Eta()));
           pico.out_ll_lepid().push_back(13);
           pico.out_ll_i1().push_back(imu1);
           pico.out_ll_i2().push_back(imu2);
@@ -99,7 +57,7 @@ void DileptonProducer::WriteDileptons(nano_tree &nano, pico_tree &pico,
           pico.out_ll_phi().push_back(diel.Phi());
           pico.out_ll_m().push_back(diel.M());
           pico.out_ll_dr().push_back(el1.DeltaR(el2));
-          pico.out_ll_dphi().push_back(el1.DeltaPhi(el2));
+          pico.out_ll_dphi().push_back(fabs(el1.DeltaPhi(el2)));
           pico.out_ll_deta().push_back(fabs(el1.Eta()-el2.Eta()));
           pico.out_ll_lepid().push_back(11);
           pico.out_ll_i1().push_back(iel1);

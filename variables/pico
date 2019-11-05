@@ -94,10 +94,10 @@ vector<float> mu_dz
 vector<float> mu_dxy
 vector<float> mu_ip3d
 vector<float> mu_sip3d
-vector<bool> mu_id
-vector<bool> mu_sig
-vector<int> mu_charge
-vector<int> mu_pflavor
+vector<bool>  mu_id
+vector<bool>  mu_sig
+vector<int>   mu_charge
+vector<int>   mu_pflavor
 
 int nel
 int nvel
@@ -111,23 +111,13 @@ vector<float> el_dxy
 vector<float> el_ip3d
 vector<float> el_sip3d
 vector<float> el_idmva
-vector<bool> el_id
-vector<bool> el_sig
-vector<bool> el_ispf
-vector<int> el_charge
-vector<int> el_pflavor
+vector<bool>  el_id
+vector<bool>  el_sig
+vector<bool>  el_ispf
+vector<int>   el_charge
+vector<int>   el_pflavor
 
 ##################   Di-Leptons   ################
-vector<float> elel_m
-vector<float> elel_pt
-vector<float> elel_eta
-vector<float> elel_phi
-
-vector<float> mumu_m
-vector<float> mumu_pt
-vector<float> mumu_eta
-vector<float> mumu_phi
-
 vector<float> ll_pt
 vector<float> ll_eta
 vector<float> ll_phi
@@ -135,10 +125,9 @@ vector<float> ll_m
 vector<float> ll_dr
 vector<float> ll_dphi
 vector<float> ll_deta
-vector<int> ll_lepid
-vector<int> ll_i1
-vector<int> ll_i2
-
+vector<int>   ll_lepid
+vector<int>   ll_i1
+vector<int>   ll_i2
 
 ##################   Photons   ###################
 int nphoton
@@ -148,10 +137,10 @@ vector<float> photon_phi
 vector<float> photon_reliso
 vector<float> photon_r9
 vector<float> photon_drmin
-vector<int>  photon_pflavor
-vector<bool> photon_id
-vector<bool> photon_elveto
-vector<bool> photon_sig
+vector<int>   photon_pflavor
+vector<bool>  photon_id
+vector<bool>  photon_elveto
+vector<bool>  photon_sig
 
 ###################   Tracks    ##################
 int ntk
@@ -161,7 +150,7 @@ vector<float> tk_eta
 vector<float> tk_phi
 vector<float> tk_dxy
 vector<float> tk_dz
-vector<int> tk_pdgid
+vector<int>   tk_pdgid
 vector<float> tk_miniso_chg
 vector<float> tk_reliso_chg
 vector<float> tk_mt
