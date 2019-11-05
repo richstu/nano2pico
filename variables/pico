@@ -128,6 +128,18 @@ vector<float> mumu_pt
 vector<float> mumu_eta
 vector<float> mumu_phi
 
+vector<float> ll_pt
+vector<float> ll_eta
+vector<float> ll_phi
+vector<float> ll_m
+vector<float> ll_dr
+vector<float> ll_dphi
+vector<float> ll_deta
+vector<int> ll_lepid
+vector<int> ll_i1
+vector<int> ll_i2
+
+
 ##################   Photons   ###################
 int nphoton
 vector<float> photon_pt

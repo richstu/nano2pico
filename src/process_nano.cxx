@@ -155,8 +155,12 @@ int main(int argc, char *argv[]){
                                                                  sig_el_nano_idx, sig_mu_nano_idx);
     tk_producer.WriteIsoTracks(nano, pico, sig_el_nano_idx, sig_mu_nano_idx);
 
-    dilep_producer.WriteDielectrons(nano, pico, sig_el_nano_idx);
-    dilep_producer.WriteDimuons(nano, pico, sig_mu_nano_idx);
+    if (isZgamma)
+      dilep_producer.WriteDileptons(nano, pico, sig_el_nano_idx, sig_mu_nano_idx);
+    else {
+      dilep_producer.WriteDielectrons(nano, pico, sig_el_nano_idx);
+      dilep_producer.WriteDimuons(nano, pico, sig_mu_nano_idx);
+    }
 
     if (debug) cout<<"INFO:: Writing jets, MET and ISR vars"<<endl;
     vector<int> sig_jet_nano_idx = jet_producer.WriteJets(nano, pico, jet_islep_nano_idx, jet_isphoton_nano_idx,
