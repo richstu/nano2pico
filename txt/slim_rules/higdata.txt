@@ -1,0 +1,44 @@
+drop *
+
+keep run
+keep lumiblock
+keep event
+keep type
+
+keep npv
+keep ht
+keep met*
+keep mt*
+
+keep hig_*
+keep low_dphi
+keep njet
+keep nb*
+
+keep jet_*
+drop jet_isphoton
+drop jet_hflavor
+drop jet_pflavor
+drop jet_h1d
+drop jet_h2d
+
+keep nfjet
+keep fjet*
+
+keep nlep
+keep nvlep
+keep nmu
+keep nvmu
+keep nel
+keep nvel
+keep elel_*
+keep mumu_*
+keep ntk
+
+keep pass*
+
+keep weight
+
+keep HLT_*
+drop HLT_Mu17*
+drop HLT_Ele23*

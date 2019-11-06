@@ -114,7 +114,7 @@ vector<Variable> GetVariables(const string &file_name){
   string allowed = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890_";
   vector<Variable> vars;
 
-  ifstream infile(("variables/"+file_name).c_str());
+  ifstream infile(("txt/variables/"+file_name).c_str());
   string line;
   while(getline(infile, line)){
     size_t start = line.find_first_not_of(" ");

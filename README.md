@@ -7,12 +7,12 @@ Utility package for converting CMS NanoAOD to analysis-ready ntuples called "pic
 Use one of the servers supporting CMSSW, e.g. cms1,cms3,cms4,cms5...
 
 ~~~~bash
-    . /cvmfs/cms.cern.ch/cmsset_default.sh
-    cd /net/cms29/cms29r0/pico/CMSSW_10_2_11_patch1/src
-    eval `scramv1 runtime -sh`
-    cd -
-    git clone --recurse-submodules https://github.com/richstu/nano2pico
-    source set_env.sh
+. /cvmfs/cms.cern.ch/cmsset_default.sh
+cd /net/cms29/cms29r0/pico/CMSSW_10_2_11_patch1/src
+eval `scramv1 runtime -sh`
+cd -
+git clone --recurse-submodules https://github.com/richstu/nano2pico
+source set_env.sh
 ~~~~
 
 ## Latest production
@@ -133,6 +133,28 @@ To generate the commands use:
 ~~~~
 
 Follow similar process as in Step 1 to submit the commands as batch jobs. 
+
+### Step 4. Making skims
+
+It's recommended to start with a relatively inclusive skim which would then serve as the starting point for tighter skims to minimize total time spent on skimming. For example:
+
+~~~~bash 
+./scripts/write_skim_cmds.py --in_dir /net/cms29/cms29r0/pico/NanoAODv5/higgsino_angeles/2016/TChiHH/unskimmed/ \
+                             --skim_name skim_met150
+~~~~
+
+The skim names are defined in [scripts/skim_file.py](scripts/skim_file.py). If defining a new skim, please commit the definition!! This eliminates confusion of what is in various folders on disk later on.
+
+### Step 5. Making slims
+
+Finally, one can remove branches that are not commonly used and merge all files pertaining to one dataset into a single file to further reduce size and speed up making plots. For example:
+
+~~~~bash 
+./scripts/write_slim_and_merge_cmds.py --in_dir /net/cms29/cms29r0/pico/NanoAODv5/higgsino_angeles/2016/mc/skim_met150/ \
+                                       --slim_name higmc
+~~~~
+
+Here the slim name must correspond to a txt file in the slim_rules folder, so in this example `txt/slim_rules/higmc.txt`. The file contains the list of branches to be dropped/kept.
 
 ## Calculating b-tagging efficiencies
 

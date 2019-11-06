@@ -22,8 +22,8 @@ if __name__ == '__main__':
   in_file_paths = glob(os.path.join(in_dir,'*.root'))
   print('Found {} input files.\n'.format(len(in_file_paths)))
 
-  enclosing_dir = in_dir.rstrip('/').split('/')[-1]
-  out_dir = in_dir.replace(enclosing_dir,'skim_'+skim_name)
+  enclosing_dir = os.path.dirname(os.path.dirname(in_dir))
+  out_dir = os.path.join(enclosing_dir,'skim_'+skim_name)
   if not os.path.exists(out_dir): 
     os.mkdir(out_dir)
 
@@ -31,8 +31,8 @@ if __name__ == '__main__':
   cmdfile = open(cmdfile_name,'w')
   cmdfile.write('#!/bin/env python\n')
   for ifile_path in in_file_paths:
-    outfile_path = ifile_path.replace(in_dir,out_dir).replace('/pico_','/pico_'+skim_name+'_')
-    if not args['overwrite'] and os.path.exists(outfile_path):
+    out_file_path = ifile_path.replace(in_dir,out_dir).replace('/pico_','/pico_'+skim_name+'_')
+    if not args['overwrite'] and os.path.exists(out_file_path):
       continue
     cmd = '{}/scripts/skim_file.py -k {} -i {} -o {}'.format(os.getcwd(), skim_name, ifile_path, out_dir)
     cmdfile.write('print(\''+cmd+'\')\n')
@@ -42,7 +42,7 @@ if __name__ == '__main__':
 
   json_name = 'skim_'+skim_name+'.json'
   print('To print a sample command:')
-  print('cat '+cmdfile_name+' | tail -n 1')
+  print('cat '+cmdfile_name+' | tail -n 1\n')
   print('To generate job json and submit jobs:')
   print('convert_cl_to_jobs_info.py '+cmdfile_name+' '+json_name)
   print('auto_submit_jobs.py '+json_name)
