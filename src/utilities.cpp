@@ -27,6 +27,7 @@
 #include "TTree.h"
 #include "TChain.h"
 #include "TRegexp.h"
+#include "TLorentzVector.h"
 
 using namespace std;
 
@@ -48,6 +49,16 @@ long double SignedDeltaPhi(long double phi1, long double phi2){
 
 float dR(float eta1, float eta2, float phi1, float phi2) {
   return AddInQuadrature(eta1-eta2, DeltaPhi(phi1,phi2));
+}
+
+double cosThetaJeff(TLorentzVector lminus, TLorentzVector lplus, TLorentzVector photon) {
+  // Calculates the angle between the Zs spin and the lepton in the Zs rest frame
+  TLorentzVector ll = lminus + lplus;
+  lminus.Boost(-ll.BoostVector());
+  photon.Boost(-ll.BoostVector());
+  TVector3 l(lminus.Vect()), p(photon.Vect());
+  double costj = l*p/(l.Mag()*p.Mag());
+  return costj;
 }
 
 TString roundNumber(double num, int decimals, double denom){

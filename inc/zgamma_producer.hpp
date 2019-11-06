@@ -11,7 +11,7 @@ public:
   explicit ZGammaVarProducer(int year);
   ~ZGammaVarProducer();
 
-  void WriteZGammaVars();
+  void WriteZGammaVars(pico_tree &pico);
 
 private:
   int year;

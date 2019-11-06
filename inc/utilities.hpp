@@ -19,6 +19,7 @@
 #include "TString.h"
 #include "TTree.h"
 #include "TGraph.h"
+#include "TLorentzVector.h"
 
 #define ERROR(x) do{throw std::runtime_error(std::string("Error in file ")+__FILE__+" at line "+std::to_string(__LINE__)+" (in "+__func__+"): "+x);}while(false)
 #define DBG(x) do{std::cerr << "In " << __FILE__ << " at line " << __LINE__ << " (in function " << __func__ << "): " << x << std::endl;}while(false)
@@ -47,6 +48,7 @@ const long double PI = acos(-1.L);
 long double DeltaPhi(long double phi1, long double phi2);
 long double SignedDeltaPhi(long double phi1, long double phi2);
 float dR(float eta1, float eta2, float phi1, float phi2);
+double cosThetaJeff(TLorentzVector lminus, TLorentzVector lplus, TLorentzVector photon);
 TString roundNumber(double num, int decimals, double denom=1.);
 TString addCommas(double num);
 long double AddInQuadrature(long double x, long double y);

@@ -194,7 +194,8 @@ int main(int argc, char *argv[]){
 
     if (debug) cout<<"INFO:: Writing analysis specific variables"<<endl;
     // might need as input sig_el_nano_idx, sig_mu_nano_idx, sig_ph_nano_idx
-    zgamma_producer.WriteZGammaVars();
+    if(isZgamma)
+      zgamma_producer.WriteZGammaVars(pico);
 
     //save higgs variables using DeepCSV and DeepFlavor
     hig_producer.WriteHigVars(pico, /*DeepFlavor*/ false);

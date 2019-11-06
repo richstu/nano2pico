@@ -27,6 +27,26 @@ vector<float> hig_df_cand_drmax
 
 bool low_dphi
 
+###################   Zgamma   ##################
+float dijet_pt
+float dijet_eta
+float dijet_phi
+float dijet_m
+float dijet_dr
+float dijet_dphi
+float dijet_deta
+
+vector<float> llphoton_pt
+vector<float> llphoton_eta
+vector<float> llphoton_phi
+vector<float> llphoton_m
+vector<float> llphoton_dr
+vector<float> llphoton_dphi
+vector<float> llphoton_deta
+vector<float> llphoton_costhj
+vector<int>   llphoton_iph
+vector<int>   llphoton_ill
+
 ###################   Jets   ##################
 int njet
 int nbl
