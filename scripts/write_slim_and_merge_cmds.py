@@ -6,9 +6,9 @@ from glob import glob
 def findBaseSampleNames(folder):
   infiles = set() # to remove duplicates
   for file in glob(folder+'/*.root'):
-    tag = file.split('/')[-1]
-    tag = tag.split('__RunIISummer16NanoAODv5__')[0]
-    infiles.add(tag)
+    dataset_tag = file.split('/')[-1]
+    dataset_tag = dataset_tag.split('__RunIISummer16NanoAODv5__')[0]
+    infiles.add(dataset_tag)
     sortedfiles = list()
   for file in infiles:
     sortedfiles.append(file)
@@ -27,6 +27,8 @@ if __name__ == '__main__':
                       help='Name of the slim, e.g. "higmc". N.B. code then assumes that txt/slim_rules/higmc.txt exists.')
   parser.add_argument('--overwrite', default=False,
                     help='Process all input files regardless whether output exists.')
+  parser.add_argument('-t', '--tag', default='',
+                    help='Optionally specify a tag to be used to differentiate helper files for batch submission.')
   args = vars(parser.parse_args())
 
   in_dir = args['in_dir']
@@ -40,16 +42,17 @@ if __name__ == '__main__':
   if not os.path.exists(out_dir): 
     os.mkdir(out_dir)
 
-  tags = findBaseSampleNames(in_dir)
-  print('Found {} tags.\n'.format(len(tags)))
+  dataset_tags = findBaseSampleNames(in_dir)
+  print('Found {} dataset_tags.\n'.format(len(dataset_tags)))
 
   cmdfile_name = 'slim_'+slim_name+'_'+skim_name+'_cmds.py'
+  if (args['tag']!=''): cmdfile_name = args['tag']+'_'+cmdfile_name
   cmdfile = open(cmdfile_name,'w')
   cmdfile.write('#!/bin/env python\n')
-  for tag in tags:
-    #if 'TTJets_SingleLeptFromT_' not in tag: continue
-    in_file_paths = os.path.join(in_dir,'*'+tag+'*.root')
-    out_file_name = 'merged_'+tag+'_'+slim_name+'_'+skim_name+'_nfiles_'+str(len(glob(in_file_paths)))
+  for dstag in dataset_tags:
+    #if 'TTJets_SingleLeptFromT_' not in dstag: continue
+    in_file_paths = os.path.join(in_dir,'*'+dstag+'*.root')
+    out_file_name = 'merged_'+dstag+'_'+slim_name+'_'+skim_name+'_nfiles_'+str(len(glob(in_file_paths)))
     out_file_path = os.path.join(out_dir,out_file_name+'.root')
 
     if not args['overwrite'] and os.path.exists(out_file_path):
@@ -61,7 +64,7 @@ if __name__ == '__main__':
   cmdfile.close()
   os.chmod(cmdfile_name, 0o755)
 
-  json_name = 'slim_'+slim_name+'_'+skim_name+'_json.py'
+  json_name = cmdfile_name.replace('.py','.json')
   print('To print a sample command:')
   print('cat '+cmdfile_name+' | tail -n 1\n')
   os.system('convert_cl_to_jobs_info.py '+cmdfile_name+' '+json_name)

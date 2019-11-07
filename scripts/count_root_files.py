@@ -17,14 +17,14 @@ class bcolors:
     BOLD = '\033[1m'
     ENDC = '\033[0m'
 
-print "\n==== Counting number of root files in subfolders of "+bcolors.BOLD+args.folder+ bcolors.ENDC+"\n"
+print("\n==== Counting number of root files in subfolders of "+bcolors.BOLD+args.folder+ bcolors.ENDC+"\n")
 
 subfolders = sorted([x[0] for x in os.walk(args.folder)])
 for subfolder in subfolders:
     files = glob.glob(subfolder+'/*.root')
     if(len(files)>0): 
         sf_name = subfolder.split(args.folder)[1]
-        print '{:>5}'.format(str(len(files)))+" .root files, size "+'{:>4}'.format(du(subfolder))+" in "+bcolors.BOLD+sf_name+ bcolors.ENDC
+        print('{:>5}'.format(str(len(files)))+" .root files, size "+'{:>4}'.format(du(subfolder))+" in "+bcolors.BOLD+sf_name+ bcolors.ENDC)
 
 print 
 

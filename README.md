@@ -139,11 +139,18 @@ Follow similar process as in Step 1 to submit the commands as batch jobs.
 It's recommended to start with a relatively inclusive skim which would then serve as the starting point for tighter skims to minimize total time spent on skimming. For example:
 
 ~~~~bash 
-./scripts/write_skim_cmds.py --in_dir /net/cms29/cms29r0/pico/NanoAODv5/higgsino_angeles/2016/TChiHH/unskimmed/ \
-                             --skim_name skim_met150
+./scripts/write_skim_cmds.py --in_dir /net/cms29/cms29r0/pico/NanoAODv5/higgsino_angeles/2016/TChiHH/skim_higloose/ \
+                             --skim_name skim_higtight \
+                             --tag apples
 ~~~~
 
 The skim names are defined in [scripts/skim_file.py](scripts/skim_file.py). If defining a new skim, please commit the definition!! This eliminates confusion of what is in various folders on disk later on.
+
+The argument `--tag` is optional. It is used to differentiate the JSON files created by the queue system in case of running multiple skims of the same type. It will not affect the folder structure.
+
+Use `--overwrite` to run over all files even if output already exists. Otherwise, restarting the process of batch submission will skip files that have already been processed. Note that if you just re-issue the `auto_submit_jobs.py` with the original json file WILL overwrite. To omit files with existing output re-start from this step.
+
+Note that this step works also on slims produced by Step 5.
 
 ### Step 5. Making slims
 
@@ -155,6 +162,8 @@ Finally, one can remove branches that are not commonly used and merge all files 
 ~~~~
 
 Here the slim name must correspond to a txt file in the slim_rules folder, so in this example `txt/slim_rules/higmc.txt`. The file contains the list of branches to be dropped/kept.
+
+Similarly to above, one can optionally use `--overwrite` or `--tag`.
 
 ## Calculating b-tagging efficiencies
 

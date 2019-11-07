@@ -14,32 +14,42 @@ def convert_name(file_paths_string, split_strings):
   return converted_name
 
 def get_cuts(skim_name):
-  # a few special cuts for convenience
+  cuts = ''
+
+  # General use
   pass_1l_trig40 = '(Max$(el_pt*el_sig)>40 || Max$(mu_pt*mu_sig)>40)' # use for 1L CR
   pass_1l_trig30 = '(Max$(el_pt*el_sig)>30 || Max$(mu_pt*mu_sig)>30)' # use for 2L CR, can lower the cut since two leps!
   mllcut = '&&'.join(['(mumu_m*(mumu_m>0)+elel_m*(elel_m>0))>80','(mumu_m*(mumu_m>0)+elel_m*(elel_m>0))<100'])
-  nb_or_fjet_cut = '(nbt>=2 || nbdft>=2 || Sum$(fjet_pt>300 && fjet_msoftdrop>50)>0)'
-  sys_nbcut = 'max(nbdft,Max$(sys_nbdft))>=2'
-  njcut = 'njet>=4&&njet<=5'
-  # sys_njcut = '(njet==4||sys_njet[1]==4||sys_njet[2]==4||njet==5||sys_njet[1]==5||sys_njet[2]==5)'
-  higtrim = 'hig_drmax[0]<2.2 && hig_dm[0]<=40 && hig_am[0]<=200'
-  sys_higtrim = '&&'.join(['min(hig_drmax,Min$(sys_hig_drmax))<2.2',
-                           'min(hig_dm,Min$(sys_hig_dm))<=40',
-                           'min(hig_am,Min$(sys_hig_am))<=200'])
-
-  # General use
   if(skim_name=='met150'): cuts = 'met>150'
   if(skim_name=='zcand'): cuts = '&&'.join(['nlep==2', 'nbm==0', pass_1l_trig30, mllcut])
   if(skim_name=='ttisr'): cuts = '&&'.join(['nlep==2', 'nbm==2', pass_1l_trig30])
   if(skim_name=='wisr'):  cuts = '&&'.join(['met>100', 'nbl==0', pass_1l_trig40])
 
-  # Higgsino
-  if(skim_name=='higqcd'):  cuts = '&&'.join([njcut, 'met>150 && nvlep==0'])
+  # Higgsino loose
+  nb_or_fjet_cut = '(nbt>=2 || nbdft>=2 || Sum$(fjet_pt>300 && fjet_msoftdrop>50)>0)'
   if(skim_name=='higloose'): cuts = '&&'.join([nb_or_fjet_cut, 'met>150', 'nvlep==0'])
-  if(skim_name=='higtight'): cuts = '&&'.join([njcut, nbcut, 'met>150', 'nvlep==0', 'ntks==0','!low_dphi', higtrim])
-  if(skim_name=='higsys'):   cuts = '&&'.join([sys_njcut, sys_nbcut, 'max(met,Max$(sys_met))>150', 'nvlep==0', 'ntk==0', '!low_dphi', sys_higtrim])
-  if(skim_name=='higlep1'):  cuts = '&&'.join([njcut, nbcut, 'nleps==1', pass_1l_trig40])
-  if(skim_name=='higlep2'):  cuts = '&&'.join([njcut, zcand, 'nleps==2', pass_1l_trig30])
+  
+  # Higgsino tight
+  higtrim = '((hig_cand_drmax[0]<2.2 && hig_cand_dm[0]<=40 && hig_cand_am[0]<=200) ||'
+  higtrim += '(hig_df_cand_drmax[0]<2.2 && hig_df_cand_dm[0]<=40 && hig_df_cand_am[0]<=200))'
+  resolved = '(nbt>=2 || nbdft>=2) && njet>=4 && njet<=5 &&' + higtrim
+  boosted = 'Sum$(fjet_pt>300 && fjet_msoftdrop>50)>1'
+  if(skim_name=='higtight'): 
+    cuts = '&&'.join(['nvlep==0', 'ntk==0','!low_dphi', 'met>150', '(('+resolved+')||('+boosted+'))'])
+    print('Using cut string:  '+cuts.replace('&&',' && '))
+
+  # Loosen up just enough to do systematics - to be updated when needed
+  # sys_nbcut = 'max(nbdft,Max$(sys_nbdft))>=2'
+  # sys_njcut = '(njet==4||sys_njet[1]==4||sys_njet[2]==4||njet==5||sys_njet[1]==5||sys_njet[2]==5)'
+  # sys_higtrim = '&&'.join(['min(hig_cand_drmax,Min$(sys_hig_cand_drmax))<2.2',
+  #                          'min(hig_cand_dm,Min$(sys_hig_cand_dm))<=40',
+  #                          'min(hig_cand_am,Min$(sys_hig_cand_am))<=200'])
+  # if(skim_name=='higsys'):   cuts = '&&'.join([sys_njcut, sys_nbcut, 'max(met,Max$(sys_met))>150', 'nvlep==0', 'ntk==0', '!low_dphi', sys_higtrim])
+
+  # Control regions skims - to be updated when needed
+  # if(skim_name=='higqcd'):  cuts = '&&'.join([njcut, 'met>150 && nvlep==0'])
+  # if(skim_name=='higlep1'):  cuts = '&&'.join([njcut, nbcut, 'nleps==1', pass_1l_trig40])
+  # if(skim_name=='higlep2'):  cuts = '&&'.join([njcut, zcand, 'nleps==2', pass_1l_trig30])
 
   return cuts
 
@@ -80,6 +90,7 @@ if __name__ == '__main__':
 
   chain.Draw(">>elist",cut_string)
   elist = ROOT.gDirectory.Get("elist")
+  print('Found {} events satisfying the skim requirements.'.format(elist.GetN()))
   chain.SetEventList(elist)
   out_file = ROOT.TFile(out_file_path, "recreate") # in case we want compression 
   if (args['mass']!=-1): 
