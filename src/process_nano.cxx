@@ -24,6 +24,7 @@
 
 #include "btag_weighter.hpp"
 #include "lepton_weighter.hpp"
+#include "photon_weighter.hpp"
 #include "event_tools.hpp"
 #include "isr_tools.hpp"
 
@@ -96,6 +97,7 @@ int main(int argc, char *argv[]){
   // BTagWeighter btag_weighter(year, isFastsim, false, btag_wpts[year]);
   // BTagWeighter btag_df_weighter(year, isFastsim, true, btag_df_wpts[year]);
   LeptonWeighter lep_weighter(year);
+  PhotonWeighter photon_weighter(year);
 
   // Other tools
   EventTools event_tools(in_path, year);
@@ -219,13 +221,18 @@ int main(int argc, char *argv[]){
     // ----------------------------------------------------------------------------------------------
     if (debug) cout<<"INFO:: Calculating weights"<<endl;
     float w_lep(1.), w_fs_lep(1.);
+    float w_photon(1.);
     vector<float> sys_lep(2,1.), sys_fs_lep(2,1.);
+    vector<float> sys_photon(2,1.);
     lep_weighter.FullSim(pico, w_lep, sys_lep);
+    if(isZgamma) photon_weighter.FullSim(pico, w_photon, sys_photon);
     if(isFastsim) lep_weighter.FastSim(pico, w_fs_lep, sys_fs_lep);
     pico.out_w_lep()      = w_lep;
     pico.out_w_fs_lep()   = w_fs_lep;
     pico.out_sys_lep()    = sys_lep; 
     pico.out_sys_fs_lep() = sys_fs_lep;
+    pico.out_w_photon()   = w_photon;
+    pico.out_sys_photon() = sys_photon; 
     if(isZgamma) {
       pico.out_w_btag()    = 1.; 
       pico.out_w_btag_df() = 1.; 
@@ -269,6 +276,7 @@ int main(int argc, char *argv[]){
     // do not include w_prefire, or anything that should not be renormalized! Will be set again in Step 3
     pico.out_weight() = pico.out_w_lumi() *
                         w_lep * w_fs_lep * pico.out_w_bhig() *
+                        w_photon  *
                         pico.out_w_isr() * pico.out_w_pu();
 
     // ----------------------------------------------------------------------------------------------
@@ -290,6 +298,12 @@ int main(int argc, char *argv[]){
       for(size_t i = 0; i<pico.out_sys_lep().size(); ++i){
         wgt_sums.out_sys_lep()[i] += sys_lep[i];
         wgt_sums.out_sys_fs_lep()[i] += sys_fs_lep[i];
+      }
+    }
+    if(pico.out_nphoton()>0) {
+      wgt_sums.out_w_photon() += w_photon;
+      for(size_t i = 0; i < pico.out_sys_photon().size(); ++i) {
+        wgt_sums.out_sys_photon()[i] += sys_photon[i];
       }
     }
     wgt_sums.out_w_btag()    += pico.out_w_btag();
@@ -326,20 +340,22 @@ void Initialize(corrections_tree &wgt_sums){
   wgt_sums.out_tot_weight_l0() = 0.;
   wgt_sums.out_tot_weight_l1() = 0.;
 
-  wgt_sums.out_weight()    = 0.;
-  wgt_sums.out_w_lumi()    = 0.;
-  wgt_sums.out_w_lep()     = 0.;
-  wgt_sums.out_w_fs_lep()  = 0.;
-  wgt_sums.out_w_btag()    = 0.;
-  wgt_sums.out_w_btag_df() = 0.;
-  wgt_sums.out_w_bhig()    = 0.;
-  wgt_sums.out_w_bhig_df() = 0.;
-  wgt_sums.out_w_isr()     = 0.;
-  wgt_sums.out_w_pu()      = 0.;
+  wgt_sums.out_weight()     = 0.;
+  wgt_sums.out_w_lumi()     = 0.;
+  wgt_sums.out_w_lep()      = 0.;
+  wgt_sums.out_w_fs_lep()   = 0.;
+  wgt_sums.out_w_photon()   = 0.;
+  wgt_sums.out_w_btag()     = 0.;
+  wgt_sums.out_w_btag_df()  = 0.;
+  wgt_sums.out_w_bhig()     = 0.;
+  wgt_sums.out_w_bhig_df()  = 0.;
+  wgt_sums.out_w_isr()      = 0.;
+  wgt_sums.out_w_pu()       = 0.;
   // w_prefire should not be normalized!!
 
   wgt_sums.out_sys_lep().resize(2,0);
   wgt_sums.out_sys_fs_lep().resize(2,0);
+  wgt_sums.out_sys_photon().resize(2,0);
   wgt_sums.out_sys_bchig().resize(2,0);
   wgt_sums.out_sys_udsghig().resize(2,0);
   wgt_sums.out_sys_fs_bchig().resize(2,0);

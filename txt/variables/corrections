@@ -6,6 +6,7 @@ float weight
 float w_lumi
 float w_lep
 float w_fs_lep
+float w_photon
 
 # just need to add up 
 float w_btag
@@ -18,6 +19,7 @@ float w_pu
 
 vector<float> sys_lep
 vector<float> sys_fs_lep
+vector<float> sys_photon
 vector<float> sys_bchig
 vector<float> sys_udsghig
 vector<float> sys_fs_bchig
