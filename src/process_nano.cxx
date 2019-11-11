@@ -96,7 +96,8 @@ int main(int argc, char *argv[]){
   BTagWeighter btag_df_weighter(year, false, true, btag_df_wpts[year]);
   // BTagWeighter btag_weighter(year, isFastsim, false, btag_wpts[year]);
   // BTagWeighter btag_df_weighter(year, isFastsim, true, btag_df_wpts[year]);
-  LeptonWeighter lep_weighter(year);
+  LeptonWeighter lep_weighter(year, isZgamma);
+  LeptonWeighter lep_weighter16gh(year, isZgamma, true);
   PhotonWeighter photon_weighter(year);
 
   // Other tools
@@ -224,8 +225,12 @@ int main(int argc, char *argv[]){
     float w_photon(1.);
     vector<float> sys_lep(2,1.), sys_fs_lep(2,1.);
     vector<float> sys_photon(2,1.);
-    lep_weighter.FullSim(pico, w_lep, sys_lep);
-    if(isZgamma) photon_weighter.FullSim(pico, w_photon, sys_photon);
+    if(isZgamma) {
+      photon_weighter.FullSim(pico, w_photon, sys_photon);
+      if(nano.event() % 3516 <= 1887) lep_weighter.FullSim(pico, w_lep, sys_lep);
+      else lep_weighter16gh.FullSim(pico, w_lep, sys_lep);
+    }
+    else lep_weighter.FullSim(pico, w_lep, sys_lep);
     if(isFastsim) lep_weighter.FastSim(pico, w_fs_lep, sys_fs_lep);
     pico.out_w_lep()      = w_lep;
     pico.out_w_fs_lep()   = w_fs_lep;

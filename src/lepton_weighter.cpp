@@ -48,50 +48,70 @@ namespace{
   }
 }
 
-LeptonWeighter::LeptonWeighter(int year){
-  if (year==2016) {
-    in_full_mu_med_ = "TnP_NUM_MediumID_DENOM_generalTracks_VAR_map_pt_eta.root";  hist_full_mu_med_ = "SF";
-    in_full_mu_iso_ = "TnP_NUM_MiniIsoTight_DENOM_MediumID_VAR_map_pt_eta.root";  hist_full_mu_iso_ = "SF";
-    in_full_mu_trk_ = "TnP_NUM_MediumIP2D_DENOM_LooseID_VAR_map_pt_eta.root";  hist_full_mu_trk_ = "SF";
-    in_full_el_med_ = "ElectronScaleFactors_Run2016.root";  hist_full_el_med_ = "Run2016_CutBasedMediumNoIso94XV2";
-    in_full_el_iso_ = "ElectronScaleFactors_Run2016.root";  hist_full_el_iso_ = "Run2016_Mini";
-    in_full_el_trk_ = "egammaEffi_EGM2D_ETge20_recoSF2016_19_02_09.root";  hist_full_el_trk_ = "EGamma_SF2D";
+LeptonWeighter::LeptonWeighter(int year, bool isZgamma, bool doGH16){
+  if(isZgamma) {
+    if(year == 2016) {
+      if(doGH16) {
+        in_full_mu_id_ = "zgamma/RunGH_SF_ID.root";                           hist_full_mu_id_ = "NUM_LooseID_DEN_genTracks_eta_pt";
+        in_full_mu_is_ = "zgamma/RunGH_SF_ISO.root";                          hist_full_mu_is_ = "NUM_LooseRelIso_DEN_LooseID_eta_pt";
+      } else {
+        in_full_mu_id_ = "zgamma/RunBCDEF_SF_ID.root";                        hist_full_mu_id_ = "NUM_LooseID_DEN_genTracks_eta_pt";
+        in_full_mu_is_ = "zgamma/RunBCDEF_SF_ISO.root";                       hist_full_mu_is_ = "NUM_LooseRelIso_DEN_LooseID_eta_pt";
+      }
+      in_full_el_id_ = "zgamma/2016LegacyReReco_ElectronMVA90_Fall17V2.root"; hist_full_el_id_ = "EGamma_SF2D";
+      in_full_el_tk_ = "zgamma/EGM2D_BtoH_GT20GeV_RecoSF_Legacy2016.root";    hist_full_el_tk_ = "EGamma_SF2D";
+      // For electrons with pT < 20 GeV
+      in_full_el_lo_ = "zgamma/EGM2D_BtoH_low_RecoSF_Legacy2016.root";        hist_full_el_lo_ = "EGamma_SF2D";
+    }
+  }
+  else {
+    if (year==2016) {
+      in_full_mu_med_ = "TnP_NUM_MediumID_DENOM_generalTracks_VAR_map_pt_eta.root"; hist_full_mu_med_ = "SF";
+      in_full_mu_iso_ = "TnP_NUM_MiniIsoTight_DENOM_MediumID_VAR_map_pt_eta.root";  hist_full_mu_iso_ = "SF";
+      in_full_mu_trk_ = "TnP_NUM_MediumIP2D_DENOM_LooseID_VAR_map_pt_eta.root";     hist_full_mu_trk_ = "SF";
+      in_full_el_med_ = "ElectronScaleFactors_Run2016.root";                        hist_full_el_med_ = "Run2016_CutBasedMediumNoIso94XV2";
+      in_full_el_iso_ = "ElectronScaleFactors_Run2016.root";                        hist_full_el_iso_ = "Run2016_Mini";
+      in_full_el_trk_ = "egammaEffi_EGM2D_ETge20_recoSF2016_19_02_09.root";         hist_full_el_trk_ = "EGamma_SF2D";
 
-    in_fast_mu_med_ = "sf_fast_mu_mediumID_2016.root";  hist_fast_mu_med_ = "histo2D";
-    in_fast_mu_iso_ = "sf_fast_mu_mini02_2016.root";  hist_fast_mu_iso_ = "histo2D";
+      in_fast_mu_med_ = "sf_fast_mu_mediumID_2016.root";                            hist_fast_mu_med_ = "histo2D";
+      in_fast_mu_iso_ = "sf_fast_mu_mini02_2016.root";                              hist_fast_mu_iso_ = "histo2D";
 
-    in_fast_el_med_ = "sf_fast_el_mediumID_2016.root";  hist_fast_el_med_ = "histo2D";
-    in_fast_el_iso_ = "sf_fast_el_mini01_2016.root";  hist_fast_el_iso_ = "histo2D";
-  } else if (year==2017) {
-    in_full_mu_med_ = "Muon_Run2017_SF_ID.root";  hist_full_mu_med_ = "NUM_MediumID_DEN_genTracks_pt_abseta";
-    in_full_mu_iso_ = "Muon_MinIso02_wrtMediumID_SF_Run2017.root";  hist_full_mu_iso_ = "TnP_MC_NUM_MiniIso02Cut_DEN_MediumID_PAR_pt_eta";
-    in_full_mu_trk_ = "";  hist_full_mu_trk_ = ""; // not needed for 2017
-    in_full_el_med_ = "ElectronScaleFactors_Run2017.root";  hist_full_el_med_ = "Run2017_CutBasedMediumNoIso94XV2";
-    in_full_el_iso_ = "ElectronScaleFactors_Run2017.root";  hist_full_el_iso_ = "Run2017_MVAVLooseTightIP2DMini";
-    in_full_el_trk_ = "egammaEffi_EGM2D_ETge20_recoSF2017_19_02_09.root";  hist_full_el_trk_ = "EGamma_SF2D";
+      in_fast_el_med_ = "sf_fast_el_mediumID_2016.root";                            hist_fast_el_med_ = "histo2D";
+      in_fast_el_iso_ = "sf_fast_el_mini01_2016.root";                              hist_fast_el_iso_ = "histo2D";
+    } else if (year==2017) {
+      in_full_mu_med_ = "Muon_Run2017_SF_ID.root";                                  hist_full_mu_med_ = "NUM_MediumID_DEN_genTracks_pt_abseta";
+      in_full_mu_iso_ = "Muon_MinIso02_wrtMediumID_SF_Run2017.root";                hist_full_mu_iso_ = "TnP_MC_NUM_MiniIso02Cut_DEN_MediumID_PAR_pt_eta";
+      in_full_mu_trk_ = "";                                                         hist_full_mu_trk_ = ""; // not needed for 2017
+      in_full_el_med_ = "ElectronScaleFactors_Run2017.root";                        hist_full_el_med_ = "Run2017_CutBasedMediumNoIso94XV2";
+      in_full_el_iso_ = "ElectronScaleFactors_Run2017.root";                        hist_full_el_iso_ = "Run2017_MVAVLooseTightIP2DMini";
+      in_full_el_trk_ = "egammaEffi_EGM2D_ETge20_recoSF2017_19_02_09.root";         hist_full_el_trk_ = "EGamma_SF2D";
 
-    in_fast_mu_med_ = "detailed_mu_full_fast_sf_17.root";  hist_fast_mu_med_ = "miniIso02_MediumId_sf";
-    in_fast_mu_iso_ = "";  hist_fast_mu_iso_ = ""; // included in the ID SF above
+      in_fast_mu_med_ = "detailed_mu_full_fast_sf_17.root";                         hist_fast_mu_med_ = "miniIso02_MediumId_sf";
+      in_fast_mu_iso_ = "";                                                         hist_fast_mu_iso_ = ""; // included in the ID SF above
 
-    in_fast_el_med_ = "detailed_ele_full_fast_sf_17.root";  hist_fast_el_med_ = "CutBasedMediumNoIso94XV2_sf";
-    in_fast_el_iso_ = "detailed_ele_full_fast_sf_17.root";  hist_fast_el_iso_ = "MVAVLooseTightIP2DMini_sf";
-  } else {
-    in_full_mu_med_ = "Muon_Run2018_SF_ID.root";  hist_full_mu_med_ = "NUM_MediumID_DEN_TrackerMuons_pt_abseta";
-    in_full_mu_iso_ = "Muon_MinIso02_wrtMediumID_SF_Run2017.root";  hist_full_mu_iso_ = "TnP_MC_NUM_MiniIso02Cut_DEN_MediumID_PAR_pt_eta"; // official recommendation is now to use 2017
-    in_full_mu_trk_ = "";  hist_full_mu_trk_ = ""; // not needed for 2018
-    in_full_el_med_ = "ElectronScaleFactors_Run2018.root";  hist_full_el_med_ = "Run2018_CutBasedMediumNoIso94XV2";
-    in_full_el_iso_ = "ElectronScaleFactors_Run2018.root";  hist_full_el_iso_ = "Run2018_Mini";
-    in_full_el_trk_ = "egammaEffi_EGM2D_ETge10_recoSF2018_19_04_04.root";  hist_full_el_trk_ = "EGamma_SF2D";
+      in_fast_el_med_ = "detailed_ele_full_fast_sf_17.root";                        hist_fast_el_med_ = "CutBasedMediumNoIso94XV2_sf";
+      in_fast_el_iso_ = "detailed_ele_full_fast_sf_17.root";                        hist_fast_el_iso_ = "MVAVLooseTightIP2DMini_sf";
+    } else {
+      in_full_mu_med_ = "Muon_Run2018_SF_ID.root";                                  hist_full_mu_med_ = "NUM_MediumID_DEN_TrackerMuons_pt_abseta";
+      in_full_mu_iso_ = "Muon_MinIso02_wrtMediumID_SF_Run2017.root";                hist_full_mu_iso_ = "TnP_MC_NUM_MiniIso02Cut_DEN_MediumID_PAR_pt_eta"; // official recommendation is now to use 2017
+      in_full_mu_trk_ = "";                                                         hist_full_mu_trk_ = ""; // not needed for 2018
+      in_full_el_med_ = "ElectronScaleFactors_Run2018.root";                        hist_full_el_med_ = "Run2018_CutBasedMediumNoIso94XV2";
+      in_full_el_iso_ = "ElectronScaleFactors_Run2018.root";                        hist_full_el_iso_ = "Run2018_Mini";
+      in_full_el_trk_ = "egammaEffi_EGM2D_ETge10_recoSF2018_19_04_04.root";         hist_full_el_trk_ = "EGamma_SF2D";
 
-    in_fast_mu_med_ = "detailed_mu_full_fast_sf_18.root";  hist_fast_mu_med_ = "miniIso02_MediumId_sf";
-    in_fast_mu_iso_ = "";  hist_fast_mu_iso_ = ""; // included in the ID SF above
+      in_fast_mu_med_ = "detailed_mu_full_fast_sf_18.root";                         hist_fast_mu_med_ = "miniIso02_MediumId_sf";
+      in_fast_mu_iso_ = "";                                                         hist_fast_mu_iso_ = ""; // included in the ID SF above
 
-    in_fast_el_med_ = "detailed_ele_full_fast_sf_18.root";  hist_fast_el_med_ = "CutBasedMediumNoIso94XV2_sf";
-    in_fast_el_iso_ = "detailed_ele_full_fast_sf_18.root";  hist_fast_el_iso_ = "MVAVLooseTightIP2DMini_sf";
+      in_fast_el_med_ = "detailed_ele_full_fast_sf_18.root";                        hist_fast_el_med_ = "CutBasedMediumNoIso94XV2_sf";
+      in_fast_el_iso_ = "detailed_ele_full_fast_sf_18.root";                        hist_fast_el_iso_ = "MVAVLooseTightIP2DMini_sf";
+    }
   }
 
   do_full_el_med_ = (in_full_el_med_!=""); do_full_el_iso_ = (in_full_el_iso_!=""); do_full_el_trk_ = (in_full_el_trk_!="");
   do_full_mu_med_ = (in_full_mu_med_!=""); do_full_mu_iso_ = (in_full_mu_iso_!=""); do_full_mu_trk_ = (in_full_mu_trk_!="");
+
+  do_full_el_id_  = (in_full_el_id_ !=""); do_full_el_tk_  = (in_full_el_tk_ !=""); do_full_el_lo_  = (in_full_el_lo_ !="");
+  do_full_mu_id_  = (in_full_mu_id_ !=""); do_full_mu_is_  = (in_full_mu_is_ !=""); 
 
   do_fast_el_med_ = (in_fast_el_med_!=""); do_fast_el_iso_ = (in_fast_el_iso_!="");
   do_fast_mu_med_ = (in_fast_mu_med_!=""); do_fast_mu_iso_ = (in_fast_mu_iso_!="");
@@ -105,6 +125,15 @@ LeptonWeighter::LeptonWeighter(int year){
   if (do_full_el_med_) sf_full_el_med_ = LoadSF<TH2F>(in_full_el_med_, hist_full_el_med_);
   if (do_full_el_iso_) sf_full_el_iso_ = LoadSF<TH2F>(in_full_el_iso_, hist_full_el_iso_);
   if (do_full_el_trk_) sf_full_el_trk_ = LoadSF<TH2F>(in_full_el_trk_, hist_full_el_trk_);
+
+  //https://twiki.cern.ch/twiki/bin/view/CMS/EgammaRunIIRecommendations#Electron_Scale_Factors
+  if (do_full_el_id_)  sf_full_el_id_  = LoadSF<TH2F>(in_full_el_id_,  hist_full_el_id_);
+  if (do_full_el_tk_)  sf_full_el_tk_  = LoadSF<TH2F>(in_full_el_tk_,  hist_full_el_tk_);
+  if (do_full_el_lo_)  sf_full_el_lo_  = LoadSF<TH2F>(in_full_el_lo_,  hist_full_el_lo_);
+
+  //https://twiki.cern.ch/twiki/bin/view/CMS/MuonReferenceEffs2016LegacyRereco
+  if (do_full_mu_id_)  sf_full_mu_id_  = LoadSF<TH2F>(in_full_mu_id_,  hist_full_mu_id_);
+  if (do_full_mu_is_)  sf_full_mu_is_  = LoadSF<TH2F>(in_full_mu_is_,  hist_full_mu_is_);
 
   if (do_fast_mu_med_) sf_fast_mu_med_ = LoadSF<TH2D>(in_fast_mu_med_, hist_fast_mu_med_);
   if (do_fast_mu_iso_) sf_fast_mu_iso_ = LoadSF<TH2D>(in_fast_mu_iso_, hist_fast_mu_iso_);
@@ -167,6 +196,8 @@ std::pair<double, double> LeptonWeighter::GetMuonScaleFactor(pico_tree &pico, si
     sfs.push_back(GetSF(sf_full_mu_trk_, pt, abseta, false));
     sfs.push_back(make_pair(1., 0.03));//Systematic uncertainty
   }
+  if (do_full_mu_id_) sfs.push_back(GetSF(sf_full_mu_id_, eta, pt, false));
+  if (do_full_mu_is_) sfs.push_back(GetSF(sf_full_mu_is_, eta, pt, false));
   return accumulate(sfs.cbegin(), sfs.cend(), make_pair(1., 0.), MergeSF);
 }
 
@@ -184,6 +215,11 @@ std::pair<double, double> LeptonWeighter::GetElectronScaleFactor(pico_tree &pico
   if (do_full_el_med_) sfs.push_back(GetSF(sf_full_el_med_, eta, pt));
   if (do_full_el_iso_) sfs.push_back(GetSF(sf_full_el_iso_, eta, pt));
   if (do_full_el_trk_) sfs.push_back(GetSF(sf_full_el_trk_, eta, pt));
+  if (do_full_el_id_)  sfs.push_back(GetSF(sf_full_el_id_,  eta, pt));
+  if (do_full_el_tk_) {
+    if(pt > 20)        sfs.push_back(GetSF(sf_full_el_tk_,  eta, pt));
+    else               sfs.push_back(GetSF(sf_full_el_lo_,  eta, pt));
+  }
   sfs.push_back(make_pair(1., pt<20. || pt >80. ? 0.01 : 0.));//Systematic uncertainty
   return accumulate(sfs.cbegin(), sfs.cend(), make_pair(1., 0.), MergeSF);
 }
