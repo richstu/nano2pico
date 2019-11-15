@@ -4,6 +4,10 @@
 
 #include "TLorentzVector.h"
 
+#include <fastjet/JetDefinition.hh>
+#include <fastjet/PseudoJet.hh>
+#include <fastjet/ClusterSequence.hh>
+
 #include "utilities.hpp"
 
 using namespace std;
@@ -103,6 +107,28 @@ void JetProducer::WriteFatJets(nano_tree &nano, pico_tree &pico){
 
     pico.out_nfjet()++;
   }
+
+  //calculate sum of R 1.4 jet masses
+  vector<fastjet::PseudoJet> skinny_jets(0);
+  //loop over Ak4 jets to add to skinny_jets vector
+  for (unsigned int jet_idx(0); jet_idx < pico.out_jet_pt().size(); jet_idx++) {
+	//currently includes leptons and photons in clustering
+	if (pico.out_jet_pt()[jet_idx]> JetPtCut || pico.out_jet_islep()[jet_idx] || pico.out_jet_isphoton()[jet_idx]) {
+		TLorentzVector jet_4p;
+		jet_4p.SetPtEtaPhiM(pico.out_jet_pt()[jet_idx],pico.out_jet_eta()[jet_idx],pico.out_jet_phi()[jet_idx],pico.out_jet_m()[jet_idx]);
+		const fastjet::PseudoJet this_pseudo_jet(jet_4p.Px(), jet_4p.Py(), jet_4p.Pz(), jet_4p.E());
+		skinny_jets.push_back(this_pseudo_jet);
+	}
+  } //loop over Ak4 Jets
+  //cluster into R 1.4 jets with fastjet
+  fastjet::JetDefinition jet_definition(fastjet::antikt_algorithm, 1.4);
+  fastjet::ClusterSequence cluster_sequence(skinny_jets, jet_definition);
+  vector<fastjet::PseudoJet> fat_jets = cluster_sequence.inclusive_jets();
+  pico.out_mj14() = 0;
+  for (unsigned int fat_jet_idx = 0; fat_jet_idx < fat_jets.size(); fat_jet_idx++) {
+	  pico.out_mj14() += fat_jets[fat_jet_idx].m();
+  } //loop over Ak14 jets
+
   return;
 }
 

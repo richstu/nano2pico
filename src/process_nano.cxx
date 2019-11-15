@@ -61,6 +61,7 @@ int main(int argc, char *argv[]){
   int year = Contains(in_file, "RunIISummer16") ? 2016 : (Contains(in_file, "RunIIFall17") ? 2017 : 2018);
 
   bool isZgamma = Contains(out_dir, "zgamma");
+  //bool isTTZ = Contains(out_dir, "ttz");
 
   time_t begtime, endtime;
   time(&begtime);

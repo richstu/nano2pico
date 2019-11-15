@@ -21,6 +21,7 @@ else
     fi
     
     rm -rf $bad_file
+    #scram b -j$(getconf _NPROCESSORS_ONLN)
 fi
 
 exit $exit_code
