@@ -47,6 +47,9 @@ vector<float> llphoton_costhj
 vector<int>   llphoton_iph
 vector<int>   llphoton_ill
 
+###################   ttZ    ##################
+float mj14
+
 ###################   Jets   ##################
 int njet
 int nbl
