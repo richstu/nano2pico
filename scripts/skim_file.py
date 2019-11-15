@@ -1,4 +1,4 @@
-#!/bin/env python
+#!/usr/bin/env python
 import os
 import ROOT
 import argparse
@@ -30,8 +30,8 @@ def get_cuts(skim_name):
   if(skim_name=='higloose'): cuts = '&&'.join([nb_or_fjet_cut, 'met>150', 'nvlep==0'])
   
   # Higgsino tight
-  higtrim = '((hig_cand_drmax[0]<2.2 && hig_cand_dm[0]<=40 && hig_cand_am[0]<=200) ||'
-  higtrim += '(hig_df_cand_drmax[0]<2.2 && hig_df_cand_dm[0]<=40 && hig_df_cand_am[0]<=200))'
+  higtrim = '((Alt$(hig_cand_drmax[0],0)<2.2 && Alt$(hig_cand_dm[0],0)<=40 && Alt$(hig_cand_am[0],0)<=200) ||'
+  higtrim += '(Alt$(hig_df_cand_drmax[0],0)<2.2 && Alt$(hig_df_cand_dm[0],0)<=40 && Alt$(hig_df_cand_am[0],0)<=200))'
   resolved = '(nbt>=2 || nbdft>=2) && njet>=4 && njet<=5 &&' + higtrim
   boosted = 'Sum$(fjet_pt>300 && fjet_msoftdrop>50)>1'
   if(skim_name=='higtight'): 

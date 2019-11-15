@@ -140,7 +140,7 @@ It's recommended to start with a relatively inclusive skim which would then serv
 
 ~~~~bash 
 ./scripts/write_skim_cmds.py --in_dir /net/cms29/cms29r0/pico/NanoAODv5/higgsino_angeles/2016/TChiHH/skim_higloose/ \
-                             --skim_name skim_higtight \
+                             --skim_name higtight \
                              --tag apples
 ~~~~
 
