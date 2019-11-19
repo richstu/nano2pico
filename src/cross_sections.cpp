@@ -114,6 +114,11 @@ namespace xsec{
         if(file.Contains("VVTo2L2Nu"))    xsec = 11.95;
         if(file.Contains("ZZ_Tune"))      xsec = 16.523;
 
+	//cross sections stolen from AN for TOP-18-009
+	
+        if(file.Contains("tZq"))   xsec = 0.09418;
+	if(file.Contains("ttHToNonbb"))    xsec = 0.2151;
+
         // Calculated at 13 TeV in
         // https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt1314TeV
         // Higgs branching ratios from
@@ -249,6 +254,10 @@ namespace xsec{
         if(file.Contains("ZH_HToBB_ZToNuNu_M125"))    xsec = 0.883*Htobb*0.2;
         if(file.Contains("WH_HToBB_WToLNu_M125"))     xsec = 1.373*Htobb*(0.1071+0.1063+0.1138);
 
+	//cross sections stolen from AN for TOP-18-009
+	
+        if(file.Contains("tZq"))   xsec = 0.09418;
+	if(file.Contains("ttHToNonbb"))    xsec = 0.2151;
     }
     if(xsec<=0) std::cout<<"ERROR:: Cross section not found for "<<file<<std::endl;
 
@@ -258,7 +267,7 @@ namespace xsec{
   float fractionNegWeights(const TString &file){
     float fneg(0.);
 
-    // ttH, ttZ, ttW, ttGamma
+    // ttH, ttZ, ttW, ttGamma, tZq
     if(file.Contains("ttHJetTobb_M125_13TeV_amcatnloFXFX"))     fneg = 0.3515;
     if(file.Contains("TTZToQQ"))                                fneg = 0.2657;
     if(file.Contains("TTZToLLNuNu_M-10"))                       fneg = 0.2676;
@@ -269,6 +278,7 @@ namespace xsec{
     if(file.Contains("TTTT_TuneCUETP8M1_13TeV-amcatnlo"))       fneg = 0.41; // from MCM
     if(file.Contains("VVTo2L2Nu_13TeV_amcatnloFXFX"))       fneg = 0.20; // from MCM
     if(file.Contains("TTJets_Mtt-1000toInf"))                   fneg = 0.376996;
+    if(file.Contains("tZq"))					fneg = 0.3675;
 
     // Single top
     if (file.Contains("ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8")) fneg = 0.1884;

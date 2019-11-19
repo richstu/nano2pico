@@ -570,6 +570,7 @@ bool HLTriggerFinalPath
 # Single lepton triggers
 bool HLT_IsoMu24
 bool HLT_IsoMu27
+bool HLT_IsoTkMu24
 bool HLT_Mu50
 bool HLT_Ele27_WPTight_Gsf
 bool HLT_Ele35_WPTight_Gsf

@@ -49,6 +49,7 @@ vector<int>   llphoton_ill
 
 ###################   ttZ    ##################
 float mj14
+vector<float> signal_lepton_pt
 
 ###################   Jets   ##################
 int njet
@@ -235,6 +236,7 @@ float eff_trig
 ################  Triggers copy straight from Nano, same names   ##################
 # Single lepton triggers
 bool HLT_IsoMu24
+bool HLT_IsoTkMu24
 bool HLT_IsoMu27
 bool HLT_Mu50
 bool HLT_Ele27_WPTight_Gsf

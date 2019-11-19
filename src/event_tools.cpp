@@ -95,8 +95,10 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
 }
 
 void EventTools::CopyTriggerDecisions(nano_tree& nano, pico_tree& pico){
+  //single lepton triggers
   pico.out_HLT_IsoMu24() = nano.HLT_IsoMu24();
   pico.out_HLT_IsoMu27() = nano.HLT_IsoMu27();
+  pico.out_HLT_IsoTkMu24() = nano.HLT_IsoTkMu24();
   pico.out_HLT_Mu50() = nano.HLT_Mu50();
   pico.out_HLT_Ele27_WPTight_Gsf() = nano.HLT_Ele27_WPTight_Gsf();
   pico.out_HLT_Ele35_WPTight_Gsf() = nano.HLT_Ele35_WPTight_Gsf();
@@ -118,6 +120,7 @@ void EventTools::CopyTriggerDecisions(nano_tree& nano, pico_tree& pico){
   pico.out_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ() = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ();
   pico.out_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL();
   pico.out_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ();
+
   return;
 }
 

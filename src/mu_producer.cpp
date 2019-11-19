@@ -11,7 +11,7 @@ MuonProducer::MuonProducer(int year_){
 MuonProducer::~MuonProducer(){
 }
 
-vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<int> &jet_islep_nano_idx, bool isZgamma){
+vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<int> &jet_islep_nano_idx, bool isZgamma, bool isTTZ){
 
   vector<int> sig_mu_nano_idx;
   pico.out_nmu() = 0; pico.out_nvmu() = 0;
@@ -28,7 +28,17 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
            nano.Muon_pfRelIso03_all()[imu] < MuonRelIsoCut &&
            nano.Muon_sip3d()[imu] < 4)
         isSignal = true;
-      pico.out_mu_sip3d().push_back(nano.Muon_sip3d()[imu]);
+    }
+    else if (isTTZ) {
+      if (pt <= VetoMuonPtCut) continue;
+      if (fabs(eta) > MuonEtaCut) continue;
+      if (fabs(nano.Muon_dz()[imu])>0.1)  continue;
+      if (fabs(nano.Muon_dxy()[imu])>0.05) continue; 
+      if (nano.Muon_sip3d()[imu]>4) continue;
+      if (nano.Muon_miniPFRelIso_all()[imu] > 1.0) continue;
+      if (!nano.Muon_mediumId()[imu]) continue;
+      if (nano.Muon_miniPFRelIso_all()[imu] < 0.2)
+	      isSignal = true;
     }
     else {
       if (!nano.Muon_mediumId()[imu]) continue;
@@ -50,6 +60,7 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
     pico.out_mu_sig().push_back(isSignal);
     pico.out_mu_charge().push_back(nano.Muon_charge()[imu]);
     pico.out_mu_pflavor().push_back(nano.Muon_genPartFlav()[imu]);
+    pico.out_mu_sip3d().push_back(nano.Muon_sip3d()[imu]);
 
     if (nano.Muon_miniPFRelIso_all()[imu] < MuonMiniIsoCut) {
       pico.out_nvmu()++;
