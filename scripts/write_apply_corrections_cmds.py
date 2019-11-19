@@ -5,7 +5,9 @@ from glob import glob
 
 def getTag(path):
   tag = path.split("/")[-1]
+  tag = tag.split("RunIISummer16NanoAODv4")[0]
   tag = tag.split("RunIISummer16NanoAODv5")[0]
+  tag = tag.split("_ext")[0]
   tag = tag.replace("raw_pico_","")
   tag = tag.strip("_")
   return tag

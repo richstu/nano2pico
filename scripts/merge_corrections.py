@@ -19,6 +19,7 @@ def ensureDir(path):
 def getTag(path):
   tag = path.split("/")[-1]
   tag = tag.split("RunIISummer16NanoAODv5")[0]
+  tag = tag.split("_ext")[0]
   tag = tag.replace("wgt_sums_","")
   tag = tag.strip("_")
   return tag
