@@ -21,6 +21,7 @@
 #include "jet_producer.hpp"
 #include "hig_producer.hpp"
 #include "zgamma_producer.hpp"
+#include "ttz_producer.hpp"
 
 #include "btag_weighter.hpp"
 #include "lepton_weighter.hpp"
@@ -61,7 +62,7 @@ int main(int argc, char *argv[]){
   int year = Contains(in_file, "RunIISummer16") ? 2016 : (Contains(in_file, "RunIIFall17") ? 2017 : 2018);
 
   bool isZgamma = Contains(out_dir, "zgamma");
-  //bool isTTZ = Contains(out_dir, "ttz");
+  bool isTTZ = Contains(out_dir, "ttz");
 
   time_t begtime, endtime;
   time(&begtime);
@@ -88,6 +89,7 @@ int main(int argc, char *argv[]){
   JetProducer jet_producer(year);
   HigVarProducer hig_producer(year);
   ZGammaVarProducer zgamma_producer(year);
+  TTZVarProducer ttz_producer(year);
 
   //Initialize scale factor tools
   const string ctr = "central";
@@ -150,8 +152,8 @@ int main(int argc, char *argv[]){
     if (debug) cout<<"INFO:: Writing leptons, photons and tracks"<<endl;
     vector<int> jet_islep_nano_idx = vector<int>();
     pico.out_nlep() = 0; pico.out_nvlep() = 0; // filled by lepton producers
-    vector<int> sig_el_nano_idx = el_producer.WriteElectrons(nano, pico, jet_islep_nano_idx, isZgamma);
-    vector<int> sig_mu_nano_idx = mu_producer.WriteMuons(nano, pico, jet_islep_nano_idx, isZgamma);
+    vector<int> sig_el_nano_idx = el_producer.WriteElectrons(nano, pico, jet_islep_nano_idx, isZgamma, isTTZ);
+    vector<int> sig_mu_nano_idx = mu_producer.WriteMuons(nano, pico, jet_islep_nano_idx, isZgamma, isTTZ);
 
     vector<int> jet_isphoton_nano_idx = vector<int>();
     if(isZgamma)
@@ -175,31 +177,61 @@ int main(int argc, char *argv[]){
     pico.out_met_tru()     = nano.GenMET_pt();
     pico.out_met_tru_phi() = nano.GenMET_phi();
  
-    // calculate mT only for single lepton events
-    pico.out_mt() = -999; 
-    if (pico.out_nlep()==1) {
-      if (sig_el_nano_idx.size()>0) {
-        pico.out_mt() = GetMT(nano.MET_pt(), nano.MET_phi(), 
-          nano.Electron_pt()[sig_el_nano_idx[0]], nano.Electron_phi()[sig_el_nano_idx[0]]);
-      } else {
-        pico.out_mt() = GetMT(nano.MET_pt(), nano.MET_phi(), 
-          nano.Muon_pt()[sig_mu_nano_idx[0]], nano.Muon_phi()[sig_mu_nano_idx[0]]);
-      }
-    } 
-    if (pico.out_ntrulep()==1) {
-      for (unsigned imc(0); imc<pico.out_mc_id().size(); imc++){
-        if (abs(pico.out_mc_id()[imc])==11 || abs(pico.out_mc_id()[imc])==13) {
-          pico.out_mt_tru() = GetMT(pico.out_met_tru(), pico.out_met_tru_phi(), 
-                                pico.out_mc_pt()[imc], pico.out_mc_phi()[imc]);
-          break;
-        }
-      }
-    } 
+    if (isTTZ) {
+	    //calculate m_T for events with one (signal|loose) lepton
+	    pico.out_mt() = -999;
+	    if (pico.out_nlep() == 1) {
+		    //use signal lepton
+		    if (sig_mu_nano_idx.size() == 0) {
+			    pico.out_mt() = GetMT(nano.MET_pt(), nano.MET_phi(), 
+			    nano.Electron_pt()[sig_el_nano_idx[0]], nano.Electron_phi()[sig_el_nano_idx[0]]);
+		    } 
+		    else {
+			    pico.out_mt() = GetMT(nano.MET_pt(), nano.MET_phi(), 
+			    nano.Muon_pt()[sig_mu_nano_idx[0]], nano.Muon_phi()[sig_mu_nano_idx[0]]);
+		    }
+	    }
+	    else if ((pico.out_mu_pt().size() + pico.out_el_pt().size()) == 1) {
+		    //use non-signal lepton
+		    if (pico.out_mu_pt().size() == 0) {
+			    pico.out_mt() = GetMT(nano.MET_pt(), nano.MET_phi(), 
+			    pico.out_el_pt()[0], pico.out_el_eta()[0]);
+		    }
+		    else {
+			    pico.out_mt() = GetMT(nano.MET_pt(), nano.MET_phi(), 
+			    pico.out_mu_pt()[0], pico.out_mu_eta()[0]);
+		    }
+	    }
+    }
+    else {
+	    // calculate mT only for single lepton events
+	    pico.out_mt() = -999; 
+	    if (pico.out_nlep()==1) {
+	      if (sig_el_nano_idx.size()>0) {
+		pico.out_mt() = GetMT(nano.MET_pt(), nano.MET_phi(), 
+		  nano.Electron_pt()[sig_el_nano_idx[0]], nano.Electron_phi()[sig_el_nano_idx[0]]);
+	      } else {
+		pico.out_mt() = GetMT(nano.MET_pt(), nano.MET_phi(), 
+		  nano.Muon_pt()[sig_mu_nano_idx[0]], nano.Muon_phi()[sig_mu_nano_idx[0]]);
+	      }
+	    } 
+	    if (pico.out_ntrulep()==1) {
+	      for (unsigned imc(0); imc<pico.out_mc_id().size(); imc++){
+		if (abs(pico.out_mc_id()[imc])==11 || abs(pico.out_mc_id()[imc])==13) {
+		  pico.out_mt_tru() = GetMT(pico.out_met_tru(), pico.out_met_tru_phi(), 
+					pico.out_mc_pt()[imc], pico.out_mc_phi()[imc]);
+		  break;
+		}
+	      }
+	    } 
+    }
 
     if (debug) cout<<"INFO:: Writing analysis specific variables"<<endl;
     // might need as input sig_el_nano_idx, sig_mu_nano_idx, sig_ph_nano_idx
     if(isZgamma)
       zgamma_producer.WriteZGammaVars(pico);
+    if (isTTZ)
+	    ttz_producer.WriteTTZVars(pico);
 
     //save higgs variables using DeepCSV and DeepFlavor
     hig_producer.WriteHigVars(pico, /*DeepFlavor*/ false);

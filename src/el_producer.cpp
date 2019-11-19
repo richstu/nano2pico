@@ -11,7 +11,7 @@ ElectronProducer::ElectronProducer(int year_){
 ElectronProducer::~ElectronProducer(){
 }
 
-vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, vector<int> &jet_islep_nano_idx, bool isZgamma){
+vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, vector<int> &jet_islep_nano_idx, bool isZgamma, bool isTTZ){
   vector<int> sig_el_nano_idx;
   pico.out_nel() = 0; pico.out_nvel() = 0;
   for(int iel(0); iel<nano.nElectron(); ++iel){
@@ -30,7 +30,18 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
           nano.Electron_sip3d()[iel] < 4)
         isSignal = true;
       pico.out_el_idmva().push_back(nano.Electron_mvaFall17V2Iso()[iel]);
-      pico.out_el_sip3d().push_back(nano.Electron_sip3d()[iel]);
+    }
+    else if (isTTZ) {
+      if (pt <= VetoElectronPtCut) continue;
+      if (fabs(etasc) > ElectronEtaCut) continue;
+      if (fabs(nano.Electron_dz()[iel])>0.1)  continue;
+      if (fabs(nano.Electron_dxy()[iel])>0.05) continue; 
+      if (nano.Electron_sip3d()[iel]>4) continue;
+      if (nano.Electron_miniPFRelIso_all()[iel] > 1.0) continue;
+      int bitmap = nano.Electron_vidNestedWPBitmap()[iel];
+      if (!idElectron_noIso(bitmap, 1)) continue;
+      if (idElectron_noIso(bitmap, 3) && nano.Electron_miniPFRelIso_all()[iel] < 0.1) 
+	      isSignal = true;
     }
     else {
       if (pt <= VetoElectronPtCut) continue;
@@ -59,6 +70,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
     pico.out_el_ispf().push_back(nano.Electron_isPFcand()[iel]);
     pico.out_el_charge().push_back(nano.Electron_charge()[iel]);
     pico.out_el_pflavor().push_back(nano.Electron_genPartFlav()[iel]);
+    pico.out_el_sip3d().push_back(nano.Electron_sip3d()[iel]);
     
     if (nano.Electron_miniPFRelIso_all()[iel] < ElectronMiniIsoCut) {
       pico.out_nvel()++;

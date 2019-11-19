@@ -18,7 +18,7 @@ public:
   const float MuonMiniIsoCut    = 0.2;
   const float MuonRelIsoCut     = 0.35;
 
-  std::vector<int> WriteMuons(nano_tree &nano, pico_tree &pico, std::vector<int> &jet_islep_nano_idx, bool isZgamma);
+  std::vector<int> WriteMuons(nano_tree &nano, pico_tree &pico, std::vector<int> &jet_islep_nano_idx, bool isZgamma, bool isTTZ);
 
 private:
   int year;
