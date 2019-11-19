@@ -164,7 +164,8 @@ int main(int argc, char *argv[]){
     vector<int> sig_jet_nano_idx = jet_producer.WriteJets(nano, pico, jet_islep_nano_idx, jet_isphoton_nano_idx,
                                                           btag_wpts[year], btag_df_wpts[year], isZgamma);
     jet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year][1]); // usually w.r.t. medium WP
-    jet_producer.WriteFatJets(nano, pico);
+    if(!isZgamma)
+      jet_producer.WriteFatJets(nano, pico);
     isr_tools.WriteISRJetMultiplicity(nano, pico);
 
     // Copy MET directly from NanoAOD

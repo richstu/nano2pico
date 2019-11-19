@@ -8,7 +8,7 @@ using namespace std;
 namespace xsec{
 
   float crossSection(const TString &file, bool is2016){
-    float xsec(-999999.), Htobb(0.5824);
+    float xsec(-999999.), Htobb(0.5824), HToZG(0.001541);
 
     if (is2016) {
         //  Cross-section taken from https://twiki.cern.ch/twiki/bin/view/LHCPhysics/TtbarNNLO
@@ -47,18 +47,18 @@ namespace xsec{
         if(file.Contains("WJetsToLNu_Tune")) xsec=61526.7; //NNLO from Lesya's summary table 
 
         //cross-section per slice changed due to change in genHT definition
-        if(file.Contains("WJetsToLNu_HT-70To100"))  xsec = 1372.*1.21; 
-        if(file.Contains("WJetsToLNu_HT-100To200"))  xsec = 1347.*1.21; 
-        if(file.Contains("WJetsToLNu_HT-200To400"))  xsec = 360.*1.21;
-        if(file.Contains("WJetsToLNu_HT-400To600"))  xsec = 48.98*1.21;
-        if(file.Contains("WJetsToLNu_HT-600ToInf"))  xsec = 18.77*1.21;
-        if(file.Contains("WJetsToLNu_HT-600To800"))  xsec = 12.05*1.21;
+        if(file.Contains("WJetsToLNu_HT-70To100"))    xsec = 1372.*1.21; 
+        if(file.Contains("WJetsToLNu_HT-100To200"))   xsec = 1347.*1.21; 
+        if(file.Contains("WJetsToLNu_HT-200To400"))   xsec = 360.*1.21;
+        if(file.Contains("WJetsToLNu_HT-400To600"))   xsec = 48.98*1.21;
+        if(file.Contains("WJetsToLNu_HT-600ToInf"))   xsec = 18.77*1.21;
+        if(file.Contains("WJetsToLNu_HT-600To800"))   xsec = 12.05*1.21;
         if(file.Contains("WJetsToLNu_HT-800To1200"))  xsec = 5.501*1.21;
-        if(file.Contains("WJetsToLNu_HT-1200To2500"))  xsec = 1.329*1.21;
+        if(file.Contains("WJetsToLNu_HT-1200To2500")) xsec = 1.329*1.21;
         if(file.Contains("WJetsToLNu_HT-2500ToInf"))  xsec = 0.03216*1.21;
 
         //updated 02-2019 with XSDB
-        if(file.Contains("QCD_HT100to200_Tune")) xsec = 28060000;
+        if(file.Contains("QCD_HT100to200_Tune"))   xsec = 28060000;
         if(file.Contains("QCD_HT200to300_Tune"))   xsec = 1710000;
         if(file.Contains("QCD_HT300to500_Tune"))   xsec = 347500;
         if(file.Contains("QCD_HT500to700_Tune"))   xsec = 32060;
@@ -79,50 +79,74 @@ namespace xsec{
         if(file.Contains("DYJetsToLL_M-50_Tune"))     xsec = 4895*1.23;
 
         if(file.Contains("DYJetsToLL_M-50_HT-70to100"))    xsec = 175.3*1.23;
-        if(file.Contains("DYJetsToLL_M-50_HT-100to200"))    xsec = 139.4*1.23;
-        if(file.Contains("DYJetsToLL_M-50_HT-200to400"))    xsec = 42.75*1.23;
-        if(file.Contains("DYJetsToLL_M-50_HT-400to600"))    xsec = 5.497*1.23;
-        if(file.Contains("DYJetsToLL_M-50_HT-600to800"))    xsec = 1.363*1.23;
-        if(file.Contains("DYJetsToLL_M-50_HT-800to1200"))    xsec = 0.6759*1.23;
-        if(file.Contains("DYJetsToLL_M-50_HT-1200to2500"))    xsec = 0.116*1.23;
-        if(file.Contains("DYJetsToLL_M-50_HT-2500toInf"))    xsec = 0.002592*1.23;
-        if(file.Contains("DYJetsToLL_M-50_HT-600toInf"))    xsec = 2.21*1.23;
+        if(file.Contains("DYJetsToLL_M-50_HT-100to200"))   xsec = 139.4*1.23;
+        if(file.Contains("DYJetsToLL_M-50_HT-200to400"))   xsec = 42.75*1.23;
+        if(file.Contains("DYJetsToLL_M-50_HT-400to600"))   xsec = 5.497*1.23;
+        if(file.Contains("DYJetsToLL_M-50_HT-600to800"))   xsec = 1.363*1.23;
+        if(file.Contains("DYJetsToLL_M-50_HT-800to1200"))  xsec = 0.6759*1.23;
+        if(file.Contains("DYJetsToLL_M-50_HT-1200to2500")) xsec = 0.116*1.23;
+        if(file.Contains("DYJetsToLL_M-50_HT-2500toInf"))  xsec = 0.002592*1.23;
+        if(file.Contains("DYJetsToLL_M-50_HT-600toInf"))   xsec = 2.21*1.23;
 
-        if(file.Contains("ZJetsToNuNu_HT-100To200"))  xsec = 280.35*1.27;
-        if(file.Contains("ZJetsToNuNu_HT-200To400"))  xsec = 77.67*1.27;
-        if(file.Contains("ZJetsToNuNu_HT-400To600"))  xsec = 10.73*1.27;
-        if(file.Contains("ZJetsToNuNu_HT-600To800"))  xsec = 2.536*1.27;
-        if(file.Contains("ZJetsToNuNu_HT-800To1200"))  xsec = 1.161*1.27;
-        if(file.Contains("ZJetsToNuNu_HT-1200To2500"))  xsec = 0.2824*1.27;
-        if(file.Contains("ZJetsToNuNu_HT-2500ToInf"))  xsec = 0.006459*1.27;
-        if(file.Contains("ZJetsToNuNu_HT-600ToInf"))  xsec = 3.986*1.27;
+        if(file.Contains("ZJetsToNuNu_HT-100To200"))       xsec = 280.35*1.27;
+        if(file.Contains("ZJetsToNuNu_HT-200To400"))       xsec = 77.67*1.27;
+        if(file.Contains("ZJetsToNuNu_HT-400To600"))       xsec = 10.73*1.27;
+        if(file.Contains("ZJetsToNuNu_HT-600To800"))       xsec = 2.536*1.27;
+        if(file.Contains("ZJetsToNuNu_HT-800To1200"))      xsec = 1.161*1.27;
+        if(file.Contains("ZJetsToNuNu_HT-1200To2500"))     xsec = 0.2824*1.27;
+        if(file.Contains("ZJetsToNuNu_HT-2500ToInf"))      xsec = 0.006459*1.27;
+        if(file.Contains("ZJetsToNuNu_HT-600ToInf"))       xsec = 3.986*1.27;
 
-        if(file.Contains("TTZToQQ"))                xsec = 0.5297;
-        if(file.Contains("TTZToLLNuNu_M-10"))       xsec = 0.2529;
-        if(file.Contains("TTWJetsToQQ"))            xsec = 0.4062;
-        if(file.Contains("TTWJetsToLNu"))           xsec = 0.2043;
+        if(file.Contains("TTZToQQ"))                       xsec = 0.5297;
+        if(file.Contains("TTZToLLNuNu_M-10"))              xsec = 0.2529;
+        if(file.Contains("TTWJetsToQQ"))                   xsec = 0.4062;
+        if(file.Contains("TTWJetsToLNu"))                  xsec = 0.2043;
        
         //https://twiki.cern.ch/twiki/bin/viewauth/CMS/SummaryTable1G25ns#Diboson
-        if(file.Contains("WWTo2L2Nu"))   xsec = 12.178; //NNLO
-        if(file.Contains("WWToLNuQQ"))   xsec = 49.997; //NNLO
-        if(file.Contains("ttHTobb_M125"))   xsec = 0.2934;
+        if(file.Contains("WWTo2L2Nu"))    xsec = 12.178; //NNLO
+        if(file.Contains("WWToLNuQQ"))    xsec = 49.997; //NNLO
+        if(file.Contains("ttHTobb_M125")) xsec = 0.2934;
 
-        if(file.Contains("WZTo1L3Nu"))   xsec = 3.05;
-        if(file.Contains("WZTo1L1Nu2Q"))   xsec = 10.96;
-        if(file.Contains("WZTo2L2Q"))   xsec = 5.595;
-        if(file.Contains("WZTo3LNu"))   xsec = 4.42965;
-        if(file.Contains("VVTo2L2Nu"))   xsec = 11.95;
-        if(file.Contains("ZZ_Tune"))   xsec = 16.523;
+        if(file.Contains("WZTo1L3Nu"))    xsec = 3.05;
+        if(file.Contains("WZTo1L1Nu2Q"))  xsec = 10.96;
+        if(file.Contains("WZTo2L2Q"))     xsec = 5.595;
+        if(file.Contains("WZTo3LNu"))     xsec = 4.42965;
+        if(file.Contains("VVTo2L2Nu"))    xsec = 11.95;
+        if(file.Contains("ZZ_Tune"))      xsec = 16.523;
 
         // Calculated at 13 TeV in
         // https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt1314TeV
         // Higgs branching ratios from
         // https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageBR
-        if(file.Contains("ZH_HToBB_ZToLL_M-125"))      xsec = 0.883*Htobb*0.033658;
-        if(file.Contains("ZH_HToBB_ZToNuNu_M-125"))    xsec = 0.883*Htobb*0.2;
-        if(file.Contains("WH_HToBB_WToLNu_M-125"))     xsec = 1.373*Htobb*(0.1071+0.1063+0.1138);
-        if(file.Contains("ZH_HToBB_ZToNuNu_M125"))    xsec = 0.883*Htobb*0.2;
-        if(file.Contains("WH_HToBB_WToLNu_M125"))     xsec = 1.373*Htobb*(0.1071+0.1063+0.1138);
+        if(file.Contains("ZH_HToBB_ZToLL_M-125"))   xsec = 0.883*Htobb*0.033658;
+        if(file.Contains("ZH_HToBB_ZToNuNu_M-125")) xsec = 0.883*Htobb*0.2;
+        if(file.Contains("WH_HToBB_WToLNu_M-125"))  xsec = 1.373*Htobb*(0.1071+0.1063+0.1138);
+        if(file.Contains("ZH_HToBB_ZToNuNu_M125"))  xsec = 0.883*Htobb*0.2;
+        if(file.Contains("WH_HToBB_WToLNu_M125"))   xsec = 1.373*Htobb*(0.1071+0.1063+0.1138);
+
+        // Zgamma cross sections at 13 TeV
+        // https://twiki.cern.ch/twiki/bin/viewauth/CMS/SummaryTable1G25ns
+        if(file.Contains("DYJetsToLL") &&  
+           file.Contains("amcatnlo"))      xsec = 6077.22;
+        if(file.Contains("ZGTo2LG"))       xsec =  117.864;
+        if(file.Contains("ZZTo2L2Q"))      xsec =    3.22;
+        if(file.Contains("ZZTo2L2Nu"))     xsec =    0.564;
+        if(file.Contains("ZZTo4L"))        xsec =    1.256;
+        if(file.Contains("TTTo2L2Nu"))     xsec =   87.31;
+        if(file.Contains("WWW"))           xsec =    0.2086;
+        if(file.Contains("WWZ"))           xsec =    0.1651;
+        if(file.Contains("WZZ"))           xsec =    0.05565;
+        if(file.Contains("ZZZ"))           xsec =    0.01398;
+        if(file.Contains("WGGJets"))       xsec =    1.715;
+        if(file.Contains("WWG"))           xsec =    0.2147; 
+        if(file.Contains("ZGGJetsToLLGG")) xsec =    0.1699;
+        // Zgamma signal
+        if(file.Contains("GluGluHToZG"))   xsec = HToZG*44.08;
+        if(file.Contains("VBFHToZG"))      xsec = HToZG* 3.779;
+        if(file.Contains("WplusH_HToZG"))  xsec = HToZG* 0.8380;
+        if(file.Contains("WminusH_HToZG")) xsec = HToZG* 0.5313;
+        if(file.Contains("ZH_HToZG"))      xsec = HToZG* 0.8824;
+        if(file.Contains("ttHToZG"))       xsec = HToZG* 0.5065;
     } else {
         if(file.Contains("SMS-T1tttt_mGluino-1200_mLSP-800_Tune")) xsec = 0.0985;
         if(file.Contains("SMS-T1tttt_mGluino-2000_mLSP-100_Tune")) xsec = 0.00101;
