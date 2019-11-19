@@ -18,7 +18,7 @@ parser.add_argument("-i","--in_dir", default="/net/cms29/cms29r0/pico/NanoAODv5/
                     help="Directory where the raw pico files are")
 parser.add_argument("-o","--out_cmd_file", default="cmds.py",
                     help="File with list of commands for batch system.")
-parser.add_argument("--overwrite", default=False,
+parser.add_argument("--overwrite", action='store_true',
                     help="Process all input files regardless whether output exists.")
 args = parser.parse_args()
 

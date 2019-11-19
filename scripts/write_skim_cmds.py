@@ -12,7 +12,7 @@ if __name__ == '__main__':
                       help='Directory where the raw pico files are')
   parser.add_argument('-k','--skim_name', required=True, default='',
                       help='Plain text name for the skim. Output folder name will be named according to this.')
-  parser.add_argument("--overwrite", default=False,
+  parser.add_argument("--overwrite", action='store_true',
                     help="Process all input files regardless whether output exists.")
   parser.add_argument('-t', '--tag', default='',
                     help='Optionally specify a tag to be used to differentiate helper files for batch submission.')
@@ -25,7 +25,7 @@ if __name__ == '__main__':
   print('Found {} input files.\n'.format(len(in_file_paths)))
 
   enclosing_dir = os.path.dirname(os.path.dirname(in_dir))
-  out_dir = os.path.join(enclosing_dir,'skim_'+skim_name)
+  out_dir = os.path.join(enclosing_dir,'skim_'+skim_name+'/')
   # in case running on top of a slim
   if '/merged_' in in_dir: 
     slim_folder_split = in_dir.rstrip('/').split('/')[-1].split('_')
@@ -38,15 +38,22 @@ if __name__ == '__main__':
   if (args['tag']!=''): cmdfile_name = args['tag']+'_'+cmdfile_name
   cmdfile = open(cmdfile_name,'w')
   cmdfile.write('#!/bin/env python\n')
+  nexisting=0
   for ifile_path in in_file_paths:
     out_file_path = ifile_path.replace(in_dir,out_dir).replace('pico_','pico_'+skim_name+'_')
-    if not args['overwrite'] and os.path.exists(out_file_path):
-      continue
+    if os.path.exists(out_file_path):
+      nexisting +=1
+      if not args['overwrite']: 
+        continue
     cmd = '{}/scripts/skim_file.py -k {} -i {} -o {}'.format(os.getcwd(), skim_name, ifile_path, out_dir)
     cmdfile.write('print(\''+cmd+'\')\n')
 
   cmdfile.close()
   os.chmod(cmdfile_name, 0o755)
+  if not args['overwrite']:
+    print('Found existing {} output files, so will submit  {} jobs. Use --overwrite to ignore the existing output and run all jobs.\n'.format(nexisting, len(in_file_paths)-nexisting))
+  else:
+    print('Found existing {} output files, which will be overwritten.\n'.format(nexisting))
 
   json_name = cmdfile_name.replace('.py','.json')
   print('To print a sample command:')
