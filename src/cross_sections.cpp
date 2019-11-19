@@ -119,6 +119,11 @@ namespace xsec{
         if(file.Contains("tZq"))   xsec = 0.09418;
 	if(file.Contains("ttHToNonbb"))    xsec = 0.2151;
 
+	//cross sections stolen from AN for TOP-18-009
+	
+        if(file.Contains("tZq"))   xsec = 0.09418;
+	if(file.Contains("ttHToNonbb"))    xsec = 0.2151;
+
         // Calculated at 13 TeV in
         // https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt1314TeV
         // Higgs branching ratios from
