@@ -1,0 +1,31 @@
+drop *
+
+keep run
+keep event
+keep type
+keep stitch
+
+keep jet_*
+drop jet_deep*
+drop jet_met_dphi
+drop jet_h?d
+keep photon_*
+keep el_*
+keep mu_*
+keep dijet_*
+keep ll_*
+keep llphoton_*
+
+keep njet
+keep nlep
+keep nmu
+keep nel
+
+keep pass*
+
+keep mc_*
+keep *tru*
+
+keep weight
+keep w_*
+keep eff_*
