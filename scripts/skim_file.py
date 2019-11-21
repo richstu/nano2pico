@@ -25,6 +25,10 @@ def get_cuts(skim_name):
   if(skim_name=='ttisr'): cuts = '&&'.join(['nlep==2', 'nbm==2', pass_1l_trig30])
   if(skim_name=='wisr'):  cuts = '&&'.join(['met>100', 'nbl==0', pass_1l_trig40])
 
+  # Higgsino for cutlow studies
+  nb_or_ht_cut = '(nbt>=2 || nbdft>=2 || ht>300)'
+  if(skim_name=='higbase'): cuts = '&&'.join([nb_or_ht_cut, 'met>150', 'nvlep==0'])
+
   # Higgsino loose
   nb_or_fjet_cut = '(nbt>=2 || nbdft>=2 || Sum$(fjet_pt>300 && fjet_msoftdrop>50)>0)'
   if(skim_name=='higloose'): cuts = '&&'.join([nb_or_fjet_cut, 'met>150', 'nvlep==0'])
