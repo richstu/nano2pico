@@ -265,7 +265,7 @@ int main(int argc, char *argv[]){
     }
 
     // to be calculated in Step 2: merge_corrections
-    pico.out_w_lumi() = nano.Generator_weight();
+    pico.out_w_lumi() = nano.Generator_weight()>0 ? 1:-1;
 
     // @todo, copy weights from babymaker
     pico.out_w_pu() = 1.;
@@ -296,9 +296,9 @@ int main(int argc, char *argv[]){
     // leptons, keeping track of 0l and 1l totals separately to determine the SF for 0l events
     if(pico.out_nlep()==0){
       wgt_sums.out_nent_zlep() += 1.;
-      wgt_sums.out_tot_weight_l0() += pico.out_weight();
+      wgt_sums.out_tot_weight_l0() += pico.out_weight()*(nano.Generator_weight()>0 ? 1:-1); // multiplying by GenWeight to remove the sign...
     }else{
-      wgt_sums.out_tot_weight_l1() += pico.out_weight();
+      wgt_sums.out_tot_weight_l1() += pico.out_weight()*(nano.Generator_weight()>0 ? 1:-1);
       wgt_sums.out_w_lep() += w_lep;
       if(isFastsim) wgt_sums.out_w_fs_lep() += w_fs_lep;
       for(size_t i = 0; i<pico.out_sys_lep().size(); ++i){
@@ -377,12 +377,13 @@ void GetOptions(int argc, char *argv[]){
       {"in_dir",  required_argument, 0,'i'},
       {"out_dir", required_argument, 0,'o'},
       {"nent",    required_argument, 0, 0},
+      {"debug",    no_argument, 0, 'd'},
       {0, 0, 0, 0}
     };
 
     char opt = -1;
     int option_index;
-    opt = getopt_long(argc, argv, "f:i:o:", long_options, &option_index);
+    opt = getopt_long(argc, argv, "f:i:o:d", long_options, &option_index);
     if(opt == -1) break;
 
     string optname;
@@ -392,6 +393,9 @@ void GetOptions(int argc, char *argv[]){
       break;
     case 'i':
       in_dir = optarg;
+      break;
+    case 'd':
+      debug = true;
       break;
     case 'o':
       out_dir = optarg;
