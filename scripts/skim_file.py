@@ -42,6 +42,10 @@ def get_cuts(skim_name):
     cuts = '&&'.join(['nvlep==0', 'ntk==0','!low_dphi', 'met>150', '(('+resolved+')||('+boosted+'))'])
     print('Using cut string:  '+cuts.replace('&&',' && '))
 
+  # Control regions skims - to be updated when needed
+  if(skim_name=='higlep1'):  cuts = '&&'.join([nb_or_fjet_cut, 'nlep==1', pass_1l_trig40])
+  if(skim_name=='higlep2'):  cuts = '&&'.join([nb_or_fjet_cut, mllcut, 'nlep==2', pass_1l_trig30])
+
   # Loosen up just enough to do systematics - to be updated when needed
   # sys_nbcut = 'max(nbdft,Max$(sys_nbdft))>=2'
   # sys_njcut = '(njet==4||sys_njet[1]==4||sys_njet[2]==4||njet==5||sys_njet[1]==5||sys_njet[2]==5)'
@@ -49,11 +53,6 @@ def get_cuts(skim_name):
   #                          'min(hig_cand_dm,Min$(sys_hig_cand_dm))<=40',
   #                          'min(hig_cand_am,Min$(sys_hig_cand_am))<=200'])
   # if(skim_name=='higsys'):   cuts = '&&'.join([sys_njcut, sys_nbcut, 'max(met,Max$(sys_met))>150', 'nvlep==0', 'ntk==0', '!low_dphi', sys_higtrim])
-
-  # Control regions skims - to be updated when needed
-  # if(skim_name=='higqcd'):  cuts = '&&'.join([njcut, 'met>150 && nvlep==0'])
-  # if(skim_name=='higlep1'):  cuts = '&&'.join([njcut, nbcut, 'nleps==1', pass_1l_trig40])
-  # if(skim_name=='higlep2'):  cuts = '&&'.join([njcut, zcand, 'nleps==2', pass_1l_trig30])
 
   return cuts
 
