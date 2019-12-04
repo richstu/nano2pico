@@ -19,7 +19,7 @@ def get_cuts(skim_name):
   # General use
   pass_1l_trig40 = '(Max$(el_pt*el_sig)>40 || Max$(mu_pt*mu_sig)>40)' # use for 1L CR
   pass_1l_trig30 = '(Max$(el_pt*el_sig)>30 || Max$(mu_pt*mu_sig)>30)' # use for 2L CR, can lower the cut since two leps!
-  mllcut = '&&'.join(['(mumu_m*(mumu_m>0)+elel_m*(elel_m>0))>80','(mumu_m*(mumu_m>0)+elel_m*(elel_m>0))<100'])
+  mllcut = '(Alt$(mumu_m,0)+Alt$(elel_m,0))>80 && (Alt$(mumu_m,0)+Alt$(elel_m,0))<100'
   if(skim_name=='met150'): cuts = 'met>150'
   if(skim_name=='zcand'): cuts = '&&'.join(['nlep==2', 'nbm==0', pass_1l_trig30, mllcut])
   if(skim_name=='ttisr'): cuts = '&&'.join(['nlep==2', 'nbm==2', pass_1l_trig30])
@@ -44,7 +44,7 @@ def get_cuts(skim_name):
 
   # Control regions skims - to be updated when needed
   if(skim_name=='higlep1'):  cuts = '&&'.join([nb_or_fjet_cut, 'nlep==1', pass_1l_trig40])
-  if(skim_name=='higlep2'):  cuts = '&&'.join([nb_or_fjet_cut, mllcut, 'nlep==2', pass_1l_trig30])
+  if(skim_name=='higlep2'):  cuts = '&&'.join([nb_or_fjet_cut, 'nlep==2', mllcut,  pass_1l_trig30])
 
   # Loosen up just enough to do systematics - to be updated when needed
   # sys_nbcut = 'max(nbdft,Max$(sys_nbdft))>=2'
