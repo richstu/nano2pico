@@ -23,7 +23,7 @@ void HigVarProducer::WriteHigVars(pico_tree &pico, bool doDeepFlav){
   // also saving their original index in the pico.out_jet* vectors
   vector<pair<int, float>>  ordered_by_discr;
   for (unsigned ijet(0); ijet<pico.out_jet_pt().size(); ijet++) {
-    if (!pico.out_jet_islep()[ijet]) {
+    if (pico.out_jet_isgood()[ijet]) {
       float discr = doDeepFlav ? pico.out_jet_deepflav()[ijet] : pico.out_jet_deepcsv()[ijet];
       ordered_by_discr.push_back(make_pair(ijet, discr));
     }

@@ -28,37 +28,75 @@ EventTools::EventTools(const string &name_, int year_):
 EventTools::~EventTools(){
 }
 
-bool EventTools::GetStitch(nano_tree &nano){
-  bool stitch = true;
+void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
+  pico.out_stitch() = true; pico.out_stitch_ht() = true;
   if(isTTJets_LO) {
+    if (nano.LHE_HT()>600) 
+      pico.out_stitch_ht() = false;
     if(year==2018 && nano.GenMET_pt()>80)
-      stitch = false;
+      pico.out_stitch() = false;
     else if (nano.GenMET_pt()>150) 
-      stitch = false;
+      pico.out_stitch() = false;
   }
 
-  if(isDYJets_LO  && nano.LHE_HT()>70) stitch = false;
+  if(isDYJets_LO  && nano.LHE_HT()>70) pico.out_stitch() = false;
   
-  if(isWJets_LO  && nano.LHE_HT()>70) stitch = false;
-  
-  return stitch;
+  if(isWJets_LO  && nano.LHE_HT()>70) pico.out_stitch() = false;
+  return;
 }
 
 
 void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vector<int> &sig_jet_nano_idx, 
                                          bool isData, bool isFastsim){
+  // jet quality filter
+  pico.out_pass_jets() = true;
+  if (isFastsim) {
+    // Fastsim: veto if certain central jets have no matching GenJet as per SUSY recommendation:
+    // https://twiki.cern.ch/twiki/bin/view/CMS/SUSRecommendations18#Cleaning_up_of_fastsim_jets_from
+    for(int ijet(0); ijet<nano.nJet(); ++ijet){
+      if(nano.Jet_pt()[ijet] > 20 && fabs(nano.Jet_eta()[ijet])<=2.5 && nano.Jet_chHEF()[ijet] < 0.1) {
+        bool found_match = false;
+        for(int igenjet(0); igenjet<nano.nGenJet(); ++igenjet){
+          if (dR(nano.Jet_eta()[ijet], nano.GenJet_eta()[igenjet], nano.Jet_phi()[ijet], nano.GenJet_phi()[igenjet])<=0.3) {
+            found_match = true;
+            break;
+          }
+        }
+        if (!found_match) {
+          pico.out_pass_jets() = false;
+          break;
+        }
+      }
+    }
+  } else { // Fullsim: require just loosest possible ID for now (for all jets, not just central!)
+    for(int ijet(0); ijet<nano.nJet(); ++ijet){
+      if (nano.Jet_pt()[ijet] > 30 && nano.Jet_jetId()[ijet] < 1) 
+        pico.out_pass_jets() = false;
+    } 
+  }
 
-  pico.out_pass_ra2_badmu() = true; 
+  // RA2b filters  
+  pico.out_pass_muon_jet() = true; 
   for (auto &idx: sig_jet_nano_idx){
-    // if (abs(nano.Jet_eta()[idx])>2.4) continue; -> already in signal jet selection
-    // if is overlapping with lepton -> already in signal jet selection
-    if (nano.Jet_pt()[idx]<200.) continue;
+    // if (abs(nano.Jet_eta()[idx])>2.4) continue; -> already enforced in signal jet selection
+    // if is overlapping with lepton -> already enforced in signal jet selection
+    if (nano.Jet_pt()[idx]<=200.) continue;
     if (nano.Jet_muEF()[idx]<=0.5) continue;
-    if (abs(DeltaPhi(nano.Jet_phi()[idx],nano.MET_phi()))<(3.14159-0.4)) continue;
-    pico.out_pass_ra2_badmu() = false;
+    if (DeltaPhi(nano.Jet_phi()[idx],nano.MET_phi())<(3.14159-0.4)) continue;
+    pico.out_pass_muon_jet() = false;
     break;
   }
 
+  pico.out_pass_low_neutral_jet() = true;
+  if (nano.Jet_neEmEF()[0] <0.03 && pico.out_jet_mht_dphi()[0]>(3.14159-0.4))
+    pico.out_pass_low_neutral_jet() = false;
+
+  pico.out_pass_htratio_dphi_tight() = true;
+  float htratio = pico.out_ht5()/pico.out_ht();
+  if (htratio > 1.2 && pico.out_jet_mht_dphi()[0] > (5.3*htratio - 4.78)) 
+    pico.out_pass_htratio_dphi_tight() = false;
+
+  // filters directly from Nano
   pico.out_pass_hbhe() = nano.Flag_HBHENoiseFilter();
   pico.out_pass_hbheiso() = nano.Flag_HBHENoiseIsoFilter();
   pico.out_pass_goodv() = nano.Flag_goodVertices();
@@ -76,21 +114,35 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
   }
   pico.out_pass_mubadtrk() = nano.Flag_muonBadTrackFilter();
 
-  // Combined pass variable
-  pico.out_pass() = pico.out_pass_ra2_badmu() && pico.out_pass_badpfmu() && 
+  // Combined pass variable, as recommended here:
+  // https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2#Analysis_Recommendations_for_ana
+  pico.out_pass() = pico.out_pass_muon_jet() && pico.out_pass_badpfmu() && 
                     pico.out_met()/pico.out_met_calo()<5 &&
                     pico.out_pass_goodv() &&
                     pico.out_pass_hbhe() && pico.out_pass_hbheiso() && 
-                    pico.out_pass_ecaldeadcell() && pico.out_pass_badcalib();
+                    pico.out_pass_ecaldeadcell() && pico.out_pass_badcalib() &&
+                    pico.out_pass_jets();
 
-  if (isFastsim) {
-    pico.out_pass() = pico.out_pass() && pico.out_pass_fsjets();
-  } else {
-    pico.out_pass() = pico.out_pass() && pico.out_pass_jets() && pico.out_pass_cschalo_tight();
+  if (!isFastsim) {
+    pico.out_pass() = pico.out_pass() && pico.out_pass_cschalo_tight();
     if (isData) 
       pico.out_pass() = pico.out_pass() && pico.out_pass_eebadsc();
   }
   
+  // Combined pass RA2b-like variable
+  // https://github.com/rpatelCERN/boostedHiggsPlusMET/blob/Higgsino/src/definitions.cc#L1137
+  pico.out_pass_boosted() = pico.out_pass_hbhe() && 
+                         pico.out_pass_hbheiso() && 
+                         pico.out_pass_eebadsc() && 
+                         // pico.out_pass_ecaldeadcell() && 
+                         pico.out_pass_goodv() &&
+                         pico.out_met()/pico.out_met_calo() < 5. &&
+                         pico.out_pass_badpfmu() && 
+                         pico.out_pass_cschalo_tight() && 
+                         pico.out_pass_low_neutral_jet() && 
+                         pico.out_pass_htratio_dphi_tight() && 
+                         pico.out_pass_jets();
+
   return;
 }
 

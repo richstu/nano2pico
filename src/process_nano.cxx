@@ -1,6 +1,7 @@
 #include <ctime>
 
 #include <iostream>
+#include <iomanip>
 
 #include <getopt.h>
 
@@ -128,12 +129,14 @@ int main(int argc, char *argv[]){
       cout<<"Processing event: "<<entry<<endl;
     }
 
+    // if (nano.event()!=6376418) continue;
     // event info
     pico.out_event()     = nano.event();
     pico.out_lumiblock() = nano.luminosityBlock();
     pico.out_run()       = nano.run();
     pico.out_type()      = event_type;
-    pico.out_stitch()    = isData ? true: event_tools.GetStitch(nano);
+    if (isData) pico.out_stitch() = true;
+    else event_tools.WriteStitch(nano, pico);
     // number of reconstructed primary vertices
     pico.out_npv() = nano.PV_npvs();
 
@@ -152,6 +155,25 @@ int main(int argc, char *argv[]){
     vector<int> sig_el_nano_idx = el_producer.WriteElectrons(nano, pico, jet_islep_nano_idx, isZgamma);
     vector<int> sig_mu_nano_idx = mu_producer.WriteMuons(nano, pico, jet_islep_nano_idx, isZgamma);
 
+    // save a separate vector with just signal leptons ordered by pt
+    struct SignalLepton{ float pt; float eta; float phi; int pdgid;};
+    vector<SignalLepton> sig_leps;
+    for (auto &iel: sig_el_nano_idx)
+      sig_leps.push_back({nano.Electron_pt()[iel], nano.Electron_eta()[iel], 
+                          nano.Electron_phi()[iel], nano.Electron_pdgId()[iel]});
+    for (auto &imu: sig_mu_nano_idx) 
+      sig_leps.push_back({nano.Muon_pt()[imu], nano.Muon_eta()[imu], 
+                          nano.Muon_phi()[imu], nano.Muon_pdgId()[imu]});
+
+    auto greaterPt = [](SignalLepton lep1, SignalLepton lep2){ return lep1.pt > lep2.pt;};
+    sort(sig_leps.begin(), sig_leps.end(), greaterPt);
+    for(auto &ilep : sig_leps) {
+      pico.out_lep_pt().push_back(ilep.pt);
+      pico.out_lep_eta().push_back(ilep.eta);
+      pico.out_lep_phi().push_back(ilep.phi);
+      pico.out_lep_pdgid().push_back(ilep.pdgid);
+    }
+
     vector<int> jet_isphoton_nano_idx = vector<int>();
     if(isZgamma)
       vector<int> sig_ph_nano_idx = photon_producer.WritePhotons(nano, pico, jet_isphoton_nano_idx,
@@ -164,16 +186,19 @@ int main(int argc, char *argv[]){
     vector<int> sig_jet_nano_idx = jet_producer.WriteJets(nano, pico, jet_islep_nano_idx, jet_isphoton_nano_idx,
                                                           btag_wpts[year], btag_df_wpts[year], isZgamma);
     jet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year][1]); // usually w.r.t. medium WP
-    if(!isZgamma)
-      jet_producer.WriteFatJets(nano, pico);
+    if(!isZgamma){
+      jet_producer.WriteFatJets(nano, pico); // jet_producer.SetVerbose(nano.nSubJet()>0);
+      jet_producer.WriteSubJets(nano, pico);
+    }
     isr_tools.WriteISRJetMultiplicity(nano, pico);
 
-    // Copy MET directly from NanoAOD
+    // Copy MET and ME ISR directly from NanoAOD
     pico.out_met()         = nano.MET_pt();
     pico.out_met_phi()     = nano.MET_phi();
     pico.out_met_calo()    = nano.CaloMET_pt();
     pico.out_met_tru()     = nano.GenMET_pt();
     pico.out_met_tru_phi() = nano.GenMET_phi();
+    pico.out_ht_isr_me()   = nano.LHE_HT();
  
     // calculate mT only for single lepton events
     pico.out_mt() = -999; 
@@ -205,9 +230,10 @@ int main(int argc, char *argv[]){
     hig_producer.WriteHigVars(pico, /*DeepFlavor*/ false);
     hig_producer.WriteHigVars(pico, true);
     pico.out_low_dphi() = false;
-    if (pico.out_jet_met_dphi().size()>3) {
-      pico.out_low_dphi() = pico.out_jet_met_dphi()[0]<0.5 || pico.out_jet_met_dphi()[1]<0.5 ||
-                            pico.out_jet_met_dphi()[2]<0.3 || pico.out_jet_met_dphi()[3]<0.3;
+    for (unsigned ijet(0); ijet<pico.out_jet_mht_dphi().size(); ijet++){
+      if (ijet<=1 && pico.out_jet_mht_dphi()[ijet]<=0.5) pico.out_low_dphi() = true;
+      else if (ijet>=2 && pico.out_jet_mht_dphi()[ijet]<=0.3) pico.out_low_dphi() = true;
+      if (ijet==3) break;
     }
 
     if (debug) cout<<"INFO:: Writing filters and triggers"<<endl;

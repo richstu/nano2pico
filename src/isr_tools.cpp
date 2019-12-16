@@ -97,7 +97,7 @@ void ISRTools::WriteISRJetMultiplicity(nano_tree &nano, pico_tree &pico) {
 
   pico.out_nisr() = 0;
   for (size_t ijet(0); ijet<pico.out_jet_pt().size(); ijet++){
-    if (pico.out_jet_islep()[ijet]) continue;
+    if (!pico.out_jet_isgood()[ijet]) continue;
 
     bool matched = false;
     for (int imc(0); imc < nano.nGenPart(); imc++) {

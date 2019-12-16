@@ -4,10 +4,14 @@ int lumiblock
 Long64_t event
 int type
 bool stitch
+bool stitch_ht
 
 ####################   Global   ###################
 int npv
 float ht
+float ht5
+float mht
+float mht_phi
 float met
 float met_phi
 float met_calo
@@ -15,6 +19,7 @@ float met_tru
 float met_tru_phi
 float mt
 float mt_tru
+float ht_isr_me
 
 ###################   Higgsinos   ##################
 vector<float> hig_cand_dm
@@ -61,15 +66,18 @@ vector<float> jet_pt
 vector<float> jet_eta
 vector<float> jet_phi
 vector<float> jet_m
+vector<float> jet_breg_corr
+vector<float> jet_breg_res
 vector<float> jet_deepcsv
 vector<float> jet_deepflav
 vector<float> jet_qgl
 vector<bool>  jet_islep
 vector<bool>  jet_isphoton
+vector<bool>  jet_isgood
 vector<bool>  jet_id
 vector<int>   jet_hflavor
 vector<int>   jet_pflavor
-vector<float> jet_met_dphi
+vector<float> jet_mht_dphi
 vector<bool>  jet_h1d
 vector<bool>  jet_h2d
 vector<int>   jet_fjet_idx
@@ -85,6 +93,21 @@ vector<float> fjet_msoftdrop
 vector<float> fjet_deep_md_hbb_btv
 vector<float> fjet_mva_hbb_btv
 vector<float> fjet_deep_md_hbb_jme
+vector<int>   fjet_subjet_idx1
+vector<int>   fjet_subjet_idx2
+
+int nsubfjet
+vector<float> subfjet_pt
+vector<float> subfjet_eta
+vector<float> subfjet_phi
+vector<float> subfjet_m
+vector<float> subfjet_deepcsv
+vector<float> subfjet_raw_factor
+vector<float> subfjet_tau1
+vector<float> subfjet_tau2
+vector<float> subfjet_tau3
+vector<float> subfjet_tau4
+vector<int>   subfjet_jet_idx
 
 ###################   ISR related   ##################
 
@@ -102,6 +125,10 @@ float jetsys_nob_m
 ##################   Leptons   ################
 int nlep
 int nvlep
+vector<float> lep_pt
+vector<float> lep_eta
+vector<float> lep_phi
+vector<float> lep_pdgid
 
 int nmu
 int nvmu
@@ -184,12 +211,14 @@ bool pass_goodv
 bool pass_cschalo_tight
 bool pass_eebadsc
 bool pass_ecaldeadcell
-bool pass_fsjets
 bool pass_badpfmu
 bool pass_mubadtrk
 bool pass_badchhad
-bool pass_ra2_badmu
+bool pass_muon_jet
+bool pass_low_neutral_jet
+bool pass_htratio_dphi_tight
 bool pass_badcalib
+bool pass_boosted
 bool pass
 
 ################  Truth   ##################
