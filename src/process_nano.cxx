@@ -124,11 +124,12 @@ int main(int argc, char *argv[]){
   wgt_sums.out_nent() = nentries;
 
   for(size_t entry(0); entry<nentries; ++entry){
+    if (debug) cout << "GetEntry: " << entry << endl;
     nano.GetEntry(entry);
     if (entry%1000==0 || entry == nentries-1) {
       cout<<"Processing event: "<<entry<<endl;
     }
-
+/*
     // if (nano.event()!=6376418) continue;
     // event info
     pico.out_event()     = nano.event();
@@ -146,6 +147,7 @@ int main(int argc, char *argv[]){
     // with signal lepton, thus jets must be processed only after leptons have been selected.
     //-----------------------------------------------------------------------------------------------
     if (debug) cout<<"INFO:: Writing gen particles"<<endl;
+
     mc_producer.WriteGenParticles(nano, pico);
     isr_tools.WriteISRSystemPt(nano, pico);
 
@@ -227,12 +229,14 @@ int main(int argc, char *argv[]){
       zgamma_producer.WriteZGammaVars(pico);
 
     //save higgs variables using DeepCSV and DeepFlavor
-    hig_producer.WriteHigVars(pico, /*DeepFlavor*/ false);
+    hig_producer.WriteHigVars(pico, false);
     hig_producer.WriteHigVars(pico, true);
-    pico.out_low_dphi() = false;
+    pico.out_low_dphi_mht() = false;
+    pico.out_low_dphi_met() = false;
     for (unsigned ijet(0); ijet<pico.out_jet_mht_dphi().size(); ijet++){
-      if (ijet<=1 && pico.out_jet_mht_dphi()[ijet]<=0.5) pico.out_low_dphi() = true;
-      else if (ijet>=2 && pico.out_jet_mht_dphi()[ijet]<=0.3) pico.out_low_dphi() = true;
+      float cut_ = ijet<=1 ? 0.5 : 0.3;
+      if (pico.out_jet_mht_dphi()[ijet]<=cut_) pico.out_low_dphi_mht() = true;
+      if (pico.out_jet_met_dphi()[ijet]<=cut_) pico.out_low_dphi_met() = true;
       if (ijet==3) break;
     }
 
@@ -354,6 +358,7 @@ int main(int argc, char *argv[]){
       wgt_sums.out_sys_pu()[i]         += pico.out_sys_pu()[i];
     }
 
+    if (debug) cout<<"INFO:: Filling tree"<<endl;*/
     pico.Fill();
   } // loop over events
 

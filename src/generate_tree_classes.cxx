@@ -83,30 +83,30 @@ string FixName(string name){
 
 int GetArrayLength(const std::string var_name){
   const string var_type = var_name.substr(0,var_name.find_first_of('_'));
-  if      (var_type == "Electron") return 20;
-  else if (var_type == "Muon") return 20;
-  else if (var_type == "Tau") return 10;
-  else if (var_type == "IsoTrack") return 20;
-  else if (var_type == "Photon") return 20;
-  else if (var_type == "Jet") return 40;
+  if      (var_type == "Electron") return 30;
+  else if (var_type == "Muon") return 30;
+  else if (var_type == "Tau") return 30;
+  else if (var_type == "IsoTrack") return 30;
+  else if (var_type == "Photon") return 30;
+  else if (var_type == "Jet") return 100;
   else if (var_type == "SoftActivityJet") return 30;
-  else if (var_type == "FatJet") return 20;
-  else if (var_type == "SubJet") return 30;
-  else if (var_type == "CorrT1METJet") return 20;
+  else if (var_type == "FatJet") return 30;
+  else if (var_type == "SubJet") return 60;
+  else if (var_type == "CorrT1METJet") return 40;
   else if (var_type == "GenPart") return 500;
-  else if (var_type == "GenDressedLepton") return 10;
-  else if (var_type == "GenVisTau") return 10;
-  else if (var_type == "GenJet") return 30;
-  else if (var_type == "GenJetAK8") return 20;
-  else if (var_type == "SubGenJetAK8") return 30;
-  else if (var_type == "LHEPart") return 20;
+  else if (var_type == "GenDressedLepton") return 20;
+  else if (var_type == "GenVisTau") return 20;
+  else if (var_type == "GenJet") return 50;
+  else if (var_type == "GenJetAK8") return 50;
+  else if (var_type == "SubGenJetAK8") return 100;
+  else if (var_type == "LHEPart") return 40;
   else if (var_type == "LHEPdfWeight") return 100;
   else if (var_type == "LHEReweightingWeight") return 100;
   else if (var_type == "LHEScaleWeight") return 10;
-  else if (var_type == "PSWeight") return 10;
-  else if (var_type == "OtherPV") return 10;
-  else if (var_type == "SV") return 20;
-  else if (var_type == "TrigObj") return 20;
+  else if (var_type == "PSWeight") return 20;
+  else if (var_type == "OtherPV") return 20;
+  else if (var_type == "SV") return 40;
+  else if (var_type == "TrigObj") return 40;
   else return -1;
 }
 

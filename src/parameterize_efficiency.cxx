@@ -48,8 +48,8 @@ int main(int argc, char *argv[]) {
     TH3D denominator = TH3D("btagEfficiency", "btagEfficiency", 2, eta_cuts, 8, pt_cuts, 3, flavor_cuts);
     // Assign branch variables and turn off unused branches
     int nJet;
-    array<float,40> Jet_pt, Jet_eta, Jet_btagDeepB, Jet_btagDeepFlavB;
-    array<int,40> Jet_hadronFlavour, Jet_nElectrons, Jet_nMuons;
+    array<float,100> Jet_pt, Jet_eta, Jet_btagDeepB, Jet_btagDeepFlavB;
+    array<int,100> Jet_hadronFlavour, Jet_nElectrons, Jet_nMuons;
     TBranch *b_Jet_pt = nullptr, *b_Jet_eta = nullptr, *b_Jet_btagDeepB = nullptr, *b_Jet_btagDeepFlavB = nullptr;
     TBranch *b_Jet_hadronFlavour = nullptr, *b_Jet_nElectrons = nullptr, *b_Jet_nMuons = nullptr;
     c.SetBranchStatus("*",0);

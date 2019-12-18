@@ -69,6 +69,7 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
     pico.out_jet_isgood().push_back(isgood);
     pico.out_jet_id().push_back(nano.Jet_jetId()[ijet]);
     pico.out_jet_mht_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], pico.out_mht_phi()));
+    pico.out_jet_met_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], pico.out_met_phi()));
     
     // will be overwritten with the overlapping fat jet index, if such exists, in WriteFatJets
     pico.out_jet_fjet_idx().push_back(-999);

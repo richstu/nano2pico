@@ -30,7 +30,8 @@ vector<float> hig_df_cand_dm
 vector<float> hig_df_cand_am
 vector<float> hig_df_cand_drmax
 
-bool low_dphi
+bool low_dphi_met
+bool low_dphi_mht
 
 ###################   Zgamma   ##################
 float dijet_pt
@@ -78,6 +79,7 @@ vector<bool>  jet_id
 vector<int>   jet_hflavor
 vector<int>   jet_pflavor
 vector<float> jet_mht_dphi
+vector<float> jet_met_dphi
 vector<bool>  jet_h1d
 vector<bool>  jet_h2d
 vector<int>   jet_fjet_idx
@@ -128,7 +130,7 @@ int nvlep
 vector<float> lep_pt
 vector<float> lep_eta
 vector<float> lep_phi
-vector<float> lep_pdgid
+vector<int> lep_pdgid
 
 int nmu
 int nvmu
