@@ -12,13 +12,13 @@ ZGammaVarProducer::ZGammaVarProducer(int year_){
 ZGammaVarProducer::~ZGammaVarProducer(){
 }
 
-void ZGammaVarProducer::WriteZGammaVars(pico_tree &pico){
-  if(pico.out_njet() > 1) {
+void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector<int> sig_jet_nano_idx){
+  if(sig_jet_nano_idx.size() > 1) {
     TLorentzVector j1, j2, dijet;
-    j1.SetPtEtaPhiM(pico.out_jet_pt()[0], pico.out_jet_eta()[0], 
-                    pico.out_jet_phi()[0],pico.out_jet_m()[0]);
-    j2.SetPtEtaPhiM(pico.out_jet_pt()[1], pico.out_jet_eta()[1], 
-                    pico.out_jet_phi()[1],pico.out_jet_m()[1]);
+    j1.SetPtEtaPhiM(nano.Jet_pt()[sig_jet_nano_idx[0]], nano.Jet_eta()[sig_jet_nano_idx[0]], 
+                    nano.Jet_phi()[sig_jet_nano_idx[0]],nano.Jet_mass()[sig_jet_nano_idx[0]]);
+    j2.SetPtEtaPhiM(nano.Jet_pt()[sig_jet_nano_idx[1]], nano.Jet_eta()[sig_jet_nano_idx[1]], 
+                    nano.Jet_phi()[sig_jet_nano_idx[1]],nano.Jet_mass()[sig_jet_nano_idx[1]]);
     dijet = j1 + j2;
     pico.out_dijet_pt()   = dijet.Pt();
     pico.out_dijet_eta()  = dijet.Eta();

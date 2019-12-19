@@ -30,6 +30,8 @@ vector<float> hig_df_cand_dm
 vector<float> hig_df_cand_am
 vector<float> hig_df_cand_drmax
 
+bool low_dphi_met_e5
+bool low_dphi_mht_e5
 bool low_dphi_met
 bool low_dphi_mht
 

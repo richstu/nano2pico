@@ -37,6 +37,9 @@ namespace {
   string out_dir = "";
   int nent_test = -1;
   bool debug = false;
+  // requirements for jets to be counted in njet, mofified for Zgamma below
+  float min_jet_pt = 30.0;
+  float max_jet_eta =  2.4;
 }
 
 void WriteDataQualityFilters(nano_tree& nano, pico_tree& pico);
@@ -66,6 +69,9 @@ int main(int argc, char *argv[]){
   time_t begtime, endtime;
   time(&begtime);
 
+  // jet requirements
+  if(isZgamma) max_jet_eta  =  4.7;
+
   // B-tag working points
   map<int, vector<float>> btag_wpts{
     {2016, vector<float>({0.2217, 0.6321, 0.8953})},
@@ -85,7 +91,7 @@ int main(int argc, char *argv[]){
   DileptonProducer dilep_producer(year);
   IsoTrackProducer tk_producer(year);
   PhotonProducer photon_producer(year);
-  JetProducer jet_producer(year);
+  JetProducer jet_producer(year, min_jet_pt, max_jet_eta);
   HigVarProducer hig_producer(year);
   ZGammaVarProducer zgamma_producer(year);
 
@@ -129,7 +135,7 @@ int main(int argc, char *argv[]){
     if (entry%1000==0 || entry == nentries-1) {
       cout<<"Processing event: "<<entry<<endl;
     }
-/*
+
     // if (nano.event()!=6376418) continue;
     // event info
     pico.out_event()     = nano.event();
@@ -186,7 +192,7 @@ int main(int argc, char *argv[]){
 
     if (debug) cout<<"INFO:: Writing jets, MET and ISR vars"<<endl;
     vector<int> sig_jet_nano_idx = jet_producer.WriteJets(nano, pico, jet_islep_nano_idx, jet_isphoton_nano_idx,
-                                                          btag_wpts[year], btag_df_wpts[year], isZgamma);
+                                                          btag_wpts[year], btag_df_wpts[year]);
     jet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year][1]); // usually w.r.t. medium WP
     if(!isZgamma){
       jet_producer.WriteFatJets(nano, pico); // jet_producer.SetVerbose(nano.nSubJet()>0);
@@ -226,23 +232,15 @@ int main(int argc, char *argv[]){
     if (debug) cout<<"INFO:: Writing analysis specific variables"<<endl;
     // might need as input sig_el_nano_idx, sig_mu_nano_idx, sig_ph_nano_idx
     if(isZgamma)
-      zgamma_producer.WriteZGammaVars(pico);
+      zgamma_producer.WriteZGammaVars(nano, pico, sig_jet_nano_idx);
 
     //save higgs variables using DeepCSV and DeepFlavor
     hig_producer.WriteHigVars(pico, false);
     hig_producer.WriteHigVars(pico, true);
-    pico.out_low_dphi_mht() = false;
-    pico.out_low_dphi_met() = false;
-    for (unsigned ijet(0); ijet<pico.out_jet_mht_dphi().size(); ijet++){
-      float cut_ = ijet<=1 ? 0.5 : 0.3;
-      if (pico.out_jet_mht_dphi()[ijet]<=cut_) pico.out_low_dphi_mht() = true;
-      if (pico.out_jet_met_dphi()[ijet]<=cut_) pico.out_low_dphi_met() = true;
-      if (ijet==3) break;
-    }
 
     if (debug) cout<<"INFO:: Writing filters and triggers"<<endl;
     // N.B. Jets: pico.out_pass_jets() and pico.out_pass_fsjets() filled in jet_producer
-    event_tools.WriteDataQualityFilters(nano, pico, sig_jet_nano_idx, isData, isFastsim);
+    event_tools.WriteDataQualityFilters(nano, pico, sig_jet_nano_idx, min_jet_pt, max_jet_eta, isData, isFastsim);
     
     event_tools.CopyTriggerDecisions(nano, pico);
 
@@ -358,7 +356,7 @@ int main(int argc, char *argv[]){
       wgt_sums.out_sys_pu()[i]         += pico.out_sys_pu()[i];
     }
 
-    if (debug) cout<<"INFO:: Filling tree"<<endl;*/
+    if (debug) cout<<"INFO:: Filling tree"<<endl;
     pico.Fill();
   } // loop over events
 

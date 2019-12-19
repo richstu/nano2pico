@@ -8,19 +8,14 @@
 class JetProducer{
 public:
 
-  explicit JetProducer(int year, bool verbose=false);
+  explicit JetProducer(int year, float min_jet_pt, float max_jet_eta, bool verbose=false);
   ~JetProducer();
-
-  const float JetPtCut     = 30.0;
-  const float JetEtaCut    =  2.4;
-  const float ZgJetEtaCut  =  4.7;
 
   void SetVerbose(bool verbose_){ verbose = verbose_; };
 
   std::vector<int> WriteJets(nano_tree &nano, pico_tree &pico, 
                              std::vector<int> jet_islep_nano_idx, std::vector<int> jet_isphoton_nano_idx,
-                             const std::vector<float> &btag_wpts, const std::vector<float> &btag_df_wpts,
-                             bool isZgamma);
+                             const std::vector<float> &btag_wpts, const std::vector<float> &btag_df_wpts);
   void WriteFatJets(nano_tree &nano, pico_tree &pico);
   void WriteSubJets(nano_tree &nano, pico_tree &pico);
   void WriteJetSystemPt(nano_tree &nano, pico_tree &pico, 
@@ -28,6 +23,8 @@ public:
 private:
   int year;
   bool verbose;
+  float min_jet_pt;
+  float max_jet_eta;
 };
 
 #endif

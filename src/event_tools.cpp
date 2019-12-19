@@ -46,8 +46,8 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
 }
 
 
-void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vector<int> &sig_jet_nano_idx, 
-                                         bool isData, bool isFastsim){
+void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vector<int> sig_jet_nano_idx,
+                                         float min_jet_pt, float max_jet_eta, bool isData, bool isFastsim){
   // jet quality filter
   pico.out_pass_jets() = true;
   if (isFastsim) {
@@ -70,7 +70,7 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
     }
   } else { // Fullsim: require just loosest possible ID for now (for all jets, not just central!)
     for(int ijet(0); ijet<nano.nJet(); ++ijet){
-      if (nano.Jet_pt()[ijet] > 30 && nano.Jet_jetId()[ijet] < 1) 
+      if (nano.Jet_pt()[ijet] > min_jet_pt && nano.Jet_jetId()[ijet] < 1) 
         pico.out_pass_jets() = false;
     } 
   }
@@ -88,13 +88,21 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
   }
 
   pico.out_pass_low_neutral_jet() = true;
-  if (nano.Jet_neEmEF()[0] <0.03 && pico.out_jet_mht_dphi()[0]>(3.14159-0.4))
-    pico.out_pass_low_neutral_jet() = false;
+  for(int ijet(0); ijet<nano.nJet(); ++ijet){  
+    if (nano.Jet_pt()[ijet]<=min_jet_pt || fabs(nano.Jet_eta()[ijet])>max_jet_eta) continue;
+    if (nano.Jet_neEmEF()[ijet] <0.03 && DeltaPhi(nano.Jet_phi()[ijet], pico.out_mht_phi())>(3.14159-0.4))
+      pico.out_pass_low_neutral_jet() = false;
+    break; //only apply to leading jet that passes pt and eta
+  }
 
   pico.out_pass_htratio_dphi_tight() = true;
   float htratio = pico.out_ht5()/pico.out_ht();
-  if (htratio > 1.2 && pico.out_jet_mht_dphi()[0] > (5.3*htratio - 4.78)) 
-    pico.out_pass_htratio_dphi_tight() = false;
+  for(int ijet(0); ijet<nano.nJet(); ++ijet){  
+    if (nano.Jet_pt()[ijet]<=min_jet_pt || fabs(nano.Jet_eta()[ijet])>max_jet_eta) continue;
+    if (htratio > 1.2 && DeltaPhi(nano.Jet_phi()[ijet], pico.out_mht_phi()) > (5.3*htratio - 4.78)) 
+      pico.out_pass_htratio_dphi_tight() = false;
+    break; //only apply to leading jet that passes pt and eta
+  }
 
   // filters directly from Nano
   pico.out_pass_hbhe() = nano.Flag_HBHENoiseFilter();
