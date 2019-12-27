@@ -48,21 +48,23 @@ namespace{
   }
 }
 
-PhotonWeighter::PhotonWeighter(int year){
-  if (year==2016) {
-    in_full_photon_id_ = "zgamma/Fall17V2_2016_MVAwp90_photons.root"; hist_full_photon_id_ = "EGamma_SF2D";
-    in_full_photon_ev_ = "zgamma/Photon_ElVetoSFs_80X_Summer16.root"; hist_full_photon_ev_ = "Scaling_Factors_CSEV_R9 Inclusive";
-  } else if (year==2017) {
-    in_full_photon_id_ = "zgamma/2017_PhotonsMVAwp90.root";    hist_full_photon_id_ = "EGamma_SF2D";
-    in_full_photon_ev_ = "zgamma/CSEV_ScaleFactors_2017.root"; hist_full_photon_ev_ = "MVA_ID";
-  } else {
-    in_full_photon_id_ = "zgamma/2018_PhotonsMVAwp90.root"; hist_full_photon_id_ = "EGamma_SF2D";
-    in_full_photon_ev_ = "zgamma/CSEV_2018.root";           hist_full_photon_ev_ = "MVA_ID";
-  }
-  do_full_photon_id_ = (in_full_photon_id_!=""); do_full_photon_ev_ = (in_full_photon_ev_!="");
+PhotonWeighter::PhotonWeighter(int year, bool isZgamma){
+  if (isZgamma) {
+    if (year==2016) {
+      in_full_photon_id_ = "zgamma/Fall17V2_2016_MVAwp90_photons.root"; hist_full_photon_id_ = "EGamma_SF2D";
+      in_full_photon_ev_ = "zgamma/Photon_ElVetoSFs_80X_Summer16.root"; hist_full_photon_ev_ = "Scaling_Factors_CSEV_R9 Inclusive";
+    } else if (year==2017) {
+      in_full_photon_id_ = "zgamma/2017_PhotonsMVAwp90.root";    hist_full_photon_id_ = "EGamma_SF2D";
+      in_full_photon_ev_ = "zgamma/CSEV_ScaleFactors_2017.root"; hist_full_photon_ev_ = "MVA_ID";
+    } else {
+      in_full_photon_id_ = "zgamma/2018_PhotonsMVAwp90.root"; hist_full_photon_id_ = "EGamma_SF2D";
+      in_full_photon_ev_ = "zgamma/CSEV_2018.root";           hist_full_photon_ev_ = "MVA_ID";
+    }
+    do_full_photon_id_ = (in_full_photon_id_!=""); do_full_photon_ev_ = (in_full_photon_ev_!="");
 
-  if (do_full_photon_id_) sf_full_photon_id_ = LoadSF<TH2F>(in_full_photon_id_, hist_full_photon_id_);
-  if (do_full_photon_ev_) sf_full_photon_ev_ = LoadSF<TH2F>(in_full_photon_ev_, hist_full_photon_ev_);
+    if (do_full_photon_id_) sf_full_photon_id_ = LoadSF<TH2F>(in_full_photon_id_, hist_full_photon_id_);
+    if (do_full_photon_ev_) sf_full_photon_ev_ = LoadSF<TH2F>(in_full_photon_ev_, hist_full_photon_ev_);
+  }
 }
 
 void PhotonWeighter::FullSim(pico_tree &pico, float &w_photon, vector<float> &sys_photon){

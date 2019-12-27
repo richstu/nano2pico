@@ -105,7 +105,7 @@ int main(int argc, char *argv[]){
   // BTagWeighter btag_df_weighter(year, isFastsim, true, btag_df_wpts[year]);
   LeptonWeighter lep_weighter(year, isZgamma);
   LeptonWeighter lep_weighter16gh(year, isZgamma, true);
-  PhotonWeighter photon_weighter(year);
+  PhotonWeighter photon_weighter(year, isZgamma);
 
   // Other tools
   EventTools event_tools(in_path, year);

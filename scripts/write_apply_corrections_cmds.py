@@ -7,6 +7,8 @@ def getTag(path):
   tag = path.split("/")[-1]
   tag = tag.split("RunIISummer16NanoAODv4")[0]
   tag = tag.split("RunIISummer16NanoAODv5")[0]
+  tag = tag.split("RunIIFall17NanoAODv5")[0]
+  tag = tag.split("RunIIAutumn18NanoAODv5")[0]
   tag = tag.split("_ext")[0]
   tag = tag.replace("raw_pico_","")
   tag = tag.strip("_")
@@ -16,10 +18,10 @@ parser = argparse.ArgumentParser(description="Submits batch jobs to apply new SF
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument("-i","--in_dir", default="/net/cms29/cms29r0/pico/NanoAODv5/higgsino_angeles/2016/mc/raw_pico/",
                     help="Directory where the raw pico files are")
-parser.add_argument("-o","--out_cmd_file", default="cmds.py",
-                    help="File with list of commands for batch system.")
 parser.add_argument("--overwrite", action='store_true',
                     help="Process all input files regardless whether output exists.")
+parser.add_argument('-t', '--tag', default='',
+                    help='Optionally specify a tag to be used to differentiate helper files for batch submission.')
 args = parser.parse_args()
 
 in_dir = args.in_dir
@@ -33,7 +35,9 @@ if not os.path.exists(out_dir):
 in_file_paths = glob(os.path.join(in_dir,'*.root'))
 
 nfiles = 0
-cmdfile = open(args.out_cmd_file,'w')
+cmdfile_name = 'apply_corr_cmds.py'
+if (args.tag!=''): cmdfile_name = args.tag+'_'+cmdfile_name
+cmdfile = open(cmdfile_name,'w')
 cmdfile.write('#!/bin/env python\n')
 for ifile_path in in_file_paths:
   outfile_path = ifile_path.replace('/raw_pico/','/unskimmed/').replace('/raw_pico_','/pico_')
@@ -46,11 +50,14 @@ for ifile_path in in_file_paths:
   nfiles +=1
 
 cmdfile.close()
-os.chmod(args.out_cmd_file, 0o755)
+os.chmod(cmdfile_name, 0o755)
 
 print("Found {} input files.\n".format(nfiles))
 
+json_name = cmdfile_name.replace('.py','.json')
+print('To print a sample command:')
+print('cat '+cmdfile_name+' | tail -n 1\n')
 print("To generate job json and submit jobs do: ")
-print('convert_cl_to_jobs_info.py '+args.out_cmd_file+' apply_corrections.json')
-print('auto_submit_jobs.py apply_corrections.json -c scripts/check_apply_corrections_job.py')
+os.system('convert_cl_to_jobs_info.py '+cmdfile_name+' '+json_name)
+print('auto_submit_jobs.py '+json_name+' -c scripts/check_apply_corrections_job.py')
   

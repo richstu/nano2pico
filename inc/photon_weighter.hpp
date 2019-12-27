@@ -11,7 +11,7 @@
 
 class PhotonWeighter{
 public:
-  PhotonWeighter(int year);
+  PhotonWeighter(int year, bool isZgamma);
 
   void FullSim(pico_tree &pico, float &w_photon, std::vector<float> &sys_photon);
   
