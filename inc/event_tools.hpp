@@ -11,9 +11,9 @@ public:
   explicit EventTools(const std::string &name, int year);
   ~EventTools();
 
-  bool GetStitch(nano_tree &nano);
-  void WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, std::vector<int> &sig_jet_nano_idx,
-                               bool isData, bool isFastsim);
+  void WriteStitch(nano_tree &nano, pico_tree &pico);
+  void WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, std::vector<int> sig_jet_nano_idx,
+                               float min_jet_pt, float max_jet_pt, bool isData, bool isFastsim);
   void CopyTriggerDecisions(nano_tree& nano, pico_tree& pico);
   void WriteTriggerEfficiency(pico_tree &pico);
   int GetEventType();

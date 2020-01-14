@@ -46,7 +46,7 @@ export INDIR=/net/cms29/cms29r0/pico/NanoAODv5/nano/2016/TChiHH/
 export INFILE=SMS-TChiHH_mChi-1000_mLSP-1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISummer16NanoAODv5__PUSummer16v3Fast_94X_mcRun2_asymptotic_v3-v1.root
 ~~~~
 
-Step 1. Produce raw pico ntuple from a nano input file, adding `--isFastsim` and `--isData` if applicable:
+Step 1. Produce raw pico ntuple from a nano input file:
 
 ~~~~bash
 ./compile.sh && ./run/process_nano.exe --in_file $INFILE --in_dir $INDIR --out_dir out/ --nent 10000

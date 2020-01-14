@@ -1,6 +1,7 @@
 #include <ctime>
 
 #include <iostream>
+#include <iomanip>
 
 #include <getopt.h>
 
@@ -37,6 +38,9 @@ namespace {
   string out_dir = "";
   int nent_test = -1;
   bool debug = false;
+  // requirements for jets to be counted in njet, mofified for Zgamma below
+  float min_jet_pt = 30.0;
+  float max_jet_eta =  2.4;
 }
 
 void WriteDataQualityFilters(nano_tree& nano, pico_tree& pico);
@@ -67,6 +71,9 @@ int main(int argc, char *argv[]){
   time_t begtime, endtime;
   time(&begtime);
 
+  // jet requirements
+  if(isZgamma) max_jet_eta  =  4.7;
+
   // B-tag working points
   map<int, vector<float>> btag_wpts{
     {2016, vector<float>({0.2217, 0.6321, 0.8953})},
@@ -86,7 +93,7 @@ int main(int argc, char *argv[]){
   DileptonProducer dilep_producer(year);
   IsoTrackProducer tk_producer(year);
   PhotonProducer photon_producer(year);
-  JetProducer jet_producer(year);
+  JetProducer jet_producer(year, min_jet_pt, max_jet_eta);
   HigVarProducer hig_producer(year);
   ZGammaVarProducer zgamma_producer(year);
   TTZVarProducer ttz_producer(year);
@@ -101,7 +108,7 @@ int main(int argc, char *argv[]){
   // BTagWeighter btag_df_weighter(year, isFastsim, true, btag_df_wpts[year]);
   LeptonWeighter lep_weighter(year, isZgamma);
   LeptonWeighter lep_weighter16gh(year, isZgamma, true);
-  PhotonWeighter photon_weighter(year);
+  PhotonWeighter photon_weighter(year, isZgamma);
 
   // Other tools
   EventTools event_tools(in_path, year);
@@ -126,17 +133,20 @@ int main(int argc, char *argv[]){
   wgt_sums.out_nent() = nentries;
 
   for(size_t entry(0); entry<nentries; ++entry){
+    if (debug) cout << "GetEntry: " << entry << endl;
     nano.GetEntry(entry);
     if (entry%1000==0 || entry == nentries-1) {
       cout<<"Processing event: "<<entry<<endl;
     }
 
+    // if (nano.event()!=6376418) continue;
     // event info
     pico.out_event()     = nano.event();
     pico.out_lumiblock() = nano.luminosityBlock();
     pico.out_run()       = nano.run();
     pico.out_type()      = event_type;
-    pico.out_stitch()    = isData ? true: event_tools.GetStitch(nano);
+    if (isData) pico.out_stitch() = true;
+    else event_tools.WriteStitch(nano, pico);
     // number of reconstructed primary vertices
     pico.out_npv() = nano.PV_npvs();
 
@@ -146,6 +156,7 @@ int main(int argc, char *argv[]){
     // with signal lepton, thus jets must be processed only after leptons have been selected.
     //-----------------------------------------------------------------------------------------------
     if (debug) cout<<"INFO:: Writing gen particles"<<endl;
+
     mc_producer.WriteGenParticles(nano, pico);
     isr_tools.WriteISRSystemPt(nano, pico);
 
@@ -154,6 +165,25 @@ int main(int argc, char *argv[]){
     pico.out_nlep() = 0; pico.out_nvlep() = 0; // filled by lepton producers
     vector<int> sig_el_nano_idx = el_producer.WriteElectrons(nano, pico, jet_islep_nano_idx, isZgamma, isTTZ);
     vector<int> sig_mu_nano_idx = mu_producer.WriteMuons(nano, pico, jet_islep_nano_idx, isZgamma, isTTZ);
+
+    // save a separate vector with just signal leptons ordered by pt
+    struct SignalLepton{ float pt; float eta; float phi; int pdgid;};
+    vector<SignalLepton> sig_leps;
+    for (auto &iel: sig_el_nano_idx)
+      sig_leps.push_back({nano.Electron_pt()[iel], nano.Electron_eta()[iel], 
+                          nano.Electron_phi()[iel], nano.Electron_pdgId()[iel]});
+    for (auto &imu: sig_mu_nano_idx) 
+      sig_leps.push_back({nano.Muon_pt()[imu], nano.Muon_eta()[imu], 
+                          nano.Muon_phi()[imu], nano.Muon_pdgId()[imu]});
+
+    auto greaterPt = [](SignalLepton lep1, SignalLepton lep2){ return lep1.pt > lep2.pt;};
+    sort(sig_leps.begin(), sig_leps.end(), greaterPt);
+    for(auto &ilep : sig_leps) {
+      pico.out_lep_pt().push_back(ilep.pt);
+      pico.out_lep_eta().push_back(ilep.eta);
+      pico.out_lep_phi().push_back(ilep.phi);
+      pico.out_lep_pdgid().push_back(ilep.pdgid);
+    }
 
     vector<int> jet_isphoton_nano_idx = vector<int>();
     if(isZgamma)
@@ -165,18 +195,21 @@ int main(int argc, char *argv[]){
 
     if (debug) cout<<"INFO:: Writing jets, MET and ISR vars"<<endl;
     vector<int> sig_jet_nano_idx = jet_producer.WriteJets(nano, pico, jet_islep_nano_idx, jet_isphoton_nano_idx,
-                                                          btag_wpts[year], btag_df_wpts[year], isZgamma);
+                                                          btag_wpts[year], btag_df_wpts[year]);
     jet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year][1]); // usually w.r.t. medium WP
-    if(!isZgamma)
-      jet_producer.WriteFatJets(nano, pico);
+    if(!isZgamma){
+      jet_producer.WriteFatJets(nano, pico); // jet_producer.SetVerbose(nano.nSubJet()>0);
+      jet_producer.WriteSubJets(nano, pico);
+    }
     isr_tools.WriteISRJetMultiplicity(nano, pico);
 
-    // Copy MET directly from NanoAOD
+    // Copy MET and ME ISR directly from NanoAOD
     pico.out_met()         = nano.MET_pt();
     pico.out_met_phi()     = nano.MET_phi();
     pico.out_met_calo()    = nano.CaloMET_pt();
     pico.out_met_tru()     = nano.GenMET_pt();
     pico.out_met_tru_phi() = nano.GenMET_phi();
+    pico.out_ht_isr_me()   = nano.LHE_HT();
  
     if (isTTZ) {
 	    //calculate m_T for events with one (signal|loose) lepton
@@ -230,22 +263,17 @@ int main(int argc, char *argv[]){
     if (debug) cout<<"INFO:: Writing analysis specific variables"<<endl;
     // might need as input sig_el_nano_idx, sig_mu_nano_idx, sig_ph_nano_idx
     if(isZgamma)
-      zgamma_producer.WriteZGammaVars(pico);
+	    zgamma_producer.WriteZGammaVars(nano, pico, sig_jet_nano_idx);
     if (isTTZ)
 	    ttz_producer.WriteTTZVars(pico);
 
     //save higgs variables using DeepCSV and DeepFlavor
-    hig_producer.WriteHigVars(pico, /*DeepFlavor*/ false);
+    hig_producer.WriteHigVars(pico, false);
     hig_producer.WriteHigVars(pico, true);
-    pico.out_low_dphi() = false;
-    if (pico.out_jet_met_dphi().size()>3) {
-      pico.out_low_dphi() = pico.out_jet_met_dphi()[0]<0.5 || pico.out_jet_met_dphi()[1]<0.5 ||
-                            pico.out_jet_met_dphi()[2]<0.3 || pico.out_jet_met_dphi()[3]<0.3;
-    }
 
     if (debug) cout<<"INFO:: Writing filters and triggers"<<endl;
     // N.B. Jets: pico.out_pass_jets() and pico.out_pass_fsjets() filled in jet_producer
-    event_tools.WriteDataQualityFilters(nano, pico, sig_jet_nano_idx, isData, isFastsim);
+    event_tools.WriteDataQualityFilters(nano, pico, sig_jet_nano_idx, min_jet_pt, max_jet_eta, isData, isFastsim);
     
     event_tools.CopyTriggerDecisions(nano, pico);
 
@@ -298,7 +326,7 @@ int main(int argc, char *argv[]){
     }
 
     // to be calculated in Step 2: merge_corrections
-    pico.out_w_lumi() = nano.Generator_weight();
+    pico.out_w_lumi() = nano.Generator_weight()>0 ? 1:-1;
 
     // @todo, copy weights from babymaker
     pico.out_w_pu() = 1.;
@@ -329,9 +357,9 @@ int main(int argc, char *argv[]){
     // leptons, keeping track of 0l and 1l totals separately to determine the SF for 0l events
     if(pico.out_nlep()==0){
       wgt_sums.out_nent_zlep() += 1.;
-      wgt_sums.out_tot_weight_l0() += pico.out_weight();
+      wgt_sums.out_tot_weight_l0() += pico.out_weight()*(nano.Generator_weight()>0 ? 1:-1); // multiplying by GenWeight to remove the sign...
     }else{
-      wgt_sums.out_tot_weight_l1() += pico.out_weight();
+      wgt_sums.out_tot_weight_l1() += pico.out_weight()*(nano.Generator_weight()>0 ? 1:-1);
       wgt_sums.out_w_lep() += w_lep;
       if(isFastsim) wgt_sums.out_w_fs_lep() += w_fs_lep;
       for(size_t i = 0; i<pico.out_sys_lep().size(); ++i){
@@ -361,6 +389,7 @@ int main(int argc, char *argv[]){
       wgt_sums.out_sys_pu()[i]         += pico.out_sys_pu()[i];
     }
 
+    if (debug) cout<<"INFO:: Filling tree"<<endl;
     pico.Fill();
   } // loop over events
 
@@ -410,12 +439,13 @@ void GetOptions(int argc, char *argv[]){
       {"in_dir",  required_argument, 0,'i'},
       {"out_dir", required_argument, 0,'o'},
       {"nent",    required_argument, 0, 0},
+      {"debug",    no_argument, 0, 'd'},
       {0, 0, 0, 0}
     };
 
     char opt = -1;
     int option_index;
-    opt = getopt_long(argc, argv, "f:i:o:", long_options, &option_index);
+    opt = getopt_long(argc, argv, "f:i:o:d", long_options, &option_index);
     if(opt == -1) break;
 
     string optname;
@@ -425,6 +455,9 @@ void GetOptions(int argc, char *argv[]){
       break;
     case 'i':
       in_dir = optarg;
+      break;
+    case 'd':
+      debug = true;
       break;
     case 'o':
       out_dir = optarg;

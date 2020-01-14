@@ -2,6 +2,8 @@
 
 #include "utilities.hpp"
 
+#include<iomanip>
+
 using namespace std;
 
 ElectronProducer::ElectronProducer(int year_){
@@ -76,6 +78,10 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
       pico.out_nvel()++;
       pico.out_nvlep()++;
     }
+    // cout<<"Adding to"<<(isSignal ? "signal":"veto")<<" leptons"<<iel<<": pt = "<<setw(10)<<nano.Electron_pt()[iel]
+    //                                 <<" eta = "<<setw(10)<<nano.Electron_eta()[iel]
+    //                                 <<" phi = "<<setw(10)<<nano.Electron_phi()[iel]
+    //                                 <<" m = "<<setw(10)<<nano.Electron_mass()[iel];
     if (isSignal) {
       pico.out_nel()++;
       pico.out_nlep()++;

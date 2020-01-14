@@ -174,6 +174,13 @@ namespace xsec{
         if(file.Contains("TTJets_DiLept_genMET-80")) xsec = 0.412882*85.66; // filter_eff*(3*0.108)^2*815.96
         if(file.Contains("TTJets_SingleLept") && file.Contains("genMET-80")) xsec = 0.293137*178.7; //filter_eff*(1- ((1-3*0.108)^2+(3*0.108)^2))*815.96*0.5 per half
 
+        if(file.Contains("TTJets_HT")){//LO cross sections with k-factor of 1.625 already applied
+          if(file.Contains("2500toInf")) xsec = 0.0015; // 0.0023234211;TTJets_HT-1200to2500
+          if(file.Contains("1200to2500")) xsec = 0.1326; // 0.194972521;
+          if(file.Contains("800to1200")) xsec = 0.7378; // 1.07722318;
+          if(file.Contains("600to800")) xsec = 1.7966; // 2.61537118;
+        }
+
         // from cross XSDB
         if(file.Contains("TTG")) xsec = 4.078;                
         if(file.Contains("TTTT_Tune")) xsec = 0.008213;
@@ -186,6 +193,7 @@ namespace xsec{
         if(file.Contains("WJetsToLNu_Tune")) xsec=20508.9*3; //NNLO from Lesya's summary table 
 
         //cross-section per slice based on inclusive sample, roughly 10% higher than 2016, less in extreme tail
+        if(file.Contains("WJetsToLNu_HT-70To100"))  xsec = 0.0243795*20508.9*3;
         if(file.Contains("WJetsToLNu_HT-100To200"))  xsec = 0.0262096*20508.9*3;
         if(file.Contains("WJetsToLNu_HT-200To400"))  xsec = 0.00772818*20508.9*3;
         if(file.Contains("WJetsToLNu_HT-400To600"))  xsec = 0.00109366*20508.9*3;
@@ -215,6 +223,7 @@ namespace xsec{
 
         if(file.Contains("DYJetsToLL_M-50_Tune"))     xsec = 2075.14*3;
 
+        if(file.Contains("DYJetsToLL_M-50_HT-70to100"))    xsec = 0.0275032*2075.14*3;
         if(file.Contains("DYJetsToLL_M-50_HT-100to200"))    xsec = 0.0302083*2075.14*3;
         if(file.Contains("DYJetsToLL_M-50_HT-200to400"))    xsec = 0.00907651*2075.14*3;
         if(file.Contains("DYJetsToLL_M-50_HT-400to600"))    xsec = 0.00129238*2075.14*3;
@@ -257,7 +266,7 @@ namespace xsec{
         if(file.Contains("ZH_HToBB_ZToNuNu_M-125"))    xsec = 0.883*Htobb*0.2;
         if(file.Contains("WH_HToBB_WToLNu_M-125"))     xsec = 1.373*Htobb*(0.1071+0.1063+0.1138);
         if(file.Contains("ZH_HToBB_ZToNuNu_M125"))    xsec = 0.883*Htobb*0.2;
-        if(file.Contains("WH_HToBB_WToLNu_M125"))     xsec = 1.373*Htobb*(0.1071+0.1063+0.1138);
+        if(file.Contains("WHiggs0PMToBB"))     xsec = 1.373*Htobb*(0.1071+0.1063+0.1138); //using same as 2016
 
 	//cross sections stolen from AN for TOP-18-009
 	

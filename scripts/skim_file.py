@@ -19,11 +19,15 @@ def get_cuts(skim_name):
   # General use
   pass_1l_trig40 = '(Max$(el_pt*el_sig)>40 || Max$(mu_pt*mu_sig)>40)' # use for 1L CR
   pass_1l_trig30 = '(Max$(el_pt*el_sig)>30 || Max$(mu_pt*mu_sig)>30)' # use for 2L CR, can lower the cut since two leps!
-  mllcut = '&&'.join(['(mumu_m*(mumu_m>0)+elel_m*(elel_m>0))>80','(mumu_m*(mumu_m>0)+elel_m*(elel_m>0))<100'])
+  mllcut = '(Alt$(mumu_m,0)+Alt$(elel_m,0))>80 && (Alt$(mumu_m,0)+Alt$(elel_m,0))<100'
   if(skim_name=='met150'): cuts = 'met>150'
   if(skim_name=='zcand'): cuts = '&&'.join(['nlep==2', 'nbm==0', pass_1l_trig30, mllcut])
   if(skim_name=='ttisr'): cuts = '&&'.join(['nlep==2', 'nbm==2', pass_1l_trig30])
   if(skim_name=='wisr'):  cuts = '&&'.join(['met>100', 'nbl==0', pass_1l_trig40])
+
+  # Higgsino for cutlow studies
+  nb_or_ht_cut = '(nbt>=2 || nbdft>=2 || ht>300)'
+  if(skim_name=='higbase'): cuts = '&&'.join([nb_or_ht_cut, 'met>150', 'nvlep==0'])
 
   # Higgsino loose
   nb_or_fjet_cut = '(nbt>=2 || nbdft>=2 || Sum$(fjet_pt>300 && fjet_msoftdrop>50)>0)'
@@ -39,10 +43,11 @@ def get_cuts(skim_name):
     print('Using cut string:  '+cuts.replace('&&',' && '))
 
   #ttZ
-  if (skim_name=='1l'):
-    cuts = 'nlep>=1'
-  if (skim_name=='3l'):
-    cuts = 'nlep==3'
+  if (skim_name=='1l'):  cuts = 'nlep>=1'
+  if (skim_name=='3l'):  cuts = 'nlep==3'
+  #CR
+  if(skim_name=='higlep1'):  cuts = '&&'.join([nb_or_fjet_cut, 'nlep==1', pass_1l_trig40])
+  if(skim_name=='higlep2'):  cuts = '&&'.join([nb_or_fjet_cut, 'nlep==2', mllcut,  pass_1l_trig30])
 
   # Loosen up just enough to do systematics - to be updated when needed
   # sys_nbcut = 'max(nbdft,Max$(sys_nbdft))>=2'
@@ -51,11 +56,6 @@ def get_cuts(skim_name):
   #                          'min(hig_cand_dm,Min$(sys_hig_cand_dm))<=40',
   #                          'min(hig_cand_am,Min$(sys_hig_cand_am))<=200'])
   # if(skim_name=='higsys'):   cuts = '&&'.join([sys_njcut, sys_nbcut, 'max(met,Max$(sys_met))>150', 'nvlep==0', 'ntk==0', '!low_dphi', sys_higtrim])
-
-  # Control regions skims - to be updated when needed
-  # if(skim_name=='higqcd'):  cuts = '&&'.join([njcut, 'met>150 && nvlep==0'])
-  # if(skim_name=='higlep1'):  cuts = '&&'.join([njcut, nbcut, 'nleps==1', pass_1l_trig40])
-  # if(skim_name=='higlep2'):  cuts = '&&'.join([njcut, zcand, 'nleps==2', pass_1l_trig30])
 
   return cuts
 

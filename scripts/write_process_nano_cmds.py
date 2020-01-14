@@ -19,7 +19,7 @@ in_dir = args.in_dir
 out_base_dir = args.in_dir.replace('/mnt/hadoop/','/net/cms29/cms29r0/').replace('/nano/','/'+args.production+'/')
 
 if not os.path.exists(out_base_dir): 
-  os.mkdir(out_base_dir)
+  os.makedirs(out_base_dir)
 if not os.path.exists(out_base_dir+"/raw_pico/"): 
   os.mkdir(out_base_dir+"/raw_pico/")
 if not os.path.exists(out_base_dir+"/wgt_sums/"): 

@@ -11,7 +11,7 @@ public:
   explicit ZGammaVarProducer(int year);
   ~ZGammaVarProducer();
 
-  void WriteZGammaVars(pico_tree &pico);
+  void WriteZGammaVars(nano_tree &nano, pico_tree &pico, std::vector<int> sig_jet_nano_idx);
 
 private:
   int year;

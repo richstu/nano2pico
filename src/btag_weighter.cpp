@@ -108,9 +108,9 @@ double BTagWeighter::EventWeight(pico_tree &pico, BTagEntry::OperatingPoint op,
                                  const string &bc_full_syst, const string &udsg_full_syst,
                                  const string &bc_fast_syst, const string &udsg_fast_syst) const{
   double product = 1.;
-  auto n_jets = pico.out_jet_islep().size();
+  auto n_jets = pico.out_jet_isgood().size();
   for(size_t i = 0; i < n_jets; ++i){
-    if(!pico.out_jet_islep().at(i)){
+    if(pico.out_jet_isgood().at(i)){
       product *= JetBTagWeight(pico, i, op, bc_full_syst, udsg_full_syst, bc_fast_syst, udsg_fast_syst);
     }
   }
@@ -120,9 +120,9 @@ double BTagWeighter::EventWeight(pico_tree &pico, BTagEntry::OperatingPoint op,
 double BTagWeighter::EventWeight(pico_tree &pico, BTagEntry::OperatingPoint op,
                                  const string &bc_full_syst, const string &udsg_full_syst) const{
   double product = 1.;
-  auto n_jets = pico.out_jet_islep().size();
+  auto n_jets = pico.out_jet_isgood().size();
   for(size_t i = 0; i < n_jets; ++i){
-    if(!pico.out_jet_islep().at(i)){
+    if(pico.out_jet_isgood().at(i)){
       product *= JetBTagWeight(pico, i, op, bc_full_syst, udsg_full_syst);
     }
   }
@@ -132,9 +132,9 @@ double BTagWeighter::EventWeight(pico_tree &pico, BTagEntry::OperatingPoint op,
 double BTagWeighter::EventWeight(pico_tree &pico, const vector<BTagEntry::OperatingPoint> &ops,
                                  const string &bc_full_syst, const string &udsg_full_syst) const{
   double product = 1.;
-  auto n_jets = pico.out_jet_islep().size();
+  auto n_jets = pico.out_jet_isgood().size();
   for(size_t i = 0; i < n_jets; ++i){
-    if(!pico.out_jet_islep().at(i)){
+    if(pico.out_jet_isgood().at(i)){
       product *= JetBTagWeight(pico, i, ops,bc_full_syst, udsg_full_syst);
     }
   }
@@ -145,9 +145,9 @@ double BTagWeighter::EventWeight(pico_tree &pico, const vector<BTagEntry::Operat
                                  const string &bc_full_syst, const string &udsg_full_syst,
                                  const string &bc_fast_syst, const string &udsg_fast_syst) const{
   double product = 1.;
-  auto n_jets = pico.out_jet_islep().size();
+  auto n_jets = pico.out_jet_isgood().size();
   for(size_t i = 0; i < n_jets; ++i){
-    if(!pico.out_jet_islep().at(i)){
+    if(pico.out_jet_isgood().at(i)){
       product *= JetBTagWeight(pico, i, ops, bc_full_syst, udsg_full_syst, bc_fast_syst, udsg_fast_syst);
     }
   }
