@@ -38,6 +38,12 @@ def get_cuts(skim_name):
     cuts = '&&'.join(['nvlep==0', 'ntk==0','!low_dphi', 'met>150', '(('+resolved+')||('+boosted+'))'])
     print('Using cut string:  '+cuts.replace('&&',' && '))
 
+  #ttZ
+  if (skim_name=='1l'):
+    cuts = 'nlep>=1'
+  if (skim_name=='3l'):
+    cuts = 'nlep==3'
+
   # Loosen up just enough to do systematics - to be updated when needed
   # sys_nbcut = 'max(nbdft,Max$(sys_nbdft))>=2'
   # sys_njcut = '(njet==4||sys_njet[1]==4||sys_njet[2]==4||njet==5||sys_njet[1]==5||sys_njet[2]==5)'
