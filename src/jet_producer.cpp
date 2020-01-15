@@ -11,6 +11,8 @@
 
 #include "utilities.hpp"
 
+#include <iostream>
+
 using namespace std;
 
 JetProducer::JetProducer(int year_, float min_jet_pt_, float max_jet_eta_, bool verbose_){
@@ -67,14 +69,17 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
     pico.out_jet_deepcsv().push_back(nano.Jet_btagDeepB()[ijet]);
     pico.out_jet_deepflav().push_back(nano.Jet_btagDeepFlavB()[ijet]);
     pico.out_jet_qgl().push_back(nano.Jet_qgl()[ijet]);
-    pico.out_jet_hflavor().push_back(nano.Jet_hadronFlavour()[ijet]);
-    pico.out_jet_pflavor().push_back(nano.Jet_partonFlavour()[ijet]);
     pico.out_jet_islep().push_back(islep);
     pico.out_jet_isphoton().push_back(isphoton);
     pico.out_jet_isgood().push_back(isgood);
     pico.out_jet_id().push_back(nano.Jet_jetId()[ijet]);
     pico.out_jet_mht_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], mht_vec.Phi()));
     pico.out_jet_met_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], nano.MET_phi()));
+
+    if (!isData) {
+	    pico.out_jet_hflavor().push_back(nano.Jet_hadronFlavour()[ijet]);
+	    pico.out_jet_pflavor().push_back(nano.Jet_partonFlavour()[ijet]);
+    }
     
     // will be overwritten with the overlapping fat jet index, if such exists, in WriteFatJets
     pico.out_jet_fjet_idx().push_back(-999);
@@ -82,6 +87,7 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
     //the jets for the higgs pair with smallest dm will be set to true in hig_producer
     pico.out_jet_h1d().push_back(false);
     pico.out_jet_h2d().push_back(false);
+
 
     if (!islep && !isphoton) pico.out_ht5() += nano.Jet_pt()[ijet];
 
@@ -158,7 +164,7 @@ void JetProducer::WriteFatJets(nano_tree &nano, pico_tree &pico){
   //loop over Ak4 jets to add to skinny_jets vector
   for (unsigned int jet_idx(0); jet_idx < pico.out_jet_pt().size(); jet_idx++) {
 	//currently includes leptons and photons in clustering
-	if (pico.out_jet_pt()[jet_idx]> JetPtCut || pico.out_jet_islep()[jet_idx] || pico.out_jet_isphoton()[jet_idx]) {
+	if (pico.out_jet_pt()[jet_idx]> min_jet_pt || pico.out_jet_islep()[jet_idx] || pico.out_jet_isphoton()[jet_idx]) {
 		TLorentzVector jet_4p;
 		jet_4p.SetPtEtaPhiM(pico.out_jet_pt()[jet_idx],pico.out_jet_eta()[jet_idx],pico.out_jet_phi()[jet_idx],pico.out_jet_m()[jet_idx]);
 		const fastjet::PseudoJet this_pseudo_jet(jet_4p.Px(), jet_4p.Py(), jet_4p.Pz(), jet_4p.E());

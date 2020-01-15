@@ -39,10 +39,10 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
       if (fabs(nano.Electron_dz()[iel])>0.1)  continue;
       if (fabs(nano.Electron_dxy()[iel])>0.05) continue; 
       if (nano.Electron_sip3d()[iel]>4) continue;
-      if (nano.Electron_miniPFRelIso_all()[iel] > 1.0) continue;
+      if (nano.Electron_pfRelIso03_all()[iel] > 1.0) continue;
       int bitmap = nano.Electron_vidNestedWPBitmap()[iel];
       if (!idElectron_noIso(bitmap, 1)) continue;
-      if (idElectron_noIso(bitmap, 3) && nano.Electron_miniPFRelIso_all()[iel] < 0.1) 
+      if (idElectron_noIso(bitmap, 3) && nano.Electron_pfRelIso03_all()[iel] < 0.1) 
 	      isSignal = true;
     }
     else {

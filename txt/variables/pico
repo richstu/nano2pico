@@ -57,6 +57,11 @@ vector<int>   llphoton_ill
 
 ###################   ttZ    ##################
 float mj14
+float min_dilep_dr
+float z_m
+float lll_m
+float l3_mt
+
 vector<float> signal_lepton_pt
 
 ###################   Jets   ##################

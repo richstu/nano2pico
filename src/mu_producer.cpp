@@ -35,9 +35,9 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
       if (fabs(nano.Muon_dz()[imu])>0.1)  continue;
       if (fabs(nano.Muon_dxy()[imu])>0.05) continue; 
       if (nano.Muon_sip3d()[imu]>4) continue;
-      if (nano.Muon_miniPFRelIso_all()[imu] > 1.0) continue;
+      if (nano.Muon_pfRelIso03_all()[imu] > 1.0) continue;
       if (!nano.Muon_mediumId()[imu]) continue;
-      if (nano.Muon_miniPFRelIso_all()[imu] < 0.2)
+      if (nano.Muon_pfRelIso03_all()[imu] < 0.2)
 	      isSignal = true;
     }
     else {

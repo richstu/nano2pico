@@ -157,7 +157,8 @@ int main(int argc, char *argv[]){
     //-----------------------------------------------------------------------------------------------
     if (debug) cout<<"INFO:: Writing gen particles"<<endl;
 
-    mc_producer.WriteGenParticles(nano, pico);
+    if (!isData) 
+	    mc_producer.WriteGenParticles(nano, pico);
     isr_tools.WriteISRSystemPt(nano, pico);
 
     if (debug) cout<<"INFO:: Writing leptons, photons and tracks"<<endl;
