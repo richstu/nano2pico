@@ -8,7 +8,7 @@
 class MuonProducer{
 public:
 
-  explicit MuonProducer(int year);
+  explicit MuonProducer(int year, bool isData);
   ~MuonProducer();
 
   const float SignalMuonPtCut  = 20.0;
@@ -22,6 +22,7 @@ public:
 
 private:
   int year;
+  bool isData;
   
 };
 

@@ -86,12 +86,12 @@ int main(int argc, char *argv[]){
 
   //Initialize object producers
   GenParticleProducer mc_producer(year);
-  ElectronProducer el_producer(year);
-  MuonProducer mu_producer(year);
+  ElectronProducer el_producer(year, isData);
+  MuonProducer mu_producer(year, isData);
   DileptonProducer dilep_producer(year);
   IsoTrackProducer tk_producer(year);
   PhotonProducer photon_producer(year);
-  JetProducer jet_producer(year, min_jet_pt, max_jet_eta);
+  JetProducer jet_producer(year, min_jet_pt, max_jet_eta, isData);
   HigVarProducer hig_producer(year);
   ZGammaVarProducer zgamma_producer(year);
 
@@ -154,7 +154,8 @@ int main(int argc, char *argv[]){
     //-----------------------------------------------------------------------------------------------
     if (debug) cout<<"INFO:: Writing gen particles"<<endl;
 
-    mc_producer.WriteGenParticles(nano, pico);
+    if (!isData)
+	    mc_producer.WriteGenParticles(nano, pico);
     isr_tools.WriteISRSystemPt(nano, pico);
 
     if (debug) cout<<"INFO:: Writing leptons, photons and tracks"<<endl;
@@ -259,7 +260,9 @@ int main(int argc, char *argv[]){
       if(nano.event() % 3516 <= 1887) lep_weighter.FullSim(pico, w_lep, sys_lep);
       else lep_weighter16gh.FullSim(pico, w_lep, sys_lep);
     }
-    else lep_weighter.FullSim(pico, w_lep, sys_lep);
+    else if (!isData) {
+      lep_weighter.FullSim(pico, w_lep, sys_lep);
+    }
     if(isFastsim) lep_weighter.FastSim(pico, w_fs_lep, sys_fs_lep);
     pico.out_w_lep()      = w_lep;
     pico.out_w_fs_lep()   = w_fs_lep;
@@ -267,7 +270,7 @@ int main(int argc, char *argv[]){
     pico.out_sys_fs_lep() = sys_fs_lep;
     pico.out_w_photon()   = w_photon;
     pico.out_sys_photon() = sys_photon; 
-    if(isZgamma) {
+    if(isZgamma || isData) {
       pico.out_w_btag()    = 1.; 
       pico.out_w_btag_df() = 1.; 
       pico.out_w_bhig()    = 1.; 
@@ -293,7 +296,10 @@ int main(int argc, char *argv[]){
     }
 
     // to be calculated in Step 2: merge_corrections
-    pico.out_w_lumi() = nano.Generator_weight()>0 ? 1:-1;
+    if (!isData)
+      pico.out_w_lumi() = nano.Generator_weight()>0 ? 1:-1;
+    else
+      pico.out_w_lumi() = 1.;
 
     // @todo, copy weights from babymaker
     pico.out_w_pu() = 1.;
@@ -317,43 +323,45 @@ int main(int argc, char *argv[]){
     //              *** Add up weights to save for renormalization step ***
     // ----------------------------------------------------------------------------------------------
     if (debug) cout<<"INFO:: Writing sum of weights"<<endl;
-    wgt_sums.out_weight() += pico.out_weight();
-    // taking care of samples with negative weights
-    wgt_sums.out_neff() += nano.Generator_weight()>0 ? 1:-1;
+    if (!isData) {
+      wgt_sums.out_weight() += pico.out_weight();
+      // taking care of samples with negative weights
+      wgt_sums.out_neff() += nano.Generator_weight()>0 ? 1:-1;
 
-    // leptons, keeping track of 0l and 1l totals separately to determine the SF for 0l events
-    if(pico.out_nlep()==0){
-      wgt_sums.out_nent_zlep() += 1.;
-      wgt_sums.out_tot_weight_l0() += pico.out_weight()*(nano.Generator_weight()>0 ? 1:-1); // multiplying by GenWeight to remove the sign...
-    }else{
-      wgt_sums.out_tot_weight_l1() += pico.out_weight()*(nano.Generator_weight()>0 ? 1:-1);
-      wgt_sums.out_w_lep() += w_lep;
-      if(isFastsim) wgt_sums.out_w_fs_lep() += w_fs_lep;
-      for(size_t i = 0; i<pico.out_sys_lep().size(); ++i){
-        wgt_sums.out_sys_lep()[i] += sys_lep[i];
-        wgt_sums.out_sys_fs_lep()[i] += sys_fs_lep[i];
+      // leptons, keeping track of 0l and 1l totals separately to determine the SF for 0l events
+      if(pico.out_nlep()==0){
+        wgt_sums.out_nent_zlep() += 1.;
+        wgt_sums.out_tot_weight_l0() += pico.out_weight()*(nano.Generator_weight()>0 ? 1:-1); // multiplying by GenWeight to remove the sign...
+      }else{
+        wgt_sums.out_tot_weight_l1() += pico.out_weight()*(nano.Generator_weight()>0 ? 1:-1);
+        wgt_sums.out_w_lep() += w_lep;
+        if(isFastsim) wgt_sums.out_w_fs_lep() += w_fs_lep;
+        for(size_t i = 0; i<pico.out_sys_lep().size(); ++i){
+          wgt_sums.out_sys_lep()[i] += sys_lep[i];
+          wgt_sums.out_sys_fs_lep()[i] += sys_fs_lep[i];
+        }
       }
-    }
-    if(pico.out_nphoton()>0) {
-      wgt_sums.out_w_photon() += w_photon;
-      for(size_t i = 0; i < pico.out_sys_photon().size(); ++i) {
-        wgt_sums.out_sys_photon()[i] += sys_photon[i];
+      if(pico.out_nphoton()>0) {
+        wgt_sums.out_w_photon() += w_photon;
+        for(size_t i = 0; i < pico.out_sys_photon().size(); ++i) {
+          wgt_sums.out_sys_photon()[i] += sys_photon[i];
+        }
       }
-    }
-    wgt_sums.out_w_btag()    += pico.out_w_btag();
-    wgt_sums.out_w_btag_df() += pico.out_w_btag_df();
-    wgt_sums.out_w_bhig()    += pico.out_w_bhig();
-    wgt_sums.out_w_bhig_df() += pico.out_w_bhig_df();
-    wgt_sums.out_w_isr()     += pico.out_w_isr();
-    wgt_sums.out_w_pu()      += pico.out_w_pu();
+      wgt_sums.out_w_btag()    += pico.out_w_btag();
+      wgt_sums.out_w_btag_df() += pico.out_w_btag_df();
+      wgt_sums.out_w_bhig()    += pico.out_w_bhig();
+      wgt_sums.out_w_bhig_df() += pico.out_w_bhig_df();
+      wgt_sums.out_w_isr()     += pico.out_w_isr();
+      wgt_sums.out_w_pu()      += pico.out_w_pu();
 
-    for(size_t i = 0; i<2; ++i){ 
-      wgt_sums.out_sys_bchig()[i]      += pico.out_sys_bchig()[i];
-      wgt_sums.out_sys_udsghig()[i]    += pico.out_sys_udsghig()[i];
-      wgt_sums.out_sys_fs_bchig()[i]   += pico.out_sys_fs_bchig()[i];
-      wgt_sums.out_sys_fs_udsghig()[i] += pico.out_sys_fs_udsghig()[i];
-      wgt_sums.out_sys_isr()[i]        += pico.out_sys_isr()[i];
-      wgt_sums.out_sys_pu()[i]         += pico.out_sys_pu()[i];
+      for(size_t i = 0; i<2; ++i){ 
+        wgt_sums.out_sys_bchig()[i]      += pico.out_sys_bchig()[i];
+        wgt_sums.out_sys_udsghig()[i]    += pico.out_sys_udsghig()[i];
+        wgt_sums.out_sys_fs_bchig()[i]   += pico.out_sys_fs_bchig()[i];
+        wgt_sums.out_sys_fs_udsghig()[i] += pico.out_sys_fs_udsghig()[i];
+        wgt_sums.out_sys_isr()[i]        += pico.out_sys_isr()[i];
+        wgt_sums.out_sys_pu()[i]         += pico.out_sys_pu()[i];
+      }
     }
 
     if (debug) cout<<"INFO:: Filling tree"<<endl;
