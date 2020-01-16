@@ -8,6 +8,7 @@ bool stitch_ht
 
 ####################   Global   ###################
 int npv
+int npv_good
 float ht
 float ht5
 float mht

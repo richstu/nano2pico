@@ -150,6 +150,7 @@ int main(int argc, char *argv[]){
     else event_tools.WriteStitch(nano, pico);
     // number of reconstructed primary vertices
     pico.out_npv() = nano.PV_npvs();
+    pico.out_npv_good() = nano.PV_npvsGood();
 
     // ----------------------------------------------------------------------------------------------
     //            *** Writing physics objects ***

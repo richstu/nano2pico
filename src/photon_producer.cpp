@@ -29,7 +29,9 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
     pico.out_photon_pflavor().push_back(nano.Photon_genPartFlav()[iph]);
     pico.out_photon_elveto().push_back(nano.Photon_electronVeto()[iph]);
     pico.out_photon_id().push_back(nano.Photon_mvaID_WP90()[iph]);
-    bool isSig = nano.Photon_mvaID_WP90()[iph] && nano.Photon_electronVeto()[iph];
+    bool isSig = nano.Photon_mvaID_WP90()[iph] && 
+                 nano.Photon_electronVeto()[iph] && 
+                 nano.Photon_pt()[iph] > SignalPhotonPtCut;
     pico.out_photon_sig().push_back(isSig);
     // Find min(dR) between photon and signal lepton
     double minLepDR(999.);
