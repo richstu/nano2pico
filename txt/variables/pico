@@ -44,6 +44,7 @@ float dijet_dr
 float dijet_dphi
 float dijet_deta
 
+int nllphoton
 vector<float> llphoton_pt
 vector<float> llphoton_eta
 vector<float> llphoton_phi
@@ -169,6 +170,7 @@ vector<int>   el_charge
 vector<int>   el_pflavor
 
 ##################   Di-Leptons   ################
+int nll
 vector<float> ll_pt
 vector<float> ll_eta
 vector<float> ll_phi
