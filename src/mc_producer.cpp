@@ -149,7 +149,8 @@ void GenParticleProducer::WriteGenParticles(nano_tree &nano, pico_tree &pico){
     if (mc_index_to_interested_index.find(mc_mom_index) != mc_index_to_interested_index.end()) {
       mc_mom_idx = mc_index_to_interested_index[mc_mom_index];
     }
-    int mc_status = nano.GenPart_status().at(imc);
+    int mc_status     = nano.GenPart_status().at(imc);
+    int mc_statusflag = nano.GenPart_statusFlags().at(imc);
 
     // Save information
     pico.out_mc_pt().push_back(mc_pt);
@@ -160,9 +161,10 @@ void GenParticleProducer::WriteGenParticles(nano_tree &nano, pico_tree &pico){
     pico.out_mc_mom().push_back(mc_mom);
     pico.out_mc_momidx().push_back(mc_mom_idx);
     pico.out_mc_status().push_back(mc_status);
-    pico.out_ntrulep() = ntrulep;
-    pico.out_ntruel() = ntruel;
-    pico.out_ntrumu() = ntrumu;
+    pico.out_mc_statusflag().push_back(mc_statusflag);
+    pico.out_ntrulep()  = ntrulep;
+    pico.out_ntruel()   = ntruel;
+    pico.out_ntrumu()   = ntrumu;
     pico.out_ntrutaul() = ntrutaul;
     pico.out_ntrutauh() = ntrutauh;
   }

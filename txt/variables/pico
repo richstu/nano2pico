@@ -234,6 +234,7 @@ vector<int>   mc_id
 vector<int>   mc_mom
 vector<int>   mc_momidx
 vector<int>   mc_status
+vector<int>   mc_statusflag
 
 int ntrulep
 int ntrumu
