@@ -14,9 +14,10 @@ ElectronProducer::ElectronProducer(int year_, bool isData_){
 ElectronProducer::~ElectronProducer(){
 }
 
-vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, vector<int> &jet_islep_nano_idx, bool isZgamma){
+vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, vector<int> &jet_islep_nano_idx, vector<int> &sig_el_pico_idx, bool isZgamma){
   vector<int> sig_el_nano_idx;
   pico.out_nel() = 0; pico.out_nvel() = 0;
+  int pico_idx = 0;
   for(int iel(0); iel<nano.nElectron(); ++iel){
     float pt = nano.Electron_pt()[iel];///nano.Electron_eCorr()[iel]; 
     float etasc = nano.Electron_deltaEtaSC()[iel] + nano.Electron_eta()[iel];
@@ -77,6 +78,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
       pico.out_nel()++;
       pico.out_nlep()++;
       sig_el_nano_idx.push_back(iel);
+      sig_el_pico_idx.push_back(pico_idx);
       // save indices of matching jets
       if (nano.Electron_isPFcand()[iel] && nano.Electron_jetIdx()[iel]>=0) {
         jet_islep_nano_idx.push_back(nano.Electron_jetIdx()[iel]);
@@ -87,6 +89,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
         }
       }
     }
+    pico_idx++;
   }
   return sig_el_nano_idx;
 }
