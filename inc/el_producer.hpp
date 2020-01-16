@@ -8,7 +8,7 @@
 class ElectronProducer{
 public:
 
-  explicit ElectronProducer(int year);
+  explicit ElectronProducer(int year, bool isData);
   ~ElectronProducer();
 
   const float SignalElectronPtCut  = 20.0;
@@ -22,6 +22,7 @@ public:
 
 private:
   int year;
+  bool isData;
 
   bool idElectron_noIso(int bitmap, int level);
   

@@ -8,7 +8,7 @@
 class JetProducer{
 public:
 
-  explicit JetProducer(int year, float min_jet_pt, float max_jet_eta, bool verbose=false);
+  explicit JetProducer(int year, float min_jet_pt, float max_jet_eta, bool isData, bool verbose=false);
   ~JetProducer();
 
   void SetVerbose(bool verbose_){ verbose = verbose_; };
@@ -25,6 +25,7 @@ private:
   bool verbose;
   float min_jet_pt;
   float max_jet_eta;
+  bool isData;
 };
 
 #endif

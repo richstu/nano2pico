@@ -46,13 +46,11 @@ export INDIR=/net/cms29/cms29r0/pico/NanoAODv5/nano/2016/TChiHH/
 export INFILE=SMS-TChiHH_mChi-1000_mLSP-1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISummer16NanoAODv5__PUSummer16v3Fast_94X_mcRun2_asymptotic_v3-v1.root
 ~~~~
 
-Step 1. Produce raw pico ntuple from a nano input file:
+Step 1. Make an output directory out/ with subdirectories `wgt_sums` and `raw_pico` (or `wgt_sums` and `unskimmed` for data). Produce raw pico ntuple from a nano input file:
 
 ~~~~bash
 ./compile.sh && ./run/process_nano.exe --in_file $INFILE --in_dir $INDIR --out_dir out/ --nent 10000
 ~~~~
-
-Note that for interactive jobs, you need to ensure that the output directory subfolders `wgt_sums` and `raw_pico` exist.
 
 :bangbang: Code functionality relies on the input NanoAOD filename! Specifically, `INFILE` is parsed for:
 
@@ -62,7 +60,7 @@ Note that for interactive jobs, you need to ensure that the output directory sub
 * output branch `type` is set based on the presence of dataset name substrings (see event_tools.cpp)
 * branches related on ISR also depend on the presence of dataset name substrings
 
-Step 2. For each dataset, add up the sums of weights obtained for each file in step 1 and calculate the corrections needed to normalize each individual weight as well as the total weight. Note that the order of options is fixed with the arguments after the first being the input files. This is to allow arbitrary number of input files. Note that again functionality depends on the naming, e.g. correction file name is used to decide what cross-section to use.
+Step 2. If you are using data, you are done! If you are using MC, for each dataset, add up the sums of weights obtained for each file in step 1 and calculate the corrections needed to normalize each individual weight as well as the total weight. Note that the order of options is fixed with the arguments after the first being the input files. This is to allow arbitrary number of input files. Note that again functionality depends on the naming, e.g. correction file name is used to decide what cross-section to use.
 
 ~~~~bash
 ./compile.sh && ./run/merge_corrections.exe out/corrections/corr_$INFILE out/wgt_sums/wgt_sums_$INFILE

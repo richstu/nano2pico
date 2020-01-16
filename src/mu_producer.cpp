@@ -4,8 +4,9 @@
 
 using namespace std;
 
-MuonProducer::MuonProducer(int year_){
+MuonProducer::MuonProducer(int year_, bool isData_){
     year = year_;
+    isData = isData_;
 }
 
 MuonProducer::~MuonProducer(){
@@ -59,8 +60,9 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
     pico.out_mu_id().push_back(nano.Muon_looseId()[imu]);
     pico.out_mu_sig().push_back(isSignal);
     pico.out_mu_charge().push_back(nano.Muon_charge()[imu]);
-    pico.out_mu_pflavor().push_back(nano.Muon_genPartFlav()[imu]);
     pico.out_mu_sip3d().push_back(nano.Muon_sip3d()[imu]);
+    if (!isData)
+      pico.out_mu_pflavor().push_back(nano.Muon_genPartFlav()[imu]);
 
     if (nano.Muon_miniPFRelIso_all()[imu] < MuonMiniIsoCut) {
       pico.out_nvmu()++;

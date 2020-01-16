@@ -40,7 +40,10 @@ if __name__ == '__main__':
   cmdfile.write('#!/bin/env python\n')
   nexisting=0
   for ifile_path in in_file_paths:
-    out_file_path = ifile_path.replace(in_dir,out_dir).replace('pico_','pico_'+skim_name+'_')
+    if "raw_pico" in ifile_path:
+      out_file_path = ifile_path.replace(in_dir,out_dir).replace('raw_pico_','pico_'+skim_name+'_')
+    else: 
+      out_file_path = ifile_path.replace(in_dir,out_dir).replace('pico_','pico_'+skim_name+'_')
     if os.path.exists(out_file_path):
       nexisting +=1
       if not args['overwrite']: 

@@ -6,8 +6,9 @@
 
 using namespace std;
 
-ElectronProducer::ElectronProducer(int year_){
+ElectronProducer::ElectronProducer(int year_, bool isData_){
     year = year_;
+    isData = isData_;
 }
 
 ElectronProducer::~ElectronProducer(){
@@ -71,8 +72,10 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
     pico.out_el_sig().push_back(isSignal);
     pico.out_el_ispf().push_back(nano.Electron_isPFcand()[iel]);
     pico.out_el_charge().push_back(nano.Electron_charge()[iel]);
-    pico.out_el_pflavor().push_back(nano.Electron_genPartFlav()[iel]);
     pico.out_el_sip3d().push_back(nano.Electron_sip3d()[iel]);
+    if (!isData) {
+      pico.out_el_pflavor().push_back(nano.Electron_genPartFlav()[iel]);
+    }
     
     if (nano.Electron_miniPFRelIso_all()[iel] < ElectronMiniIsoCut) {
       pico.out_nvel()++;

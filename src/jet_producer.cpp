@@ -15,8 +15,9 @@
 
 using namespace std;
 
-JetProducer::JetProducer(int year_, float min_jet_pt_, float max_jet_eta_, bool verbose_){
+JetProducer::JetProducer(int year_, float min_jet_pt_, float max_jet_eta_, bool isData_, bool verbose_){
   year = year_;
+  isData = isData_;
   verbose = verbose_;
   min_jet_pt = min_jet_pt_;
   max_jet_eta = max_jet_eta_;
@@ -75,10 +76,9 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
     pico.out_jet_id().push_back(nano.Jet_jetId()[ijet]);
     pico.out_jet_mht_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], mht_vec.Phi()));
     pico.out_jet_met_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], nano.MET_phi()));
-
     if (!isData) {
-	    pico.out_jet_hflavor().push_back(nano.Jet_hadronFlavour()[ijet]);
-	    pico.out_jet_pflavor().push_back(nano.Jet_partonFlavour()[ijet]);
+      pico.out_jet_hflavor().push_back(nano.Jet_hadronFlavour()[ijet]);
+      pico.out_jet_pflavor().push_back(nano.Jet_partonFlavour()[ijet]);
     }
     
     // will be overwritten with the overlapping fat jet index, if such exists, in WriteFatJets
