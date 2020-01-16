@@ -56,13 +56,17 @@ int main(int argc, char *argv[]){
     exit(0);
   }
 
-  string in_path = in_dir+"/"+in_file;
-  string wgt_sums_path = out_dir+"/wgt_sums/wgt_sums_"+in_file;
-  string out_path = out_dir+"/raw_pico/raw_pico_"+in_file;
-
   bool isData = Contains(in_file, "Run201") ? true : false;
   bool isFastsim = Contains(in_file, "Fast") ? true : false;
   int year = Contains(in_file, "RunIISummer16") ? 2016 : (Contains(in_file, "RunIIFall17") ? 2017 : 2018);
+
+  string in_path = in_dir+"/"+in_file;
+  string wgt_sums_path = out_dir+"/wgt_sums/wgt_sums_"+in_file;
+  string out_path;
+  if (!isData)
+    out_path = out_dir+"/raw_pico/raw_pico_"+in_file;
+  else
+    out_path = out_dir+"/unskimmed/pico_"+in_file;
 
   bool isZgamma = Contains(out_dir, "zgamma");
 
