@@ -8,7 +8,7 @@ using namespace std;
 namespace xsec{
 
   float crossSection(const TString &file, bool is2016){
-    float xsec(-999999.), Htobb(0.5824), HToZG(0.001541);
+    float xsec(-999999.), Htobb(0.5824), HToZG(0.001541), ZToLL(0.10099);
 
     if (is2016) {
         //  Cross-section taken from https://twiki.cern.ch/twiki/bin/view/LHCPhysics/TtbarNNLO
@@ -141,12 +141,12 @@ namespace xsec{
         if(file.Contains("WWG"))           xsec =    0.2147; 
         if(file.Contains("ZGGJetsToLLGG")) xsec =    0.1699;
         // Zgamma signal
-        if(file.Contains("GluGluHToZG"))   xsec = HToZG*44.08;
-        if(file.Contains("VBFHToZG"))      xsec = HToZG* 3.779;
-        if(file.Contains("WplusH_HToZG"))  xsec = HToZG* 0.8380;
-        if(file.Contains("WminusH_HToZG")) xsec = HToZG* 0.5313;
-        if(file.Contains("ZH_HToZG"))      xsec = HToZG* 0.8824;
-        if(file.Contains("ttHToZG"))       xsec = HToZG* 0.5065;
+        if(file.Contains("GluGluHToZG"))   xsec = HToZG*ZToLL*44.08;
+        if(file.Contains("VBFHToZG"))      xsec = HToZG*ZToLL* 3.779;
+        if(file.Contains("WplusH_HToZG"))  xsec = HToZG*ZToLL* 0.8380;
+        if(file.Contains("WminusH_HToZG")) xsec = HToZG*ZToLL* 0.5313;
+        if(file.Contains("ZH_HToZG"))      xsec = HToZG*ZToLL* 0.8824;
+        if(file.Contains("ttHToZG"))       xsec = HToZG*ZToLL* 0.5065;
     } else {
         if(file.Contains("SMS-T1tttt_mGluino-1200_mLSP-800_Tune")) xsec = 0.0985;
         if(file.Contains("SMS-T1tttt_mGluino-2000_mLSP-100_Tune")) xsec = 0.00101;

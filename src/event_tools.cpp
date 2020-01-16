@@ -174,10 +174,13 @@ void EventTools::CopyTriggerDecisions(nano_tree& nano, pico_tree& pico){
   pico.out_HLT_PFJet500() = nano.HLT_PFJet500();
 
   // ZGamma triggers
-  pico.out_HLT_Mu17_Photon30_IsoCaloId() = nano.HLT_Mu17_Photon30_IsoCaloId();
+  pico.out_HLT_Mu17_Photon30_IsoCaloId()               = nano.HLT_Mu17_Photon30_IsoCaloId();
   pico.out_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ() = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ();
-  pico.out_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL();
-  pico.out_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ();
+  pico.out_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL()    = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL();
+  pico.out_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL()          = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL();
+  pico.out_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL()        = nano.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL();
+  pico.out_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ()       = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ();
+  pico.out_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ()     = nano.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ();
   return;
 }
 
