@@ -1,0 +1,27 @@
+Long64_t event
+
+vector<float> jet_pt
+vector<float> jet_eta
+vector<float> jet_phi
+vector<float> jet_m
+vector<float> jet_deepcsv
+vector<float> jet_qgl
+
+vector<float> mjj
+vector<float> drjj
+
+int mhiggs
+
+int njet
+
+int mchi
+int mlsp
+float h1_pt
+float h2_pt
+int nbacc
+int nbl
+int nbm
+int nbt
+float met
+float hig_am
+float hig_dm

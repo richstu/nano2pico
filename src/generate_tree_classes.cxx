@@ -165,6 +165,10 @@ int main(){
   WriteHeader(pico_vars, "pico");
   WriteSource(pico_vars, "pico");
 
+  vector<Variable> atto_vars = GetVariables("atto");  
+  WriteHeader(atto_vars, "atto");
+  WriteSource(atto_vars, "atto");
+
   vector<Variable> corr_vars = GetVariables("corrections");
   WriteHeader(corr_vars, "corrections");
   WriteSource(corr_vars, "corrections");
