@@ -5,6 +5,7 @@ Long64_t event
 int type
 bool stitch
 bool stitch_ht
+bool stitch_dy
 
 ####################   Global   ###################
 int npv

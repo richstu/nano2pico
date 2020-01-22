@@ -157,12 +157,6 @@ int main(int argc, char *argv[]){
     // N.B. Order in which producers are called matters! E.g. jets are not counted if overlapping 
     // with signal lepton, thus jets must be processed only after leptons have been selected.
     //-----------------------------------------------------------------------------------------------
-    if (debug) cout<<"INFO:: Writing gen particles"<<endl;
-
-    if (!isData)
-	    mc_producer.WriteGenParticles(nano, pico);
-    isr_tools.WriteISRSystemPt(nano, pico);
-
     if (debug) cout<<"INFO:: Writing leptons, photons and tracks"<<endl;
     vector<int> jet_islep_nano_idx = vector<int>();
     pico.out_nlep() = 0; pico.out_nvlep() = 0; // filled by lepton producers
@@ -198,6 +192,13 @@ int main(int argc, char *argv[]){
     tk_producer.WriteIsoTracks(nano, pico, sig_el_nano_idx, sig_mu_nano_idx);
 
     dilep_producer.WriteDileptons(pico, sig_el_pico_idx, sig_mu_pico_idx);
+
+    if (debug) cout<<"INFO:: Writing gen particles"<<endl;
+
+    pico.out_stitch_dy() = true;
+    if (!isData)
+	    mc_producer.WriteGenParticles(nano, pico);
+    isr_tools.WriteISRSystemPt(nano, pico);
 
     if (debug) cout<<"INFO:: Writing jets, MET and ISR vars"<<endl;
     vector<int> sig_jet_nano_idx = jet_producer.WriteJets(nano, pico, jet_islep_nano_idx, jet_isphoton_nano_idx,
