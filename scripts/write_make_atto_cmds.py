@@ -8,6 +8,8 @@ parser = argparse.ArgumentParser(description="Submits batch jobs to make atto nt
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument("-i","--in_dir", default="",
                     help="Directory where the NanoAOD files are")
+parser.add_argument("-v","--version", default="",
+                    help="Production version, which will determine the output folder.")
 parser.add_argument('-t', '--tag', default='',
                   help='Optionally specify a tag to be used to differentiate helper files for batch submission.')
 args = vars(parser.parse_args())
@@ -17,7 +19,7 @@ if (in_dir[-1]!='/'): in_dir = in_dir + '/'
 in_file_paths = glob(os.path.join(in_dir,'*.root'))
 print('Found {} input files.\n'.format(len(in_file_paths)))
 
-out_dir = args['in_dir'].replace(in_dir.split('/')[-2],'raw_atto')
+out_dir = args['in_dir'].replace('nano',args['version'])+'raw_atto/'
 if not os.path.exists(out_dir): 
   os.makedirs(out_dir)
 

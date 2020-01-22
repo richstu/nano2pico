@@ -103,8 +103,10 @@ int main(int argc, char *argv[]){
 
       atto.out_jet_pt().push_back(nano.Jet_pt()[ijet]);
       atto.out_jet_eta().push_back(nano.Jet_eta()[ijet]);
-      atto.out_jet_phi().push_back(nano.Jet_phi()[ijet]);
-      atto.out_jet_m().push_back(nano.Jet_mass()[ijet]);
+      atto.out_jet_phi().push_back(SignedDeltaPhi(nano.Jet_phi()[0], nano.Jet_phi()[ijet]));
+      // don't write negative masses since unphysical and it interferes with taking the log
+      // only 5 events have small negative mass in training sample
+      atto.out_jet_m().push_back(nano.Jet_mass()[ijet]<=0 ? 1e-5 : nano.Jet_mass()[ijet]);
       atto.out_jet_deepcsv().push_back(nano.Jet_btagDeepB()[ijet]);
       atto.out_jet_qgl().push_back(nano.Jet_qgl()[ijet]);
 
@@ -134,7 +136,7 @@ int main(int argc, char *argv[]){
 
     //make possible combinations with top 4 jets as we do in cut-based for reference
     vector<vector<unsigned>>  hcombs = {{0,1,2,3},{0,2,1,3},{0,3,1,2}};
-    float dm(9999.), am(-9999.);
+    float dm(9999.);
     for (unsigned ic(0); ic<hcombs.size(); ic++){
       ROOT::Math::PtEtaPhiMVector h1 = jets_lv[hcombs[ic][0]] + jets_lv[hcombs[ic][1]]; 
       ROOT::Math::PtEtaPhiMVector h2 = jets_lv[hcombs[ic][2]] + jets_lv[hcombs[ic][3]]; 
