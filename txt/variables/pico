@@ -183,6 +183,7 @@ vector<float> ll_deta
 vector<int>   ll_lepid
 vector<int>   ll_i1
 vector<int>   ll_i2
+vector<int>   ll_charge
 
 ##################   Photons   ###################
 int nphoton
