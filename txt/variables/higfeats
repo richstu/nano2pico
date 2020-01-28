@@ -1,0 +1,30 @@
+Long64_t event
+
+# 5 AK4 jets with pt > 30, eta < 2.4, ordered by deep CSV value
+# phi value set w.r.t. leading pt jet
+#--------------------------------------------------------------------
+vector<float> jet_brank_pt
+vector<float> jet_brank_eta
+vector<float> jet_brank_phi
+vector<float> jet_brank_m
+vector<float> jet_brank_deepcsv
+vector<float> jet_brank_qgl
+
+# masses of all combinations of the above jets
+#--------------------------------------------------------------------
+vector<float> mjj
+vector<float> drjj
+
+# 5 AK4 jets with pt > 300, eta < 2.4, ordered by deep doubleB value
+# phi value set w.r.t. leading pt jet
+#--------------------------------------------------------------------
+vector<float> fjet_brank_pt
+vector<float> fjet_brank_eta
+vector<float> fjet_brank_phi
+vector<float> fjet_brank_m
+vector<float> fjet_brank_ddb
+
+# possible outputs
+#------------------------
+int mhiggs
+int nbacc
