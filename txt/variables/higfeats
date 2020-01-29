@@ -28,3 +28,7 @@ vector<float> fjet_brank_ddb
 #------------------------
 int mhiggs
 int nbacc
+
+# miscellaneous, for selection
+#-------------------------------
+int njet

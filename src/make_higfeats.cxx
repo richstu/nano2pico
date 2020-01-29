@@ -63,17 +63,20 @@ int main(int argc, char *argv[]){
     //--------------------------------------------------------------
     if (debug) cout<<"INFO:: Filling Ak4 jet higfeats."<<endl;
     vector<pair<unsigned, float>>  ordered_idx;
-    for (unsigned ijet(0); ijet<pico.jet_pt().size(); ijet++) 
+    for (unsigned ijet(0); ijet<pico.jet_pt().size(); ijet++) {
+      if (fabs(pico.jet_eta()[ijet]) > 2.4) continue; // because this cut is not applied in pico!
       ordered_idx.push_back(make_pair(ijet, pico.jet_deepcsv()[ijet]));
-    
+    }
+
+    higfeats.out_njet() = ordered_idx.size();
+
     sort(ordered_idx.begin(), ordered_idx.end(), 
           [](const pair<unsigned, float> &a, const pair<unsigned, float> &b) -> bool {
             return a.second > b.second;
           });
 
-    unsigned max_idx = ordered_idx.size()<=5 ? ordered_idx.size() : 5;
     vector<ROOT::Math::PtEtaPhiMVector> jets_lv;
-    for (unsigned idx(0); idx<max_idx; idx++) {
+    for (unsigned idx(0); idx<ordered_idx.size(); idx++) {
       unsigned ijet = ordered_idx[idx].first;
       higfeats.out_jet_brank_pt().push_back(pico.jet_pt()[ijet]);
       higfeats.out_jet_brank_eta().push_back(pico.jet_eta()[ijet]);
@@ -90,6 +93,7 @@ int main(int argc, char *argv[]){
     }
 
     if (debug) cout<<"INFO:: Filling Ak4 jet pair higfeats."<<endl;
+    unsigned max_idx = ordered_idx.size()<=5 ? ordered_idx.size() : 5;
     for(unsigned idx(0); idx<max_idx; ++idx){
       unsigned ijet = ordered_idx[idx].first;
       for(unsigned jdx(idx+1); jdx<max_idx; ++jdx){
