@@ -10,7 +10,7 @@ EXTRA_WARNINGS := -Wcast-align -Wcast-qual -Wdisabled-optimization -Wformat=2 -W
 ALLOW_FASTJET_COMPILE := -Wno-error=undef -Wno-error=old-style-cast -Wno-error=deprecated-declarations
 CXXFLAGS := -isystem $(shell root-config --incdir) -Wall -Wextra -pedantic -Werror -Wshadow -Woverloaded-virtual -Wold-style-cast $(EXTRA_WARNINGS) $(ALLOW_FASTJET_COMPILE) $(shell root-config --cflags) $(shell fastjet-config --cxxflags) -O2 -I $(INCDIR)
 LD := $(shell root-config --ld)
-LDFLAGS := $(shell root-config --ldflags)
+LDFLAGS := $(shell root-config --ldflags) -lGenVector
 LDLIBS := $(shell root-config --libs) -lMinuit -lRooStats -lTreePlayer $(shell fastjet-config --libs)
 
 EXECUTABLES := $(addprefix $(EXEDIR)/, $(addsuffix .exe, $(notdir $(basename $(wildcard $(SRCDIR)/*.cxx))))) 

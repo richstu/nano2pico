@@ -598,5 +598,8 @@ bool HLT_PFJet500
 # ZGamma triggers
 bool HLT_Mu17_Photon30_IsoCaloId
 bool HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ
+bool HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL
 bool HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL
+bool HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL
 bool HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ
+bool HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ

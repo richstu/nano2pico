@@ -6,7 +6,7 @@ keep type
 keep stitch
 
 keep npv
-keep ht
+keep *ht*
 keep met*
 keep mt*
 
@@ -19,6 +19,8 @@ keep jet_*
 drop jet_isphoton
 keep nfjet
 keep fjet*
+keep nsubfjet
+keep subfjet*
 
 keep nlep
 keep nvlep
@@ -26,6 +28,7 @@ keep nmu
 keep nvmu
 keep nel
 keep nvel
+keep lep_*
 keep elel_*
 keep mumu_*
 keep ntk

@@ -8,6 +8,8 @@ def findBaseSampleNames(folder):
   for file in glob(folder+'/*.root'):
     dataset_tag = file.split('/')[-1]
     dataset_tag = dataset_tag.split('__RunIISummer16NanoAODv5__')[0]
+    dataset_tag = dataset_tag.split('__RunIIFall17NanoAODv5__')[0]
+    dataset_tag = dataset_tag.split('__RunIIAutumn18NanoAODv5__')[0]
     dataset_tag = dataset_tag.split('_ext')[0]
     infiles.add(dataset_tag)
     sortedfiles = list()

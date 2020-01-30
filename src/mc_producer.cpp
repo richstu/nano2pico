@@ -110,6 +110,23 @@ void GenParticleProducer::WriteGenParticles(nano_tree &nano, pico_tree &pico){
         is_tauDecayProduct = true;
       }
     }
+    // Checking for faked photons for DY stitch
+    if(mc_id == 22 && nano.GenPart_status().at(imc) == 1) // Stable photons
+      if(mc_statusFlags[0] || mc_statusFlags[8])  // Which are prompt or fromHardProcess
+        for(size_t igamma(0); igamma < pico.out_photon_pt().size(); igamma++)
+          if(pico.out_photon_sig()[igamma]){
+            TVector3 genPhoton, recoPhoton;
+            genPhoton.SetPtEtaPhi(nano.GenPart_pt().at(imc), 
+                                  nano.GenPart_eta().at(imc), 
+                                  nano.GenPart_phi().at(imc));
+            recoPhoton.SetPtEtaPhi(pico.out_photon_pt().at(igamma), 
+                                   pico.out_photon_eta().at(igamma), 
+                                   pico.out_photon_phi().at(igamma));
+            if(genPhoton.DeltaR(recoPhoton) < 0.1)
+              pico.out_stitch_dy() = false;
+          }
+
+
     // store information
     if (save_index) {
       interested_mc_indices.push_back(imc);
@@ -149,7 +166,8 @@ void GenParticleProducer::WriteGenParticles(nano_tree &nano, pico_tree &pico){
     if (mc_index_to_interested_index.find(mc_mom_index) != mc_index_to_interested_index.end()) {
       mc_mom_idx = mc_index_to_interested_index[mc_mom_index];
     }
-    int mc_status = nano.GenPart_status().at(imc);
+    int mc_status     = nano.GenPart_status().at(imc);
+    int mc_statusflag = nano.GenPart_statusFlags().at(imc);
 
     // Save information
     pico.out_mc_pt().push_back(mc_pt);
@@ -160,9 +178,10 @@ void GenParticleProducer::WriteGenParticles(nano_tree &nano, pico_tree &pico){
     pico.out_mc_mom().push_back(mc_mom);
     pico.out_mc_momidx().push_back(mc_mom_idx);
     pico.out_mc_status().push_back(mc_status);
-    pico.out_ntrulep() = ntrulep;
-    pico.out_ntruel() = ntruel;
-    pico.out_ntrumu() = ntrumu;
+    pico.out_mc_statusflag().push_back(mc_statusflag);
+    pico.out_ntrulep()  = ntrulep;
+    pico.out_ntruel()   = ntruel;
+    pico.out_ntrumu()   = ntrumu;
     pico.out_ntrutaul() = ntrutaul;
     pico.out_ntrutauh() = ntrutauh;
   }

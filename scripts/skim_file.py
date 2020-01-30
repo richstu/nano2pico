@@ -39,7 +39,7 @@ def get_cuts(skim_name):
   resolved = '(nbt>=2 || nbdft>=2) && njet>=4 && njet<=5 &&' + higtrim
   boosted = 'Sum$(fjet_pt>300 && fjet_msoftdrop>50)>1'
   if(skim_name=='higtight'): 
-    cuts = '&&'.join(['nvlep==0', 'ntk==0','!low_dphi', 'met>150', '(('+resolved+')||('+boosted+'))'])
+    cuts = '&&'.join(['nvlep==0', 'ntk==0', 'met>150', '(('+resolved+')||('+boosted+'))'])
     print('Using cut string:  '+cuts.replace('&&',' && '))
 
   #ttZ

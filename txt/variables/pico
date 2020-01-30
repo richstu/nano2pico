@@ -5,9 +5,11 @@ Long64_t event
 int type
 bool stitch
 bool stitch_ht
+bool stitch_dy
 
 ####################   Global   ###################
 int npv
+int npv_good
 float ht
 float ht5
 float mht
@@ -44,6 +46,7 @@ float dijet_dr
 float dijet_dphi
 float dijet_deta
 
+int nllphoton
 vector<float> llphoton_pt
 vector<float> llphoton_eta
 vector<float> llphoton_phi
@@ -58,7 +61,7 @@ vector<int>   llphoton_ill
 ###################   ttZ    ##################
 float mj14
 float min_dilep_dr
-float z_idx
+int z_idx
 float lll_m
 float l3_mt
 
@@ -178,6 +181,7 @@ vector<int>   el_charge
 vector<int>   el_pflavor
 
 ##################   Di-Leptons   ################
+int nll
 vector<float> ll_pt
 vector<float> ll_eta
 vector<float> ll_phi
@@ -188,6 +192,7 @@ vector<float> ll_deta
 vector<int>   ll_lepid
 vector<int>   ll_i1
 vector<int>   ll_i2
+vector<int>   ll_charge
 
 ##################   Photons   ###################
 int nphoton
@@ -243,6 +248,7 @@ vector<int>   mc_id
 vector<int>   mc_mom
 vector<int>   mc_momidx
 vector<int>   mc_status
+vector<int>   mc_statusflag
 
 int ntrulep
 int ntrumu
@@ -295,8 +301,11 @@ bool HLT_PFJet500
 # ZGamma triggers
 bool HLT_Mu17_Photon30_IsoCaloId
 bool HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ
+bool HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL
 bool HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL
+bool HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL
 bool HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ
+bool HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ
 
 ################  Systematic variations  - to be implemented as needed  ##################
 

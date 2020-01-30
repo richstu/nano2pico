@@ -51,9 +51,11 @@ void TTZVarProducer::WriteTTZVars(pico_tree &pico){
 	float z_m = -999;
 	int zcandidate_idx = -1;
 	for (unsigned int dilep_idx = 0; dilep_idx < pico.out_ll_m().size(); dilep_idx++) {
-		if (TMath::Abs(pico.out_ll_m()[dilep_idx]-91) < TMath::Abs(z_m-91)) {
-			z_m = pico.out_ll_m()[dilep_idx];
-			zcandidate_idx = dilep_idx;	
+		if (pico.out_ll_charge()[dilep_idx]==0) { //OSSF
+			if (TMath::Abs(pico.out_ll_m()[dilep_idx]-91) < TMath::Abs(z_m-91)) {
+				z_m = pico.out_ll_m()[dilep_idx];
+				zcandidate_idx = dilep_idx;	
+			}
 		}
 	}
 	pico.out_z_idx() = zcandidate_idx;
