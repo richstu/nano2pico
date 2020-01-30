@@ -168,8 +168,10 @@ int main(int argc, char *argv[]){
     if (debug) cout<<"INFO:: Writing leptons, photons and tracks"<<endl;
     vector<int> jet_islep_nano_idx = vector<int>();
     pico.out_nlep() = 0; pico.out_nvlep() = 0; // filled by lepton producers
-    vector<int> sig_el_nano_idx = el_producer.WriteElectrons(nano, pico, jet_islep_nano_idx, isZgamma, isTTZ);
-    vector<int> sig_mu_nano_idx = mu_producer.WriteMuons(nano, pico, jet_islep_nano_idx, isZgamma, isTTZ);
+    vector<int> sig_el_pico_idx = vector<int>();
+    vector<int> sig_mu_pico_idx = vector<int>();
+    vector<int> sig_el_nano_idx = el_producer.WriteElectrons(nano, pico, jet_islep_nano_idx, sig_el_pico_idx, isZgamma, isTTZ);
+    vector<int> sig_mu_nano_idx = mu_producer.WriteMuons(nano, pico, jet_islep_nano_idx, sig_mu_pico_idx, isZgamma, isTTZ);
 
     // save a separate vector with just signal leptons ordered by pt
     struct SignalLepton{ float pt; float eta; float phi; int pdgid;};
@@ -196,7 +198,7 @@ int main(int argc, char *argv[]){
                                                                  sig_el_nano_idx, sig_mu_nano_idx);
     tk_producer.WriteIsoTracks(nano, pico, sig_el_nano_idx, sig_mu_nano_idx);
 
-    dilep_producer.WriteDileptons(nano, pico, sig_el_nano_idx, sig_mu_nano_idx);
+    dilep_producer.WriteDileptons(nano, pico, sig_el_nano_idx, sig_mu_nano_idx, sig_el_pico_idx, sig_mu_pico_idx);
 
     if (debug) cout<<"INFO:: Writing jets, MET and ISR vars"<<endl;
     vector<int> sig_jet_nano_idx = jet_producer.WriteJets(nano, pico, jet_islep_nano_idx, jet_isphoton_nano_idx,

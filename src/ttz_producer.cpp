@@ -56,7 +56,7 @@ void TTZVarProducer::WriteTTZVars(pico_tree &pico){
 			zcandidate_idx = dilep_idx;	
 		}
 	}
-	pico.out_z_m() = z_m;
+	pico.out_z_idx() = zcandidate_idx;
 
 	//calculate lll_m
 	if (pico.out_nlep() == 3) {

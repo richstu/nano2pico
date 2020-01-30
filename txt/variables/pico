@@ -58,7 +58,7 @@ vector<int>   llphoton_ill
 ###################   ttZ    ##################
 float mj14
 float min_dilep_dr
-float z_m
+float z_idx
 float lll_m
 float l3_mt
 
