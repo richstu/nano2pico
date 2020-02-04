@@ -21,6 +21,7 @@ def get_cuts(skim_name):
   pass_1l_trig30 = '(Max$(el_pt*el_sig)>30 || Max$(mu_pt*mu_sig)>30)' # use for 2L CR, can lower the cut since two leps!
   mllcut = '(Alt$(mumu_m,0)+Alt$(elel_m,0))>80 && (Alt$(mumu_m,0)+Alt$(elel_m,0))<100'
   if(skim_name=='met150'): cuts = 'met>150'
+  if(skim_name=='nj45'): cuts = 'njet>=4 && njet<=5'
   if(skim_name=='zcand'): cuts = '&&'.join(['nlep==2', 'nbm==0', pass_1l_trig30, mllcut])
   if(skim_name=='ttisr'): cuts = '&&'.join(['nlep==2', 'nbm==2', pass_1l_trig30])
   if(skim_name=='wisr'):  cuts = '&&'.join(['met>100', 'nbl==0', pass_1l_trig40])

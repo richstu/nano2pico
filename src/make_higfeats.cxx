@@ -76,7 +76,8 @@ int main(int argc, char *argv[]){
           });
 
     vector<ROOT::Math::PtEtaPhiMVector> jets_lv;
-    for (unsigned idx(0); idx<ordered_idx.size(); idx++) {
+    unsigned max_idx = ordered_idx.size()<=5 ? ordered_idx.size() : 5;
+    for (unsigned idx(0); idx<max_idx; idx++) {
       unsigned ijet = ordered_idx[idx].first;
       higfeats.out_jet_brank_pt().push_back(pico.jet_pt()[ijet]);
       higfeats.out_jet_brank_eta().push_back(pico.jet_eta()[ijet]);
@@ -93,7 +94,6 @@ int main(int argc, char *argv[]){
     }
 
     if (debug) cout<<"INFO:: Filling Ak4 jet pair higfeats."<<endl;
-    unsigned max_idx = ordered_idx.size()<=5 ? ordered_idx.size() : 5;
     for(unsigned idx(0); idx<max_idx; ++idx){
       unsigned ijet = ordered_idx[idx].first;
       for(unsigned jdx(idx+1); jdx<max_idx; ++jdx){
