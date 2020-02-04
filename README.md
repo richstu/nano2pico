@@ -79,7 +79,10 @@ Step 3. Using the pico file from step 1 and the corrections file from step 2 as 
   source set_env.sh
 
 ### Step 1. Converting Nano to Pico:
-Generate a python file that prints the commands to be run in the batch (input for the queue system):
+
+First, generate a text file containing the datasets in DAS format (this is produced by copy\_dataset) or the filenames to be processed, one per line. If you use filenames, you must add the argument `--list\_format filename` when invoking `scripts/write_process_nano_cmds.py`.
+
+Next, generate a python file that prints the commands to be run in the batch (input for the queue system):
 
 ~~~~bash 
 ./scripts/write_process_nano_cmds.py --in_dir /mnt/hadoop/pico/NanoAODv5/nano/2016/mc/ \
