@@ -159,6 +159,33 @@ Here the slim name must correspond to a txt file in the slim_rules folder, so in
 
 Similarly to above, one can optionally use `--overwrite` or `--tag`.
 
+### Step 6. Prior to DNN training: Prepare tree with DNN inputs
+
+For the higgsino analysis, one can prepare a tree with all the necessary DNN inputs for either training or inference using the executable `make_higfeats.exe`, and in the batch system, e.g.:
+
+~~~~bash 
+./scripts/write_generic_cmds.py ./scripts/write_generic_cmds.py \
+           -i /net/cms29/cms29r0/pico/NanoAODv5/higgsino_eldorado/2017/mc/merged_higmc_higloose/ \
+           -o /net/cms29/cms29r0/pico/NanoAODv5/higgsino_eldorado/2017/mc/higfeats_higloose/ \
+           -e ./run/make_higfeats.exe -t mc2017
+~~~~
+
+As usual, the tag is optional and only relevant for the filename of the resulting cmd file.
+
+### Step 7. After DNN evaluation: Merge pico with DNN output
+
+After training the DNN and evaluating its output for all samples of interest using the `diboson_ml` package, one can update the corresponding pico trees to add a new branch containing the DNN output. This relies on having the events in the same order, so one has to update the pico ntuples used as input to higfeats! Given it is rather quick, it's done interactively.
+
+For now, copy the input folder just in case...
+
+~~~~bash 
+cp -r /net/cms29/cms29r0/pico/NanoAODv5/higgsino_eldorado/2016/mc/merged_higmc_higloose/ \
+      /net/cms29/cms29r0/pico/NanoAODv5/higgsino_eldorado/2016/mc/mergednn_higmc_higloose/ 
+./scripts/run_update_pico.py \
+     --pico_dir /net/cms29/cms29r0/pico/NanoAODv5/higgsino_eldorado/2016/mc/mergednn_higmc_higloose/ \
+     --dnnout_dir /net/cms29/cms29r0/pico/NanoAODv5/higgsino_eldorado/2016/mc/dnnout_higloose/
+~~~~
+
 ## Calculating b-tagging efficiencies
 
 Use `parameterize_efficiency.cxx`, giving the directory with all the MC files and the year as arguments. Below is an example run for 2016 MC.
