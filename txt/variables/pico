@@ -65,8 +65,6 @@ int z_idx
 float lll_m
 float l3_mt
 
-vector<float> signal_lepton_pt
-
 ###################   Jets   ##################
 int njet
 int nbl
