@@ -34,6 +34,7 @@ run_tree_generator = envClone.Command(tree_generated_files_mark, [], './'+tree_g
 # input: tree_generator, tree_variable_file
 envClone.Depends(run_tree_generator, tree_variable_files)
 envClone.Depends(run_tree_generator, tree_generator)
+envClone.SideEffect(tree_generated_files, run_tree_generator)
 
 # Make binaries for every directory
 exclude_files = [tree_generator_file] + tree_generated_files
