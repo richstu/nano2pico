@@ -169,6 +169,10 @@ int main(){
   WriteHeader(atto_vars, "atto");
   WriteSource(atto_vars, "atto");
 
+  vector<Variable> higfeats_vars = GetVariables("higfeats");  
+  WriteHeader(higfeats_vars, "higfeats");
+  WriteSource(higfeats_vars, "higfeats");
+
   vector<Variable> corr_vars = GetVariables("corrections");
   WriteHeader(corr_vars, "corrections");
   WriteSource(corr_vars, "corrections");
