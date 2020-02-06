@@ -44,7 +44,7 @@ for source_directory in source_directories: # source_directories = 'core'
     source_files = set()
     for lib_file in Glob("src/"+source_directory+"/*.cpp"): source_files.add(lib_file)
     for core_lib_file in Glob("src/core/*.cpp"): source_files.add(core_lib_file)
-    source_files = [source_file] + list(source_files)
+    source_files = [source_file] + sorted(source_files)
     # Make binary
     program = envClone.Program('#/kernel/'+envClone['kernel']+'/run/'+source_directory+'/${SOURCE.filebase}.exe', list(source_files))
     envClone.Depends(program, run_tree_generator)
