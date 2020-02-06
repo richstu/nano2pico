@@ -57,10 +57,7 @@ def getKernel():
 
 SConsignFile('kernel/'+getKernel()+'/sconsign.dblite')
 
-if getKernel()=='3.10.0':
-  analysisEnv = Environment(ENV = returnEnviornment('set_env.sh.nocms'))
-else:
-  analysisEnv = Environment(ENV = returnEnviornment('set_env.sh'))
+analysisEnv = Environment(ENV = returnEnviornment('set_env.sh'))
 
 addBasicEnv(analysisEnv)
 addKernelEnv(analysisEnv)
