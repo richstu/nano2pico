@@ -1,10 +1,25 @@
 #!/bin/env python
 import os, argparse
+import ROOT
+
+def get_2d_mass_points(signal_chain, pdgId_1, pdgId_2):
+  signal_chain.SetEstimate(signal_chain.GetEntries()+1)
+  signal_chain.Draw("MinIf$(GenPart_mass,GenPart_pdgId=="+str(pdgId_1)+"):MinIf$(GenPart_mass,GenPart_pdgId=="+str(pdgId_2)+")","", "goff")
+  number_variables = signal_chain.GetSelectedRows()
+  mass_array_1 = signal_chain.GetV1()
+  mass_array_2 = signal_chain.GetV2()
+  mass_points = set()
+  #print(number_variables, signal_chain.GetEntries())
+  for iVar in range(number_variables):
+    #print (mass_array_1[iVar], mass_array_2[iVar])
+    mass_points.add((int(mass_array_1[iVar]), int(mass_array_2[iVar])))
+  return sorted(mass_points)
 
 if __name__ == '__main__':
 
   parser = argparse.ArgumentParser(description="Submits batch jobs to split mass points of signal NanoAOD files",
                                    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+  parser.add_argument("-2","--two_dim", action="store_true")
   parser.add_argument("-i","--in_dir", default="/mnt/hadoop/pico/NanoAODv5/nano/2016/TChiHH_unsplit/",
                       help="Directory where the unsplit NanoAOD files are")
   parser.add_argument("-p","--target_dir", default="/mnt/hadoop/pico/NanoAODv5/nano/2016/TChiHH",
@@ -20,8 +35,23 @@ if __name__ == '__main__':
 
   if not os.path.exists(target_directory):
     os.makedirs(target_directory)
-  
-  out_string = '''#!/bin/env python
+
+  if args.two_dim:
+    chain = ROOT.TChain('Events')
+    print(args.in_dir+"/"+args.dataset_filenames)
+    chain.Add(args.in_dir+"/"+args.dataset_filenames)
+    # signal_id=1000023, lsp_id=1000022
+    # mass_points = [(mass of signal, mass of lsp)]
+    mass_points = get_2d_mass_points(chain, 1000023, 1000022)
+    out_string = '''#!/bin/env python
+source_directory = "'''+source_directory+'''/"
+target_directory = "'''+target_directory+'''/"
+mass_points = '''+str(mass_points)+'''
+for mass_point in mass_points:
+  print("'''+os.getcwd()+'''/scripts/skim_file.py -m "+str(mass_point[0])+" -l "+str(mass_point[1])+" -i \\""+source_directory+"'''+args.dataset_filenames+'''\\" -o "+target_directory)
+'''
+  else:
+    out_string = '''#!/bin/env python
 source_directory = "'''+source_directory+'''"
 target_directory = "'''+target_directory+'''"
 mass_points = [127, 150, 175, 

@@ -79,7 +79,10 @@ Step 3. Using the pico file from step 1 and the corrections file from step 2 as 
   source set_env.sh
 
 ### Step 1. Converting Nano to Pico:
-Generate a python file that prints the commands to be run in the batch (input for the queue system):
+
+First, generate a text file containing the datasets in DAS format (this is produced by copy\_dataset) or the filenames to be processed, one per line. If you use filenames, you must add the argument `--list\_format filename` when invoking `scripts/write_process_nano_cmds.py`.
+
+Next, generate a python file that prints the commands to be run in the batch (input for the queue system):
 
 ~~~~bash 
 ./scripts/write_process_nano_cmds.py --in_dir /mnt/hadoop/pico/NanoAODv5/nano/2016/mc/ \
@@ -158,6 +161,33 @@ Finally, one can remove branches that are not commonly used and merge all files 
 Here the slim name must correspond to a txt file in the slim_rules folder, so in this example `txt/slim_rules/higmc.txt`. The file contains the list of branches to be dropped/kept.
 
 Similarly to above, one can optionally use `--overwrite` or `--tag`.
+
+### Step 6. Prior to DNN training: Prepare tree with DNN inputs
+
+For the higgsino analysis, one can prepare a tree with all the necessary DNN inputs for either training or inference using the executable `make_higfeats.exe`, and in the batch system, e.g.:
+
+~~~~bash 
+./scripts/write_generic_cmds.py ./scripts/write_generic_cmds.py \
+           -i /net/cms29/cms29r0/pico/NanoAODv5/higgsino_eldorado/2017/mc/merged_higmc_higloose/ \
+           -o /net/cms29/cms29r0/pico/NanoAODv5/higgsino_eldorado/2017/mc/higfeats_higloose/ \
+           -e ./run/make_higfeats.exe -t mc2017
+~~~~
+
+As usual, the tag is optional and only relevant for the filename of the resulting cmd file.
+
+### Step 7. After DNN evaluation: Merge pico with DNN output
+
+After training the DNN and evaluating its output for all samples of interest using the `diboson_ml` package, one can update the corresponding pico trees to add a new branch containing the DNN output. This relies on having the events in the same order, so one has to update the pico ntuples used as input to higfeats! Given it is rather quick, it's done interactively.
+
+For now, copy the input folder just in case...
+
+~~~~bash 
+cp -r /net/cms29/cms29r0/pico/NanoAODv5/higgsino_eldorado/2016/mc/merged_higmc_higloose/ \
+      /net/cms29/cms29r0/pico/NanoAODv5/higgsino_eldorado/2016/mc/mergednn_higmc_higloose/ 
+./scripts/run_update_pico.py \
+     --pico_dir /net/cms29/cms29r0/pico/NanoAODv5/higgsino_eldorado/2016/mc/mergednn_higmc_higloose/ \
+     --dnnout_dir /net/cms29/cms29r0/pico/NanoAODv5/higgsino_eldorado/2016/mc/dnnout_higloose/
+~~~~
 
 ## Calculating b-tagging efficiencies
 
@@ -280,3 +310,63 @@ Calculated in [process_nano](src/process_nano.cxx) and then re-normalized in sub
 
 * `HLT_*` - trigger decisions
 * `sys_*` - systematic variations of weights up=0, down=1
+
+## Spliting Higgsino signal
+
+### Step 0. Setup environment
+
+  source set_env.sh
+
+### Step 1. Split scan
+Generate a python file that prints the commands to be run in the batch (input for the queue system):
+
+~~~~bash 
+./scripts/write_split_signal_mass_points_cmds.py --two_dim
+                                                 --in_dir /net/cms29/cms29r0/pico/NanoAODv5/nano/2016/SMS-TChiHH_2D_unsplit 
+                                                 --target_dir /net/cms29/cms29r0/pico/NanoAODv5/nano/2016/SMS-TChiHH_2D 
+                                                 --dataset_filenames SMS-TChiHH_*_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISummer16NanoAODv5__PUSummer16v3Fast_Nano1June2019_102X_mcRun2_asymptotic_v7-v1_*.root
+                                                 --out_cmd_filename cmds_split.py
+~~~~
+
+Dataset name needs to be writen out like above.
+This produces the commands in `cmds_split.py`. You can perform a last check by running one of the commands interactively. Next, submit the jobs to the batch system. Note the -c option which allows to attach a script that compares the input and output number of entries when each job is done. Note the check can be performed later if one needs to detach the session. Alternatively, this command can be started in screen:
+
+~~~~bash 
+convert_cl_to_jobs_info.py cmds_split.py cmds_split.py.json
+auto_submit_jobs.py cmds_split.py.json -c modules/queue_system/bin/jobscript_check.py
+~~~~
+
+This command will result in `checked_auto_cmds_split.py.json`, which can then be used to resubmit failed jobs if any:
+
+~~~~bash 
+select_resubmit_jobs.py checked_auto_cmds_split.py.json -c modules/queue_system/bin/jobscript_check.py
+auto_submit_jobs.py resubmit_checked_auto_cmds_split.py.json -c modules/queue_system/bin/jobscript_check.py
+~~~~
+
+## Getting Higgsino cross-section
+
+### Step 1. Download cross-section files
+
+~~~~bash
+scp -r lxplus:/afs/cern.ch/user/a/amete/public/EWKGauginoCrossSections_13TeV cross_section
+~~~~
+
+### Step 2. Fix bug in script
+
+Set masses, xsecs, xsecUncs to 0 when initializing.
+
+~~~~bash
+cd cross_section
+sed -i 's/std::vector<double>\* masses;/std::vector<double>\* masses=0;/' get_gaugino.C
+sed -i 's/std::vector<double>\* xsecs;/std::vector<double>\* xsecs=0;/' get_gaugino.C
+sed -i 's/std::vector<double>\* xsecUncs;/std::vector<double>\* xsecUncs=0;/' get_gaugino.C
+~~~~
+
+### Step 3. Run script for all mass points.
+
+Use model "CN" (mixing) or "N1N2" (no mixing).
+
+~~~~bash
+cd cross_section
+../scripts/get_higgsino_cross_sections.py -i /net/cms29/cms29r0/pico/NanoAODv5/nano/2016/SMS-TChiHH_2D --model "N1N2"
+~~~~
