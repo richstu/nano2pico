@@ -1,0 +1,1 @@
+../../draw_pico/scripts/make_run_scripts.py

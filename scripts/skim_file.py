@@ -7,8 +7,9 @@ import argparse
 # Output:  SMS-TChiHH_HToBB_HToBB_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISummer16NanoAODv5__PUSummer16v3Fast_94X_mcRun2_asymptotic_v3-v1_0.root
 def convert_name(file_paths_string, split_strings):
   converted_name = os.path.basename(file_paths_string)
-  for split_string in split_strings:
-    converted_name = converted_name.replace(split_string, '_'+split_string)
+  # Below is not needed anymore.
+  #for split_string in split_strings:
+  #  converted_name = converted_name.replace(split_string, '_'+split_string)
   converted_name = converted_name.replace('_*','')
 
   return converted_name
@@ -61,6 +62,7 @@ if __name__ == '__main__':
 
   parser = argparse.ArgumentParser()
   parser.add_argument('-m','--mass', default = -1)
+  parser.add_argument('-l','--mass_lsp', default = 0)
   parser.add_argument('-k','--skim_name', default = "")
   parser.add_argument('-i','--input_paths', required=True, default = "")
   parser.add_argument('-o','--output_dir', required=True, default = "")
@@ -73,11 +75,15 @@ if __name__ == '__main__':
 
   if args['mass'] !=-1:
     mass = args['mass']
-    cut_string = "GenPart_pdgId==1000023&&(GenPart_mass>"+str(int(mass)-10)+"&&GenPart_mass<"+str(int(mass)+10)+")"  
+    mass_lsp = args['mass_lsp']
+    #cut_string = "GenPart_pdgId==1000023&&(GenPart_mass>"+str(int(mass)-10)+"&&GenPart_mass<"+str(int(mass)+10)+")"  
+    cut_string = "(MaxIf$(GenPart_mass,GenPart_pdgId==1000023)>"+str(int(mass)-10)+"&&MaxIf$(GenPart_mass,GenPart_pdgId==1000023)<"+str(int(mass)+10)+")"
+    cut_string += "&&(MaxIf$(GenPart_mass,GenPart_pdgId==1000022)>"+str(int(mass_lsp)-10)+"&&MaxIf$(GenPart_mass,GenPart_pdgId==1000022)<"+str(int(mass_lsp)+10)+")"
     # Input:   SMS-TChiHH_HToBB_HToBB_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16NanoAODv5_PUSummer16v3Fast_94X_mcRun2_asymptotic_v3-v1_0.root
     # Output: SMS-TChiHH_mChi-1000_mLSP-1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISummer16NanoAODv5__PUSummer16v3Fast_94X_mcRun2_asymptotic_v3-v1.root
     out_filename = convert_name(file_paths_string, ['RunII','PUSummer'])
-    out_filename = out_filename.replace('SMS-TChiHH_HToBB_HToBB', 'SMS-TChiHH_mChi-'+str(mass)+'_mLSP-1')
+    #out_filename = out_filename.replace('SMS-TChiHH_HToBB_HToBB', 'SMS-TChiHH_mChi-'+str(mass)+'_mLSP-1')
+    out_filename = out_filename.replace('SMS-TChiHH', 'SMS-TChiHH_mChi-'+str(mass)+'_mLSP-'+str(mass_lsp))
     out_file_path = os.path.join(args['output_dir'], out_filename)
     treename = 'Events'
   elif args['skim_name'] !="":
