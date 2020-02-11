@@ -133,7 +133,7 @@ To generate the commands use:
 
 Follow similar process as in Step 1 to submit the commands as batch jobs. 
 
-### Step 2 (Data). Submit the weight correction jobs
+### Step 2 (Data). Remove duplicate events
 
 If you are processing data, then you must remove duplicate events. Generate a list of dataset names like the following.
 
@@ -143,12 +143,11 @@ SingleMuon
 MET
 ```
 
-If this file is saved in /txt/datasets/singleleptonmet.txt invoke, you could invoke, for example
+If this file is saved in /txt/datasets/singleleptonmet.txt invoke, one could invoke, for example
 
 ~~~~bash 
 ./scripts/send_combine_data_datsets.py --in_dir /net/cms29/cms29r0/pico/NanoAODv5/ttz_cordellbank/2016/data/raw_pico/ \ 
                                        --dataset_list ./txt/datasets/singleleptonmet.txt
-t/datasets/singlelepton.txt
 convert_cl_to_jobs_info.py cmds.py stitch_data.json
 auto_submit_jobs.py stitch_data.json
 ~~~~
