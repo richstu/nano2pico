@@ -1,6 +1,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <getopt.h>
 
 #include "corrections_tree.hpp"
 #include "cross_sections.hpp"
@@ -38,15 +39,21 @@ void FixISR(corrections_tree &corr, const string &corr_path, int year);
 void Normalize(corrections_tree &corr);
 void Fix0L(corrections_tree &corr);
 
+void GetOptions(int argc, char *argv[]);
+
 int main(int argc, char *argv[]){
-  if(argc < 3){
+
+  GetOptions(argc, argv);
+
+  if(argc-optind+1 < 3){
     cout << "Too few arguments! Usage: " << argv[0]
          << " output_file input_file [more_input_files...]" << endl;
     return 1;
   }
+  
+  string output_path = argv[optind];
+  vector<string> input_paths(argv+optind+1, argv+argc);
 
-  string output_path = argv[1];
-  vector<string> input_paths(argv+2, argv+argc);
   int year = Contains(input_paths[0], "RunIISummer16") ? 2016 : (Contains(input_paths[0], "RunIIFall17") ? 2017 : 2018);
   cout << "Running with settings for year = "<<year<<"."<<endl; 
 
@@ -256,3 +263,25 @@ void Normalize(corrections_tree &corr){
   // Normalize(corr.out_w_pdf(), nent);
   // Normalize(corr.out_sys_pdf(), nent);
 }
+
+
+void GetOptions(int argc, char *argv[]){
+  while(true){
+    static struct option long_options[] = {
+      {0, 0, 0, 0}
+    };
+
+    char opt = -1;
+    int option_index;
+    opt = getopt_long(argc, argv, "", long_options, &option_index);
+    if(opt == -1) break;
+
+    string optname;
+    switch(opt){
+    default:
+      printf("Bad option! getopt_long returned character code 0%o\n", opt);
+      break;
+    }
+  }
+}
+

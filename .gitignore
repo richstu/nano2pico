@@ -46,3 +46,6 @@ archive
 .nfs*
 .#-emacs*
 sftp-config.json
+apply*.json
+auto*.json
+*cmds.json

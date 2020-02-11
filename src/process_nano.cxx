@@ -23,6 +23,7 @@
 #include "hig_producer.hpp"
 #include "zgamma_producer.hpp"
 #include "ttz_producer.hpp"
+#include "in_json.hpp"
 
 #include "btag_weighter.hpp"
 #include "lepton_weighter.hpp"
@@ -60,14 +61,32 @@ int main(int argc, char *argv[]){
   bool isData = Contains(in_file, "Run201") ? true : false;
   bool isFastsim = Contains(in_file, "Fast") ? true : false;
   int year = Contains(in_file, "RunIISummer16") ? 2016 : (Contains(in_file, "RunIIFall17") ? 2017 : 2018);
+  if (isData) {
+    year = Contains(in_file, "Run2016") ? 2016 : (Contains(in_file, "Run2017") ? 2017 : 2018);
+  }
+
+  vector<vector<int>> VVRunLumi;
+  if (isData) {
+    switch (year) {
+      case 2016:
+        VVRunLumi = MakeVRunLumi("golden2016");
+	break;
+      case 2017:
+        VVRunLumi = MakeVRunLumi("golden2017");
+	break;
+      case 2018:
+        VVRunLumi = MakeVRunLumi("golden2018");
+	break;
+      default:
+	cout << "ERROR: no golden cert for given year" << endl;
+	return 0;
+    }
+  }
 
   string in_path = in_dir+"/"+in_file;
   string wgt_sums_path = out_dir+"/wgt_sums/wgt_sums_"+in_file;
   string out_path;
-  if (!isData)
-    out_path = out_dir+"/raw_pico/raw_pico_"+in_file;
-  else
-    out_path = out_dir+"/unskimmed/pico_"+in_file;
+  out_path = out_dir+"/raw_pico/raw_pico_"+in_file;
 
   bool isZgamma = Contains(out_dir, "zgamma");
   bool isTTZ = Contains(out_dir, "ttz");
@@ -141,6 +160,11 @@ int main(int argc, char *argv[]){
     nano.GetEntry(entry);
     if (entry%1000==0 || entry == nentries-1) {
       cout<<"Processing event: "<<entry<<endl;
+    }
+
+    //skip events that are data but not in the golden json
+    if (isData) {
+      if(!inJSON(VVRunLumi, nano.run(), nano.luminosityBlock())) continue; 
     }
 
     // if (nano.event()!=6376418) continue;
