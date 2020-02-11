@@ -46,7 +46,7 @@ export INDIR=/net/cms29/cms29r0/pico/NanoAODv5/nano/2016/TChiHH/
 export INFILE=SMS-TChiHH_mChi-1000_mLSP-1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISummer16NanoAODv5__PUSummer16v3Fast_94X_mcRun2_asymptotic_v3-v1.root
 ~~~~
 
-Step 1. Make an output directory out/ with subdirectories `wgt_sums` and `raw_pico` (or `wgt_sums` and `unskimmed` for data). Produce raw pico ntuple from a nano input file:
+Step 1. Make an output directory out/ with subdirectories `wgt_sums` and `raw_pico`. Produce raw pico ntuple from a nano input file:
 
 ~~~~bash
 ./compile.sh && ./run/process_nano.exe --in_file $INFILE --in_dir $INDIR --out_dir out/ --nent 10000
@@ -80,7 +80,7 @@ Step 3. Using the pico file from step 1 and the corrections file from step 2 as 
 
 ### Step 1. Converting Nano to Pico:
 
-First, generate a text file containing the datasets in DAS format (this is produced by copy\_dataset) or the filenames to be processed, one per line. If you use filenames, you must add the argument `--list\_format filename` when invoking `scripts/write_process_nano_cmds.py`.
+First, generate a text file containing the datasets in DAS format (this is produced by copy\_dataset) or the filenames to be processed, one per line. If you use filenames, you must add the argument `--list_format filename` when invoking `scripts/write_process_nano_cmds.py`.
 
 Next, generate a python file that prints the commands to be run in the batch (input for the queue system):
 
@@ -112,7 +112,9 @@ select_resubmit_jobs.py checked_auto_higgsino_angeles.json -c scripts/check_proc
 auto_submit_jobs.py resubmit_checked_auto_higgsino_angeles.json -c scripts/check_process_nano_job.py 
 ~~~~
 
-### Step 2. Merge sums of weights
+If you are processing Monte Carlo, then proceed to steps 2 and 3 (MC). If you are processing data, go to step 2 (data).
+
+### Step 2 (MC). Merge sums of weights
 
 For example:
 
@@ -121,7 +123,7 @@ For example:
                                --corr_dir /net/cms29/cms29r0/pico/NanoAODv5/higgsino_angeles/2016/mc/corrections/ 
 ~~~~
 
-### Step 3. Submit the weight correction jobs
+### Step 3 (MC). Submit the weight correction jobs
 
 To generate the commands use:
 
@@ -130,6 +132,28 @@ To generate the commands use:
 ~~~~
 
 Follow similar process as in Step 1 to submit the commands as batch jobs. 
+
+### Step 2 (Data). Submit the weight correction jobs
+
+If you are processing data, then you must remove duplicate events. Generate a list of dataset names like the following.
+
+```
+SingleElectron
+SingleMuon
+MET
+```
+
+If this file is saved in /txt/datasets/singleleptonmet.txt invoke, you could invoke, for example
+
+~~~~bash 
+./scripts/send_combine_data_datsets.py --in_dir /net/cms29/cms29r0/pico/NanoAODv5/ttz_cordellbank/2016/data/raw_pico/ \ 
+                                       --dataset_list ./txt/datasets/singleleptonmet.txt
+t/datasets/singlelepton.txt
+convert_cl_to_jobs_info.py cmds.py stitch_data.json
+auto_submit_jobs.py stitch_data.json
+~~~~
+
+and the output will be saved to the unskimmed folder.
 
 ### Step 4. Making skims
 
