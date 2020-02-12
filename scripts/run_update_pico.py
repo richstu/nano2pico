@@ -6,9 +6,11 @@ from glob import glob
 
 parser = argparse.ArgumentParser(description="Update pico tree with DNN output.",
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument("-p","--pico_dir", default="",
+parser.add_argument("-p","--pico_dir", 
+                    default="/net/cms29/cms29r0/pico/NanoAODv5/higgsino_eldorado/2016/SMS-TChiHH_2D/mergednn_higmc_higloose/",
                     help="Directory where the input files are.")
-parser.add_argument("-d","--dnnout_dir", default="",
+parser.add_argument("-d","--dnnout_dir", 
+                    default="/net/cms29/cms29r0/pico/NanoAODv5/higgsino_eldorado/2016/SMS-TChiHH_2D/dnnout_higloose/",
                     help="Directory where the output files should go.")
 args = vars(parser.parse_args())
 
@@ -22,6 +24,7 @@ for ipico_path in pico_paths:
   idnnout_path = os.path.join(args['dnnout_dir'], 'dnnout_'+ipico_file)
   if os.path.exists(idnnout_path):
     cmd = './run/update_pico.exe -p {} -d {}'.format(ipico_path, idnnout_path)
+    print(cmd)
     os.system(cmd)
   else:
     print('Could not find dnn output file:',idnnout_path)
