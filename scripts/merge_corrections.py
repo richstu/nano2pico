@@ -26,7 +26,7 @@ def getTag(path):
   tag = tag.strip("_")
   return tag
 
-def mergeCorrections(wgt_dir, corr_dir, higgsino_model):
+def mergeCorrections(wgt_dir, corr_dir):
   wgt_dir = fullPath(wgt_dir)
   corr_dir = fullPath(corr_dir)
 
@@ -48,8 +48,6 @@ def mergeCorrections(wgt_dir, corr_dir, higgsino_model):
     for f in input_files:
       if tag in f:
         command.append(f)
-    command.append('-m')
-    command.append(higgsino_model)
     print("Processing tag {} of {}: {}".format(i+1,len(tags),tag))
     subprocess.call(command)
 
@@ -60,6 +58,7 @@ if __name__ == "__main__":
                       help="Directory from which to read sum-of-weights files")
   parser.add_argument("-c", "--corr_dir", default=os.getcwd()+"/corrections/",
                       help="Directory in which to store corrections files")
+
   args = parser.parse_args()
 
-  mergeCorrections(args.wgt_dir, args.corr_dir, args.higgsino_model)
+  mergeCorrections(args.wgt_dir, args.corr_dir)
