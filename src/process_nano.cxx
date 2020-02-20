@@ -243,7 +243,7 @@ int main(int argc, char *argv[]){
     pico.out_met_calo()    = nano.CaloMET_pt();
     pico.out_met_tru()     = nano.GenMET_pt();
     pico.out_met_tru_phi() = nano.GenMET_phi();
-    pico.out_ht_isr_me()   = nano.LHE_HT();
+    pico.out_ht_isr_me()   = nano.LHE_HTIncoming();
  
     if (isTTZ) {
 	    //calculate m_T for events with one (signal|loose) lepton

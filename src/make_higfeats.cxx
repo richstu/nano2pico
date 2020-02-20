@@ -15,8 +15,8 @@
 using namespace std;
 
 namespace {
-  string in_file = "merged_pico_higloose_met150_TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_higmc_higloose_nfiles_78.root";
-  string in_dir = "/cms29r0/pico/NanoAODv5/higgsino_eldorado/2016/mc/merged_higmc_higloose/";
+  string in_file = "merged_pico_higloose_met150_SMS-TChiHH_mChi-400_mLSP-0_higmc_higloose_nfiles_1.root";
+  string in_dir = "/cms29r0/pico/NanoAODv5/higgsino_eldorado/2016/SMS-TChiHH_2D/merged_higmc_higloose/";
   string out_dir = "out";
   int nent_test = -1;
   bool debug = false;
@@ -132,9 +132,11 @@ int main(int argc, char *argv[]){
       higfeats.out_fjet_brank_ddb().push_back(pico.fjet_deep_md_hbb_btv()[ifjet]);
     }
 
-    //     Potential outputs
+    //     Other branches of interest
     //------------------------------
-    if (debug) cout<<"INFO:: Filling outputs."<<endl;
+    higfeats.out_mprod() = pico.mprod();
+    higfeats.out_mlsp() = pico.mlsp();
+
     higfeats.out_nbacc() = 0;
     for (unsigned imc(0); imc<pico.mc_pt().size(); imc++) {
       if (pico.mc_id()[imc]==25) {

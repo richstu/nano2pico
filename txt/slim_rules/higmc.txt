@@ -3,7 +3,7 @@ drop *
 keep run
 keep event
 keep type
-keep stitch
+keep stitch*
 
 keep npv
 keep *ht*
@@ -11,7 +11,7 @@ keep met*
 keep mt*
 
 keep hig_*
-keep low_dphi
+keep low_dphi*
 keep njet
 keep nb*
 
