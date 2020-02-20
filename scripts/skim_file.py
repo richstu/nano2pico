@@ -46,6 +46,7 @@ def get_cuts(skim_name):
 
   #ttZ
   if (skim_name=='1l'):  cuts = 'nlep>=1'
+  if (skim_name=='2l'):  cuts = 'nlep>=2'
   if (skim_name=='3l'):  cuts = 'nlep==3'
   #CR
   if(skim_name=='higlep1'):  cuts = '&&'.join([nb_or_fjet_cut, 'nlep==1', pass_1l_trig40])
