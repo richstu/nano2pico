@@ -8,15 +8,16 @@ using namespace std;
 EventTools::EventTools(const string &name_, int year_):
   name(name_),
   year(year_),
-  isTTJets_LO(false),
+  isTTJets_LO_MET(false),
+  isTTJets_LO_Incl(false),
   isWJets_LO(false),
   isDYJets_LO(false){
 
-  if((Contains(name, "TTJets_SingleLeptFromT_Tune") || 
-      Contains(name, "TTJets_SingleLeptFromTbar_Tune") || 
-      Contains(name, "TTJets_DiLept_Tune"))
-      && Contains(name, "madgraphMLM")) 
-    isTTJets_LO = true;
+  if(Contains(name, "TTJets_") && Contains(name, "genMET-") && Contains(name, "madgraphMLM")) 
+    isTTJets_LO_MET = true;
+
+  if(Contains(name, "TTJets_") && !Contains(name, "TTJets_HT") && !Contains(name, "genMET-") &&Contains(name, "madgraphMLM")) 
+    isTTJets_LO_Incl = true;
 
   if(Contains(name, "WJetsToLNu_Tune")  && Contains(name,"madgraphMLM"))
     isWJets_LO = true;
@@ -29,19 +30,24 @@ EventTools::~EventTools(){
 }
 
 void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
-  pico.out_stitch() = true; pico.out_stitch_ht() = true;
-  if(isTTJets_LO) {
-    if (nano.LHE_HT()>600) 
-      pico.out_stitch_ht() = false;
+  pico.out_stitch_htmet() = pico.out_stitch() = pico.out_stitch_ht() = true;
+  if(isTTJets_LO_Incl) {
+    if (nano.LHE_HTIncoming()>600) 
+      pico.out_stitch_htmet() = pico.out_stitch_ht() = false;
     if(year==2018 && nano.GenMET_pt()>80)
-      pico.out_stitch() = false;
+      pico.out_stitch_htmet() = pico.out_stitch() = false;
     else if (nano.GenMET_pt()>150) 
-      pico.out_stitch() = false;
+      pico.out_stitch_htmet() = pico.out_stitch() = false;
   }
 
-  if(isDYJets_LO  && nano.LHE_HT()>70) pico.out_stitch() = false;
+  if (isTTJets_LO_MET && nano.LHE_HTIncoming()>600) 
+      pico.out_stitch_htmet() = pico.out_stitch_ht() = false;
+
+  if(isDYJets_LO  && nano.LHE_HT()>70) 
+    pico.out_stitch_htmet() = pico.out_stitch_ht() = pico.out_stitch() = false;
   
-  if(isWJets_LO  && nano.LHE_HT()>70) pico.out_stitch() = false;
+  if(isWJets_LO  && nano.LHE_HT()>70) 
+    pico.out_stitch_htmet() = pico.out_stitch_ht() = pico.out_stitch() = false;
   return;
 }
 

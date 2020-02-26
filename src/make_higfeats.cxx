@@ -15,6 +15,7 @@
 using namespace std;
 
 namespace {
+  string in_file_path = ""; //will be used insted of in_file and in_dir if specified
   string in_file = "merged_pico_higloose_met150_SMS-TChiHH_mChi-400_mLSP-0_higmc_higloose_nfiles_1.root";
   string in_dir = "/cms29r0/pico/NanoAODv5/higgsino_eldorado/2016/SMS-TChiHH_2D/merged_higmc_higloose/";
   string out_dir = "out";
@@ -28,25 +29,31 @@ int main(int argc, char *argv[]){
   gErrorIgnoreLevel=6000; // Turns off ROOT errors due to missing branches       
   GetOptions(argc, argv);
 
-  if(in_file=="" || in_dir=="" || out_dir == "") {
-    cout<<"ERROR: Input file, sum-of-weights and/or output directory not specified. Exit."<<endl;
+  if((in_file_path=="" && (in_file=="" || in_dir=="")) || out_dir == "") {
+    cout<<"ERROR: Input file and/or output directory not specified. Exit."<<endl;
     exit(0);
   }
 
-  string in_path = in_dir+"/"+in_file;
-  string out_path = out_dir+"/higfeats_"+in_file;
+  string out_file_path = "";
+  if (in_file_path!="") {
+    size_t found = in_file_path.find_last_of("/");
+    out_file_path = out_dir+"/higfeats_"+in_file_path.substr(found+1);
+  } else {
+    in_file_path = in_dir+"/"+in_file;
+    out_file_path = out_dir+"/higfeats_"+in_file;
+  }
 
   time_t begtime, endtime;
   time(&begtime);
 
  // Initialize trees
-  pico_tree pico(in_path);
+  pico_tree pico(in_file_path);
   size_t nentries(nent_test>0 ? nent_test : pico.GetEntries());
-  cout << "Pico input file: " << in_path << endl;
+  cout << "Pico input file: " << in_file_path << endl;
   cout << "Input number of events: " << nentries << endl;
 
-  higfeats_tree higfeats("", out_path);
-  cout << "Writing output to: " << out_path << endl;
+  higfeats_tree higfeats("", out_file_path);
+  cout << "Writing output to: " << out_file_path << endl;
 
   for(size_t entry(0); entry<nentries; ++entry){
     if (debug) cout << "GetEntry: " << entry << endl;
@@ -57,6 +64,13 @@ int main(int argc, char *argv[]){
 
     if (debug) cout<<"INFO:: Filling event number."<<endl;
     higfeats.out_event() = pico.event();
+    higfeats.out_nbt() = pico.nbt();
+    higfeats.out_nbm() = pico.nbm();
+    higfeats.out_nbl() = pico.nbl();
+
+    higfeats.out_hig_cand_am() = -999.;
+    if (pico.hig_cand_am().size()>0)
+      higfeats.out_hig_cand_am() = pico.hig_cand_am()[0];
 
     //--------------------------------------------------------------
     //         Save AK4 jets ordered by deepCSV value    
@@ -164,6 +178,7 @@ int main(int argc, char *argv[]){
 void GetOptions(int argc, char *argv[]){
   while(true){
     static struct option long_options[] = {
+      {"in_file_path", required_argument, 0,'p'}, //alternative way to specify input, more convenient sometime
       {"in_file", required_argument, 0,'f'}, 
       {"in_dir",  required_argument, 0,'i'},
       {"out_dir", required_argument, 0,'o'},
@@ -174,11 +189,14 @@ void GetOptions(int argc, char *argv[]){
 
     char opt = -1;
     int option_index;
-    opt = getopt_long(argc, argv, "f:i:o:d", long_options, &option_index);
+    opt = getopt_long(argc, argv, "p:f:i:o:d", long_options, &option_index);
     if(opt == -1) break;
 
     string optname;
     switch(opt){
+    case 'p':
+      in_file_path = optarg;
+      break;
     case 'f':
       in_file = optarg;
       break;

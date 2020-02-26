@@ -27,10 +27,6 @@ def get_cuts(skim_name):
   if(skim_name=='ttisr'): cuts = '&&'.join(['nlep==2', 'nbm==2', pass_1l_trig30])
   if(skim_name=='wisr'):  cuts = '&&'.join(['met>100', 'nbl==0', pass_1l_trig40])
 
-  # Higgsino for cutlow studies
-  nb_or_ht_cut = '(nbt>=2 || nbdft>=2 || ht>300)'
-  if(skim_name=='higbase'): cuts = '&&'.join([nb_or_ht_cut, 'met>150', 'nvlep==0'])
-
   # Higgsino loose
   nb_or_fjet_cut = '(nbt>=2 || nbdft>=2 || Sum$(fjet_pt>300 && fjet_msoftdrop>50)>0)'
   if(skim_name=='higloose'): cuts = '&&'.join([nb_or_fjet_cut, 'met>150', 'nvlep==0'])
@@ -38,10 +34,17 @@ def get_cuts(skim_name):
   # Higgsino tight
   higtrim = '((Alt$(hig_cand_drmax[0],0)<2.2 && Alt$(hig_cand_dm[0],0)<=40 && Alt$(hig_cand_am[0],0)<=200) ||'
   higtrim += '(Alt$(hig_df_cand_drmax[0],0)<2.2 && Alt$(hig_df_cand_dm[0],0)<=40 && Alt$(hig_df_cand_am[0],0)<=200))'
-  resolved = '(nbt>=2 || nbdft>=2) && njet>=4 && njet<=5 &&' + higtrim
+  resolved = 'nbt>=2 && njet>=4 && njet<=5 &&' + higtrim
   boosted = 'Sum$(fjet_pt>300 && fjet_msoftdrop>50)>1'
   if(skim_name=='higtight'): 
-    cuts = '&&'.join(['nvlep==0', 'ntk==0', 'met>150', '(('+resolved+')||('+boosted+'))'])
+    cuts = '&&'.join(['nvlep==0', 'ntk==0', 'met>150', '!low_dphi_met', '(('+resolved+')||('+boosted+'))'])
+    print('Using cut string:  '+cuts.replace('&&',' && '))
+
+  # Higgsino preselection for training DNN, can be done from higloose
+  resolved = 'nbt>=2 && njet>=4 && njet<=5'
+  boosted = 'Sum$(fjet_pt>300 && fjet_msoftdrop>50)>1'
+  if(skim_name=='preselect'): 
+    cuts = '&&'.join(['nvlep==0', 'ntk==0', '!low_dphi_met', 'met>150', '(('+resolved+')||('+boosted+'))'])
     print('Using cut string:  '+cuts.replace('&&',' && '))
 
   # Control regions skims - to be updated when needed
@@ -50,6 +53,8 @@ def get_cuts(skim_name):
   # do not cut on Nb since CR goes down to 0b!
   njet_or_fjet_cut = '(Sum$(fjet_pt>300 && fjet_msoftdrop>50)>1 || (njet>=4 && njet<=5))' 
   if(skim_name=='higlep2T'):  cuts = '&&'.join([njet_or_fjet_cut, 'nlep==2', mllcut,  pass_1l_trig30])
+
+  if(skim_name=='higqcd'):  cuts = '&&'.join([njet_or_fjet_cut, 'nvlep==0', 'ntk==0', 'low_dphi_met'])
 
   # Loosen up just enough to do systematics - to be updated when needed
   # sys_nbcut = 'max(nbdft,Max$(sys_nbdft))>=2'

@@ -22,7 +22,8 @@ public:
 private:
   const std::string name;
   int year;
-  bool isTTJets_LO;
+  bool isTTJets_LO_MET;
+  bool isTTJets_LO_Incl;
   bool isWJets_LO;
   bool isDYJets_LO;
 
