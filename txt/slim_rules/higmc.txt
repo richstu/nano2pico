@@ -15,6 +15,8 @@ keep low_dphi*
 keep njet
 keep nb*
 
+keep ll_pt
+
 keep jet_*
 drop jet_isphoton
 keep nfjet

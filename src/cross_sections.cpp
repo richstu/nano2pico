@@ -8,7 +8,7 @@ using namespace std;
 namespace xsec{
 
   float crossSection(const TString &file, bool is2016){
-    float xsec(-999999.), Htobb(0.5824), HToZG(0.001541), ZToLL(0.10099);
+    float xsec(-999999.), Htobb(0.5824), HToZG(0.001533), ZToLL(0.100974);
 
     if (is2016) {
         //  Cross-section taken from https://twiki.cern.ch/twiki/bin/view/LHCPhysics/TtbarNNLO
@@ -139,10 +139,13 @@ namespace xsec{
         if(file.Contains("DYJetsToLL") &&  
            file.Contains("amcatnlo"))      xsec = 6077.22;
         if(file.Contains("ZGTo2LG"))       xsec =  117.864;
+        if(file.Contains("ZGToLLG"))       xsec =  117.864; // Other sample name
         if(file.Contains("ZZTo2L2Q"))      xsec =    3.22;
         if(file.Contains("ZZTo2L2Nu"))     xsec =    0.564;
         if(file.Contains("ZZTo4L"))        xsec =    1.256;
         if(file.Contains("TTTo2L2Nu"))     xsec =   87.31;
+        if(file.Contains("TGJets"))        xsec =    2.967;
+        if(file.Contains("LLAJJ"))         xsec =    0.1084; // from XSDB
         if(file.Contains("WWW"))           xsec =    0.2086;
         if(file.Contains("WWZ"))           xsec =    0.1651;
         if(file.Contains("WZZ"))           xsec =    0.05565;
@@ -150,13 +153,15 @@ namespace xsec{
         if(file.Contains("WGGJets"))       xsec =    1.715;
         if(file.Contains("WWG"))           xsec =    0.2147; 
         if(file.Contains("ZGGJetsToLLGG")) xsec =    0.1699;
+        if(file.Contains("WZ_Tune"))       xsec =   47.13;
+        if(file.Contains("WW_Tune"))       xsec =  116.7; // From arXiv:1408.5243
         // Zgamma signal
-        if(file.Contains("GluGluHToZG"))   xsec = HToZG*ZToLL*44.08;
-        if(file.Contains("VBFHToZG"))      xsec = HToZG*ZToLL* 3.779;
-        if(file.Contains("WplusH_HToZG"))  xsec = HToZG*ZToLL* 0.8380;
-        if(file.Contains("WminusH_HToZG")) xsec = HToZG*ZToLL* 0.5313;
-        if(file.Contains("ZH_HToZG"))      xsec = HToZG*ZToLL* 0.8824;
-        if(file.Contains("ttHToZG"))       xsec = HToZG*ZToLL* 0.5065;
+        if(file.Contains("GluGluHToZG"))   xsec = HToZG*ZToLL*48.58  ;// OG: 44.08;   J+M:48.58
+        if(file.Contains("VBFHToZG"))      xsec = HToZG*ZToLL* 3.782 ;// OG:  3.779;  J+M: 3.782
+        if(file.Contains("WplusH_HToZG"))  xsec = HToZG*ZToLL* 0.831 ;// OG:  0.8380  J+M: 0.831
+        if(file.Contains("WminusH_HToZG")) xsec = HToZG*ZToLL* 0.527 ;// OG:  0.5313  J+M: 0.527
+        if(file.Contains("ZH_HToZG"))      xsec = HToZG*ZToLL* 0.8839;// OG:  0.8824  J+M: 0.8839
+        if(file.Contains("ttHToZG"))       xsec = HToZG*ZToLL* 0.5071;// OG:  0.5065  J+M: 0.5071
     } else {
         if(file.Contains("SMS-T1tttt_mGluino-1200_mLSP-800_Tune")) xsec = 0.0985;
         if(file.Contains("SMS-T1tttt_mGluino-2000_mLSP-100_Tune")) xsec = 0.00101;

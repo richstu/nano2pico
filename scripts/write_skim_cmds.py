@@ -35,7 +35,7 @@ if __name__ == '__main__':
     os.mkdir(out_dir)
 
   cmdfile_name = 'skim_'+skim_name+'_cmds.py'
-  if (args['tag']!=''): cmdfile_name = args['tag']+'_'+cmdfile_name
+  if (args['tag']!=''): cmdfile_name = cmdfile_name.replace('.py', '_'+args['tag']+'.py')
   cmdfile = open(cmdfile_name,'w')
   cmdfile.write('#!/bin/env python\n')
   nexisting=0

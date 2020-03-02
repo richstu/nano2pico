@@ -74,10 +74,10 @@ TString get_era(int run) {
 		return TString("Run2016E");
 	}
 	else if (run >= 277772 && run <= 278808) {
-		return TString("Run2016E");
+		return TString("Run2016F");
 	}
 	else if (run >= 278820 && run <= 280385) {
-		return TString("Run2016F");
+		return TString("Run2016G");
 	}
 	else if (run >= 280919 && run <= 284044) {
 		return TString("Run2016H");
@@ -183,7 +183,7 @@ int main(int argc, char *argv[]){
 	outname += yearname + "_";
     outname += idata;
     outname += "_"+basename;
-    if (begrun > 0) outname += "_" + run_s;
+    if (begrun > 0) outname += run_s;
     outname += ".root";
     TFile outfile(outname, "RECREATE");
     outfile.cd();

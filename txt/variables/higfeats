@@ -28,11 +28,15 @@ vector<float> fjet_brank_ddb
 #------------------------
 int mhiggs
 int nbacc
+int nbt
+int nbm
+int nbl
 
 # miscellaneous, for selection or checks
 #-----------------------------------------
 int njet
 float mlsp
 float mprod
+float hig_cand_am
 
 

@@ -5,6 +5,7 @@ Long64_t event
 int type
 bool stitch
 bool stitch_ht
+bool stitch_htmet
 bool stitch_dy
 
 ####################   Global   ###################
@@ -304,6 +305,8 @@ bool HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL
 bool HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL
 bool HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ
 bool HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ
+bool HLT_Ele27_eta2p1_WPTight_Gsf
+bool HLT_Photon175
 
 ################  Systematic variations  - to be implemented as needed  ##################
 

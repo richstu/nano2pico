@@ -29,11 +29,15 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
       if (fabs(nano.Electron_dz()[iel])>1.0)  continue;
       if (fabs(nano.Electron_dxy()[iel])>0.5) continue; 
       id = nano.Electron_mvaFall17V2Iso_WP90()[iel];
-      if (id && 
-          nano.Electron_pfRelIso03_all()[iel] < ElectronRelIsoCut &&
-          nano.Electron_sip3d()[iel] < 4)
-        isSignal = true;
-      pico.out_el_idmva().push_back(nano.Electron_mvaFall17V2Iso()[iel]);
+      double wp[2][3] = {{-0.145237, -0.0315746, -0.032173},
+                         { 0.604775,  0.628743,   0.896462}};
+      int ipt(1), ieta(2);
+      if(pt>10) ipt = 0;
+      if(fabs(etasc) < 0.8) ieta = 0;
+      else if(fabs(etasc) < 1.479) ieta = 1;
+      double mva = nano.Electron_mvaFall17V2Iso()[iel];
+      isSignal = mva > wp[ipt][ieta];
+      pico.out_el_idmva().push_back(mva);
     }
     else if (isTTZ) {
       if (pt <= VetoElectronPtCut) continue;

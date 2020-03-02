@@ -8,15 +8,16 @@ using namespace std;
 EventTools::EventTools(const string &name_, int year_):
   name(name_),
   year(year_),
-  isTTJets_LO(false),
+  isTTJets_LO_MET(false),
+  isTTJets_LO_Incl(false),
   isWJets_LO(false),
   isDYJets_LO(false){
 
-  if((Contains(name, "TTJets_SingleLeptFromT_Tune") || 
-      Contains(name, "TTJets_SingleLeptFromTbar_Tune") || 
-      Contains(name, "TTJets_DiLept_Tune"))
-      && Contains(name, "madgraphMLM")) 
-    isTTJets_LO = true;
+  if(Contains(name, "TTJets_") && Contains(name, "genMET-") && Contains(name, "madgraphMLM")) 
+    isTTJets_LO_MET = true;
+
+  if(Contains(name, "TTJets_") && !Contains(name, "TTJets_HT") && !Contains(name, "genMET-") &&Contains(name, "madgraphMLM")) 
+    isTTJets_LO_Incl = true;
 
   if(Contains(name, "WJetsToLNu_Tune")  && Contains(name,"madgraphMLM"))
     isWJets_LO = true;
@@ -29,19 +30,24 @@ EventTools::~EventTools(){
 }
 
 void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
-  pico.out_stitch() = true; pico.out_stitch_ht() = true;
-  if(isTTJets_LO) {
-    if (nano.LHE_HT()>600) 
-      pico.out_stitch_ht() = false;
+  pico.out_stitch_htmet() = pico.out_stitch() = pico.out_stitch_ht() = true;
+  if(isTTJets_LO_Incl) {
+    if (nano.LHE_HTIncoming()>600) 
+      pico.out_stitch_htmet() = pico.out_stitch_ht() = false;
     if(year==2018 && nano.GenMET_pt()>80)
-      pico.out_stitch() = false;
+      pico.out_stitch_htmet() = pico.out_stitch() = false;
     else if (nano.GenMET_pt()>150) 
-      pico.out_stitch() = false;
+      pico.out_stitch_htmet() = pico.out_stitch() = false;
   }
 
-  if(isDYJets_LO  && nano.LHE_HT()>70) pico.out_stitch() = false;
+  if (isTTJets_LO_MET && nano.LHE_HTIncoming()>600) 
+      pico.out_stitch_htmet() = pico.out_stitch_ht() = false;
+
+  if(isDYJets_LO  && nano.LHE_HT()>70) 
+    pico.out_stitch_htmet() = pico.out_stitch_ht() = pico.out_stitch() = false;
   
-  if(isWJets_LO  && nano.LHE_HT()>70) pico.out_stitch() = false;
+  if(isWJets_LO  && nano.LHE_HT()>70) 
+    pico.out_stitch_htmet() = pico.out_stitch_ht() = pico.out_stitch() = false;
   return;
 }
 
@@ -183,6 +189,8 @@ void EventTools::CopyTriggerDecisions(nano_tree& nano, pico_tree& pico){
   pico.out_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL()        = nano.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL();
   pico.out_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ()       = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ();
   pico.out_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ()     = nano.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ();
+  pico.out_HLT_Ele27_eta2p1_WPTight_Gsf()              = nano.HLT_Ele27_eta2p1_WPTight_Gsf();
+  pico.out_HLT_Photon175()                             = nano.HLT_Photon175();
   return;
 }
 
@@ -191,11 +199,11 @@ int EventTools::GetEventType(){
   if(Contains(name, "Run201")){ sample = 0;
     if(Contains(name, "SingleElectron") || Contains(name, "EGamma")){ category = 0;
     }else if(Contains(name, "SingleMuon")){ category = 1;
-    }else if(Contains(name, "DoubleEG")){ category = 2;
+    }else if(Contains(name, "DoubleEG")){   category = 2;
     }else if(Contains(name, "DoubleMuon")){ category = 3;
-    }else if(Contains(name, "MET")){ category = 4;
-    }else if(Contains(name, "HTMHT")){ category = 5;
-    }else if(Contains(name, "JetHT")){ category = 6;
+    }else if(Contains(name, "MET")){        category = 4;
+    }else if(Contains(name, "HTMHT")){      category = 5;
+    }else if(Contains(name, "JetHT")){      category = 6;
     }
     auto pos = name.find("Run201")+7;
     if(pos < name.size()
@@ -344,23 +352,39 @@ int EventTools::GetEventType(){
   }else if(Contains(name, "WW") && !Contains(name,"TChiHH")){ sample = 14;
     if(Contains(name, "WWToLNuQQ")){ category = 0; bin = 0;
     }else if(Contains(name, "WWTo2L2Nu")){ category = 1; bin = 0;
+    }else if(Contains(name, "WW_Tune"))  { category = 2; bin = 0;
     }
   }else if(Contains(name, "WZ") && !Contains(name,"TChiHH")){ sample = 15;
     if(Contains(name, "WZTo1L3Nu")){ category = 0; bin = 0;
     }else if(Contains(name, "WZTo1L1Nu2Q")){ category = 1; bin = 0;
-    }else if(Contains(name, "WZTo2L2Q")){ category = 2; bin = 0;
-    }else if(Contains(name, "WZTo3LNu")){ category = 3; bin = 0;
+    }else if(Contains(name, "WZTo2L2Q")){    category = 2; bin = 0;
+    }else if(Contains(name, "WZTo3LNu")){    category = 3; bin = 0;
+    }else if(Contains(name, "WZ_Tune")){     category = 4; bin = 0;
     }
   }else if(Contains(name, "ZZ") && !Contains(name,"TChiHH")){ sample = 16;
     if(Contains(name, "ZZ_Tune")){ category = 0; bin = 0;
     }
+  }else if(Contains(name, "ZGTo")) { sample = 17; bin = 0;
+    if(Contains(name,"ZGTo2LG_Tune")) category = 0;
+    else if(Contains(name,"ZGToLLG_01J")) category = 1;
+  }else if(Contains(name, "TGJets")) { sample = 18; bin = 0;
+    if(Contains(name, "TGJets_Tune")) category = 0;
+  }else if(Contains(name, "LLAJJ")) { sample = 19; bin = 0;
+    if(Contains(name,"EWK_MLL-50")) category = 0;
   }else if(Contains(name, "T1tttt")){ sample = 100; category = 0; bin = 0;
-  }else if(Contains(name, "T2tt")){ sample = 101; category = 0; bin = 0;
+  }else if(Contains(name, "T2tt")){   sample = 101; category = 0; bin = 0;
   }else if(Contains(name, "T1bbbb")){ sample = 102; category = 0; bin = 0;
-  }else if(Contains(name, "T2bb")){ sample = 103; category = 0; bin = 0;
+  }else if(Contains(name, "T2bb")){   sample = 103; category = 0; bin = 0;
   }else if(Contains(name, "T1qqqq")){ sample = 104; category = 0; bin = 0;
-  }else if(Contains(name, "RPV")){ sample = 105; category = 0; bin = 0;
+  }else if(Contains(name, "RPV")){    sample = 105; category = 0; bin = 0;
   }else if(Contains(name, "TChiHH")){ sample = 106; category = 0; bin = 0;
+  }else if(Contains(name, "HToZG")) { sample = 200; bin = 0;
+    if(Contains(name,"GluGluH"))      category = 0; 
+    else if(Contains(name,"VBF"))     category = 1; 
+    else if(Contains(name,"WPlusH"))  category = 2; 
+    else if(Contains(name,"WMinusH")) category = 3; 
+    else if(Contains(name,"ZH"))      category = 4; 
+    else if(Contains(name,"ttH"))     category = 5; 
   }
 
   if(sample < 0 || category < 0 || bin < 0
