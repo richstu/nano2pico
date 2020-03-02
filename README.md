@@ -133,7 +133,7 @@ To generate the commands use:
 
 Follow similar process as in Step 1 to submit the commands as batch jobs. 
 
-### Step 2 (Data). Remove duplicate events
+### Step 2/3 (Data). Remove duplicate events
 
 If you are processing data, then you must remove duplicate events. Generate a list of dataset names like the following.
 
@@ -149,10 +149,10 @@ If this file is saved in /txt/datasets/singleleptonmet.txt invoke, one could inv
 ./scripts/send_combine_data_datsets.py --in_dir /net/cms29/cms29r0/pico/NanoAODv5/ttz_cordellbank/2016/data/raw_pico/ \ 
                                        --dataset_list ./txt/datasets/singleleptonmet.txt
 convert_cl_to_jobs_info.py cmds.py stitch_data.json
-auto_submit_jobs.py stitch_data.json
+auto_submit_jobs.py stitch_data.json -c scripts/check_combine_datasets_job.py
 ~~~~
 
-and the output will be saved to the unskimmed folder.
+and the output will be saved to the unskimmed folder. For unknown reasons, combine jobs often fail on the batch system so `check_combine_datasets_job.py` is particularly important.
 
 ### Step 4. Making skims
 
