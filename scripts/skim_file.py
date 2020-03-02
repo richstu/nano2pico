@@ -26,6 +26,8 @@ def get_cuts(skim_name):
   if(skim_name=='zcand'): cuts = '&&'.join(['nlep==2', 'nbm==0', pass_1l_trig30, mllcut])
   if(skim_name=='ttisr'): cuts = '&&'.join(['nlep==2', 'nbm==2', pass_1l_trig30])
   if(skim_name=='wisr'):  cuts = '&&'.join(['met>100', 'nbl==0', pass_1l_trig40])
+  if(skim_name=='2l'): cuts = 'nlep>=2'
+  if(skim_name=='llg'): cuts = '(nmu > 1 || nel > 1) && nphoton > 0'
 
   # Higgsino loose
   nb_or_fjet_cut = '(nbt>=2 || nbdft>=2 || Sum$(fjet_pt>300 && fjet_msoftdrop>50)>0)'
