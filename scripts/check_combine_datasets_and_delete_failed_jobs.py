@@ -2,6 +2,7 @@
 # The ./jobscript_check.py should return 'success' or 'fail' or 'to_submit' or 'submitted' for a job_log_string
 # The input is given as sys.argv[1] = queue_system.compress_string(job_log_string) sys.argv[2] = queue_system.compress_string(job_argument_string)
 import sys
+import os
 import os.path
 import queue_system
 from ROOT import TFile
@@ -70,21 +71,16 @@ for output_filename in output_filenames:
   if os.path.isfile(output_filename):
     #file exists, check that is was closed properly
     output_file = TFile(output_filename)
-    if output_file.TestBit(TFile.kRecovered):
+    if output_file.TestBit(TFile.kRecovered) or output_file.IsZombie():
       #file had to be recovered, job must have crashed
       fail_message = 'File not closed properly.'
       job_failed = True
-      break
-    if output_file.IsZombie():
-      #file is zombie, job crashed
-      fail_message = 'File not closed properly, is now zombie.'
-      job_failed = True
-      break
+      os.remove(output_filename)
   else:
     #file doesn't even exist, job must have crashed
-    fail_message = 'File doesn\'t exist.'
+    if not (job_failed == True):
+      fail_message = 'File doesn\'t exist.'
     job_failed = True
-    break
 
 if job_failed:
   print('[For queue_system] fail: ' + fail_message)
