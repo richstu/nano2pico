@@ -168,6 +168,7 @@ It's recommended to start with a relatively inclusive skim which would then serv
 ./scripts/write_skim_cmds.py --in_dir /net/cms29/cms29r0/pico/NanoAODv5/higgsino_angeles/2016/TChiHH/skim_higloose/ \
                              --skim_name higtight \
                              --tag apples
+auto_submit_jobs.py skim_hightight_cmds_apples.json -c scripts/check_skim.py
 ~~~~
 
 The skim names are defined in [scripts/skim_file.py](scripts/skim_file.py). If defining a new skim, please commit the definition!! This eliminates confusion of what is in various folders on disk later on.
