@@ -27,6 +27,7 @@ def get_cuts(skim_name):
   if(skim_name=='ttisr'): cuts = '&&'.join(['nlep==2', 'nbm==2', pass_1l_trig30])
   if(skim_name=='wisr'):  cuts = '&&'.join(['met>100', 'nbl==0', pass_1l_trig40])
   if(skim_name=='2l'): cuts = 'nlep>=2'
+  if(skim_name=='3l'): cuts = 'nlep==3'
   if(skim_name=='llg'): cuts = '(nmu > 1 || nel > 1) && nphoton > 0'
 
   # Higgsino loose
@@ -114,6 +115,7 @@ if __name__ == '__main__':
 
   chain = ROOT.TChain(treename)
   chain.Add(file_paths_string)
+  nent_total = chain.GetEntries()
   nent_skim = chain.GetEntries(cut_string)
   print('Found {} events satisfying the skim requirements.'.format(nent_skim))
 
@@ -121,7 +123,7 @@ if __name__ == '__main__':
   if (args['mass']!=-1): 
     out_file.SetCompressionSettings(209); # kLZMA algo with level 9 compression
 
-  if nent_skim>0:
+  if nent_total>0:
     chain.Draw(">>elist",cut_string)
     elist = ROOT.gDirectory.Get("elist")
     chain.SetEventList(elist)
