@@ -29,6 +29,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
     pico.out_photon_pflavor().push_back(nano.Photon_genPartFlav()[iph]);
     pico.out_photon_elveto().push_back(nano.Photon_electronVeto()[iph]);
     pico.out_photon_id().push_back(nano.Photon_mvaID_WP90()[iph]);
+    pico.out_photon_idmva().push_back(nano.Photon_mvaID()[iph]);
     bool isSig = nano.Photon_mvaID_WP90()[iph] && 
                  nano.Photon_electronVeto()[iph] && 
                  nano.Photon_pt()[iph] > SignalPhotonPtCut;

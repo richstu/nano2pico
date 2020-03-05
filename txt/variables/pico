@@ -194,6 +194,9 @@ vector<float> photon_phi
 vector<float> photon_reliso
 vector<float> photon_r9
 vector<float> photon_drmin
+vector<float> photon_pterr
+vector<float> photon_hoe
+vector<float> photon_idmva
 vector<int>   photon_pflavor
 vector<bool>  photon_id
 vector<bool>  photon_elveto
