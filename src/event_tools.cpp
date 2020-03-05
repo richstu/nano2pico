@@ -332,7 +332,7 @@ int EventTools::GetEventType(){
       if(Contains(name, "HT600toInf")){ bin = 0;
       }
     }
-  }else if(Contains(name, "ttH")){ sample = 9;
+  }else if(Contains(name, "ttHJet") && !Contains(name,"HToZG")){ sample = 9;
     if(Contains(name, "ttHJetTobb")){ category = 0; bin = 0;
     }
   }else if(Contains(name, "TTGJets")){ sample = 10;
@@ -344,7 +344,7 @@ int EventTools::GetEventType(){
   }else if(Contains(name, "WH_") && !Contains(name,"TChiWH")){ sample = 12;
     if(Contains(name, "WH_HToBB_WToLNu")){ category = 0; bin = 0;
     }
-  }else if(Contains(name, "ZH_")){ sample = 13;
+  }else if(Contains(name, "ZH") && !Contains(name,"HToZG")){ sample = 13;
     if(Contains(name, "ZH_HToBB_ZToNuNu")){ category = 0; bin = 0;
     }
   }else if(Contains(name, "WW") && !Contains(name,"TChiHH")){ sample = 14;
@@ -379,8 +379,8 @@ int EventTools::GetEventType(){
   }else if(Contains(name, "HToZG")) { sample = 200; bin = 0;
     if(Contains(name,"GluGluH"))      category = 0; 
     else if(Contains(name,"VBF"))     category = 1; 
-    else if(Contains(name,"WPlusH"))  category = 2; 
-    else if(Contains(name,"WMinusH")) category = 3; 
+    else if(Contains(name,"WplusH"))  category = 2; 
+    else if(Contains(name,"WminusH")) category = 3; 
     else if(Contains(name,"ZH"))      category = 4; 
     else if(Contains(name,"ttH"))     category = 5; 
   }

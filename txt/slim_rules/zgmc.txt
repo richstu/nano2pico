@@ -3,12 +3,14 @@ drop *
 keep run
 keep event
 keep type
-keep stitch
+keep stitch*
 
 keep jet_*
 drop jet_deep*
-drop jet_met_dphi
+drop jet_m?t_dphi
 drop jet_h?d
+drop *fjet*
+drop *hig*
 keep photon_*
 keep el_*
 keep mu_*
@@ -18,8 +20,11 @@ keep llphoton_*
 
 keep njet
 keep nlep
+keep nll
+keep nllphoton
 keep nmu
 keep nel
+keep nphoton
 
 keep pass*
 
@@ -29,3 +34,6 @@ keep *tru*
 keep weight
 keep w_*
 keep eff_*
+
+keep HLT*
+drop *met*
