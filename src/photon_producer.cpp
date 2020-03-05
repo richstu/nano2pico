@@ -15,25 +15,41 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
                                          vector<int> &sig_el_nano_idx, vector<int> &sig_mu_nano_idx){
   pico.out_nphoton() = 0; 
   vector<int> sig_photon_nano_idx;
+  int nphotons(0);
   for(int iph(0); iph<nano.nPhoton(); ++iph){
     if (nano.Photon_pt()[iph] <= PhotonPtCut) continue;
     if (fabs(nano.Photon_eta()[iph]) > PhotonEtaCut) continue;
     if (!(nano.Photon_isScEtaEB()[iph] || nano.Photon_isScEtaEE()[iph])) continue;
     // if (nano.Photon_pfRelIso03_all()[iph]==PhotonRelIsoCut) continue; // no isolation cut in 2016...?
-
-    pico.out_photon_pt().push_back(nano.Photon_pt()[iph]);
-    pico.out_photon_eta().push_back(nano.Photon_eta()[iph]);
-    pico.out_photon_phi().push_back(nano.Photon_phi()[iph]);
-    pico.out_photon_reliso().push_back(nano.Photon_pfRelIso03_all()[iph]);
-    pico.out_photon_r9().push_back(nano.Photon_r9()[iph]);
-    pico.out_photon_pflavor().push_back(nano.Photon_genPartFlav()[iph]);
-    pico.out_photon_elveto().push_back(nano.Photon_electronVeto()[iph]);
-    pico.out_photon_id().push_back(nano.Photon_mvaID_WP90()[iph]);
-    pico.out_photon_idmva().push_back(nano.Photon_mvaID()[iph]);
     bool isSig = nano.Photon_mvaID_WP90()[iph] && 
                  nano.Photon_electronVeto()[iph] && 
                  nano.Photon_pt()[iph] > SignalPhotonPtCut;
-    pico.out_photon_sig().push_back(isSig);
+    // Sig photon with highest pT gets put at the front
+    if(isSig) {
+      pico.out_photon_pt()     .insert(pico.out_photon_pt()     .begin()+nphotons, nano.Photon_pt()[iph]);
+      pico.out_photon_eta()    .insert(pico.out_photon_eta()    .begin()+nphotons, nano.Photon_eta()[iph]);
+      pico.out_photon_phi()    .insert(pico.out_photon_phi()    .begin()+nphotons, nano.Photon_phi()[iph]);
+      pico.out_photon_reliso() .insert(pico.out_photon_reliso() .begin()+nphotons, nano.Photon_pfRelIso03_all()[iph]);
+      pico.out_photon_r9()     .insert(pico.out_photon_r9()     .begin()+nphotons, nano.Photon_r9()[iph]);
+      pico.out_photon_pflavor().insert(pico.out_photon_pflavor().begin()+nphotons, nano.Photon_genPartFlav()[iph]);
+      pico.out_photon_elveto() .insert(pico.out_photon_elveto() .begin()+nphotons, nano.Photon_electronVeto()[iph]);
+      pico.out_photon_id()     .insert(pico.out_photon_id()     .begin()+nphotons, nano.Photon_mvaID_WP90()[iph]);
+      pico.out_photon_idmva()  .insert(pico.out_photon_idmva()  .begin()+nphotons, nano.Photon_mvaID()[iph]);
+      pico.out_photon_sig()    .insert(pico.out_photon_sig()    .begin()+nphotons, isSig);
+      nphotons++;
+    }
+    else{
+      pico.out_photon_pt()     .push_back(nano.Photon_pt()[iph]);
+      pico.out_photon_eta()    .push_back(nano.Photon_eta()[iph]);
+      pico.out_photon_phi()    .push_back(nano.Photon_phi()[iph]);
+      pico.out_photon_reliso() .push_back(nano.Photon_pfRelIso03_all()[iph]);
+      pico.out_photon_r9()     .push_back(nano.Photon_r9()[iph]);
+      pico.out_photon_pflavor().push_back(nano.Photon_genPartFlav()[iph]);
+      pico.out_photon_elveto() .push_back(nano.Photon_electronVeto()[iph]);
+      pico.out_photon_id()     .push_back(nano.Photon_mvaID_WP90()[iph]);
+      pico.out_photon_idmva()  .push_back(nano.Photon_mvaID()[iph]);
+      pico.out_photon_sig()    .push_back(isSig);
+    }
     // Find min(dR) between photon and signal lepton
     double minLepDR(999.);
     for(size_t iel(0); iel<sig_el_nano_idx.size(); iel++) {
