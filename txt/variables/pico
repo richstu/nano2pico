@@ -79,6 +79,7 @@ vector<float> jet_deepcsv
 vector<float> jet_deepflav
 vector<float> jet_qgl
 vector<bool>  jet_islep
+vector<bool>  jet_isvlep
 vector<bool>  jet_isphoton
 vector<bool>  jet_isgood
 vector<bool>  jet_id
@@ -158,6 +159,7 @@ int nel
 int nvel
 vector<float> el_pt
 vector<float> el_eta
+vector<float> el_etasc
 vector<float> el_phi
 vector<float> el_miniso
 vector<float> el_reliso

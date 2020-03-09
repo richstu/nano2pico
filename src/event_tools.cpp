@@ -119,13 +119,11 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
   pico.out_pass_ecaldeadcell() = nano.Flag_EcalDeadCellTriggerPrimitiveFilter();
   if (year==2016) {
     pico.out_pass_badcalib() = true;
-    pico.out_pass_badpfmu() = nano.Flag_BadPFMuonSummer16Filter();
-    pico.out_pass_badchhad() = nano.Flag_BadChargedCandidateSummer16Filter();
   } else {
     pico.out_pass_badcalib() = nano.Flag_ecalBadCalibFilterV2();
-    pico.out_pass_badpfmu() = nano.Flag_BadPFMuonFilter();
-    pico.out_pass_badchhad() = nano.Flag_BadChargedCandidateFilter();
   }
+  pico.out_pass_badchhad() = nano.Flag_BadChargedCandidateFilter();
+  pico.out_pass_badpfmu() = nano.Flag_BadPFMuonFilter();
   pico.out_pass_mubadtrk() = nano.Flag_muonBadTrackFilter();
 
   // Combined pass variable, as recommended here:

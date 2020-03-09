@@ -183,11 +183,12 @@ int main(int argc, char *argv[]){
     //-----------------------------------------------------------------------------------------------
     if (debug) cout<<"INFO:: Writing leptons, photons and tracks"<<endl;
     vector<int> jet_islep_nano_idx = vector<int>();
+    vector<int> jet_isvlep_nano_idx = vector<int>();
     pico.out_nlep() = 0; pico.out_nvlep() = 0; // filled by lepton producers
     vector<int> sig_el_pico_idx = vector<int>();
     vector<int> sig_mu_pico_idx = vector<int>();
-    vector<int> sig_el_nano_idx = el_producer.WriteElectrons(nano, pico, jet_islep_nano_idx, sig_el_pico_idx, isZgamma);
-    vector<int> sig_mu_nano_idx = mu_producer.WriteMuons(nano, pico, jet_islep_nano_idx, sig_mu_pico_idx, isZgamma);
+    vector<int> sig_el_nano_idx = el_producer.WriteElectrons(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, sig_el_pico_idx, isZgamma);
+    vector<int> sig_mu_nano_idx = mu_producer.WriteMuons(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, sig_mu_pico_idx, isZgamma);
 
     // save a separate vector with just signal leptons ordered by pt
     struct SignalLepton{ float pt; float eta; float phi; int pdgid;};
@@ -225,7 +226,7 @@ int main(int argc, char *argv[]){
     isr_tools.WriteISRSystemPt(nano, pico);
 
     if (debug) cout<<"INFO:: Writing jets, MET and ISR vars"<<endl;
-    vector<int> sig_jet_nano_idx = jet_producer.WriteJets(nano, pico, jet_islep_nano_idx, jet_isphoton_nano_idx,
+    vector<int> sig_jet_nano_idx = jet_producer.WriteJets(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, jet_isphoton_nano_idx,
                                                           btag_wpts[year], btag_df_wpts[year]);
     jet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year][1]); // usually w.r.t. medium WP
     if(!isZgamma){
