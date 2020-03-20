@@ -65,7 +65,7 @@ if __name__ == '__main__':
   print('cat '+cmdfile_name+' | tail -n 1\n')
 
   print('To generate job json and submit jobs:')
-  print('auto_submit_jobs.py '+json_name)
+  print('auto_submit_jobs.py '+json_name+' -c scripts/check_skim.py')
 
 
 
