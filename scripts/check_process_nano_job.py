@@ -24,7 +24,9 @@ outfile = TChain("tree");
 outfile.Add(outfile_path);
 out_nent = outfile.GetEntries()
 
-if in_nent == out_nent:
+if outfile.GetNbranches() == 0:
+  print('[For queue_system] fail: output ({}) has no branches.'.format(outfile_path))
+elif in_nent == out_nent:
   print('[For queue_system] success')
 else:
   print('[For queue_system] fail: Input ({}) has {} entries, while output ({}) has {} entries.'.format(infile_path, in_nent, outfile_path, out_nent))
