@@ -60,14 +60,16 @@ bool IsoTrackProducer::IsGoodTk(pico_tree &pico, int pdgid, float pt, float eta,
   
   pdgid = abs(pdgid);
 
-  if (pdgid!=11 && pdgid!=13 && pdgid!=15 && pdgid!=211) return false; // allow also taus compared to babymaker
+  if (pdgid!=11 && pdgid!=13 && pdgid!=211) return false; 
   
   if (pdgid==11 || pdgid==13) {
     if (pt < 5) return false;
-    if ((pt < 25 && reliso_chg*pt > 5) || reliso_chg > 0.2) return false; //combination of our old cuts & Nano baseline
+    if (pt < 25 && !(reliso_chg*pt < 5 || reliso_chg < 0.2)) return false; //combination of our old cuts & Nano baseline
+    if (!(reliso_chg < 0.2)) return false; //combination of our old cuts & Nano baseline
   } else {
     if (pt < 10) return false;
-    if ((pt < 25 && reliso_chg*pt > 5) || reliso_chg > 0.1) return false; //combination of our old cuts & Nano baseline
+    if (pt < 25 && !(reliso_chg*pt < 5 || reliso_chg < 0.1)) return false; //combination of our old cuts & Nano baseline
+    if (!(reliso_chg < 0.1)) return false; //combination of our old cuts & Nano baseline
   }
 
   if (fabs(eta) > 2.5) return false; // not applied to all tracks in Nano

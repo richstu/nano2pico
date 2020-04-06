@@ -14,7 +14,7 @@ ElectronProducer::ElectronProducer(int year_, bool isData_){
 ElectronProducer::~ElectronProducer(){
 }
 
-vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, vector<int> &jet_islep_nano_idx, vector<int> &sig_el_pico_idx, bool isZgamma, bool isTTZ){
+vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, vector<int> &jet_islep_nano_idx, vector<int> &jet_isvlep_nano_idx, vector<int> &sig_el_pico_idx, bool isZgamma, bool isTTZ){
   vector<int> sig_el_nano_idx;
   pico.out_nel() = 0; pico.out_nvel() = 0;
   pico.out_nel_loose() = 0;
@@ -78,6 +78,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
     }
     pico.out_el_pt().push_back(pt);
     pico.out_el_eta().push_back(nano.Electron_eta()[iel]);
+    pico.out_el_etasc().push_back(etasc);
     pico.out_el_phi().push_back(nano.Electron_phi()[iel]);
     pico.out_el_miniso().push_back(nano.Electron_miniPFRelIso_all()[iel]);
     pico.out_el_reliso().push_back(nano.Electron_pfRelIso03_all()[iel]);
@@ -93,9 +94,16 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
       pico.out_el_pflavor().push_back(nano.Electron_genPartFlav()[iel]);
     }
     
+    // veto electron selection
     if (nano.Electron_miniPFRelIso_all()[iel] < ElectronMiniIsoCut) {
       pico.out_nvel()++;
       pico.out_nvlep()++;
+      // save indices of matching jets
+      for (int ijet(0); ijet<nano.nJet(); ijet++) {
+        if (dR(nano.Electron_eta()[iel], nano.Jet_eta()[ijet], nano.Electron_phi()[iel], nano.Jet_phi()[ijet])<0.4 &&
+            fabs(nano.Jet_pt()[ijet] - nano.Electron_pt()[iel])/nano.Electron_pt()[iel] < 1)
+          jet_isvlep_nano_idx.push_back(ijet);
+      }
     }
     // cout<<"Adding to"<<(isSignal ? "signal":"veto")<<" leptons"<<iel<<": pt = "<<setw(10)<<nano.Electron_pt()[iel]
     //                                 <<" eta = "<<setw(10)<<nano.Electron_eta()[iel]
@@ -107,13 +115,10 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
       sig_el_nano_idx.push_back(iel);
       sig_el_pico_idx.push_back(pico_idx);
       // save indices of matching jets
-      if (nano.Electron_isPFcand()[iel] && nano.Electron_jetIdx()[iel]>=0) {
-        jet_islep_nano_idx.push_back(nano.Electron_jetIdx()[iel]);
-      } else {
-        for (int ijet(0); ijet<nano.nJet(); ijet++) {
-          if (dR(nano.Electron_eta()[iel], nano.Jet_eta()[ijet], nano.Electron_phi()[iel], nano.Jet_phi()[ijet])<0.4)
-            jet_islep_nano_idx.push_back(ijet);
-        }
+      for (int ijet(0); ijet<nano.nJet(); ijet++) {
+        if (dR(nano.Electron_eta()[iel], nano.Jet_eta()[ijet], nano.Electron_phi()[iel], nano.Jet_phi()[ijet])<0.4 &&
+            fabs(nano.Jet_pt()[ijet] - nano.Electron_pt()[iel])/nano.Electron_pt()[iel] < 1)
+          jet_islep_nano_idx.push_back(ijet);
       }
     }
     pico_idx++;

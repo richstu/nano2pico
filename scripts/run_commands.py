@@ -13,6 +13,13 @@ def runCommand(command):
   #return subprocess.check_output(command[1], shell=True, stderr=subprocess.STDOUT)
   process = subprocess.Popen(command[1], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
   out, err = process.communicate()
+  print('--------')
+  print('['+str(command[0])+'] '+command[1])
+  print('Output')
+  print(out.rstrip())
+  print('Error')
+  print(err.rstrip())
+  print('--------')
   return out+'\n'+err
 
 

@@ -146,7 +146,7 @@ namespace xsec{
         if(file.Contains("TTTo2L2Nu"))     xsec =   87.31;
         if(file.Contains("TGJets"))        xsec =    2.967;
         if(file.Contains("LLAJJ"))         xsec =    0.1084; // from XSDB
-        if(file.Contains("WZ_Tune"))       xsec =   47.13; //has to be before WWZ for string matching
+        if(file.Contains("WZ_Tune"))       xsec =   47.13; //must come before WWZ for string matching
         if(file.Contains("WW_Tune"))       xsec =  116.7; // From arXiv:1408.5243
         if(file.Contains("WWW"))           xsec =    0.2086;
         if(file.Contains("WWZ"))           xsec =    0.1651;
