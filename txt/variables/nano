@@ -575,6 +575,10 @@ bool HLT_Mu50
 bool HLT_Ele27_WPTight_Gsf
 bool HLT_Ele35_WPTight_Gsf
 bool HLT_Ele115_CaloIdVT_GsfTrkIdT
+bool HLT_Mu8
+bool HLT_Mu17
+bool HLT_Ele8_CaloIdM_TrackIdM_PFJet30
+bool HLT_Ele17_CaloIdM_TrackIdM_PFJet30
 
 # Lepton HT cross-triggers
 bool HLT_Mu15_IsoVVVL_PFHT450

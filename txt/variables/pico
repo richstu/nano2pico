@@ -63,8 +63,10 @@ vector<int>   llphoton_ill
 float mj14
 float min_dilep_dr
 int z_idx
+int l3_idx
 float lll_m
 float l3_mt
+float z_m
 
 ###################   Jets   ##################
 int njet
@@ -139,6 +141,7 @@ float jetsys_nob_m
 
 ##################   Leptons   ################
 int nlep
+int nlep_loose
 int nvlep
 vector<float> lep_pt
 vector<float> lep_eta
@@ -146,6 +149,7 @@ vector<float> lep_phi
 vector<int> lep_pdgid
 
 int nmu
+int nmu_loose
 int nvmu
 vector<float> mu_pt
 vector<float> mu_eta
@@ -157,11 +161,13 @@ vector<float> mu_dxy
 vector<float> mu_ip3d
 vector<float> mu_sip3d
 vector<bool>  mu_id
+vector<bool>  mu_sig_loose
 vector<bool>  mu_sig
 vector<int>   mu_charge
 vector<int>   mu_pflavor
 
 int nel
+int nel_loose
 int nvel
 vector<float> el_pt
 vector<float> el_eta
@@ -174,6 +180,7 @@ vector<float> el_ip3d
 vector<float> el_sip3d
 vector<float> el_idmva
 vector<bool>  el_id
+vector<bool>  el_sig_loose
 vector<bool>  el_sig
 vector<bool>  el_ispf
 vector<int>   el_charge
@@ -285,6 +292,10 @@ bool HLT_Mu50
 bool HLT_Ele27_WPTight_Gsf
 bool HLT_Ele35_WPTight_Gsf
 bool HLT_Ele115_CaloIdVT_GsfTrkIdT
+bool HLT_Mu8
+bool HLT_Mu17
+bool HLT_Ele8_CaloIdM_TrackIdM_PFJet30
+bool HLT_Ele17_CaloIdM_TrackIdM_PFJet30
 
 # MET triggers
 bool HLT_PFMET110_PFMHT110_IDTight

@@ -1,1 +1,14 @@
 DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX*.root
+TTGJets_TuneCUETP8M1_13TeV-amcatnloFXFX*.root
+TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM*.root
+TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM*.root
+TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM*.root
+TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX*.root
+TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo*.root
+WWZ_TuneCUETP8M1_13TeV-amcatnlo*.root
+WZTo3LNu_TuneCUETP8M1_13TeV-powheg*.root
+WZZ_TuneCUETP8M1_13TeV-amcatnlo*.root
+ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX*.root
+ZZTo4L_13TeV_powheg*.root
+ZZZ_TuneCUETP8M1_13TeV-amcatnlo*.root
+tZq_ll_4f_13TeV-amcatnlo*.root

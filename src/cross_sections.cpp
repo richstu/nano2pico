@@ -146,6 +146,8 @@ namespace xsec{
         if(file.Contains("TTTo2L2Nu"))     xsec =   87.31;
         if(file.Contains("TGJets"))        xsec =    2.967;
         if(file.Contains("LLAJJ"))         xsec =    0.1084; // from XSDB
+        if(file.Contains("WZ_Tune"))       xsec =   47.13; //has to be before WWZ for string matching
+        if(file.Contains("WW_Tune"))       xsec =  116.7; // From arXiv:1408.5243
         if(file.Contains("WWW"))           xsec =    0.2086;
         if(file.Contains("WWZ"))           xsec =    0.1651;
         if(file.Contains("WZZ"))           xsec =    0.05565;
@@ -153,8 +155,6 @@ namespace xsec{
         if(file.Contains("WGGJets"))       xsec =    1.715;
         if(file.Contains("WWG"))           xsec =    0.2147; 
         if(file.Contains("ZGGJetsToLLGG")) xsec =    0.1699;
-        if(file.Contains("WZ_Tune"))       xsec =   47.13;
-        if(file.Contains("WW_Tune"))       xsec =  116.7; // From arXiv:1408.5243
         // Zgamma signal
         if(file.Contains("GluGluHToZG"))   xsec = HToZG*ZToLL*48.58  ;// OG: 44.08;   J+M:48.58
         if(file.Contains("VBFHToZG"))      xsec = HToZG*ZToLL* 3.782 ;// OG:  3.779;  J+M: 3.782

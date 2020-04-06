@@ -17,6 +17,7 @@ ElectronProducer::~ElectronProducer(){
 vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, vector<int> &jet_islep_nano_idx, vector<int> &sig_el_pico_idx, bool isZgamma, bool isTTZ){
   vector<int> sig_el_nano_idx;
   pico.out_nel() = 0; pico.out_nvel() = 0;
+  pico.out_nel_loose() = 0;
   int pico_idx = 0;
   for(int iel(0); iel<nano.nElectron(); ++iel){
     float pt = nano.Electron_pt()[iel];///nano.Electron_eCorr()[iel]; 
@@ -48,8 +49,18 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
       if (nano.Electron_pfRelIso03_all()[iel] > 1.0) continue;
       int bitmap = nano.Electron_vidNestedWPBitmap()[iel];
       if (!idElectron_noIso(bitmap, 1)) continue;
-      if (idElectron_noIso(bitmap, 3) && nano.Electron_pfRelIso03_all()[iel] < 0.1) 
+      id = idElectron_noIso(bitmap, 3);
+      if (id && nano.Electron_pfRelIso03_all()[iel] < 0.1) 
 	      isSignal = true;
+      if (id && nano.Electron_pfRelIso03_all()[iel] < 1.0) {
+        pico.out_el_sig_loose().push_back(true);
+	pico.out_nel_loose()++;
+	pico.out_nlep_loose()++;
+      }
+      else {
+        pico.out_el_sig_loose().push_back(false);
+      }
+      pico.out_el_idmva().push_back(nano.Electron_mvaFall17V2noIso()[iel]);
     }
     else {
       if (pt <= VetoElectronPtCut) continue;

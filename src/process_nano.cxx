@@ -187,6 +187,7 @@ int main(int argc, char *argv[]){
     if (debug) cout<<"INFO:: Writing leptons, photons and tracks"<<endl;
     vector<int> jet_islep_nano_idx = vector<int>();
     pico.out_nlep() = 0; pico.out_nvlep() = 0; // filled by lepton producers
+    pico.out_nlep_loose() = 0;
     vector<int> sig_el_pico_idx = vector<int>();
     vector<int> sig_mu_pico_idx = vector<int>();
     vector<int> sig_el_nano_idx = el_producer.WriteElectrons(nano, pico, jet_islep_nano_idx, sig_el_pico_idx, isZgamma, isTTZ);
@@ -259,15 +260,23 @@ int main(int argc, char *argv[]){
 			    nano.Muon_pt()[sig_mu_nano_idx[0]], nano.Muon_phi()[sig_mu_nano_idx[0]]);
 		    }
 	    }
-	    else if ((pico.out_mu_pt().size() + pico.out_el_pt().size()) == 1) {
-		    //use non-signal lepton
-		    if (pico.out_mu_pt().size() == 0) {
-			    pico.out_mt() = GetMT(nano.MET_pt(), nano.MET_phi(), 
-			    pico.out_el_pt()[0], pico.out_el_eta()[0]);
+	    else if (pico.out_nlep_loose() == 1) {
+		    //use loose lepton
+		    if (pico.out_nel_loose() == 1) {
+			    for (unsigned int el_idx = 0; el_idx < pico.out_el_pt().size(); el_idx++) {
+				    if (pico.out_el_sig_loose()[el_idx]) {
+					    pico.out_mt() = GetMT(nano.MET_pt(), nano.MET_phi(), 
+					    pico.out_el_pt()[el_idx], pico.out_el_eta()[el_idx]);
+				    }
+			    }
 		    }
 		    else {
-			    pico.out_mt() = GetMT(nano.MET_pt(), nano.MET_phi(), 
-			    pico.out_mu_pt()[0], pico.out_mu_eta()[0]);
+			    for (unsigned int mu_idx = 0; mu_idx < pico.out_mu_pt().size(); mu_idx++) {
+				    if (pico.out_mu_sig_loose()[mu_idx]) {
+					    pico.out_mt() = GetMT(nano.MET_pt(), nano.MET_phi(), 
+					    pico.out_mu_pt()[mu_idx], pico.out_mu_eta()[mu_idx]);
+				    }
+			    }
 		    }
 	    }
     }

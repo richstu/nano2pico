@@ -15,6 +15,7 @@ MuonProducer::~MuonProducer(){
 vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<int> &jet_islep_nano_idx, vector<int> &sig_mu_pico_idx, bool isZgamma, bool isTTZ){
   vector<int> sig_mu_nano_idx;
   pico.out_nmu() = 0; pico.out_nvmu() = 0;
+  pico.out_nmu_loose() = 0;
   int pico_idx = 0;
   for(int imu(0); imu<nano.nMuon(); ++imu){
     float pt = nano.Muon_pt()[imu];
@@ -29,6 +30,7 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
            nano.Muon_pfRelIso03_all()[imu] < MuonRelIsoCut &&
            nano.Muon_sip3d()[imu] < 4)
         isSignal = true;
+      pico.out_mu_id().push_back(nano.Muon_looseId()[imu]);
     }
     else if (isTTZ) {
       if (pt <= VetoMuonPtCut) continue;
@@ -36,10 +38,19 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
       if (fabs(nano.Muon_dz()[imu])>0.1)  continue;
       if (fabs(nano.Muon_dxy()[imu])>0.05) continue; 
       if (nano.Muon_sip3d()[imu]>4) continue;
-      if (nano.Muon_pfRelIso03_all()[imu] > 1.0) continue;
+      if (nano.Muon_pfRelIso03_all()[imu] > 0.7) continue;
       if (!nano.Muon_mediumId()[imu]) continue;
       if (nano.Muon_pfRelIso03_all()[imu] < 0.2)
 	      isSignal = true;
+      if (nano.Muon_pfRelIso03_all()[imu] < 0.7) {
+	      pico.out_mu_sig_loose().push_back(true);
+	      pico.out_nmu_loose()++;
+	      pico.out_nlep_loose()++;
+      }
+      else {
+	      pico.out_mu_sig_loose().push_back(false);
+      }
+      pico.out_mu_id().push_back(nano.Muon_mediumId()[imu]);
     }
     else {
       if (!nano.Muon_mediumId()[imu]) continue;
@@ -48,6 +59,7 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
       if (pt > SignalMuonPtCut &&
         nano.Muon_miniPFRelIso_all()[imu] < MuonMiniIsoCut)
         isSignal = true;
+      pico.out_mu_id().push_back(nano.Muon_looseId()[imu]);
     }
     pico.out_mu_pt().push_back(pt);
     pico.out_mu_eta().push_back(eta);
@@ -57,7 +69,6 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
     pico.out_mu_dz().push_back(nano.Muon_dz()[imu]);
     pico.out_mu_dxy().push_back(nano.Muon_dxy()[imu]);
     pico.out_mu_ip3d().push_back(nano.Muon_ip3d()[imu]);
-    pico.out_mu_id().push_back(nano.Muon_looseId()[imu]);
     pico.out_mu_sig().push_back(isSignal);
     pico.out_mu_charge().push_back(nano.Muon_charge()[imu]);
     pico.out_mu_sip3d().push_back(nano.Muon_sip3d()[imu]);

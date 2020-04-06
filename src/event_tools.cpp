@@ -169,6 +169,10 @@ void EventTools::CopyTriggerDecisions(nano_tree& nano, pico_tree& pico){
   pico.out_HLT_Ele27_WPTight_Gsf() = nano.HLT_Ele27_WPTight_Gsf();
   pico.out_HLT_Ele35_WPTight_Gsf() = nano.HLT_Ele35_WPTight_Gsf();
   pico.out_HLT_Ele115_CaloIdVT_GsfTrkIdT() = nano.HLT_Ele115_CaloIdVT_GsfTrkIdT();
+  pico.out_HLT_Mu8() = nano.HLT_Mu8();
+  pico.out_HLT_Mu17() = nano.HLT_Mu17();
+  pico.out_HLT_Ele8_CaloIdM_TrackIdM_PFJet30() = nano.HLT_Ele8_CaloIdM_TrackIdM_PFJet30();
+  pico.out_HLT_Ele17_CaloIdM_TrackIdM_PFJet30() = nano.HLT_Ele17_CaloIdM_TrackIdM_PFJet30();
 
   // MET triggers
   pico.out_HLT_PFMET110_PFMHT110_IDTight() = nano.HLT_PFMET110_PFMHT110_IDTight();

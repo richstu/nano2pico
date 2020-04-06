@@ -59,6 +59,7 @@ void TTZVarProducer::WriteTTZVars(pico_tree &pico){
 		}
 	}
 	pico.out_z_idx() = zcandidate_idx;
+	pico.out_z_m() = z_m;
 
 	//calculate lll_m
 	if (pico.out_nlep() == 3) {
@@ -84,6 +85,7 @@ void TTZVarProducer::WriteTTZVars(pico_tree &pico){
 
 	//calculate l3_mt
 	float l3_mt = -999;
+	int l3_idx = -1;
 	if (!(zcandidate_idx == -1)) {
 		//loop over leptons, return M_T for signal lepton that is not z-candidate
 		for (unsigned int el_idx = 0; el_idx < pico.out_el_pt().size(); el_idx++) {
@@ -93,6 +95,7 @@ void TTZVarProducer::WriteTTZVars(pico_tree &pico){
 				}
 				//this is the lepton of interest
 				l3_mt = TMath::Sqrt(2.0*pico.out_el_pt()[el_idx]*pico.out_met()*(1.0-TMath::Cos(get_deltaphi(pico.out_el_phi()[el_idx],pico.out_met_phi()))));
+				l3_idx = el_idx;
 			}
 		}
 		for (unsigned int mu_idx = 0; mu_idx < pico.out_mu_pt().size(); mu_idx++) {
@@ -102,10 +105,12 @@ void TTZVarProducer::WriteTTZVars(pico_tree &pico){
 				}
 				//this is the lepton of interest
 				l3_mt = TMath::Sqrt(2.0*pico.out_mu_pt()[mu_idx]*pico.out_met()*(1.0-TMath::Cos(get_deltaphi(pico.out_mu_phi()[mu_idx],pico.out_met_phi()))));
+				l3_idx = mu_idx;
 			}
 		}
 	}
 	pico.out_l3_mt() = l3_mt;
+	pico.out_l3_idx() = l3_idx;
 
 
   return;
