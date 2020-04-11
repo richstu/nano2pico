@@ -69,7 +69,7 @@ bool IsoTrackProducer::IsGoodTk(pico_tree &pico, int pdgid, float pt, float eta,
   } else {
     if (pt < 10) return false;
     if (pt < 25 && !(reliso_chg*pt < 5 || reliso_chg < 0.1)) return false; //combination of our old cuts & Nano baseline
-    if (!(reliso_chg < 0.1)) return false; //combination of our old cuts & Nano baseline
+    if (pt>= 25 && !(reliso_chg < 0.1)) return false; //combination of our old cuts & Nano baseline
   }
 
   if (fabs(eta) > 2.5) return false; // not applied to all tracks in Nano
