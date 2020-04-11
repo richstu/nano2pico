@@ -299,7 +299,9 @@ void WriteNanoSource(const vector<Variable> &vars){
       file << "  " << var->name_ << "_(0),\n";
     } else if(Contains(var->type_, "tring")){
       file << "  " << var->name_ << "_(\"\"),\n";
-    }else{
+    } else if(Contains(var->type_, "bool")){
+      file << "  " << var->name_ << "_(false),\n";
+    } else{
       file << "  " << var->name_ << "_(static_cast<" << var->type_ << ">(bad_val_)),\n";
     }
     if(Contains(var->type_, "vector")){
@@ -508,6 +510,8 @@ void WriteSource(const vector<Variable> &vars, const string name){
       file << "  " << var->name_ << "_(0),\n";
     }else if(Contains(var->type_, "tring")){
       file << "  " << var->name_ << "_(\"\"),\n";
+    }else if(Contains(var->type_, "bool")){
+      file << "  " << var->name_ << "_(false),\n";
     }else{
       file << "  " << var->name_ << "_(static_cast<" << var->type_ << ">(bad_val_)),\n";
     }
@@ -523,6 +527,8 @@ void WriteSource(const vector<Variable> &vars, const string name){
       file << "  out_" << var->name_ << "_(0),\n";
     }else if(Contains(var->type_, "tring")){
       file << "  out_" << var->name_ << "_(\"\"),\n";
+    }else if(Contains(var->type_, "bool")){
+      file << "  out_" << var->name_ << "_(false),\n";
     }else{
       file << "  out_" << var->name_ << "_(static_cast<" << var->type_ << ">(bad_val_)),\n";
     }
@@ -588,6 +594,8 @@ void WriteSource(const vector<Variable> &vars, const string name){
       file << "    " << var->name_ << "_.clear();\n";
     }else if(Contains(var->type_, "tring")){
       file << "    " << var->name_ << "_ = \"\";\n";
+    }else if(Contains(var->type_, "bool")){
+      file << "    " << var->name_ << "_ = false;\n";
     }else{
       file << "    " << var->name_ << "_ = static_cast<" << var->type_ << ">(bad_val_);\n";
     }
@@ -601,6 +609,8 @@ void WriteSource(const vector<Variable> &vars, const string name){
       file << "    out_" << var->name_ << "_.clear();\n";
     }else if(Contains(var->type_, "tring")){
       file << "    out_" << var->name_ << "_ = \"\";\n";
+    }else if(Contains(var->type_, "bool")){
+      file << "    out_" << var->name_ << "_ = false;\n";
     }else{ 
       file << "    out_" << var->name_ << "_ = static_cast<" << var->type_ << ">(bad_val_);\n";
     }

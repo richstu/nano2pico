@@ -23,6 +23,7 @@ namespace {
   bool debug = false;
 }
 
+int comboEncoder(pair<int, int> h1_jets, pair<int, int> h2_jets);
 void GetOptions(int argc, char *argv[]);
 
 int main(int argc, char *argv[]){
@@ -62,6 +63,8 @@ int main(int argc, char *argv[]){
       cout<<"Processing event: "<<entry<<endl;
     }
 
+    if (pico.njet()<4) continue;
+
     if (debug) cout<<"INFO:: Filling event number."<<endl;
     higfeats.out_event() = pico.event();
     higfeats.out_nbt() = pico.nbt();
@@ -73,7 +76,7 @@ int main(int argc, char *argv[]){
       higfeats.out_hig_cand_am() = pico.hig_cand_am()[0];
 
     //--------------------------------------------------------------
-    //         Save AK4 jets ordered by deepCSV value    
+    //     Save AK4 jets ordered by deepCSV value    
     //--------------------------------------------------------------
     if (debug) cout<<"INFO:: Filling Ak4 jet higfeats."<<endl;
     vector<pair<unsigned, float>>  ordered_idx;
@@ -119,7 +122,7 @@ int main(int argc, char *argv[]){
     } // end jet loop
 
     //--------------------------------------------------------------
-    //         Save AK8 jets ordered by deepDoubleB value    
+    //    Save AK8 jets ordered by deepDoubleB value    
     //--------------------------------------------------------------
     if (debug) cout<<"INFO:: Filling Ak8 jet higfeats."<<endl;
     vector<pair<unsigned, float>>  ordered_fjet_idx;
@@ -146,8 +149,9 @@ int main(int argc, char *argv[]){
       higfeats.out_fjet_brank_ddb().push_back(pico.fjet_deep_md_hbb_btv()[ifjet]);
     }
 
+    //--------------------------------------------------------------
     //     Other branches of interest
-    //------------------------------
+    //--------------------------------------------------------------
     higfeats.out_mprod() = pico.mprod();
     higfeats.out_mlsp() = pico.mlsp();
 
@@ -156,13 +160,66 @@ int main(int argc, char *argv[]){
       if (pico.mc_id()[imc]==25) {
         // this will get triggered multiple times but that's ok, should be all the same
         higfeats.out_mhiggs() = pico.mc_mass()[imc];
-      } else if (abs(pico.mc_id()[imc])==5 && 
-                  pico.mc_id()[pico.mc_momidx()[imc]]==25 &&
-                  fabs(pico.mc_eta()[imc]) <= 2.4 && 
-                  pico.mc_pt()[imc] > 30) {
+      } else if (abs(pico.mc_id()[imc])==5 && pico.mc_mom()[imc]==25 &&
+                  fabs(pico.mc_eta()[imc]) <= 2.4 && pico.mc_pt()[imc] > 30) {
         higfeats.out_nbacc()++;
       }
     }
+
+    //--------------------------------------------------------------
+    //     Match Higgs decay products to jets
+    //--------------------------------------------------------------
+    pair<int, int> h1_jets(make_pair(-1,-1)), h2_jets(make_pair(-1,-1));
+    int h1_idx(-1), h2_idx(-1);
+    set<int> selected_jets; 
+
+    //printing jets
+    // for (unsigned idx(0); idx<max_idx; idx++) {
+    //   unsigned ijet = ordered_idx[idx].first;
+    //   cout<<"Jet "<<ijet<<" ("<<pico.jet_pt()[ijet]<<","<<pico.jet_eta()[ijet]
+    //                      <<","<<pico.jet_phi()[ijet]<<","<<pico.jet_m()[ijet]<<")"<<endl;
+    // }
+
+    for (unsigned imc(0); imc<pico.mc_pt().size(); imc++) {
+      if (abs(pico.mc_id()[imc])==5 && pico.mc_mom()[imc]==25) {
+        // cout<<"b "<<imc<<" ("<<pico.mc_pt()[imc]<<","<<pico.mc_eta()[imc]
+        //                <<","<<pico.mc_phi()[imc]<<","<<pico.mc_mass()[imc]<<")"<<endl;
+        // cout<<"found b (idx "<<imc<<","<<pico.mc_status()[imc]<<") with mom idx "<<pico.mc_momidx()[imc];
+        float dr_min(9999);
+        unsigned closest_jet(-1);
+        // loop through original jets, since the output phi is transformed
+        for (unsigned idx(0); idx<max_idx; idx++) {
+          unsigned ijet = ordered_idx[idx].first;
+          if (selected_jets.find(idx) != selected_jets.end()) continue;
+          float dr_ = dR(pico.mc_eta()[imc], pico.jet_eta()[ijet], 
+                         pico.mc_phi()[imc], pico.jet_phi()[ijet]);
+          if (dr_ < dr_min) {
+            dr_min = dr_;
+            closest_jet = idx;
+          }
+        }
+        if (dr_min<0.4) {
+          // cout<<" matching with jet "<<closest_jet<<endl;
+          selected_jets.insert(closest_jet);
+          if (h1_idx==-1 || h1_idx==pico.mc_momidx()[imc]) {
+            h1_idx = pico.mc_momidx()[imc];
+            if (h1_jets.first==-1) h1_jets.first = closest_jet;
+            else if (h1_jets.second==-1) h1_jets.second = closest_jet;
+            else cout<<"ERROR: Found more than two decay products for the Higgs"<<endl;
+          } else if (h2_idx==-1 || h2_idx==pico.mc_momidx()[imc]) {
+            h2_idx = pico.mc_momidx()[imc];
+            if (h2_jets.first==-1) h2_jets.first = closest_jet;
+            else if (h2_jets.second==-1) h2_jets.second = closest_jet;
+            else cout<<"ERROR: Found more than two decay products for the Higgs"<<endl;
+          } else {
+            cout<<"ERROR: Found more than two Higgs particles"<<endl;
+          }
+        } 
+      }
+    }
+     
+    higfeats.out_combo_code() = (selected_jets.size()==4) ? comboEncoder(h1_jets, h2_jets) : -1;
+    // cout<<"INFO: Combination code is: "<<higfeats.out_combo_code()<<endl;
 
     if (debug) cout<<"INFO:: Filling tree"<<endl;
     higfeats.Fill();
@@ -173,6 +230,44 @@ int main(int argc, char *argv[]){
   cout<<endl;
   time(&endtime); 
   cout<<"Time passed: "<<hoursMinSec(difftime(endtime, begtime))<<endl<<endl;  
+}
+
+int comboEncoder(pair<int, int> h1_jets, pair<int, int> h2_jets) {
+  // order pairs to enable encoding
+  array<int,4> a;
+  if (h1_jets.first > h1_jets.second) h1_jets = std::make_pair(h1_jets.second, h1_jets.first);
+  if (h2_jets.first > h2_jets.second) h2_jets = std::make_pair(h2_jets.second, h2_jets.first);
+  if (h2_jets.first > h1_jets.first) {
+    a = {h1_jets.first, h1_jets.second, h2_jets.first, h2_jets.second};
+  } else {
+    a = {h2_jets.first, h2_jets.second, h1_jets.first, h1_jets.second};
+  } 
+
+  // 5 combinations of 4 jets - each has 3 possible pairings
+  // combo 0,1,2,3
+  if      (a[0]==0 && a[1]==1 && a[2]==2 && a[3]==3) return 0; //pair option 0
+  else if (a[0]==0 && a[1]==2 && a[2]==1 && a[3]==3) return 1; //pair option 1
+  else if (a[0]==0 && a[1]==3 && a[2]==1 && a[3]==2) return 2; //pair option 2
+  // combo 0,1,2,4
+  else if (a[0]==0 && a[1]==1 && a[2]==2 && a[3]==4) return 3;
+  else if (a[0]==0 && a[1]==2 && a[2]==1 && a[3]==4) return 4;
+  else if (a[0]==0 && a[1]==4 && a[2]==1 && a[3]==2) return 5;
+  // combo 0,1,3,4
+  else if (a[0]==0 && a[1]==1 && a[2]==3 && a[3]==4) return 6;
+  else if (a[0]==0 && a[1]==3 && a[2]==1 && a[3]==4) return 7;
+  else if (a[0]==0 && a[1]==4 && a[2]==1 && a[3]==3) return 8;
+  // combo 0,2,3,4
+  else if (a[0]==0 && a[1]==2 && a[2]==3 && a[3]==4) return 9;
+  else if (a[0]==0 && a[1]==3 && a[2]==2 && a[3]==4) return 10;
+  else if (a[0]==0 && a[1]==4 && a[2]==2 && a[3]==3) return 11;
+  // combo 1,2,3,4
+  else if (a[0]==1 && a[1]==2 && a[2]==3 && a[3]==4) return 12;
+  else if (a[0]==1 && a[1]==3 && a[2]==2 && a[3]==4) return 13;
+  else if (a[0]==1 && a[1]==4 && a[2]==2 && a[3]==3) return 14;
+  else {
+    std::cout<<"ERROR: Could not find matching combination for ("<<a[0]<<","<<a[1]<<") ("<<a[2]<<","<<a[3]<<")"<<endl;
+    return -1;
+  }
 }
 
 void GetOptions(int argc, char *argv[]){
