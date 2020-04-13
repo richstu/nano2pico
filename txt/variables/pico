@@ -216,6 +216,8 @@ vector<int>   tk_pdgid
 vector<float> tk_miniso_chg
 vector<float> tk_reliso_chg
 vector<float> tk_mt
+vector<bool>  tk_nano_electron
+vector<bool>  tk_nano_muon
 
 
 ###################   Quality   ##################
