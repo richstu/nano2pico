@@ -41,11 +41,14 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
       pico.out_el_sip3d().push_back(nano.Electron_sip3d()[iel]);
     }
     else {
+      // Redefine pt and eta to match RA2B ntuples
+      pt = nano.Electron_pt()[iel]/nano.Electron_eCorr()[iel];
+      float eta = nano.Electron_eta()[iel];
       if (pt <= VetoElectronPtCut) continue;
-      if (fabs(etasc) > ElectronEtaCut) continue;
+      if (fabs(eta) > ElectronEtaCut) continue;
       int bitmap = nano.Electron_vidNestedWPBitmap()[iel];
       if (!idElectron_noIso(bitmap, 1)) continue;
-      bool isBarrel = fabs(etasc) <= 1.479;
+      bool isBarrel = fabs(eta) <= 1.479;
       if ((isBarrel && fabs(nano.Electron_dz()[iel])>0.10) || (!isBarrel && fabs(nano.Electron_dz()[iel])>0.20)) continue;
       if ((isBarrel && fabs(nano.Electron_dxy()[iel])>0.05) || (!isBarrel && fabs(nano.Electron_dxy()[iel])>0.10)) continue; 
       id = idElectron_noIso(bitmap,3);
