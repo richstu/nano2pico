@@ -105,6 +105,12 @@ This produces the commands in `cmds.py`. You can perform a last check by running
 auto_submit_jobs.py process_nano_cmds.json -c scripts/check_process_nano_job.py
 ~~~~
 
+For data use the scripts/check_data_process_nano_job.py like below
+
+~~~~bash 
+auto_submit_jobs.py process_nano_cmds.json -c scripts/check_data_process_nano_job.py
+~~~~
+
 If the above script is interrupted, one can check whether the jobs were successful later on by passing the json produced by auto_submit_job.py to check_jobs.py:
 
 ~~~~bash 
@@ -116,6 +122,12 @@ This command will result in `checked_auto_higgsino_angeles.json`, which can then
 ~~~~bash 
 select_resubmit_jobs.py checked_auto_higgsino_angeles.json -c scripts/check_process_nano_job.py 
 auto_submit_jobs.py resubmit_checked_auto_higgsino_angeles.json -c scripts/check_process_nano_job.py 
+~~~~
+
+One can also resume the auto_submit_job.py like below
+
+~~~~bash 
+auto_submit_jobs.py auto_higgsino_angeles.json -c scripts/check_process_nano_job.py -o auto_higgsino_angeles.json
 ~~~~
 
 If you are processing Monte Carlo, then proceed to steps 2 and 3 (MC). If you are processing data, go to step 2 (data).
