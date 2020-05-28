@@ -3,9 +3,32 @@
 # The input is given as sys.argv[1] = queue_system.compress_string(job_log_string) sys.argv[2] = queue_system.compress_string(job_argument_string)
 import sys
 import os
+import argparse
+import shlex
 import queue_system
 from ROOT import TChain
 from skim_file import get_cuts
+
+#def get_args(keys, job_argument_string):
+#  parser = argparse.ArgumentParser()
+#  for key in keys:
+#    parser.add_argument('--'+key)
+#  args, unknown_args = parser.parse_known_args(shlex.split(job_argument_string))
+#  return vars(args)
+#
+## key_pairs = [(-key, --key)]
+#def get_args_from_key_pairs(key_pairs, job_argument_string):
+#  parser = argparse.ArgumentParser()
+#  for dkey, ddkey in key_pairs:
+#    parser.add_argument('-'+dkey, '--'+ddkey)
+#  args, unknown_args = parser.parse_known_args(shlex.split(job_argument_string))
+#  return vars(args)
+#
+#def argument_string_to_dict(job_argument_string):
+#  command_arg_string = get_args(['command'], job_argument_string)['command']
+#  command_args = get_args_from_key_pairs([['m', 'mass'], ['l', 'mass_lsp'], ['k', 'skim_name'], 
+#                           ['i', 'input_paths'], ['o', 'output_dir']], command_arg_string)
+#  return command_args
 
 # job_argument_string = "/net/top/homes/oshiro/code/nano2pico/scripts/skim_file.py -k 2l -i /net/cms29/cms29r0/pico/NanoAODv5/ttz_cordellbankv2/2016/data/unskimmed/pico_Run2016B_0_SingleElectron_SingleMuon_Nano1June2019-v1_runs275290.root -o /net/cms29/cms29r0/pico/NanoAODv5/ttz_cordellbankv2/2016/data/skim_2l/"
 job_log_string = queue_system.decompress_string(sys.argv[1])
@@ -13,11 +36,13 @@ job_argument_string = queue_system.decompress_string(sys.argv[2])
 
 print(job_argument_string)
 
+#argDict = argument_string_to_dict(job_argument_string)
+
 args = job_argument_string.split('--command="')[1].split('"')[0]
 tmp = args.split(' ')
 infile_path = tmp[4]
 
-if '/merged_' in infile_path: 
+if '/merged_' in infile_path or '/raw_pico_' in infile_path: 
   in_dir = os.path.dirname(infile_path)
   skim_name = tmp[2]
   out_dir = tmp[6]
