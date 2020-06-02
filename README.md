@@ -381,14 +381,14 @@ This produces the commands in `cmds_split.py`. You can perform a last check by r
 
 ~~~~bash 
 convert_cl_to_jobs_info.py cmds_split.py cmds_split.py.json
-auto_submit_jobs.py cmds_split.py.json -c modules/queue_system/bin/jobscript_check.py
+auto_submit_jobs.py cmds_split.py.json -c scripts/check_skim.py
 ~~~~
 
 This command will result in `checked_auto_cmds_split.py.json`, which can then be used to resubmit failed jobs if any:
 
 ~~~~bash 
-select_resubmit_jobs.py checked_auto_cmds_split.py.json -c modules/queue_system/bin/jobscript_check.py
-auto_submit_jobs.py resubmit_checked_auto_cmds_split.py.json -c modules/queue_system/bin/jobscript_check.py
+select_resubmit_jobs.py checked_auto_cmds_split.py.json -c scripts/check_skim.py
+auto_submit_jobs.py resubmit_checked_auto_cmds_split.py.json -c scripts/check_skim.py
 ~~~~
 
 ## Getting Higgsino cross-section
