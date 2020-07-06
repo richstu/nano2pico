@@ -15,13 +15,13 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
                                          vector<int> &sig_el_nano_idx, vector<int> &sig_mu_nano_idx){
   pico.out_nphoton() = 0; 
   vector<int> sig_photon_nano_idx;
-  int nphotons(0);
+  int nphotons(0), ndr(0), shift(0);
   for(int iph(0); iph<nano.nPhoton(); ++iph){
     if (nano.Photon_pt()[iph] <= PhotonPtCut) continue;
     if (fabs(nano.Photon_eta()[iph]) > PhotonEtaCut) continue;
     if (!(nano.Photon_isScEtaEB()[iph] || nano.Photon_isScEtaEE()[iph])) continue;
     // if (nano.Photon_pfRelIso03_all()[iph]==PhotonRelIsoCut) continue; // no isolation cut in 2016...?
-    bool isSig = nano.Photon_mvaID_WP90()[iph] && 
+    bool isSig = nano.Photon_mvaID()[iph] > 0.2 && 
                  nano.Photon_electronVeto()[iph] && 
                  nano.Photon_pt()[iph] > SignalPhotonPtCut;
     // Find min(dR) between photon and signal lepton
@@ -38,19 +38,24 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
     }
     // Sig photon with highest pT gets put at the front
     if(isSig) {
-      pico.out_photon_pt()     .insert(pico.out_photon_pt()     .begin()+nphotons, nano.Photon_pt()[iph]);
-      pico.out_photon_eta()    .insert(pico.out_photon_eta()    .begin()+nphotons, nano.Photon_eta()[iph]);
-      pico.out_photon_phi()    .insert(pico.out_photon_phi()    .begin()+nphotons, nano.Photon_phi()[iph]);
-      pico.out_photon_reliso() .insert(pico.out_photon_reliso() .begin()+nphotons, nano.Photon_pfRelIso03_all()[iph]);
-      pico.out_photon_r9()     .insert(pico.out_photon_r9()     .begin()+nphotons, nano.Photon_r9()[iph]);
-      pico.out_photon_pflavor().insert(pico.out_photon_pflavor().begin()+nphotons, nano.Photon_genPartFlav()[iph]);
-      pico.out_photon_pterr()  .insert(pico.out_photon_pterr()  .begin()+nphotons, nano.Photon_energyErr()[iph]);
-      pico.out_photon_hoe()    .insert(pico.out_photon_hoe()    .begin()+nphotons, nano.Photon_hoe()[iph]);
-      pico.out_photon_elveto() .insert(pico.out_photon_elveto() .begin()+nphotons, nano.Photon_electronVeto()[iph]);
-      pico.out_photon_id()     .insert(pico.out_photon_id()     .begin()+nphotons, nano.Photon_mvaID_WP90()[iph]);
-      pico.out_photon_idmva()  .insert(pico.out_photon_idmva()  .begin()+nphotons, nano.Photon_mvaID()[iph]);
-      pico.out_photon_sig()    .insert(pico.out_photon_sig()    .begin()+nphotons, isSig);
-      pico.out_photon_drmin()  .insert(pico.out_photon_drmin()  .begin()+nphotons, minLepDR);
+      if(minLepDR > 0.4) { //photons passing drmin cut get put at the very front
+        shift = ndr;
+        ndr++;
+      }
+      else shift = nphotons;
+      pico.out_photon_pt()     .insert(pico.out_photon_pt()     .begin()+shift, nano.Photon_pt()[iph]);
+      pico.out_photon_eta()    .insert(pico.out_photon_eta()    .begin()+shift, nano.Photon_eta()[iph]);
+      pico.out_photon_phi()    .insert(pico.out_photon_phi()    .begin()+shift, nano.Photon_phi()[iph]);
+      pico.out_photon_reliso() .insert(pico.out_photon_reliso() .begin()+shift, nano.Photon_pfRelIso03_all()[iph]);
+      pico.out_photon_r9()     .insert(pico.out_photon_r9()     .begin()+shift, nano.Photon_r9()[iph]);
+      pico.out_photon_pflavor().insert(pico.out_photon_pflavor().begin()+shift, nano.Photon_genPartFlav()[iph]);
+      pico.out_photon_pterr()  .insert(pico.out_photon_pterr()  .begin()+shift, nano.Photon_energyErr()[iph]);
+      pico.out_photon_hoe()    .insert(pico.out_photon_hoe()    .begin()+shift, nano.Photon_hoe()[iph]);
+      pico.out_photon_elveto() .insert(pico.out_photon_elveto() .begin()+shift, nano.Photon_electronVeto()[iph]);
+      pico.out_photon_id()     .insert(pico.out_photon_id()     .begin()+shift, nano.Photon_mvaID_WP90()[iph]);
+      pico.out_photon_idmva()  .insert(pico.out_photon_idmva()  .begin()+shift, nano.Photon_mvaID()[iph]);
+      pico.out_photon_sig()    .insert(pico.out_photon_sig()    .begin()+shift, isSig);
+      pico.out_photon_drmin()  .insert(pico.out_photon_drmin()  .begin()+shift, minLepDR);
       nphotons++;
     }
     else{
