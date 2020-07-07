@@ -24,9 +24,27 @@ outfile = TChain("tree");
 outfile.Add(outfile_path);
 out_nent = outfile.GetEntries()
 
+isFail = False
 if outfile.GetNbranches() == 0:
   print('[For queue_system] fail: output ({}) has no branches.'.format(outfile_path))
-elif in_nent == out_nent:
+  isFail = True
+
+for line in job_log_string.split('\n'):
+  if 'Error in <TTree::SetBranchStatus>: unknown branch' in line:
+    continue
+  if 'error' in line.lower():
+    print('[For queue_system] fail: Error in job_log')
+    isFail = True
+
+if 'segmentation fault' in job_log_string.lower():
+  print('[For queue_system] fail: Segmentation fault in job_log')
+  isFail = True
+
+if not isFail:
   print('[For queue_system] success')
-else:
-  print('[For queue_system] fail: Input ({}) has {} entries, while output ({}) has {} entries.'.format(infile_path, in_nent, outfile_path, out_nent))
+
+## Below will not work because data files are stiched
+#elif in_nent == out_nent:
+#  print('[For queue_system] success')
+#else:
+#  print('[For queue_system] fail: Input ({}) has {} entries, while output ({}) has {} entries.'.format(infile_path, in_nent, outfile_path, out_nent))

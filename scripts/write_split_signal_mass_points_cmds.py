@@ -12,7 +12,7 @@ def get_2d_mass_points(signal_chain, pdgId_1, pdgId_2):
   #print(number_variables, signal_chain.GetEntries())
   for iVar in range(number_variables):
     #print (mass_array_1[iVar], mass_array_2[iVar])
-    mass_points.add((int(mass_array_1[iVar]), int(mass_array_2[iVar])))
+    mass_points.add((int(round(mass_array_1[iVar]/25)*25), int(round(mass_array_2[iVar]/25)*25)))
   return sorted(mass_points)
 
 if __name__ == '__main__':

@@ -79,6 +79,7 @@ vector<float> jet_deepcsv
 vector<float> jet_deepflav
 vector<float> jet_qgl
 vector<bool>  jet_islep
+vector<bool>  jet_isvlep
 vector<bool>  jet_isphoton
 vector<bool>  jet_isgood
 vector<bool>  jet_id
@@ -158,6 +159,7 @@ int nel
 int nvel
 vector<float> el_pt
 vector<float> el_eta
+vector<float> el_etasc
 vector<float> el_phi
 vector<float> el_miniso
 vector<float> el_reliso
@@ -214,6 +216,8 @@ vector<int>   tk_pdgid
 vector<float> tk_miniso_chg
 vector<float> tk_reliso_chg
 vector<float> tk_mt
+vector<bool>  tk_nano_electron
+vector<bool>  tk_nano_muon
 
 
 ###################   Quality   ##################
@@ -273,23 +277,43 @@ float w_prefire
 float eff_trig
 
 ################  Triggers copy straight from Nano, same names   ##################
-# Single lepton triggers
+
+# Muon triggers
+#------------------------------
+# Muon trigger info: https://twiki.cern.ch/twiki/bin/view/CMS/MuonHLT2016, modify URL to get 2017 and 2018
+# IsoMu24 unprescaled for all years except it was missing 4ifb in 2017, thus combine with IsoMu27
 bool HLT_IsoMu24
 bool HLT_IsoMu27
+# non-isolated unprescaled trigger to maximize miniIso efficiency at high pT
 bool HLT_Mu50
+
+# Electron triggers
+#------------------------------
+# some info here: https://twiki.cern.ch/twiki/bin/viewauth/CMS/Egamma2017DataRecommendations#Single_Electron_Triggers
+# unprescaled in 2016
 bool HLT_Ele27_WPTight_Gsf
+# collected ~75% of 2017 data unprescaled
+bool HLT_Ele32_WPTight_Gsf_L1DoubleEG
+# unprescaled all of Run2
 bool HLT_Ele35_WPTight_Gsf
+# non-isolated unprescaled trigger to maximize miniIso efficiency at high pT
 bool HLT_Ele115_CaloIdVT_GsfTrkIdT
 
 # MET triggers
+#------------------------------
+# unprescaled for part of 2016, so to maximize efficiency for turn on
 bool HLT_PFMET110_PFMHT110_IDTight
-bool HLT_PFMET120_PFMHT120_IDTight
 bool HLT_PFMETNoMu110_PFMHTNoMu110_IDTight
+# all unprescaled in Run 2
+bool HLT_PFMET120_PFMHT120_IDTight
 bool HLT_PFMETNoMu120_PFMHTNoMu120_IDTight
+# compensating for some inefficiencies in the above
 bool HLT_PFMET120_PFMHT120_IDTight_PFHT60
 bool HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60
 
-# Jet trigger
+# Jet trigger 
+#------------------------------
+# unprescaled, reference for 1L trigger eff measurements
 bool HLT_PFJet500
 
 # ZGamma triggers

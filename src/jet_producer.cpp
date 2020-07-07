@@ -21,7 +21,7 @@ JetProducer::~JetProducer(){
 }
 
 vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
-                                   vector<int> jet_islep_nano_idx, vector<int> jet_isphoton_nano_idx,
+                                   vector<int> jet_islep_nano_idx, vector<int> jet_isvlep_nano_idx,  vector<int> jet_isphoton_nano_idx,
                                    const vector<float> &btag_wpts, const vector<float> &btag_df_wpts){
   vector<int> sig_jet_nano_idx;
   pico.out_njet() = 0; pico.out_ht() = 0; pico.out_ht5() = 0; 
@@ -50,6 +50,8 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
 
     // check overlap with signal leptons (or photons)
     bool islep = find(jet_islep_nano_idx.begin(), jet_islep_nano_idx.end(), ijet) != jet_islep_nano_idx.end();
+    // check overlap with veto leptons
+    bool isvlep = find(jet_isvlep_nano_idx.begin(), jet_isvlep_nano_idx.end(), ijet) != jet_isvlep_nano_idx.end();
     // N.B. photon collection is not filled for Higgsino analysis, so there is no overlap removal!
     bool isphoton = find(jet_isphoton_nano_idx.begin(), jet_isphoton_nano_idx.end(), ijet) != jet_isphoton_nano_idx.end();
 
@@ -65,6 +67,7 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
     pico.out_jet_deepflav().push_back(nano.Jet_btagDeepFlavB()[ijet]);
     pico.out_jet_qgl().push_back(nano.Jet_qgl()[ijet]);
     pico.out_jet_islep().push_back(islep);
+    pico.out_jet_isvlep().push_back(isvlep);
     pico.out_jet_isphoton().push_back(isphoton);
     pico.out_jet_isgood().push_back(isgood);
     pico.out_jet_id().push_back(nano.Jet_jetId()[ijet]);

@@ -11,21 +11,14 @@ git clone --recurse-submodules https://github.com/richstu/nano2pico
 source set_env.sh
 ~~~~
 
-## Latest production
+## Productions
 
 Variables stored in the pico can be seen in [variables/pico](variables/pico). For an overview of the available branches, see the dedicated section at the bottom of this README.
 
-The latest Higgsino production nicknamed "Angeles" can be found here:
+To see the sizes and number of files in all available productions do:
 
 ~~~~bash
-  /net/cms2/cms2r0/pico/NanoAODv5/higgsino_angeles/2016/mc/
-  /net/cms2/cms2r0/pico/NanoAODv5/higgsino_angeles/2016/TChiHH/
-~~~~
-
-To see the sizes and number of files, one can do:
-
-~~~~bash
-  ./scripts/count_root_files.py -f /net/cms29/cms29r0/pico/NanoAODv5/higgsino_angeles/2016/mc/
+  ./scripts/count_root_files.py -f /net/cms29/cms29r0/pico/NanoAODv5/
 ~~~~
 
 ## What is nano2pico?
@@ -36,6 +29,11 @@ This package is used to do the Nano -> pico conversion in three steps in order t
   3. The `raw_pico` files from step 1 are corrected by the per-dataset correction factors derived in step 2 and written to the `unskimmed` folder.
 
 At this point, various skims can be made as defined in [scripts/skim_file.py](scripts/skim_file.py).
+
+## Trigger info
+
+Spreadsheets describing the final trigger menus from each year from a post on the [Trigger HN](https://hypernews.cern.ch/HyperNews/CMS/get/trigger-prim-datasets/52/1/2.html): [2016](https://docs.google.com/spreadsheets/d/1bII_92pCrgk20A9FMIIHsOsYYj3f-lLjsoRkP_ZNQW4/edit?usp=sharing), [2017](https://docs.google.com/spreadsheets/d/1SqSKATiHcZdSB-t7rMb0SRSUL4Ot1jr2TExjnMrDUpA/edit?usp=sharing), [2018](https://docs.google.com/spreadsheets/d/1D_og1_J6Hp4uALUg-R4Hkq3CF0VN6IK5komHPHv5R-o/edit?usp=sharing).
+
 
 ## Interactive test usage
 
@@ -92,14 +90,28 @@ Next, generate a python file that prints the commands to be run in the batch (in
 
 or for signal, just specify the appropriate input folder and omit the `--dataset_list` argument to run on all files in the input folder.
 
+To run on data, use `--list_format filename` in order to interpret the lines in the file passes to `--dataset_list` as a list of filenames with wildcards. For an example file, see [txt/datasets/higgsino_data_infile_list.txt](txt/datasets/higgsino_data_infile_list.txt). For example:
+
+~~~~bash 
+./scripts/write_process_nano_cmds.py --in_dir /net/cms29/cms29r0/pico/NanoAODv5/nano/2016/data/ \
+                                     --production higgsino_humboldt \
+                                     --dataset_list txt/datasets/higgsino_data_infile_list.txt \
+                                     --list_format filename
+~~~~
+
 This produces the commands in `cmds.py`. You can perform a last check by running one of the commands interactively. Next, submit the jobs to the batch system. Note the -c option which allows to attach a script that compares the input and output number of entries when each job is done. Note the check can be performed later if one needs to detach the session. Alternatively, this command can be started in screen:
 
 ~~~~bash 
-convert_cl_to_jobs_info.py cmds.py higgsino_angeles.json
-auto_submit_jobs.py higgsino_angeles.json -c scripts/check_process_nano_job.py
+auto_submit_jobs.py process_nano_cmds.json -c scripts/check_process_nano_job.py
 ~~~~
 
-To check whether the jobs were successful later on do something like, where `auto_higgsino_angeles.json` is generated earlier by the `auto_submit_jobs.py` command:
+For data use the scripts/check_data_process_nano_job.py like below
+
+~~~~bash 
+auto_submit_jobs.py process_nano_cmds.json -c scripts/check_data_process_nano_job.py
+~~~~
+
+If the above script is interrupted, one can check whether the jobs were successful later on by passing the json produced by auto_submit_job.py to check_jobs.py:
 
 ~~~~bash 
 check_jobs.py auto_higgsino_angeles.json -c scripts/check_process_nano_job.py
@@ -110,6 +122,12 @@ This command will result in `checked_auto_higgsino_angeles.json`, which can then
 ~~~~bash 
 select_resubmit_jobs.py checked_auto_higgsino_angeles.json -c scripts/check_process_nano_job.py 
 auto_submit_jobs.py resubmit_checked_auto_higgsino_angeles.json -c scripts/check_process_nano_job.py 
+~~~~
+
+One can also resume the auto_submit_job.py like below
+
+~~~~bash 
+auto_submit_jobs.py auto_higgsino_angeles.json -c scripts/check_process_nano_job.py -o auto_higgsino_angeles.json
 ~~~~
 
 If you are processing Monte Carlo, then proceed to steps 2 and 3 (MC). If you are processing data, go to step 2 (data).
@@ -363,14 +381,14 @@ This produces the commands in `cmds_split.py`. You can perform a last check by r
 
 ~~~~bash 
 convert_cl_to_jobs_info.py cmds_split.py cmds_split.py.json
-auto_submit_jobs.py cmds_split.py.json -c modules/queue_system/bin/jobscript_check.py
+auto_submit_jobs.py cmds_split.py.json -c scripts/check_skim.py
 ~~~~
 
 This command will result in `checked_auto_cmds_split.py.json`, which can then be used to resubmit failed jobs if any:
 
 ~~~~bash 
-select_resubmit_jobs.py checked_auto_cmds_split.py.json -c modules/queue_system/bin/jobscript_check.py
-auto_submit_jobs.py resubmit_checked_auto_cmds_split.py.json -c modules/queue_system/bin/jobscript_check.py
+select_resubmit_jobs.py checked_auto_cmds_split.py.json -c scripts/check_skim.py
+auto_submit_jobs.py resubmit_checked_auto_cmds_split.py.json -c scripts/check_skim.py
 ~~~~
 
 ## Getting Higgsino cross-section

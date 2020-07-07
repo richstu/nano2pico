@@ -11,7 +11,8 @@ EventTools::EventTools(const string &name_, int year_):
   isTTJets_LO_MET(false),
   isTTJets_LO_Incl(false),
   isWJets_LO(false),
-  isDYJets_LO(false){
+  isDYJets_LO(false),
+  dataset(-1){
 
   if(Contains(name, "TTJets_") && Contains(name, "genMET-") && Contains(name, "madgraphMLM")) 
     isTTJets_LO_MET = true;
@@ -24,6 +25,21 @@ EventTools::EventTools(const string &name_, int year_):
   
   if(Contains(name, "DYJetsToLL_M-50_Tune")  && Contains(name,"madgraphMLM"))
     isDYJets_LO = true;
+
+  if(Contains(name, "EGamma")) // looks like this replaced SingleElectron and DoubleEG starting in 2018
+    dataset = Dataset::EGamma;
+  else if(Contains(name, "SingleElectron")) 
+    dataset = Dataset::SingleElectron;
+  else if(Contains(name, "SingleMuon")) 
+    dataset = Dataset::SingleMuon;
+  else if(Contains(name, "DoubleEG")) 
+    dataset = Dataset::DoubleEG;
+  else if(Contains(name, "DoubleMuon")) 
+    dataset = Dataset::DoubleMuon;
+  else if(Contains(name, "MET")) 
+    dataset = Dataset::MET;
+  else if(Contains(name, "JetHT")) 
+    dataset = Dataset::JetHT;
 }
 
 EventTools::~EventTools(){
@@ -119,13 +135,11 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
   pico.out_pass_ecaldeadcell() = nano.Flag_EcalDeadCellTriggerPrimitiveFilter();
   if (year==2016) {
     pico.out_pass_badcalib() = true;
-    pico.out_pass_badpfmu() = nano.Flag_BadPFMuonSummer16Filter();
-    pico.out_pass_badchhad() = nano.Flag_BadChargedCandidateSummer16Filter();
   } else {
     pico.out_pass_badcalib() = nano.Flag_ecalBadCalibFilterV2();
-    pico.out_pass_badpfmu() = nano.Flag_BadPFMuonFilter();
-    pico.out_pass_badchhad() = nano.Flag_BadChargedCandidateFilter();
   }
+  pico.out_pass_badchhad() = nano.Flag_BadChargedCandidateFilter();
+  pico.out_pass_badpfmu() = nano.Flag_BadPFMuonFilter();
   pico.out_pass_mubadtrk() = nano.Flag_muonBadTrackFilter();
 
   // Combined pass variable, as recommended here:
@@ -160,23 +174,32 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
   return;
 }
 
-void EventTools::CopyTriggerDecisions(nano_tree& nano, pico_tree& pico){
-  pico.out_HLT_IsoMu24() = nano.HLT_IsoMu24();
-  pico.out_HLT_IsoMu27() = nano.HLT_IsoMu27();
-  pico.out_HLT_Mu50() = nano.HLT_Mu50();
+bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZgamma){
+
+  bool egamma_trigs = nano.HLT_Ele27_WPTight_Gsf() || nano.HLT_Ele32_WPTight_Gsf_L1DoubleEG() || 
+                      nano.HLT_Ele35_WPTight_Gsf() || nano.HLT_Ele115_CaloIdVT_GsfTrkIdT();
   pico.out_HLT_Ele27_WPTight_Gsf() = nano.HLT_Ele27_WPTight_Gsf();
+  pico.out_HLT_Ele32_WPTight_Gsf_L1DoubleEG() = nano.HLT_Ele32_WPTight_Gsf_L1DoubleEG();
   pico.out_HLT_Ele35_WPTight_Gsf() = nano.HLT_Ele35_WPTight_Gsf();
   pico.out_HLT_Ele115_CaloIdVT_GsfTrkIdT() = nano.HLT_Ele115_CaloIdVT_GsfTrkIdT();
 
-  // MET triggers
+  bool muon_trigs = nano.HLT_IsoMu24() || nano.HLT_IsoMu27() || nano.HLT_Mu50();
+  pico.out_HLT_IsoMu24() = nano.HLT_IsoMu24();
+  pico.out_HLT_IsoMu27() = nano.HLT_IsoMu27();
+  pico.out_HLT_Mu50() = nano.HLT_Mu50();
+
+  bool met_trigs = nano.HLT_PFMET110_PFMHT110_IDTight() || nano.HLT_PFMETNoMu110_PFMHTNoMu110_IDTight() || 
+                   nano.HLT_PFMET120_PFMHT120_IDTight() || nano.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight() || 
+                   nano.HLT_PFMET120_PFMHT120_IDTight_PFHT60() || nano.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60();
   pico.out_HLT_PFMET110_PFMHT110_IDTight() = nano.HLT_PFMET110_PFMHT110_IDTight();
-  pico.out_HLT_PFMET120_PFMHT120_IDTight() = nano.HLT_PFMET120_PFMHT120_IDTight();
   pico.out_HLT_PFMETNoMu110_PFMHTNoMu110_IDTight() = nano.HLT_PFMETNoMu110_PFMHTNoMu110_IDTight();
+  pico.out_HLT_PFMET120_PFMHT120_IDTight() = nano.HLT_PFMET120_PFMHT120_IDTight();
   pico.out_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight() = nano.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight();
   pico.out_HLT_PFMET120_PFMHT120_IDTight_PFHT60() = nano.HLT_PFMET120_PFMHT120_IDTight_PFHT60();
   pico.out_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60() = nano.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60();
 
   // Jet trigger
+  bool jetht_trigs = nano.HLT_PFJet500();
   pico.out_HLT_PFJet500() = nano.HLT_PFJet500();
 
   // ZGamma triggers
@@ -189,7 +212,22 @@ void EventTools::CopyTriggerDecisions(nano_tree& nano, pico_tree& pico){
   pico.out_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ()     = nano.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ();
   pico.out_HLT_Ele27_eta2p1_WPTight_Gsf()              = nano.HLT_Ele27_eta2p1_WPTight_Gsf();
   pico.out_HLT_Photon175()                             = nano.HLT_Photon175();
-  return;
+
+
+  if (isZgamma)
+    return true;
+  else {
+    // this assumes that we process either all the datasets or at least an ordered subset starting with the MET 
+    // e.g. after measuring trigger efficiency, it would no longer be necessary to run on JetHT
+    if (dataset==Dataset::MET                                                                && met_trigs) return true;
+    else if (year==2018 && dataset==Dataset::EGamma                         && egamma_trigs && !met_trigs) return true;
+    else if ((year==2016 || year==2017) && dataset==Dataset::SingleElectron && egamma_trigs && !met_trigs) return true;
+    else if (dataset==Dataset::SingleMuon                    && muon_trigs && !egamma_trigs && !met_trigs) return true;
+    else if (dataset==Dataset::JetHT         && jetht_trigs && !muon_trigs && !egamma_trigs && !met_trigs) return true;
+    else return false;
+  }
+
+  return false;
 }
 
 int EventTools::GetEventType(){

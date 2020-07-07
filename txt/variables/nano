@@ -572,6 +572,7 @@ bool HLT_IsoMu24
 bool HLT_IsoMu27
 bool HLT_Mu50
 bool HLT_Ele27_WPTight_Gsf
+bool HLT_Ele32_WPTight_Gsf_L1DoubleEG
 bool HLT_Ele35_WPTight_Gsf
 bool HLT_Ele115_CaloIdVT_GsfTrkIdT
 
@@ -591,8 +592,9 @@ bool HLT_PFMETNoMu120_PFMHTNoMu120_IDTight
 bool HLT_PFMET120_PFMHT120_IDTight_PFHT60
 bool HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60
 
-# Jet trigger
+# JetHT triggers
 bool HLT_PFJet500
+bool HLT_PFHT890
 
 # ZGamma triggers
 bool HLT_Mu17_Photon30_IsoCaloId

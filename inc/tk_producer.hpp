@@ -17,7 +17,7 @@ public:
                       std::vector<int> &sig_el_nano_idx,
                       std::vector<int> &sig_mu_nano_idx);
 
-  bool IsGoodTk(pico_tree &pico, int pdgid, float pt, float eta, float phi, 
+  bool IsGoodTk(pico_tree &pico, bool isNanoElectron, bool isNanoMuon, int pdgid, float pt, float eta, float phi, 
                 float miniso, float reliso, float d0, float dz, float mt);
 
 private:

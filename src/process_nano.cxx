@@ -69,16 +69,16 @@ int main(int argc, char *argv[]){
     switch (year) {
       case 2016:
         VVRunLumi = MakeVRunLumi("golden2016");
-	break;
+        break;
       case 2017:
         VVRunLumi = MakeVRunLumi("golden2017");
-	break;
+        break;
       case 2018:
         VVRunLumi = MakeVRunLumi("golden2018");
-	break;
+        break;
       default:
-	cout << "ERROR: no golden cert for given year" << endl;
-	return 0;
+        cout << "ERROR: no golden cert for given year" << endl;
+        return 0;
     }
   }
 
@@ -153,7 +153,7 @@ int main(int argc, char *argv[]){
   wgt_sums.out_nent() = nentries;
 
   for(size_t entry(0); entry<nentries; ++entry){
-    if (debug) cout << "GetEntry: " << entry << endl;
+    if (debug) cout << "GetEntry: " << entry <<" event = "<< endl;
     nano.GetEntry(entry);
     if (entry%1000==0 || entry == nentries-1) {
       cout<<"Processing event: "<<entry<<endl;
@@ -164,7 +164,9 @@ int main(int argc, char *argv[]){
       if(!inJSON(VVRunLumi, nano.run(), nano.luminosityBlock())) continue; 
     }
 
-    // if (nano.event()!=6376418) continue;
+    bool passed_trig = event_tools.SaveTriggerDecisions(nano, pico, isZgamma);
+    if (isData && !passed_trig) continue;
+
     // event info
     pico.out_event()     = nano.event();
     pico.out_lumiblock() = nano.luminosityBlock();
@@ -183,11 +185,12 @@ int main(int argc, char *argv[]){
     //-----------------------------------------------------------------------------------------------
     if (debug) cout<<"INFO:: Writing leptons, photons and tracks"<<endl;
     vector<int> jet_islep_nano_idx = vector<int>();
+    vector<int> jet_isvlep_nano_idx = vector<int>();
     pico.out_nlep() = 0; pico.out_nvlep() = 0; // filled by lepton producers
     vector<int> sig_el_pico_idx = vector<int>();
     vector<int> sig_mu_pico_idx = vector<int>();
-    vector<int> sig_el_nano_idx = el_producer.WriteElectrons(nano, pico, jet_islep_nano_idx, sig_el_pico_idx, isZgamma);
-    vector<int> sig_mu_nano_idx = mu_producer.WriteMuons(nano, pico, jet_islep_nano_idx, sig_mu_pico_idx, isZgamma);
+    vector<int> sig_el_nano_idx = el_producer.WriteElectrons(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, sig_el_pico_idx, isZgamma);
+    vector<int> sig_mu_nano_idx = mu_producer.WriteMuons(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, sig_mu_pico_idx, isZgamma);
 
     // save a separate vector with just signal leptons ordered by pt
     struct SignalLepton{ float pt; float eta; float phi; int pdgid;};
@@ -225,7 +228,7 @@ int main(int argc, char *argv[]){
     isr_tools.WriteISRSystemPt(nano, pico);
 
     if (debug) cout<<"INFO:: Writing jets, MET and ISR vars"<<endl;
-    vector<int> sig_jet_nano_idx = jet_producer.WriteJets(nano, pico, jet_islep_nano_idx, jet_isphoton_nano_idx,
+    vector<int> sig_jet_nano_idx = jet_producer.WriteJets(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, jet_isphoton_nano_idx,
                                                           btag_wpts[year], btag_df_wpts[year]);
     jet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year][1]); // usually w.r.t. medium WP
     if(!isZgamma){
@@ -275,8 +278,6 @@ int main(int argc, char *argv[]){
     if (debug) cout<<"INFO:: Writing filters and triggers"<<endl;
     // N.B. Jets: pico.out_pass_jets() and pico.out_pass_fsjets() filled in jet_producer
     event_tools.WriteDataQualityFilters(nano, pico, sig_jet_nano_idx, min_jet_pt, max_jet_eta, isData, isFastsim);
-    
-    event_tools.CopyTriggerDecisions(nano, pico);
 
     event_tools.WriteTriggerEfficiency(pico);
 
