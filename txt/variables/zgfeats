@@ -1,0 +1,68 @@
+#--------------------------------------------------------------------
+# Global event variables
+#--------------------------------------------------------------------
+Long64_t event
+int nlep
+int nphoton
+int njet
+#--------------------------------------------------------------------
+# highest photon candidate
+#--------------------------------------------------------------------
+float photon_pt
+float photon_eta
+float photon_phi
+float photon_drmin
+#--------------------------------------------------------------------
+# two lepton candidates
+#--------------------------------------------------------------------
+float lep1_pt
+float lep1_eta
+float lep1_phi
+float lep2_pt
+float lep2_eta
+float lep2_phi
+#--------------------------------------------------------------------
+# two leding pt jets (and combination)
+#--------------------------------------------------------------------
+float jet1_pt
+float jet1_eta
+float jet1_phi
+float jet1_m
+float jet2_pt
+float jet2_eta
+float jet2_phi
+float jet2_m
+float dijet_pt
+float dijet_eta
+float dijet_phi
+float dijet_m
+float dijet_dr
+float dijet_dphi
+float dijet_deta
+#--------------------------------------------------------------------
+# Z candidate made with two lepton candidates
+#--------------------------------------------------------------------
+float ll_pt
+float ll_eta
+float ll_phi
+float ll_m
+float ll_dr
+float ll_dphi
+float ll_deta
+int   ll_lepid
+#--------------------------------------------------------------------
+# higgs candidate made with two lepton candidates and photon
+#--------------------------------------------------------------------
+float llphoton_pt
+float llphoton_eta
+float llphoton_phi
+float llphoton_m
+float llphoton_dr
+float llphoton_dphi
+float llphoton_deta
+float llphoton_costhj
+
+# possible outputs
+#------------------------
+int mhiggs
+int nbacc

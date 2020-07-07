@@ -173,6 +173,10 @@ int main(){
   WriteHeader(higfeats_vars, "higfeats");
   WriteSource(higfeats_vars, "higfeats");
 
+  vector<Variable> zgfeats_vars = GetVariables("zgfeats");  
+  WriteHeader(zgfeats_vars, "zgfeats");
+  WriteSource(zgfeats_vars, "zgfeats");
+
   vector<Variable> corr_vars = GetVariables("corrections");
   WriteHeader(corr_vars, "corrections");
   WriteSource(corr_vars, "corrections");
