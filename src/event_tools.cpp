@@ -190,17 +190,56 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
 
   bool met_trigs = nano.HLT_PFMET110_PFMHT110_IDTight() || nano.HLT_PFMETNoMu110_PFMHTNoMu110_IDTight() || 
                    nano.HLT_PFMET120_PFMHT120_IDTight() || nano.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight() || 
-                   nano.HLT_PFMET120_PFMHT120_IDTight_PFHT60() || nano.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60();
+                   nano.HLT_PFMET120_PFMHT120_IDTight_PFHT60() || nano.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60() ||
+                   nano.HLT_PFMET140_PFMHT140_IDTight() || nano.HLT_PFMETNoMu140_PFMHTNoMu140_IDTight() || 
+                   nano.HLT_PFMET90_PFMHT90_IDTight() || nano.HLT_PFMETNoMu90_PFMHTNoMu90_IDTight() || 
+                   nano.HLT_PFMET100_PFMHT100_IDTight_PFHT60() || nano.HLT_PFMETNoMu100_PFMHTNoMu100_IDTight_PFHT60() ||
+                   nano.HLT_PFMET100_PFMHT100_IDTight_CaloBTagCSV_3p1() || nano.HLT_PFMET110_PFMHT110_IDTight_CaloBTagCSV_3p1() || nano.HLT_PFMET110_PFMHT110_IDTight_CaloBTagDeepCSV_3p1();
   pico.out_HLT_PFMET110_PFMHT110_IDTight() = nano.HLT_PFMET110_PFMHT110_IDTight();
   pico.out_HLT_PFMETNoMu110_PFMHTNoMu110_IDTight() = nano.HLT_PFMETNoMu110_PFMHTNoMu110_IDTight();
   pico.out_HLT_PFMET120_PFMHT120_IDTight() = nano.HLT_PFMET120_PFMHT120_IDTight();
   pico.out_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight() = nano.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight();
   pico.out_HLT_PFMET120_PFMHT120_IDTight_PFHT60() = nano.HLT_PFMET120_PFMHT120_IDTight_PFHT60();
   pico.out_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60() = nano.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60();
+  pico.out_HLT_PFMET140_PFMHT140_IDTight() = nano.HLT_PFMET140_PFMHT140_IDTight();
+  pico.out_HLT_PFMETNoMu140_PFMHTNoMu140_IDTight() = nano.HLT_PFMETNoMu140_PFMHTNoMu140_IDTight();
+  pico.out_HLT_PFMET90_PFMHT90_IDTight() = nano.HLT_PFMET90_PFMHT90_IDTight();
+  pico.out_HLT_PFMETNoMu90_PFMHTNoMu90_IDTight() = nano.HLT_PFMETNoMu90_PFMHTNoMu90_IDTight();
+  pico.out_HLT_PFMET100_PFMHT100_IDTight_PFHT60() = nano.HLT_PFMET100_PFMHT100_IDTight_PFHT60();
+  pico.out_HLT_PFMETNoMu100_PFMHTNoMu100_IDTight_PFHT60() = nano.HLT_PFMETNoMu100_PFMHTNoMu100_IDTight_PFHT60();
+  pico.out_HLT_PFMET100_PFMHT100_IDTight_CaloBTagCSV_3p1() = nano.HLT_PFMET100_PFMHT100_IDTight_CaloBTagCSV_3p1();
+  pico.out_HLT_PFMET110_PFMHT110_IDTight_CaloBTagCSV_3p1() = nano.HLT_PFMET110_PFMHT110_IDTight_CaloBTagCSV_3p1();
+  pico.out_HLT_PFMET110_PFMHT110_IDTight_CaloBTagDeepCSV_3p1() = nano.HLT_PFMET110_PFMHT110_IDTight_CaloBTagDeepCSV_3p1();
 
-  // Jet trigger
-  bool jetht_trigs = nano.HLT_PFJet500();
+  // Jet/HT trigger
+  bool jetht_trigs = nano.HLT_PFJet500() || nano.HLT_PFHT125() || nano.HLT_PFHT200() || nano.HLT_PFHT300() || 
+                                            nano.HLT_PFHT400() || nano.HLT_PFHT475() || nano.HLT_PFHT600() || 
+					    nano.HLT_PFHT650() || nano.HLT_PFHT800() || nano.HLT_PFHT900() || 
+					    nano.HLT_PFHT180() || nano.HLT_PFHT370() || nano.HLT_PFHT430() || 
+					    nano.HLT_PFHT510() || nano.HLT_PFHT590() || nano.HLT_PFHT680() || 
+					    nano.HLT_PFHT780() || nano.HLT_PFHT890() || nano.HLT_PFHT1050() || 
+					    nano.HLT_PFHT250() || nano.HLT_PFHT350();
   pico.out_HLT_PFJet500() = nano.HLT_PFJet500();
+  pico.out_HLT_PFHT125() = nano.HLT_PFHT125();
+  pico.out_HLT_PFHT200() = nano.HLT_PFHT125();
+  pico.out_HLT_PFHT300() = nano.HLT_PFHT300();
+  pico.out_HLT_PFHT400() = nano.HLT_PFHT400();
+  pico.out_HLT_PFHT475() = nano.HLT_PFHT475();
+  pico.out_HLT_PFHT600() = nano.HLT_PFHT600();
+  pico.out_HLT_PFHT650() = nano.HLT_PFHT650();
+  pico.out_HLT_PFHT800() = nano.HLT_PFHT800();
+  pico.out_HLT_PFHT900() = nano.HLT_PFHT900();
+  pico.out_HLT_PFHT180() = nano.HLT_PFHT180();
+  pico.out_HLT_PFHT370() = nano.HLT_PFHT370();
+  pico.out_HLT_PFHT430() = nano.HLT_PFHT430();
+  pico.out_HLT_PFHT510() = nano.HLT_PFHT510();
+  pico.out_HLT_PFHT590() = nano.HLT_PFHT590();
+  pico.out_HLT_PFHT680() = nano.HLT_PFHT680();
+  pico.out_HLT_PFHT780() = nano.HLT_PFHT780();
+  pico.out_HLT_PFHT890() = nano.HLT_PFHT890();
+  pico.out_HLT_PFHT1050() = nano.HLT_PFHT1050();
+  pico.out_HLT_PFHT250() = nano.HLT_PFHT250();
+  pico.out_HLT_PFHT350() = nano.HLT_PFHT350();
 
   // ZGamma triggers
   pico.out_HLT_Mu17_Photon30_IsoCaloId()               = nano.HLT_Mu17_Photon30_IsoCaloId();

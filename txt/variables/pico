@@ -310,11 +310,51 @@ bool HLT_PFMETNoMu120_PFMHTNoMu120_IDTight
 # compensating for some inefficiencies in the above
 bool HLT_PFMET120_PFMHT120_IDTight_PFHT60
 bool HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60
+# all unprescaled and fully active
+bool HLT_PFMET140_PFMHT140_IDTight
+bool HLT_PFMETNoMu140_PFMHTNoMu140_IDTight
+# experimental MET cross triggers 2017/18
+bool HLT_PFMET90_PFMHT90_IDTight
+bool HLT_PFMETNoMu90_PFMHTNoMu90_IDTight
+bool HLT_PFMET100_PFMHT100_IDTight_PFHT60
+bool HLT_PFMETNoMu100_PFMHTNoMu100_IDTight_PFHT60
+bool HLT_PFMET100_PFMHT100_IDTight_CaloBTagCSV_3p1
+bool HLT_PFMET110_PFMHT110_IDTight_CaloBTagCSV_3p1
+bool HLT_PFMET110_PFMHT110_IDTight_CaloBTagDeepCSV_3p1
 
 # Jet trigger 
 #------------------------------
 # unprescaled, reference for 1L trigger eff measurements
 bool HLT_PFJet500
+
+# HT triggers
+#------------------------------
+#for QCD control region
+#---2016---
+bool HLT_PFHT125
+bool HLT_PFHT200
+bool HLT_PFHT300
+bool HLT_PFHT400
+bool HLT_PFHT475
+bool HLT_PFHT600
+bool HLT_PFHT650
+bool HLT_PFHT800
+#unprescaled
+bool HLT_PFHT900
+#---2017/18---
+bool HLT_PFHT180
+bool HLT_PFHT370
+bool HLT_PFHT430
+bool HLT_PFHT510
+bool HLT_PFHT590
+bool HLT_PFHT680
+bool HLT_PFHT780
+bool HLT_PFHT890
+#unprescaled
+bool HLT_PFHT1050
+#---2016/17/18---
+bool HLT_PFHT250
+bool HLT_PFHT350
 
 # ZGamma triggers
 bool HLT_Mu17_Photon30_IsoCaloId
