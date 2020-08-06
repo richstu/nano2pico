@@ -15,7 +15,11 @@ keep low_dphi*
 keep njet
 keep nb*
 
+keep el_*
+keep mu_*
 keep ll_pt
+
+keep tk_*
 
 keep jet_*
 drop jet_isphoton
@@ -46,3 +50,4 @@ keep mlsp
 keep weight
 keep w_*
 keep eff_*
+

@@ -9,11 +9,20 @@ keep npv
 keep ht
 keep met*
 keep mt*
+keep mht*
 
 keep hig_*
-keep low_dphi
+keep low_dphi*
 keep njet
 keep nb*
+
+keep el_*
+drop el_pflavor
+keep mu_*
+drop mu_pflavor
+keep ll_pt
+
+keep tk_*
 
 keep jet_*
 drop jet_isphoton
@@ -24,6 +33,8 @@ drop jet_h2d
 
 keep nfjet
 keep fjet*
+keep nsubfjet
+keep subfjet*
 
 keep nlep
 keep nvlep
@@ -40,5 +51,3 @@ keep pass*
 keep weight
 
 keep HLT_*
-drop HLT_Mu17*
-drop HLT_Ele23*

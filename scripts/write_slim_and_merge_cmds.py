@@ -12,6 +12,7 @@ def findBaseSampleNames(folder):
     dataset_tag = dataset_tag.split('__RunIIAutumn18NanoAODv5__')[0]
     dataset_tag = dataset_tag.split('_ext')[0]
     dataset_tag = dataset_tag.split('__Nano1June2019')[0]
+    dataset_tag = dataset_tag.split('__Nano25Oct2019')[0]
     dataset_tag = dataset_tag.replace('.root','')
     infiles.add(dataset_tag)
     sortedfiles = list()
