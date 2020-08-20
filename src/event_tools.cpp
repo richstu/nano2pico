@@ -196,7 +196,7 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
 
   bool muon_trigs = nano.HLT_IsoMu24() || nano.HLT_IsoMu27() || nano.HLT_Mu50() ||
                     nano.HLT_IsoMu20() || nano.HLT_IsoTkMu20() || nano.HLT_IsoMu22() ||
-                    nano.HLT_IsoTkMu22() || nano.HLT_Mu24_eta2p1() || nano.HLT_IsoMu22_eta2p1() ||
+                    nano.HLT_IsoTkMu22() || nano.HLT_Mu45_eta2p1() || nano.HLT_IsoMu22_eta2p1() ||
                     nano.HLT_TkMu50() || nano.HLT_IsoTkMu24(); 
   pico.out_HLT_IsoMu24() = nano.HLT_IsoMu24();
   pico.out_HLT_IsoMu27() = nano.HLT_IsoMu27();
@@ -205,7 +205,7 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
   pico.out_HLT_IsoTkMu20() = nano.HLT_IsoTkMu20();
   pico.out_HLT_IsoMu22() = nano.HLT_IsoMu22();
   pico.out_HLT_IsoTkMu22() = nano.HLT_IsoTkMu22();
-  pico.out_HLT_Mu24_eta2p1() = nano.HLT_Mu24_eta2p1();
+  pico.out_HLT_Mu45_eta2p1() = nano.HLT_Mu45_eta2p1();
   pico.out_HLT_IsoMu22_eta2p1() = nano.HLT_IsoMu22_eta2p1();
   pico.out_HLT_TkMu50() = nano.HLT_TkMu50();
   pico.out_HLT_IsoTkMu24() = nano.HLT_IsoTkMu24();

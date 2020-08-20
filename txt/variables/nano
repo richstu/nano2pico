@@ -575,7 +575,7 @@ bool HLT_IsoMu20
 bool HLT_IsoTkMu20
 bool HLT_IsoMu22
 bool HLT_IsoTkMu22
-bool HLT_Mu24_eta2p1
+bool HLT_Mu45_eta2p1
 bool HLT_IsoMu22_eta2p1
 bool HLT_TkMu50
 bool HLT_IsoTkMu24

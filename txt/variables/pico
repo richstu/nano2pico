@@ -293,7 +293,7 @@ bool HLT_IsoTkMu20
 bool HLT_IsoMu22
 bool HLT_IsoTkMu22
 # 2016 prescaled (25/36 ifb)
-bool HLT_Mu24_eta2p1
+bool HLT_Mu45_eta2p1
 # 2016 partial (34/36 ifb)
 bool HLT_IsoMu22_eta2p1
 bool HLT_TkMu50
