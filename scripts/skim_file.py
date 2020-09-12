@@ -26,6 +26,8 @@ def get_cuts(skim_name):
   if(skim_name=='zcand'): cuts = '&&'.join(['nlep==2', 'nbm==0', pass_1l_trig30, mllcut])
   if(skim_name=='ttisr'): cuts = '&&'.join(['nlep==2', 'nbm==2', pass_1l_trig30])
   if(skim_name=='wisr'):  cuts = '&&'.join(['met>100', 'nbl==0', pass_1l_trig40])
+  if(skim_name=='1l2j'): cuts = '&&'.join(['nlep>=1', 'njet>=2'])
+  if(skim_name=='1e4j'): cuts = '&&'.join(['nel>=1', 'njet>=4'])
   if(skim_name=='2l'): cuts = 'nlep>=2'
   if(skim_name=='3l'): cuts = 'nlep==3'
   if(skim_name=='llg'): cuts = '(nmu > 1 || nel > 1) && nphoton > 0'

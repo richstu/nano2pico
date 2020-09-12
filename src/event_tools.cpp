@@ -8,8 +8,9 @@ using namespace std;
 EventTools::EventTools(const string &name_, int year_):
   name(name_),
   year(year_),
-  isTTJets_LO_MET(false),
   isTTJets_LO_Incl(false),
+  isTTJets_LO_MET(false),
+  isTTJets_LO_HT(false),
   isWJets_LO(false),
   isDYJets_LO(false),
   dataset(-1){
@@ -19,6 +20,9 @@ EventTools::EventTools(const string &name_, int year_):
 
   if(Contains(name, "TTJets_") && !Contains(name, "TTJets_HT") && !Contains(name, "genMET-") &&Contains(name, "madgraphMLM")) 
     isTTJets_LO_Incl = true;
+
+  if(Contains(name, "TTJets_HT") && Contains(name, "madgraphMLM")) 
+    isTTJets_LO_HT = true;
 
   if(Contains(name, "WJetsToLNu_Tune")  && Contains(name,"madgraphMLM"))
     isWJets_LO = true;
@@ -46,7 +50,7 @@ EventTools::~EventTools(){
 }
 
 void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
-  pico.out_stitch_htmet() = pico.out_stitch() = pico.out_stitch_ht() = true;
+  pico.out_stitch_photon() = pico.out_stitch_htmet() = pico.out_stitch() = pico.out_stitch_ht() = true;
   if(isTTJets_LO_Incl) {
     if (nano.LHE_HTIncoming()>600) 
       pico.out_stitch_htmet() = pico.out_stitch_ht() = false;
@@ -58,6 +62,31 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
 
   if (isTTJets_LO_MET && nano.LHE_HTIncoming()>600) 
       pico.out_stitch_htmet() = pico.out_stitch_ht() = false;
+
+  if (isTTJets_LO_Incl || isTTJets_LO_MET || isTTJets_LO_HT) {
+    //remove events covered by TTG, see AN-17-197 (TOP-18-010)
+    //stitch if prompt photon w pt>13 |eta|<3 deltaR(genPart[pt>5])>0.2
+    for (unsigned int mc_idx = 0; mc_idx < nano.GenPart_pdgId().size(); mc_idx++) {
+      if (nano.GenPart_pdgId().at(mc_idx) == 22) {
+	float ph_pt = nano.GenPart_pt().at(mc_idx);
+	float ph_eta = nano.GenPart_eta().at(mc_idx);
+	float ph_phi = nano.GenPart_phi().at(mc_idx);
+        if (ph_pt > 13 && fabs(ph_eta)<3.0 && (nano.GenPart_statusFlags().at(mc_idx) & 0x1) == 1) {
+	  //check if another genparticle nearby
+	  bool deltar_fail = false;
+          for (unsigned int mc_idx_2 = 0; mc_idx_2 < nano.GenPart_pdgId().size(); mc_idx_2++) {
+            if (nano.GenPart_pt().at(mc_idx_2)>5 && dR(ph_eta,nano.GenPart_eta().at(mc_idx_2),ph_phi,nano.GenPart_phi().at(mc_idx_2))<0.2) {
+              deltar_fail = true;
+	      break;
+	    }
+          }
+          if (!deltar_fail) {
+            pico.out_stitch_photon() = pico.out_stitch() = false;
+          }
+	}
+      }
+    }
+  }
 
   if(isDYJets_LO  && nano.LHE_HT()>70) 
     pico.out_stitch_htmet() = pico.out_stitch_ht() = pico.out_stitch() = false;
@@ -210,31 +239,48 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
   pico.out_HLT_TkMu50() = nano.HLT_TkMu50();
   pico.out_HLT_IsoTkMu24() = nano.HLT_IsoTkMu24();
 
-  bool met_trigs = nano.HLT_PFMET110_PFMHT110_IDTight() || nano.HLT_PFMETNoMu110_PFMHTNoMu110_IDTight() || 
+  bool met_trigs = nano.HLT_PFMET90_PFMHT90_IDTight() || nano.HLT_PFMETNoMu90_PFMHTNoMu90_IDTight() || 
+                   nano.HLT_PFMET100_PFMHT100_IDTight() || nano.HLT_PFMETNoMu100_PFMHTNoMu100_IDTight() || 
+		   nano.HLT_PFMET110_PFMHT110_IDTight() || nano.HLT_PFMETNoMu110_PFMHTNoMu110_IDTight() || 
                    nano.HLT_PFMET120_PFMHT120_IDTight() || nano.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight() || 
-                   nano.HLT_PFMET120_PFMHT120_IDTight_PFHT60() || nano.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60() ||
                    nano.HLT_PFMET130_PFMHT130_IDTight() || nano.HLT_PFMETNoMu130_PFMHTNoMu130_IDTight() || 
                    nano.HLT_PFMET140_PFMHT140_IDTight() || nano.HLT_PFMETNoMu140_PFMHTNoMu140_IDTight() || 
-                   nano.HLT_PFMET90_PFMHT90_IDTight() || nano.HLT_PFMETNoMu90_PFMHTNoMu90_IDTight() || 
-                   nano.HLT_PFMET100_PFMHT100_IDTight() || nano.HLT_PFMETNoMu100_PFMHTNoMu100_IDTight() || 
                    nano.HLT_PFMET100_PFMHT100_IDTight_PFHT60() || nano.HLT_PFMETNoMu100_PFMHTNoMu100_IDTight_PFHT60() ||
+                   nano.HLT_PFMET110_PFMHT110_IDTight_PFHT60() || nano.HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_PFHT60() ||
+                   nano.HLT_PFMET120_PFMHT120_IDTight_PFHT60() || nano.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60() ||
+                   nano.HLT_PFMET130_PFMHT130_IDTight_PFHT60() || nano.HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_PFHT60() ||
+                   nano.HLT_PFMET140_PFMHT140_IDTight_PFHT60() || nano.HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_PFHT60() ||
+                   nano.HLT_PFMET120_PFMHT120_IDTight_HFCleaned() || nano.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_HFCleaned() || nano.HLT_PFMET120_PFMHT120_IDTight_PFHT60_HFCleaned() ||
                    nano.HLT_PFMET100_PFMHT100_IDTight_CaloBTagCSV_3p1() || nano.HLT_PFMET110_PFMHT110_IDTight_CaloBTagCSV_3p1() || nano.HLT_PFMET110_PFMHT110_IDTight_CaloBTagDeepCSV_3p1();
-  pico.out_HLT_PFMET110_PFMHT110_IDTight() = nano.HLT_PFMET110_PFMHT110_IDTight();
-  pico.out_HLT_PFMETNoMu110_PFMHTNoMu110_IDTight() = nano.HLT_PFMETNoMu110_PFMHTNoMu110_IDTight();
-  pico.out_HLT_PFMET120_PFMHT120_IDTight() = nano.HLT_PFMET120_PFMHT120_IDTight();
-  pico.out_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight() = nano.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight();
-  pico.out_HLT_PFMET120_PFMHT120_IDTight_PFHT60() = nano.HLT_PFMET120_PFMHT120_IDTight_PFHT60();
-  pico.out_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60() = nano.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60();
-  pico.out_HLT_PFMET130_PFMHT130_IDTight() = nano.HLT_PFMET130_PFMHT130_IDTight();
-  pico.out_HLT_PFMETNoMu130_PFMHTNoMu130_IDTight() = nano.HLT_PFMETNoMu130_PFMHTNoMu130_IDTight();
-  pico.out_HLT_PFMET140_PFMHT140_IDTight() = nano.HLT_PFMET140_PFMHT140_IDTight();
-  pico.out_HLT_PFMETNoMu140_PFMHTNoMu140_IDTight() = nano.HLT_PFMETNoMu140_PFMHTNoMu140_IDTight();
+  //MET_MHT[NoMu]
   pico.out_HLT_PFMET90_PFMHT90_IDTight() = nano.HLT_PFMET90_PFMHT90_IDTight();
   pico.out_HLT_PFMETNoMu90_PFMHTNoMu90_IDTight() = nano.HLT_PFMETNoMu90_PFMHTNoMu90_IDTight();
   pico.out_HLT_PFMET100_PFMHT100_IDTight() = nano.HLT_PFMET100_PFMHT100_IDTight();
   pico.out_HLT_PFMETNoMu100_PFMHTNoMu100_IDTight() = nano.HLT_PFMETNoMu100_PFMHTNoMu100_IDTight();
+  pico.out_HLT_PFMET110_PFMHT110_IDTight() = nano.HLT_PFMET110_PFMHT110_IDTight();
+  pico.out_HLT_PFMETNoMu110_PFMHTNoMu110_IDTight() = nano.HLT_PFMETNoMu110_PFMHTNoMu110_IDTight();
+  pico.out_HLT_PFMET120_PFMHT120_IDTight() = nano.HLT_PFMET120_PFMHT120_IDTight();
+  pico.out_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight() = nano.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight();
+  pico.out_HLT_PFMET130_PFMHT130_IDTight() = nano.HLT_PFMET130_PFMHT130_IDTight();
+  pico.out_HLT_PFMETNoMu130_PFMHTNoMu130_IDTight() = nano.HLT_PFMETNoMu130_PFMHTNoMu130_IDTight();
+  pico.out_HLT_PFMET140_PFMHT140_IDTight() = nano.HLT_PFMET140_PFMHT140_IDTight();
+  pico.out_HLT_PFMETNoMu140_PFMHTNoMu140_IDTight() = nano.HLT_PFMETNoMu140_PFMHTNoMu140_IDTight();
+  //MET_MHT[NoMu]_HT60
   pico.out_HLT_PFMET100_PFMHT100_IDTight_PFHT60() = nano.HLT_PFMET100_PFMHT100_IDTight_PFHT60();
   pico.out_HLT_PFMETNoMu100_PFMHTNoMu100_IDTight_PFHT60() = nano.HLT_PFMETNoMu100_PFMHTNoMu100_IDTight_PFHT60();
+  pico.out_HLT_PFMET110_PFMHT110_IDTight_PFHT60() = nano.HLT_PFMET110_PFMHT110_IDTight_PFHT60();
+  pico.out_HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_PFHT60() = nano.HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_PFHT60();
+  pico.out_HLT_PFMET120_PFMHT120_IDTight_PFHT60() = nano.HLT_PFMET120_PFMHT120_IDTight_PFHT60();
+  pico.out_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60() = nano.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60();
+  pico.out_HLT_PFMET130_PFMHT130_IDTight_PFHT60() = nano.HLT_PFMET130_PFMHT130_IDTight_PFHT60();
+  pico.out_HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_PFHT60() = nano.HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_PFHT60();
+  pico.out_HLT_PFMET140_PFMHT140_IDTight_PFHT60() = nano.HLT_PFMET140_PFMHT140_IDTight_PFHT60();
+  pico.out_HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_PFHT60() = nano.HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_PFHT60();
+  //HF cleaned
+  pico.out_HLT_PFMET120_PFMHT120_IDTight_HFCleaned() = nano.HLT_PFMET120_PFMHT120_IDTight_HFCleaned();
+  pico.out_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_HFCleaned() = nano.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_HFCleaned();
+  pico.out_HLT_PFMET120_PFMHT120_IDTight_PFHT60_HFCleaned() = nano.HLT_PFMET120_PFMHT120_IDTight_PFHT60_HFCleaned();
+  //experimental b-tag cross triggers
   pico.out_HLT_PFMET100_PFMHT100_IDTight_CaloBTagCSV_3p1() = nano.HLT_PFMET100_PFMHT100_IDTight_CaloBTagCSV_3p1();
   pico.out_HLT_PFMET110_PFMHT110_IDTight_CaloBTagCSV_3p1() = nano.HLT_PFMET110_PFMHT110_IDTight_CaloBTagCSV_3p1();
   pico.out_HLT_PFMET110_PFMHT110_IDTight_CaloBTagDeepCSV_3p1() = nano.HLT_PFMET110_PFMHT110_IDTight_CaloBTagDeepCSV_3p1();

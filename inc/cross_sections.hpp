@@ -7,7 +7,7 @@
 
 namespace xsec{
 
-  float crossSection(const TString &file, bool is2016);
+  float crossSection(const TString &file, int year);
   void higgsinoCrossSection(int hig_mass, double &xsec, double &xsec_unc);
   float fractionNegWeights(const TString &file);
 }
