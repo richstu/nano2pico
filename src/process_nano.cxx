@@ -20,6 +20,7 @@
 #include "tk_producer.hpp"
 #include "photon_producer.hpp"
 #include "jet_producer.hpp"
+#include "met_producer.hpp"
 #include "hig_producer.hpp"
 #include "zgamma_producer.hpp"
 #include "in_json.hpp"
@@ -115,6 +116,7 @@ int main(int argc, char *argv[]){
   IsoTrackProducer tk_producer(year);
   PhotonProducer photon_producer(year);
   JetProducer jet_producer(year, min_jet_pt, max_jet_eta, isData);
+  MetProducer met_producer(year, isData);
   HigVarProducer hig_producer(year);
   ZGammaVarProducer zgamma_producer(year);
 
@@ -177,6 +179,11 @@ int main(int argc, char *argv[]){
     // number of reconstructed primary vertices
     pico.out_npv() = nano.PV_npvs();
     pico.out_npv_good() = nano.PV_npvsGood();
+    // number of pileup in mc
+    if (!isData) {
+      pico.out_npu_tru() = nano.Pileup_nPU();
+      pico.out_npu_tru_mean() = nano.Pileup_nTrueInt();
+    }
 
     // ----------------------------------------------------------------------------------------------
     //            *** Writing physics objects ***
@@ -237,13 +244,14 @@ int main(int argc, char *argv[]){
     }
     isr_tools.WriteISRJetMultiplicity(nano, pico);
 
+    met_producer.WriteMet(nano, pico);
     // Copy MET and ME ISR directly from NanoAOD
-    pico.out_met()         = nano.MET_pt();
-    pico.out_met_phi()     = nano.MET_phi();
-    pico.out_met_calo()    = nano.CaloMET_pt();
-    pico.out_met_tru()     = nano.GenMET_pt();
-    pico.out_met_tru_phi() = nano.GenMET_phi();
-    pico.out_ht_isr_me()   = nano.LHE_HTIncoming();
+    //pico.out_met()         = nano.MET_pt();
+    //pico.out_met_phi()     = nano.MET_phi();
+    //pico.out_met_calo()    = nano.CaloMET_pt();
+    //pico.out_met_tru()     = nano.GenMET_pt();
+    //pico.out_met_tru_phi() = nano.GenMET_phi();
+    //pico.out_ht_isr_me()   = nano.LHE_HTIncoming();
  
     // calculate mT only for single lepton events
     pico.out_mt() = -999; 

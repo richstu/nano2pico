@@ -11,6 +11,8 @@ bool stitch_dy
 ####################   Global   ###################
 int npv
 int npv_good
+int npu_tru
+int npu_tru_mean
 float ht
 float ht5
 float mht
