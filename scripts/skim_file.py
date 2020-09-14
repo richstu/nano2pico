@@ -52,7 +52,7 @@ def get_cuts(skim_name):
 
   # Control regions skims - to be updated when needed
   nbnjet_or_fjet_cut = '(Sum$(fjet_pt>300 && fjet_msoftdrop>50)>1 || ((nbt>=2 || nbdft>=2) && njet>=4 && njet<=5))' 
-  if(skim_name=='higlep1T'):  cuts = '&&'.join([nbnjet_or_fjet_cut, 'nlep==1', pass_1l_trig40])
+  if(skim_name=='higlep1T'):  cuts = '&&'.join([nbnjet_or_fjet_cut, 'nlep==1', pass_1l_trig30])
   # do not cut on Nb since CR goes down to 0b!
   njet_or_fjet_cut = '(Sum$(fjet_pt>300 && fjet_msoftdrop>50)>1 || (njet>=4 && njet<=5))' 
   if(skim_name=='higlep2T'):  cuts = '&&'.join([njet_or_fjet_cut, 'nlep==2', mllcut,  pass_1l_trig30])
