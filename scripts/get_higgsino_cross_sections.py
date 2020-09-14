@@ -15,12 +15,20 @@ if __name__ == '__main__':
   parser.add_argument('-m','--model', default = "CN")
   args = parser.parse_args()
 
+  doRound =True
+
   # Find mass of higgsino
   signal_files = glob.glob(args.signal_path+'/*.root')
   chi_mass_list = set()
   for signal_file in signal_files:
     mChi = re.findall(r"mChi-\d+",signal_file)[0].replace('mChi-','')
-    chi_mass_list.add(int(mChi))
+    mChi = int(mChi)
+    if (doRound):
+      if (mChi%25!=0 and mChi!=127): 
+        mChi = int(round(mChi/25))*25
+    chi_mass_list.add(mChi)
+  print("Mass points")
+  print(sorted(chi_mass_list))
 
   # Print cross sections
   for mass in sorted(chi_mass_list):
@@ -30,7 +38,10 @@ if __name__ == '__main__':
     result = result.decode()
     xsec = float(result.split(' is ')[-1].split(' [pb] ')[0])
     xsec_unc = float(result.split(' +/- ')[-1].split(' [rel')[0])
-    print('else if(hig_mass =={}) {{ xsec = .5824*.5824*{}; xsec_unc = {}; return;}}'.format(mass, xsec, xsec_unc))
+    if (doRound):
+      print('else if(hig_mass >{}-12 && hig_mass <= {}+12) {{ xsec = .5824*.5824*{}; xsec_unc = {}; return;}}'.format(mass, mass, xsec, xsec_unc))
+    else:
+      print('else if(hig_mass =={}) {{ xsec = .5824*.5824*{}; xsec_unc = {}; return;}}'.format(mass, xsec, xsec_unc))
 
   #for mass in range(125,1501,25):
   #  if mass==125: mass=127
