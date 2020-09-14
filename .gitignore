@@ -49,3 +49,8 @@ sftp-config.json
 apply*.json
 auto*.json
 *cmds.json
+checked*.json
+resubmit*.json
+skim*.json
+skim*.py
+

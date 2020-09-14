@@ -288,6 +288,19 @@ bool HLT_IsoMu24
 bool HLT_IsoMu27
 # non-isolated unprescaled trigger to maximize miniIso efficiency at high pT
 bool HLT_Mu50
+# 2016 prescaled (10/36 ifb)
+bool HLT_IsoMu20
+bool HLT_IsoTkMu20
+# 2016 prescaled (29/36 ifb)
+bool HLT_IsoMu22
+bool HLT_IsoTkMu22
+# 2016 prescaled (25/36 ifb)
+bool HLT_Mu45_eta2p1
+# 2016 partial (34/36 ifb)
+bool HLT_IsoMu22_eta2p1
+bool HLT_TkMu50
+# 2016 unprescaled
+bool HLT_IsoTkMu24
 
 # Electron triggers
 #------------------------------
@@ -300,23 +313,81 @@ bool HLT_Ele32_WPTight_Gsf_L1DoubleEG
 bool HLT_Ele35_WPTight_Gsf
 # non-isolated unprescaled trigger to maximize miniIso efficiency at high pT
 bool HLT_Ele115_CaloIdVT_GsfTrkIdT
+# 2016 prescaled (27/36 ifb)
+bool HLT_Ele27_eta2p1_WPLoose_Gsf
+# 2016 prescaled (25/36 ifb)
+bool HLT_Ele105_CaloIdVT_GsfTrkIdT
+bool HLT_Ele25_WPTight_Gsf
+# 2016 partial (raised -> Ele27_eta2p1_WPLoose, 21/36 ifb)
+bool HLT_Ele25_eta2p1_WPLoose_Gsf
+# 2016 unprescaled
+bool HLT_Ele25_eta2p1_WPTight_Gsf
+# 2018 prescaled (24/60 ifb)
+bool HLT_Ele28_WPTight_Gsf
+# 2018 unprescaled
+bool HLT_Ele32_WPTight_Gsf
 
 # MET triggers
 #------------------------------
 # unprescaled for part of 2016, so to maximize efficiency for turn on
 bool HLT_PFMET110_PFMHT110_IDTight
 bool HLT_PFMETNoMu110_PFMHTNoMu110_IDTight
-# all unprescaled in Run 2
+# all unprescaled in Run 2 (disabled for some lumi in 2017)
 bool HLT_PFMET120_PFMHT120_IDTight
 bool HLT_PFMETNoMu120_PFMHTNoMu120_IDTight
 # compensating for some inefficiencies in the above
 bool HLT_PFMET120_PFMHT120_IDTight_PFHT60
 bool HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60
+# MET140 all unprescaled and fully active in 2017
+bool HLT_PFMET130_PFMHT130_IDTight
+bool HLT_PFMETNoMu130_PFMHTNoMu130_IDTight
+bool HLT_PFMET140_PFMHT140_IDTight
+bool HLT_PFMETNoMu140_PFMHTNoMu140_IDTight
+# low MET prescaled triggers in 2016
+bool HLT_PFMET90_PFMHT90_IDTight
+bool HLT_PFMETNoMu90_PFMHTNoMu90_IDTight
+bool HLT_PFMET100_PFMHT100_IDTight
+bool HLT_PFMETNoMu100_PFMHTNoMu100_IDTight
+# experimental MET cross triggers 2017/18
+bool HLT_PFMET100_PFMHT100_IDTight_PFHT60
+bool HLT_PFMETNoMu100_PFMHTNoMu100_IDTight_PFHT60
+bool HLT_PFMET100_PFMHT100_IDTight_CaloBTagCSV_3p1
+bool HLT_PFMET110_PFMHT110_IDTight_CaloBTagCSV_3p1
+bool HLT_PFMET110_PFMHT110_IDTight_CaloBTagDeepCSV_3p1
 
 # Jet trigger 
 #------------------------------
 # unprescaled, reference for 1L trigger eff measurements
 bool HLT_PFJet500
+
+# HT triggers
+#------------------------------
+#for QCD control region
+#---2016---
+bool HLT_PFHT125
+bool HLT_PFHT200
+bool HLT_PFHT300
+bool HLT_PFHT400
+bool HLT_PFHT475
+bool HLT_PFHT600
+bool HLT_PFHT650
+bool HLT_PFHT800
+#unprescaled
+bool HLT_PFHT900
+#---2017/18---
+bool HLT_PFHT180
+bool HLT_PFHT370
+bool HLT_PFHT430
+bool HLT_PFHT510
+bool HLT_PFHT590
+bool HLT_PFHT680
+bool HLT_PFHT780
+bool HLT_PFHT890
+#unprescaled
+bool HLT_PFHT1050
+#---2016/17/18---
+bool HLT_PFHT250
+bool HLT_PFHT350
 
 # ZGamma triggers
 bool HLT_Mu17_Photon30_IsoCaloId

@@ -68,7 +68,8 @@ void ISRTools::WriteISRSystemPt(nano_tree &nano, pico_tree &pico) {
       } else if ((mc_absid==1000023 || mc_absid==1000025) && pico.out_type()==106e3) {
         isr_p4 -= mc_v4;
         mprod = nano.GenPart_mass()[imc];
-        mlsp = 1.;
+      } else if ((mc_absid==1000022) && pico.out_type()==106e3) {
+        mlsp = nano.GenPart_mass()[imc];
       }
     }
   }
