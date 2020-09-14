@@ -21,6 +21,7 @@ drop el_pflavor
 keep mu_*
 drop mu_pflavor
 keep ll_pt
+keep ll_m
 
 keep tk_*
 
@@ -42,6 +43,7 @@ keep nmu
 keep nvmu
 keep nel
 keep nvel
+keep lep_*
 keep elel_*
 keep mumu_*
 keep ntk
