@@ -354,6 +354,15 @@ float MET_phi
 float MET_pt
 float MET_significance
 float MET_sumEt
+float METFixEE2017_MetUnclustEnUpDeltaX
+float METFixEE2017_MetUnclustEnUpDeltaY
+float METFixEE2017_covXX
+float METFixEE2017_covXY
+float METFixEE2017_covYY
+float METFixEE2017_phi
+float METFixEE2017_pt
+float METFixEE2017_significance
+float METFixEE2017_sumEt
 float CaloMET_phi
 float CaloMET_pt
 float CaloMET_sumEt
