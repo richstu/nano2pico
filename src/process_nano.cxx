@@ -27,6 +27,7 @@
 
 #include "btag_weighter.hpp"
 #include "lepton_weighter.hpp"
+#include "prefire_weighter.hpp"
 #include "photon_weighter.hpp"
 #include "event_tools.hpp"
 #include "isr_tools.hpp"
@@ -351,9 +352,11 @@ int main(int argc, char *argv[]){
 
     // N.B. out_w_prefire should not be renormalized because it models an inefficiency, 
     // i.e. we SHOULD get less events!
-    // This is on the @todo list, to be implemented based on: 
-    // https://github.com/cms-nanoAOD/nanoAOD-tools/blob/master/python/postprocessing/modules/common/Prefirewgt_sums.py
-    pico.out_w_prefire() = 1.;
+    float w_prefire=1.;
+    std::vector<float> sys_prefire(2, 1.);
+    prefire_weighter.EventWeight(nano, w_prefire, sys_prefire);
+    pico.out_w_prefire() = w_prefire;
+    pico.out_sys_prefire() = sys_prefire;
 
     // do not include w_prefire, or anything that should not be renormalized! Will be set again in Step 3
     pico.out_weight() = pico.out_w_lumi() *
