@@ -7,7 +7,7 @@
 #include "TH2D.h"
 #include "TH2F.h"
 
-#include "pico_tree.hpp"
+#include "nano_tree.hpp"
 
 class PrefireWeighter{
 public:
@@ -21,6 +21,8 @@ private:
   std::string prefire_jet_empt_filename_, prefire_jet_empt_histname_;
   std::string prefire_jet_filename_, prefire_jet_histname_;
   std::string prefire_photon_filename_, prefire_photon_histname_;
+
+  TH2F sf_hist_prefire_jet_, sf_hist_prefire_jet_empt_, sf_hist_prefire_photon_;
 
   bool do_prefire_jet_, do_prefire_jet_empt_, do_prefire_photon_;
 };

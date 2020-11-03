@@ -43,6 +43,7 @@ namespace {
   // requirements for jets to be counted in njet, mofified for Zgamma below
   float min_jet_pt = 30.0;
   float max_jet_eta =  2.4;
+  int nano2pico_version = 1;
 }
 
 void WriteDataQualityFilters(nano_tree& nano, pico_tree& pico);
@@ -131,6 +132,7 @@ int main(int argc, char *argv[]){
   // BTagWeighter btag_df_weighter(year, isFastsim, true, btag_df_wpts[year]);
   LeptonWeighter lep_weighter(year, isZgamma);
   LeptonWeighter lep_weighter16gh(year, isZgamma, true);
+  PrefireWeighter prefire_weighter(year, true);
   PhotonWeighter photon_weighter(year, isZgamma);
 
   // Other tools
@@ -185,6 +187,8 @@ int main(int argc, char *argv[]){
       pico.out_npu_tru() = nano.Pileup_nPU();
       pico.out_npu_tru_mean() = nano.Pileup_nTrueInt();
     }
+    //nano2pico provenance
+    pico.out_nano2pico_version() = nano2pico_version;
 
     // ----------------------------------------------------------------------------------------------
     //            *** Writing physics objects ***
@@ -286,7 +290,7 @@ int main(int argc, char *argv[]){
 
     if (debug) cout<<"INFO:: Writing filters and triggers"<<endl;
     // N.B. Jets: pico.out_pass_jets() and pico.out_pass_fsjets() filled in jet_producer
-    event_tools.WriteDataQualityFilters(nano, pico, sig_jet_nano_idx, min_jet_pt, max_jet_eta, isData, isFastsim);
+    event_tools.WriteDataQualityFilters(nano, pico, sig_jet_nano_idx, min_jet_pt, isData, isFastsim);
 
     event_tools.WriteTriggerEfficiency(pico);
 

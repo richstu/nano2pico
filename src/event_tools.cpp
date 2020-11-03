@@ -99,7 +99,7 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
 
 
 void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vector<int> sig_jet_nano_idx,
-                                         float min_jet_pt, float max_jet_eta, bool isData, bool isFastsim){
+                                         float min_jet_pt, bool isData, bool isFastsim){
   // jet quality filter
   pico.out_pass_jets() = true;
   if (isFastsim) {
@@ -141,19 +141,21 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
 
   pico.out_pass_low_neutral_jet() = true;
   for(int ijet(0); ijet<nano.nJet(); ++ijet){  
-    if (nano.Jet_pt()[ijet]<=min_jet_pt || fabs(nano.Jet_eta()[ijet])>max_jet_eta) continue;
+    //sync: currently, boosted does not have pt or eta cuts
+    //if (nano.Jet_pt()[ijet]<=min_jet_pt || fabs(nano.Jet_eta()[ijet])>max_jet_eta) continue;
     if (nano.Jet_neEmEF()[ijet] <0.03 && DeltaPhi(nano.Jet_phi()[ijet], pico.out_met_phi())>(TMath::Pi()-0.4))
       pico.out_pass_low_neutral_jet() = false;
-    break; //only apply to leading jet that passes pt and eta
+    break; //only apply to leading jet
   }
 
   pico.out_pass_htratio_dphi_tight() = true;
   float htratio = pico.out_ht5()/pico.out_ht();
   for(int ijet(0); ijet<nano.nJet(); ++ijet){  
-    if (nano.Jet_pt()[ijet]<=min_jet_pt || fabs(nano.Jet_eta()[ijet])>max_jet_eta) continue;
+    //sync: currently, boosted does not have pt or eta cuts
+    //if (nano.Jet_pt()[ijet]<=min_jet_pt || fabs(nano.Jet_eta()[ijet])>max_jet_eta) continue;
     if (htratio >= 1.2 && DeltaPhi(nano.Jet_phi()[ijet], pico.out_met_phi()) < (5.3*htratio - 4.78)) 
       pico.out_pass_htratio_dphi_tight() = false;
-    break; //only apply to leading jet that passes pt and eta
+    break; //only apply to leading jet
   }
 
   // filters directly from Nano
@@ -206,39 +208,68 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
 
 bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZgamma){
 
-  bool egamma_trigs = nano.HLT_Ele27_WPTight_Gsf() || nano.HLT_Ele32_WPTight_Gsf_L1DoubleEG() || 
-                      nano.HLT_Ele35_WPTight_Gsf() || nano.HLT_Ele115_CaloIdVT_GsfTrkIdT() ||
-                      nano.HLT_Ele27_eta2p1_WPLoose_Gsf() || nano.HLT_Ele105_CaloIdVT_GsfTrkIdT() ||
-                      nano.HLT_Ele25_WPTight_Gsf() || nano.HLT_Ele25_eta2p1_WPLoose_Gsf() ||
-                      nano.HLT_Ele25_eta2p1_WPTight_Gsf() || nano.HLT_Ele28_WPTight_Gsf() ||
-                      nano.HLT_Ele32_WPTight_Gsf();
-  pico.out_HLT_Ele27_WPTight_Gsf() = nano.HLT_Ele27_WPTight_Gsf();
-  pico.out_HLT_Ele32_WPTight_Gsf_L1DoubleEG() = nano.HLT_Ele32_WPTight_Gsf_L1DoubleEG();
-  pico.out_HLT_Ele35_WPTight_Gsf() = nano.HLT_Ele35_WPTight_Gsf();
-  pico.out_HLT_Ele115_CaloIdVT_GsfTrkIdT() = nano.HLT_Ele115_CaloIdVT_GsfTrkIdT();
-  pico.out_HLT_Ele27_eta2p1_WPLoose_Gsf() = nano.HLT_Ele27_eta2p1_WPLoose_Gsf();
-  pico.out_HLT_Ele105_CaloIdVT_GsfTrkIdT() = nano.HLT_Ele105_CaloIdVT_GsfTrkIdT();
+  bool egamma_trigs = nano.HLT_Ele25_WPTight_Gsf() || nano.HLT_Ele27_WPTight_Gsf() || 
+                      nano.HLT_Ele28_WPTight_Gsf() || nano.HLT_Ele32_WPTight_Gsf() ||
+	              nano.HLT_Ele32_WPTight_Gsf_L1DoubleEG() || nano.HLT_Ele35_WPTight_Gsf() || 
+                      nano.HLT_Ele20_WPLoose_Gsf() || nano.HLT_Ele45_WPLoose_Gsf() ||
+                      nano.HLT_Ele105_CaloIdVT_GsfTrkIdT() || nano.HLT_Ele115_CaloIdVT_GsfTrkIdT() ||
+                      nano.HLT_Ele135_CaloIdVT_GsfTrkIdT() || nano.HLT_Ele145_CaloIdVT_GsfTrkIdT() ||
+                      nano.HLT_Ele25_eta2p1_WPTight_Gsf() || nano.HLT_Ele27_eta2p1_WPTight_Gsf() || 
+                      nano.HLT_Ele20_eta2p1_WPLoose_Gsf() || nano.HLT_Ele25_eta2p1_WPLoose_Gsf() ||
+                      nano.HLT_Ele27_eta2p1_WPLoose_Gsf() || nano.HLT_Ele15_IsoVVVL_PFHT350() ||
+		      nano.HLT_Ele15_IsoVVVL_PFHT400() || nano.HLT_Ele15_IsoVVVL_PFHT450() ||
+		      nano.HLT_Ele15_IsoVVVL_PFHT600() || nano.HLT_Ele50_IsoVVVL_PFHT450();
+
   pico.out_HLT_Ele25_WPTight_Gsf() = nano.HLT_Ele25_WPTight_Gsf();
-  pico.out_HLT_Ele25_eta2p1_WPLoose_Gsf() = nano.HLT_Ele25_eta2p1_WPLoose_Gsf();
-  pico.out_HLT_Ele25_eta2p1_WPTight_Gsf() = nano.HLT_Ele25_eta2p1_WPTight_Gsf();
+  pico.out_HLT_Ele27_WPTight_Gsf() = nano.HLT_Ele27_WPTight_Gsf();
   pico.out_HLT_Ele28_WPTight_Gsf() = nano.HLT_Ele28_WPTight_Gsf();
   pico.out_HLT_Ele32_WPTight_Gsf() = nano.HLT_Ele32_WPTight_Gsf();
+  pico.out_HLT_Ele32_WPTight_Gsf_L1DoubleEG() = nano.HLT_Ele32_WPTight_Gsf_L1DoubleEG();
+  pico.out_HLT_Ele35_WPTight_Gsf() = nano.HLT_Ele35_WPTight_Gsf();
+  pico.out_HLT_Ele20_WPLoose_Gsf() = nano.HLT_Ele20_WPLoose_Gsf();
+  pico.out_HLT_Ele45_WPLoose_Gsf() = nano.HLT_Ele45_WPLoose_Gsf();
+  pico.out_HLT_Ele105_CaloIdVT_GsfTrkIdT() = nano.HLT_Ele105_CaloIdVT_GsfTrkIdT();
+  pico.out_HLT_Ele115_CaloIdVT_GsfTrkIdT() = nano.HLT_Ele115_CaloIdVT_GsfTrkIdT();
+  pico.out_HLT_Ele135_CaloIdVT_GsfTrkIdT() = nano.HLT_Ele135_CaloIdVT_GsfTrkIdT();
+  pico.out_HLT_Ele145_CaloIdVT_GsfTrkIdT() = nano.HLT_Ele145_CaloIdVT_GsfTrkIdT();
+  pico.out_HLT_Ele25_eta2p1_WPTight_Gsf() = nano.HLT_Ele25_eta2p1_WPTight_Gsf();
+  pico.out_HLT_Ele27_eta2p1_WPTight_Gsf() = nano.HLT_Ele27_eta2p1_WPTight_Gsf();
+  pico.out_HLT_Ele20_eta2p1_WPLoose_Gsf() = nano.HLT_Ele20_eta2p1_WPLoose_Gsf();
+  pico.out_HLT_Ele25_eta2p1_WPLoose_Gsf() = nano.HLT_Ele25_eta2p1_WPLoose_Gsf();
+  pico.out_HLT_Ele27_eta2p1_WPLoose_Gsf() = nano.HLT_Ele27_eta2p1_WPLoose_Gsf();
+  pico.out_HLT_Ele15_IsoVVVL_PFHT350() = nano.HLT_Ele15_IsoVVVL_PFHT350();
+  pico.out_HLT_Ele15_IsoVVVL_PFHT400() = nano.HLT_Ele15_IsoVVVL_PFHT400();
+  pico.out_HLT_Ele15_IsoVVVL_PFHT450() = nano.HLT_Ele15_IsoVVVL_PFHT450();
+  pico.out_HLT_Ele15_IsoVVVL_PFHT600() = nano.HLT_Ele15_IsoVVVL_PFHT600();
+  pico.out_HLT_Ele50_IsoVVVL_PFHT450() = nano.HLT_Ele50_IsoVVVL_PFHT450();
 
-  bool muon_trigs = nano.HLT_IsoMu24() || nano.HLT_IsoMu27() || nano.HLT_Mu50() ||
-                    nano.HLT_IsoMu20() || nano.HLT_IsoTkMu20() || nano.HLT_IsoMu22() ||
-                    nano.HLT_IsoTkMu22() || nano.HLT_Mu45_eta2p1() || nano.HLT_IsoMu22_eta2p1() ||
-                    nano.HLT_TkMu50() || nano.HLT_IsoTkMu24(); 
+  bool muon_trigs = nano.HLT_IsoMu20() || nano.HLT_IsoMu22() || nano.HLT_IsoMu24() ||
+                    nano.HLT_IsoMu27() || nano.HLT_IsoTkMu20() || nano.HLT_IsoTkMu22() ||
+                    nano.HLT_IsoTkMu24() || nano.HLT_Mu50() || nano.HLT_Mu55() ||
+                    nano.HLT_TkMu50() || nano.HLT_IsoMu22_eta2p1() || nano.HLT_IsoMu24_eta2p1() ||
+                    nano.HLT_Mu45_eta2p1() || nano.HLT_Mu15_IsoVVVL_PFHT350() || nano.HLT_Mu15_IsoVVVL_PFHT400() ||
+                    nano.HLT_Mu15_IsoVVVL_PFHT450() || nano.HLT_Mu15_IsoVVVL_PFHT600() || nano.HLT_Mu50_IsoVVVL_PFHT400() ||
+                    nano.HLT_Mu50_IsoVVVL_PFHT450();
+
+  pico.out_HLT_IsoMu20() = nano.HLT_IsoMu20();
+  pico.out_HLT_IsoMu22() = nano.HLT_IsoMu22();
   pico.out_HLT_IsoMu24() = nano.HLT_IsoMu24();
   pico.out_HLT_IsoMu27() = nano.HLT_IsoMu27();
-  pico.out_HLT_Mu50() = nano.HLT_Mu50();
-  pico.out_HLT_IsoMu20() = nano.HLT_IsoMu20();
   pico.out_HLT_IsoTkMu20() = nano.HLT_IsoTkMu20();
-  pico.out_HLT_IsoMu22() = nano.HLT_IsoMu22();
   pico.out_HLT_IsoTkMu22() = nano.HLT_IsoTkMu22();
-  pico.out_HLT_Mu45_eta2p1() = nano.HLT_Mu45_eta2p1();
-  pico.out_HLT_IsoMu22_eta2p1() = nano.HLT_IsoMu22_eta2p1();
-  pico.out_HLT_TkMu50() = nano.HLT_TkMu50();
   pico.out_HLT_IsoTkMu24() = nano.HLT_IsoTkMu24();
+  pico.out_HLT_Mu50() = nano.HLT_Mu50();
+  pico.out_HLT_Mu55() = nano.HLT_Mu55();
+  pico.out_HLT_TkMu50() = nano.HLT_TkMu50();
+  pico.out_HLT_IsoMu22_eta2p1() = nano.HLT_IsoMu22_eta2p1();
+  pico.out_HLT_IsoMu24_eta2p1() = nano.HLT_IsoMu24_eta2p1();
+  pico.out_HLT_Mu45_eta2p1() = nano.HLT_Mu45_eta2p1();
+  pico.out_HLT_Mu15_IsoVVVL_PFHT350() = nano.HLT_Mu15_IsoVVVL_PFHT350();
+  pico.out_HLT_Mu15_IsoVVVL_PFHT400() = nano.HLT_Mu15_IsoVVVL_PFHT400();
+  pico.out_HLT_Mu15_IsoVVVL_PFHT450() = nano.HLT_Mu15_IsoVVVL_PFHT450();
+  pico.out_HLT_Mu15_IsoVVVL_PFHT600() = nano.HLT_Mu15_IsoVVVL_PFHT600();
+  pico.out_HLT_Mu50_IsoVVVL_PFHT400() = nano.HLT_Mu50_IsoVVVL_PFHT400();
+  pico.out_HLT_Mu50_IsoVVVL_PFHT450() = nano.HLT_Mu50_IsoVVVL_PFHT450();
 
   bool met_trigs = nano.HLT_PFMET90_PFMHT90_IDTight() || nano.HLT_PFMETNoMu90_PFMHTNoMu90_IDTight() || 
                    nano.HLT_PFMET100_PFMHT100_IDTight() || nano.HLT_PFMETNoMu100_PFMHTNoMu100_IDTight() || 
@@ -324,7 +355,6 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
   pico.out_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL()        = nano.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL();
   pico.out_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ()       = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ();
   pico.out_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ()     = nano.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ();
-  pico.out_HLT_Ele27_eta2p1_WPTight_Gsf()              = nano.HLT_Ele27_eta2p1_WPTight_Gsf();
   pico.out_HLT_Photon175()                             = nano.HLT_Photon175();
 
 

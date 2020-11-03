@@ -160,7 +160,11 @@ int GetGluinoMass(const string &path){
   auto pos1 = path.rfind(key)+key.size();
   auto pos2 = path.find("_", pos1);
   string mass_string = path.substr(pos1, pos2-pos1);
-  return stoi(mass_string);
+  int unrounded_mass = stoi(mass_string);
+  int rounded_mass = unrounded_mass;
+  if (unrounded_mass != 127)
+    rounded_mass = ((unrounded_mass+12)/25)*25;
+  return rounded_mass;
 }
 
 void FixLumi(corrections_tree &corr, const string &corr_path, int year){

@@ -577,33 +577,47 @@ bool HLTriggerFirstPath
 bool HLTriggerFinalPath
 
 # Single lepton triggers
+bool HLT_IsoMu20
+bool HLT_IsoMu22
 bool HLT_IsoMu24
 bool HLT_IsoMu27
-bool HLT_Mu50
-bool HLT_IsoMu20
 bool HLT_IsoTkMu20
-bool HLT_IsoMu22
 bool HLT_IsoTkMu22
+bool HLT_IsoTkMu24
+bool HLT_Mu50
+bool HLT_Mu55
+bool HLT_TkMu50
 bool HLT_Mu45_eta2p1
 bool HLT_IsoMu22_eta2p1
-bool HLT_TkMu50
-bool HLT_IsoTkMu24
-bool HLT_Ele27_WPTight_Gsf
-bool HLT_Ele32_WPTight_Gsf_L1DoubleEG
-bool HLT_Ele35_WPTight_Gsf
-bool HLT_Ele115_CaloIdVT_GsfTrkIdT
-bool HLT_Ele27_eta2p1_WPLoose_Gsf
-bool HLT_Ele105_CaloIdVT_GsfTrkIdT
+bool HLT_IsoMu24_eta2p1
+
 bool HLT_Ele25_WPTight_Gsf
-bool HLT_Ele25_eta2p1_WPLoose_Gsf
-bool HLT_Ele25_eta2p1_WPTight_Gsf
+bool HLT_Ele27_WPTight_Gsf
 bool HLT_Ele28_WPTight_Gsf
+bool HLT_Ele32_WPTight_Gsf_L1DoubleEG
 bool HLT_Ele32_WPTight_Gsf
+bool HLT_Ele35_WPTight_Gsf
+bool HLT_Ele20_WPLoose_Gsf
+bool HLT_Ele45_WPLoose_Gsf
+bool HLT_Ele105_CaloIdVT_GsfTrkIdT
+bool HLT_Ele115_CaloIdVT_GsfTrkIdT
+bool HLT_Ele135_CaloIdVT_GsfTrkIdT
+bool HLT_Ele145_CaloIdVT_GsfTrkIdT
+bool HLT_Ele25_eta2p1_WPTight_Gsf
+bool HLT_Ele27_eta2p1_WPTight_Gsf
+bool HLT_Ele20_eta2p1_WPLoose_Gsf
+bool HLT_Ele25_eta2p1_WPLoose_Gsf
+bool HLT_Ele27_eta2p1_WPLoose_Gsf
 
 # Lepton HT cross-triggers
+bool HLT_Mu15_IsoVVVL_PFHT350
+bool HLT_Mu15_IsoVVVL_PFHT400
 bool HLT_Mu15_IsoVVVL_PFHT450
 bool HLT_Mu15_IsoVVVL_PFHT600
+bool HLT_Mu50_IsoVVVL_PFHT400
 bool HLT_Mu50_IsoVVVL_PFHT450
+bool HLT_Ele15_IsoVVVL_PFHT350
+bool HLT_Ele15_IsoVVVL_PFHT400
 bool HLT_Ele15_IsoVVVL_PFHT450
 bool HLT_Ele15_IsoVVVL_PFHT600
 bool HLT_Ele50_IsoVVVL_PFHT450
@@ -669,5 +683,4 @@ bool HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL
 bool HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL
 bool HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ
 bool HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ
-bool HLT_Ele27_eta2p1_WPTight_Gsf
 bool HLT_Photon175

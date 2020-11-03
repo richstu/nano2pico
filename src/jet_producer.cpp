@@ -65,6 +65,7 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
     pico.out_jet_breg_res().push_back(nano.Jet_bRegRes()[ijet]);
     pico.out_jet_deepcsv().push_back(nano.Jet_btagDeepB()[ijet]);
     pico.out_jet_deepflav().push_back(nano.Jet_btagDeepFlavB()[ijet]);
+    pico.out_jet_ne_emef().push_back(nano.Jet_neEmEF()[ijet]);
     pico.out_jet_qgl().push_back(nano.Jet_qgl()[ijet]);
     pico.out_jet_islep().push_back(islep);
     pico.out_jet_isvlep().push_back(isvlep);
@@ -143,6 +144,8 @@ void JetProducer::WriteFatJets(nano_tree &nano, pico_tree &pico){
     pico.out_fjet_mva_hbb_btv().push_back(nano.FatJet_btagHbb()[ifjet]);
     // Mass-decorrelated DeepAk8, H->bb vs QCD discriminator, endorsed by JME
     pico.out_fjet_deep_md_hbb_jme().push_back(nano.FatJet_deepTagMD_HbbvsQCD()[ifjet]);
+    pico.out_fjet_deep_md_tvsqcd().push_back(nano.FatJet_deepTagMD_TvsQCD()[ifjet]);
+    pico.out_fjet_deep_tvsqcd().push_back(nano.FatJet_deepTag_TvsQCD()[ifjet]);
 
     pico.out_fjet_subjet_idx1().push_back(nano.FatJet_subJetIdx1()[ifjet]);
     pico.out_fjet_subjet_idx2().push_back(nano.FatJet_subJetIdx2()[ifjet]);
