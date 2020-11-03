@@ -59,12 +59,13 @@ def processSteps(process_commands, YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, PIC
 
   # Backup log file
   fileIndex = 1
-  while (1):
-    filename = STEP_FILEBASENAME+"."+str(fileIndex)
-    if not os.path.isfile(filename):
-      os.system('mv '+STEP_FILEBASENAME+' '+STEP_FILEBASENAME+"."+str(fileIndex))
-      break
-    fileIndex += 1
+  if os.path.isfile(STEP_FILEBASENAME):
+    while (1):
+      filename = STEP_FILEBASENAME+"."+str(fileIndex)
+      if not os.path.isfile(filename):
+        os.system('mv '+STEP_FILEBASENAME+' '+STEP_FILEBASENAME+"."+str(fileIndex))
+        break
+      fileIndex += 1
 
    # Do steps
   for iStep in xrange(len(process_commands)):
@@ -117,7 +118,7 @@ def processMc(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, PICO_DIR, NANOAOD_VERSIO
   process_commands = [
     #0
     [notify_script+' "Start process nano '+mc_tag+'"',
-    './scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/mc/ --production '+PRODUCTION_NAME+' --dataset_list datasets/mc_dataset_paths --tag '+mc_tag,
+    './scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/mc/ --production '+PRODUCTION_NAME+' --dataset_list txt/datasets/'+NANOAOD_VERSION+'_higgsino_'+YEAR+'_mc_dataset_paths --tag '+mc_tag,
     'auto_submit_jobs.py process_nano_cmds_'+mc_tag+'.json -c scripts/check_process_nano_job.py -f',
     notify_script+' "Finished process nano '+mc_tag+'"'], 
     
@@ -348,9 +349,9 @@ def processData(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, PICO_DIR, NANOAOD_VERS
   return processSteps(process_commands, YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, PICO_DIR, NANOAOD_VERSION, FIRST_COMMAND, NO_RUN, data_tag)
 
 if __name__ == '__main__':
-  PRODUCTION_NAME = 'higgsino_humboldtv3'
+  PRODUCTION_NAME = 'higgsino_inyo'
   PICO_DIR = '/net/cms25/cms25r5/pico'
-  NANOAOD_VERSION = 'NanoAODv5'
+  NANOAOD_VERSION = 'NanoAODv7'
   notify_script = 'sendTelegramMessage.py'
   # Use sendMail if telegram is not setup
   #notify_script = os.path.dirname(os.path.realpath(__file__))+'/sendEmail.sh'
@@ -369,12 +370,12 @@ if __name__ == '__main__':
   # Step is the step that is running. Will run the next step.
   #FIRST_COMMAND = processMc(YEAR=2016, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME='process_steps_higgsino.py.'+PRODUCTION_NAME+'.2016.mc.step', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
   #FIRST_COMMAND = processSignal(YEAR=2016, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME='process_steps_higgsino.py.'+PRODUCTION_NAME+'.2016.sig.step', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
-  #FIRST_COMMAND = processData(YEAR=2016, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME='process_steps_higgsino.py.'+PRODUCTION_NAME+'.2016.data.step', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
+  FIRST_COMMAND = processData(YEAR=2016, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME='process_steps_higgsino.py.'+PRODUCTION_NAME+'.2016.data.step', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
 
-  FIRST_COMMAND = processMc(YEAR=2017, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME='process_steps_higgsino.py.'+PRODUCTION_NAME+'.2017.mc.step', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
-  FIRST_COMMAND = processSignal(YEAR=2017, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME='process_steps_higgsino.py.'+PRODUCTION_NAME+'.2017.sig.step', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
+  #FIRST_COMMAND = processMc(YEAR=2017, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME='process_steps_higgsino.py.'+PRODUCTION_NAME+'.2017.mc.step', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
+  #FIRST_COMMAND = processSignal(YEAR=2017, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME='process_steps_higgsino.py.'+PRODUCTION_NAME+'.2017.sig.step', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
   FIRST_COMMAND = processData(YEAR=2017, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME='process_steps_higgsino.py.'+PRODUCTION_NAME+'.2017.data.step', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
 
   #FIRST_COMMAND = processMc(YEAR=2018, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME='process_steps_higgsino.py.'+PRODUCTION_NAME+'.2018.mc.step', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
   #FIRST_COMMAND = processSignal(YEAR=2018, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME='process_steps_higgsino.py.'+PRODUCTION_NAME+'.2018.sig.step', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
-  #FIRST_COMMAND = processData(YEAR=2018, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME='process_steps_higgsino.py.'+PRODUCTION_NAME+'.2018.data.step', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
+  FIRST_COMMAND = processData(YEAR=2018, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME='process_steps_higgsino.py.'+PRODUCTION_NAME+'.2018.data.step', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)

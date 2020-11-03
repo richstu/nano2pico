@@ -391,3 +391,21 @@ Use model "CN" (mixing) or "N1N2" (no mixing).
 cd cross_section
 ../scripts/get_higgsino_cross_sections.py -i /net/cms29/cms29r0/pico/NanoAODv5/nano/2016/SMS-TChiHH_2D --model "N1N2"
 ~~~~
+
+# Tagging code with git
+
+Confirm tags: `git tag`
+
+Add a lightweight tag: `git tag <tagname>`
+
+Pushing tag: `git push origin <tagname>`
+
+Deleting tag: `git tag -d <tagname>` and `git push origin --delete <tagname>`
+
+Checking out tag: `git checkout <tagname>`
+
+# Update submodule
+
+In case didn't checkout submodule: `git submodule init` and `git submodule update`
+
+Update all submodules: `git submodule update --recursive --remote --merge` and then commit.
