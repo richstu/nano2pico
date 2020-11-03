@@ -42,8 +42,10 @@ if args['dataset_list']!='':
       tmp_ = ds.split("/")
       if("NanoAODv4" in tmp_[2]):
         wanted_file_substr.append(tmp_[1]+'__'+tmp_[2].replace("NanoAODv4-","NanoAODv4__"))
-      else:
+      elif("NanoAODv5" in tmp_[2]):
         wanted_file_substr.append(tmp_[1]+'__'+tmp_[2].replace("NanoAODv5-","NanoAODv5__"))
+      else:
+        wanted_file_substr.append(tmp_[1]+'__'+tmp_[2].replace("NanoAODv7-","NanoAODv7__"))
     for istr in wanted_file_substr:
       for ifile in all_file_paths:
         if (istr in ifile):
