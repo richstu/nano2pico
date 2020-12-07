@@ -16,13 +16,13 @@ tmp = args.split(' ')
 infile_path = tmp[4]+'/'+tmp[2]
 outfile_path = tmp[6]+'/raw_pico/raw_pico_'+tmp[2]
 
-infile = TChain("Events");
-infile.Add(infile_path);
-in_nent = infile.GetEntries()
+#infile = TChain("Events");
+#infile.Add(infile_path);
+#in_nent = infile.GetEntries()
 
 outfile = TChain("tree");
 outfile.Add(outfile_path);
-out_nent = outfile.GetEntries()
+#out_nent = outfile.GetEntries()
 
 isFail = False
 if outfile.GetNbranches() == 0:
@@ -38,6 +38,10 @@ for line in job_log_string.split('\n'):
 
 if 'segmentation fault' in job_log_string.lower():
   print('[For queue_system] fail: Segmentation fault in job_log')
+  isFail = True
+
+if 'segmentation violation' in job_log_string.lower():
+  print('[For queue_system] fail: Segmentation violation in job_log')
   isFail = True
 
 if not isFail:

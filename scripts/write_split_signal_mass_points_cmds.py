@@ -12,7 +12,10 @@ def get_2d_mass_points(signal_chain, pdgId_1, pdgId_2):
   #print(number_variables, signal_chain.GetEntries())
   for iVar in range(number_variables):
     #print (mass_array_1[iVar], mass_array_2[iVar])
-    mass_points.add((int(round(mass_array_1[iVar]/25)*25), int(round(mass_array_2[iVar]/25)*25)))
+    if (mass_array_1[iVar] == 127):
+      mass_points.add((mass_array_1[iVar], int(round(mass_array_2[iVar]/25)*25)))
+    else:
+      mass_points.add((int(round(mass_array_1[iVar]/25)*25), int(round(mass_array_2[iVar]/25)*25)))
   return sorted(mass_points)
 
 if __name__ == '__main__':
@@ -52,8 +55,8 @@ for mass_point in mass_points:
 '''
   else:
     out_string = '''#!/bin/env python
-source_directory = "'''+source_directory+'''"
-target_directory = "'''+target_directory+'''"
+source_directory = "'''+source_directory+'''/"
+target_directory = "'''+target_directory+'''/"
 mass_points = [127, 150, 175, 
                200, 225, 250, 275, 
                300, 325, 350, 375, 

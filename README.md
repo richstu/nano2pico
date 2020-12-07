@@ -349,6 +349,40 @@ Generate a python file that prints the commands to be run in the batch (input fo
                                                  --out_cmd_filename cmds_split.py
 ~~~~
 
+~~~~bash 
+./scripts/write_split_signal_mass_points_cmds.py --in_dir /net/cms25/cms25r5/pico/NanoAODv7/nano/2016/SMS-TChiHH_2D_unsplit 
+                                                 --target_dir /net/cms25/cms25r5/pico/NanoAODv7/nano/2016/SMS-TChiHH_2D 
+                                                 --dataset_filenames SMS-TChiHH_HToBB_HToBB_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISummer16NanoAODv7__PUSummer16v3Fast_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1*.root
+                                                 --out_cmd_filename cmds_split_2016_1D.py
+./scripts/write_split_signal_mass_points_cmds.py --two_dim --in_dir /net/cms25/cms25r5/pico/NanoAODv7/nano/2016/SMS-TChiHH_2D_unsplit 
+                                                 --target_dir /net/cms25/cms25r5/pico/NanoAODv7/nano/2016/SMS-TChiHH_2D 
+                                                 --dataset_filenames SMS-TChiHH_HToBB_HToBB_2D_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISummer16NanoAODv7__PUSummer16v3Fast_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1*.root
+                                                 --out_cmd_filename cmds_split_2016_2D.py
+./scripts/write_split_signal_mass_points_cmds.py --in_dir /net/cms25/cms25r5/pico/NanoAODv7/nano/2017/SMS-TChiHH_2D_unsplit 
+                                                 --target_dir /net/cms25/cms25r5/pico/NanoAODv7/nano/2017/SMS-TChiHH_2D 
+                                                 --dataset_filenames SMS-TChiHH_HToBB_HToBB_TuneCP2_13TeV-madgraphMLM-pythia8__RunIIFall17NanoAODv7__PUFall17Fast_Nano02Apr2020_102X_mc2017_realistic_v8-v1*.root
+                                                 --out_cmd_filename cmds_split_2017_1D.py
+./scripts/write_split_signal_mass_points_cmds.py --two_dim --in_dir /net/cms25/cms25r5/pico/NanoAODv7/nano/2017/SMS-TChiHH_2D_unsplit 
+                                                 --target_dir /net/cms25/cms25r5/pico/NanoAODv7/nano/2017/SMS-TChiHH_2D 
+                                                 --dataset_filenames SMS-TChiHH_HToBB_HToBB_2D_TuneCP2_13TeV-madgraphMLM-pythia8__RunIIFall17NanoAODv7__PUFall17Fast_Nano02Apr2020_102X_mc2017_realistic_v8-v1*.root
+                                                 --out_cmd_filename cmds_split_2017_2D.py
+./scripts/write_split_signal_mass_points_cmds.py --in_dir /net/cms25/cms25r5/pico/NanoAODv7/nano/2018/SMS-TChiHH_2D_unsplit 
+                                                 --target_dir /net/cms25/cms25r5/pico/NanoAODv7/nano/2018/SMS-TChiHH_2D 
+                                                 --dataset_filenames SMS-TChiHH_HToBB_HToBB_TuneCP2_13TeV-madgraphMLM-pythia8__RunIIAutumn18NanoAODv7__PUFall18Fast_Nano02Apr2020_102X_upgrade2018_realistic_v21-v1*.root
+                                                 --out_cmd_filename cmds_split_2018_1D.py
+./scripts/write_split_signal_mass_points_cmds.py --two_dim --in_dir /net/cms25/cms25r5/pico/NanoAODv7/nano/2018/SMS-TChiHH_2D_unsplit 
+                                                 --target_dir /net/cms25/cms25r5/pico/NanoAODv7/nano/2018/SMS-TChiHH_2D 
+                                                 --dataset_filenames SMS-TChiHH_HToBB_HToBB_2D_TuneCP2_13TeV-madgraphMLM-pythia8__RunIIAutumn18NanoAODv7__PUFall18Fast_Nano02Apr2020_102X_upgrade2018_realistic_v21-v1*.root
+                                                 --out_cmd_filename cmds_split_2018_2D.py
+
+convert_cl_to_jobs_info.py cmds_split.py cmds_split.py.json
+auto_submit_jobs.py cmds_split.py.json -c jobscript_check.py
+
+or 
+[cms25] ./scripts/run_commands.py cmds_split_2018_2D.py 
+Should check log file for error, segmentation..
+~~~~
+
 Dataset name needs to be writen out like above.
 This produces the commands in `cmds_split.py`. You can perform a last check by running one of the commands interactively. Next, submit the jobs to the batch system. Note the -c option which allows to attach a script that compares the input and output number of entries when each job is done. Note the check can be performed later if one needs to detach the session. Alternatively, this command can be started in screen:
 
