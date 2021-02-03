@@ -13,7 +13,7 @@ public:
 
   void SetVerbose(bool verbose_){ verbose = verbose_; };
 
-  void WriteMet(nano_tree &nano, pico_tree &pico);
+  void WriteMet(nano_tree &nano, pico_tree &pico, bool isFastsim);
 private:
   int year;
   bool verbose;

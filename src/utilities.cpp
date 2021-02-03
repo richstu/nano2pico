@@ -29,6 +29,8 @@
 #include "TRegexp.h"
 #include "TLorentzVector.h"
 
+#include "nano_tree.hpp"
+
 using namespace std;
 
 long double DeltaPhi(long double phi1, long double phi2){
@@ -195,4 +197,32 @@ void SplitFilePath(const string &path, string &dir_name, string &base_name){
   dir_name = dirname(&cstr.at(0));
   cstr = vector<char>(path.c_str(), path.c_str()+path.size()+1);
   base_name = basename(&cstr.at(0));
+}
+
+void getMETWithJEC(nano_tree & nano, int year, bool isFastsim, float & MET_pt, float & MET_phi) {
+  if (isFastsim) { 
+    if (year==2017) {
+      MET_pt = nano.METFixEE2017_T1_pt(); 
+      MET_phi = nano.METFixEE2017_T1_phi();
+    } else {
+      MET_pt = nano.MET_T1_pt();
+      MET_phi = nano.MET_T1_phi();
+    }
+  } else {
+    MET_pt = nano.MET_pt();
+    MET_phi = nano.MET_phi();
+  }
+}
+void getJetWithJEC(nano_tree & nano, bool isFastsim, vector<float> & Jet_pt, vector<float> & Jet_mass) {
+  Jet_pt.resize(nano.nJet());
+  Jet_mass.resize(nano.nJet());
+  for(int ijet(0); ijet<nano.nJet(); ++ijet){
+    if (isFastsim) {
+      Jet_pt[ijet] = nano.Jet_pt_nom()[ijet];
+      Jet_mass[ijet] = nano.Jet_mass_nom()[ijet];
+    } else {
+      Jet_pt[ijet] = nano.Jet_pt()[ijet];
+      Jet_mass[ijet] = nano.Jet_mass()[ijet];
+    }
+  };
 }

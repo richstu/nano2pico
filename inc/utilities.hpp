@@ -21,6 +21,8 @@
 #include "TGraph.h"
 #include "TLorentzVector.h"
 
+#include "nano_tree.hpp"
+
 #define ERROR(x) do{throw std::runtime_error(std::string("Error in file ")+__FILE__+" at line "+std::to_string(__LINE__)+" (in "+__func__+"): "+x);}while(false)
 #define DBG(x) do{std::cerr << "In " << __FILE__ << " at line " << __LINE__ << " (in function " << __func__ << "): " << x << std::endl;}while(false)
 
@@ -90,5 +92,8 @@ void ReplaceAll(std::string &str, const std::string &orig, const std::string &re
 std::string CopyReplaceAll(const std::string str, const std::string &orig, const std::string &rep);
 
 void SplitFilePath(const std::string &path, std::string &dir_name, std::string &base_name);
+
+void getMETWithJEC(nano_tree & nano, int year, bool isFastsim, float & MET_pt, float & MET_phi);
+void getJetWithJEC(nano_tree & nano, bool isFastsim, std::vector<float> & Jet_pt, std::vector<float> & Jet_mass);
 
 #endif

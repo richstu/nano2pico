@@ -100,13 +100,18 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
 
 void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vector<int> sig_jet_nano_idx,
                                          float min_jet_pt, bool isData, bool isFastsim){
+  float MET_pt, MET_phi;
+  getMETWithJEC(nano, year, isFastsim, MET_pt, MET_phi);
+  vector<float> Jet_pt, Jet_mass;
+  getJetWithJEC(nano, isFastsim, Jet_pt, Jet_mass);
+
   // jet quality filter
   pico.out_pass_jets() = true;
   if (isFastsim) {
     // Fastsim: veto if certain central jets have no matching GenJet as per SUSY recommendation:
     // https://twiki.cern.ch/twiki/bin/view/CMS/SUSRecommendations18#Cleaning_up_of_fastsim_jets_from
     for(int ijet(0); ijet<nano.nJet(); ++ijet){
-      if(nano.Jet_pt()[ijet] > 20 && fabs(nano.Jet_eta()[ijet])<=2.5 && nano.Jet_chHEF()[ijet] < 0.1) {
+      if(Jet_pt[ijet] > 20 && fabs(nano.Jet_eta()[ijet])<=2.5 && nano.Jet_chHEF()[ijet] < 0.1) {
         bool found_match = false;
         for(int igenjet(0); igenjet<nano.nGenJet(); ++igenjet){
           if (dR(nano.Jet_eta()[ijet], nano.GenJet_eta()[igenjet], nano.Jet_phi()[ijet], nano.GenJet_phi()[igenjet])<=0.3) {
@@ -122,7 +127,7 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
     }
   } else { // Fullsim: require just loosest possible ID for now (for all jets, not just central!)
     for(int ijet(0); ijet<nano.nJet(); ++ijet){
-      if (nano.Jet_pt()[ijet] > min_jet_pt && nano.Jet_jetId()[ijet] < 1) 
+      if (Jet_pt[ijet] > min_jet_pt && nano.Jet_jetId()[ijet] < 1) 
         pico.out_pass_jets() = false;
     } 
   }
@@ -132,9 +137,9 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
   for (auto &idx: sig_jet_nano_idx){
     // if (abs(nano.Jet_eta()[idx])>2.4) continue; -> already enforced in signal jet selection
     // if is overlapping with lepton -> already enforced in signal jet selection
-    if (nano.Jet_pt()[idx]<=200.) continue;
+    if (Jet_pt[idx]<=200.) continue;
     if (nano.Jet_muEF()[idx]<=0.5) continue;
-    if (DeltaPhi(nano.Jet_phi()[idx],nano.MET_phi())<(TMath::Pi()-0.4)) continue;
+    if (DeltaPhi(nano.Jet_phi()[idx],MET_phi)<(TMath::Pi()-0.4)) continue;
     pico.out_pass_muon_jet() = false;
     break;
   }

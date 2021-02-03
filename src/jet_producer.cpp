@@ -22,18 +22,23 @@ JetProducer::~JetProducer(){
 
 vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
                                    vector<int> jet_islep_nano_idx, vector<int> jet_isvlep_nano_idx,  vector<int> jet_isphoton_nano_idx,
-                                   const vector<float> &btag_wpts, const vector<float> &btag_df_wpts){
+                                   const vector<float> &btag_wpts, const vector<float> &btag_df_wpts, bool isFastsim){
   vector<int> sig_jet_nano_idx;
   pico.out_njet() = 0; pico.out_ht() = 0; pico.out_ht5() = 0; 
   pico.out_nbl() = 0; pico.out_nbm() = 0; pico.out_nbt() = 0; 
   pico.out_nbdfl() = 0; pico.out_nbdfm() = 0; pico.out_nbdft() = 0; 
+
+  vector<float> Jet_pt, Jet_mass;
+  getJetWithJEC(nano, isFastsim, Jet_pt, Jet_mass);
+  float MET_pt, MET_phi;
+  getMETWithJEC(nano, year, isFastsim, MET_pt, MET_phi);
   
   // calculate MHT; needed when saving jet info
   TLorentzVector mht_vec;
   for(int ijet(0); ijet<nano.nJet(); ++ijet){
-    if (nano.Jet_pt()[ijet] <= min_jet_pt) continue;
+    if (Jet_pt[ijet] <= min_jet_pt) continue;
     TLorentzVector ijet_v4;
-    ijet_v4.SetPtEtaPhiM(nano.Jet_pt()[ijet], nano.Jet_eta()[ijet], nano.Jet_phi()[ijet], nano.Jet_mass()[ijet]);
+    ijet_v4.SetPtEtaPhiM(Jet_pt[ijet], nano.Jet_eta()[ijet], nano.Jet_phi()[ijet], Jet_mass[ijet]);
     mht_vec -= ijet_v4;
   }
   pico.out_mht() = mht_vec.Pt();
@@ -41,12 +46,12 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
 
   // saving jet info on all jets passing pt cut, including endcap
   for(int ijet(0); ijet<nano.nJet(); ++ijet){
-    if (verbose) cout<<"Jet "<<ijet<<": pt = "<<setw(10)<<nano.Jet_pt()[ijet]
+    if (verbose) cout<<"Jet "<<ijet<<": pt = "<<setw(10)<<Jet_pt[ijet]
                                     <<" eta = "<<setw(10)<<nano.Jet_eta()[ijet]
                                     <<" phi = "<<setw(10)<<nano.Jet_phi()[ijet]
-                                    <<" m = "<<setw(10)<<nano.Jet_mass()[ijet]
+                                    <<" m = "<<setw(10)<<Jet_mass[ijet]
                                     <<endl;
-    if (nano.Jet_pt()[ijet] <= min_jet_pt) continue;
+    if (Jet_pt[ijet] <= min_jet_pt) continue;
 
     // check overlap with signal leptons (or photons)
     bool islep = find(jet_islep_nano_idx.begin(), jet_islep_nano_idx.end(), ijet) != jet_islep_nano_idx.end();
@@ -54,13 +59,16 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
     bool isvlep = find(jet_isvlep_nano_idx.begin(), jet_isvlep_nano_idx.end(), ijet) != jet_isvlep_nano_idx.end();
     // N.B. photon collection is not filled for Higgsino analysis, so there is no overlap removal!
     bool isphoton = find(jet_isphoton_nano_idx.begin(), jet_isphoton_nano_idx.end(), ijet) != jet_isphoton_nano_idx.end();
+    // jetid applied to only full sim and data
+    bool pass_jetid = true;
+    if (!isFastsim) if (nano.Jet_jetId()[ijet] <1) pass_jetid = false;
 
-    bool isgood = !islep && !isphoton && (fabs(nano.Jet_eta()[ijet]) <= max_jet_eta);
+    bool isgood = !islep && !isphoton && (fabs(nano.Jet_eta()[ijet]) <= max_jet_eta) && pass_jetid;
 
-    pico.out_jet_pt().push_back(nano.Jet_pt()[ijet]);
+    pico.out_jet_pt().push_back(Jet_pt[ijet]);
     pico.out_jet_eta().push_back(nano.Jet_eta()[ijet]);
     pico.out_jet_phi().push_back(nano.Jet_phi()[ijet]);
-    pico.out_jet_m().push_back(nano.Jet_mass()[ijet]);
+    pico.out_jet_m().push_back(Jet_mass[ijet]);
     pico.out_jet_breg_corr().push_back(nano.Jet_bRegCorr()[ijet]);
     pico.out_jet_breg_res().push_back(nano.Jet_bRegRes()[ijet]);
     pico.out_jet_deepcsv().push_back(nano.Jet_btagDeepB()[ijet]);
@@ -73,7 +81,7 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
     pico.out_jet_isgood().push_back(isgood);
     pico.out_jet_id().push_back(nano.Jet_jetId()[ijet]);
     pico.out_jet_mht_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], mht_vec.Phi()));
-    pico.out_jet_met_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], nano.MET_phi()));
+    pico.out_jet_met_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], MET_phi));
     if (!isData) {
       pico.out_jet_hflavor().push_back(nano.Jet_hadronFlavour()[ijet]);
       pico.out_jet_pflavor().push_back(nano.Jet_partonFlavour()[ijet]);
@@ -86,12 +94,12 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
     pico.out_jet_h1d().push_back(false);
     pico.out_jet_h2d().push_back(false);
 
-    if (!islep && !isphoton) pico.out_ht5() += nano.Jet_pt()[ijet];
+    if (!islep && !isphoton) pico.out_ht5() += Jet_pt[ijet];
 
     if (isgood) {
       sig_jet_nano_idx.push_back(ijet);
       pico.out_njet()++;
-      pico.out_ht() += nano.Jet_pt()[ijet];
+      pico.out_ht() += Jet_pt[ijet];
       if (nano.Jet_btagDeepB()[ijet] > btag_wpts[0]) pico.out_nbl()++; 
       if (nano.Jet_btagDeepB()[ijet] > btag_wpts[1]) pico.out_nbm()++; 
       if (nano.Jet_btagDeepB()[ijet] > btag_wpts[2]) pico.out_nbt()++;
@@ -204,13 +212,16 @@ void JetProducer::WriteSubJets(nano_tree &nano, pico_tree &pico){
 }
 
 void JetProducer::WriteJetSystemPt(nano_tree &nano, pico_tree &pico, 
-                                   vector<int> &sig_jet_nano_idx, const float &btag_wpt) {
+                                   vector<int> &sig_jet_nano_idx, const float &btag_wpt, bool isFastsim) {
+
+  vector<float> Jet_pt, Jet_mass;
+  getJetWithJEC(nano, isFastsim, Jet_pt, Jet_mass);
 
   TLorentzVector jetsys_v4, jetsys_nob_v4;
   int njet_nob(0);
   for (auto &idx: sig_jet_nano_idx) {
     TLorentzVector ijet_v4;
-    ijet_v4.SetPtEtaPhiM(nano.Jet_pt()[idx], nano.Jet_eta()[idx], nano.Jet_phi()[idx], nano.Jet_mass()[idx]);
+    ijet_v4.SetPtEtaPhiM(Jet_pt[idx], nano.Jet_eta()[idx], nano.Jet_phi()[idx], Jet_mass[idx]);
     jetsys_v4 += ijet_v4;
 
     if (nano.Jet_btagDeepB()[idx] <= btag_wpt){

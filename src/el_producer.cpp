@@ -14,7 +14,10 @@ ElectronProducer::ElectronProducer(int year_, bool isData_){
 ElectronProducer::~ElectronProducer(){
 }
 
-vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, vector<int> &jet_islep_nano_idx, vector<int> &jet_isvlep_nano_idx, vector<int> &sig_el_pico_idx, bool isZgamma){
+vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, vector<int> &jet_islep_nano_idx, vector<int> &jet_isvlep_nano_idx, vector<int> &sig_el_pico_idx, bool isZgamma, bool isFastsim){
+  vector<float> Jet_pt, Jet_mass;
+  getJetWithJEC(nano, isFastsim, Jet_pt, Jet_mass);
+
   vector<int> sig_el_nano_idx;
   pico.out_nel() = 0; pico.out_nvel() = 0;
   int pico_idx = 0;
@@ -81,7 +84,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
       // save indices of matching jets
       for (int ijet(0); ijet<nano.nJet(); ijet++) {
         if (dR(nano.Electron_eta()[iel], nano.Jet_eta()[ijet], nano.Electron_phi()[iel], nano.Jet_phi()[ijet])<0.4 &&
-            fabs(nano.Jet_pt()[ijet] - nano.Electron_pt()[iel])/nano.Electron_pt()[iel] < 1)
+            fabs(Jet_pt[ijet] - nano.Electron_pt()[iel])/nano.Electron_pt()[iel] < 1)
           jet_isvlep_nano_idx.push_back(ijet);
       }
     }
@@ -97,7 +100,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
       // save indices of matching jets
       for (int ijet(0); ijet<nano.nJet(); ijet++) {
         if (dR(nano.Electron_eta()[iel], nano.Jet_eta()[ijet], nano.Electron_phi()[iel], nano.Jet_phi()[ijet])<0.4 &&
-            fabs(nano.Jet_pt()[ijet] - nano.Electron_pt()[iel])/nano.Electron_pt()[iel] < 1)
+            fabs(Jet_pt[ijet] - nano.Electron_pt()[iel])/nano.Electron_pt()[iel] < 1)
           jet_islep_nano_idx.push_back(ijet);
       }
     }
