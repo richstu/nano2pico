@@ -83,5 +83,5 @@ for mass in mass_points:
 
   os.chmod(args.out_cmd_filename, 0o755)
   print("To generate job json and submit jobs do: ")
-  print('convert_cl_to_jobs_info.py '+args.out_cmd_filename+' split_mass_points.json')
-  print('auto_submit_jobs.py split_mass_points.json -c scripts/check_apply_corrections_job.py')
+  print('convert_cl_to_jobs_info.py '+args.out_cmd_filename+' '+os.path.splitext(args.out_cmd_filename)[0]+'.json')
+  print('auto_submit_jobs.py '+os.path.splitext(args.out_cmd_filename)[0]+'.json -c jobscript_check.py -n cms1')

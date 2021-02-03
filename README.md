@@ -338,6 +338,42 @@ Calculated in [process_nano](src/process_nano.cxx) and then re-normalized in sub
 
   source set_env.sh
 
+### Step . Correct FastSim JEC on NanoAODs
+
+~~~~bash 
+./scripts/write_fastsim_jmeCorrection_cmds.py --inputNanoAodFolder /net/cms25/cms25r0/pico/NanoAODv7/nano/2016/SMS-TChiHH_2D_unsplit
+                                              --outputNanoAodFolder /net/cms24/cms24r0/pico/NanoAODv7/nano/2016/SMS-TChiHH_2D_unsplit_fastSimJmeCorrection
+                                              --commandFilename apply_fastsim_jmeCorrection_2016.py
+
+./scripts/write_fastsim_jmeCorrection_cmds.py --inputNanoAodFolder /net/cms25/cms25r0/pico/NanoAODv7/nano/2017/SMS-TChiHH_2D_unsplit
+                                              --outputNanoAodFolder /net/cms24/cms24r0/pico/NanoAODv7/nano/2017/SMS-TChiHH_2D_unsplit_fastSimJmeCorrection
+                                              --commandFilename apply_fastsim_jmeCorrection_2017.py
+
+./scripts/write_fastsim_jmeCorrection_cmds.py --inputNanoAodFolder /net/cms25/cms25r0/pico/NanoAODv7/nano/2018/SMS-TChiHH_2D_unsplit
+                                              --outputNanoAodFolder /net/cms24/cms24r0/pico/NanoAODv7/nano/2018/SMS-TChiHH_2D_unsplit_fastSimJmeCorrection
+                                              --commandFilename apply_fastsim_jmeCorrection_2018.py
+~~~~
+
+~~~~bash 
+./scripts/write_fastsim_jmeCorrection_cmds.py --inputNanoAodFolder /net/cms24/cms24r0/pico/NanoAODv7/nano/2016/SMS-T5qqqqZH_unsplit
+                                              --outputNanoAodFolder /net/cms24/cms24r0/pico/NanoAODv7/nano/2016/SMS-T5qqqqZH_unsplit_fastSimJmeCorrection
+                                              --commandFilename gluino_apply_fastsim_jmeCorrection_2016.py
+
+./scripts/write_fastsim_jmeCorrection_cmds.py --inputNanoAodFolder /net/cms24/cms24r0/pico/NanoAODv7/nano/2017/SMS-T5qqqqZH_unsplit
+                                              --outputNanoAodFolder /net/cms24/cms24r0/pico/NanoAODv7/nano/2017/SMS-T5qqqqZH_unsplit_fastSimJmeCorrection
+                                              --commandFilename gluino_apply_fastsim_jmeCorrection_2017.py
+
+./scripts/write_fastsim_jmeCorrection_cmds.py --inputNanoAodFolder /net/cms24/cms24r0/pico/NanoAODv7/nano/2018/SMS-T5qqqqZH_unsplit
+                                              --outputNanoAodFolder /net/cms24/cms24r0/pico/NanoAODv7/nano/2018/SMS-T5qqqqZH_unsplit_fastSimJmeCorrection
+                                              --commandFilename gluino_apply_fastsim_jmeCorrection_2018.py
+~~~~
+
+~~~~bash 
+auto_submit_jobs.py apply_fastsim_jmeCorrection_2016.json -c scripts/check_jmeCorrection.py
+auto_submit_jobs.py apply_fastsim_jmeCorrection_2017.json -c scripts/check_jmeCorrection.py
+auto_submit_jobs.py apply_fastsim_jmeCorrection_2018.json -c scripts/check_jmeCorrection.py
+~~~~
+
 ### Step 1. Split scan
 Generate a python file that prints the commands to be run in the batch (input for the queue system):
 
@@ -347,6 +383,70 @@ Generate a python file that prints the commands to be run in the batch (input fo
                                                  --target_dir /net/cms29/cms29r0/pico/NanoAODv5/nano/2016/SMS-TChiHH_2D 
                                                  --dataset_filenames SMS-TChiHH_*_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISummer16NanoAODv5__PUSummer16v3Fast_Nano1June2019_102X_mcRun2_asymptotic_v7-v1_*.root
                                                  --out_cmd_filename cmds_split.py
+~~~~
+
+~~~~bash 
+./scripts/write_split_signal_mass_points_cmds.py --in_dir /net/cms24/cms24r0/pico/NanoAODv7/nano/2016/SMS-TChiHH_2D_unsplit_fastSimJmeCorrection 
+                                                 --target_dir /net/cms24/cms24r0/pico/NanoAODv7/nano/2016/SMS-TChiHH_2D_fastSimJmeCorrection 
+                                                 --dataset_filenames SMS-TChiHH_HToBB_HToBB_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISummer16NanoAODv7__PUSummer16v3Fast_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1*.root
+                                                 --out_cmd_filename cmds_split_2016_1D.py
+./scripts/write_split_signal_mass_points_cmds.py --two_dim --in_dir /net/cms24/cms24r0/pico/NanoAODv7/nano/2016/SMS-TChiHH_2D_unsplit_fastSimJmeCorrection 
+                                                 --target_dir /net/cms24/cms24r0/pico/NanoAODv7/nano/2016/SMS-TChiHH_2D_fastSimJmeCorrection 
+                                                 --dataset_filenames SMS-TChiHH_HToBB_HToBB_2D_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISummer16NanoAODv7__PUSummer16v3Fast_Nano02Apr2020_102X_mcRun2_asymptotic_v8-v1*.root
+                                                 --out_cmd_filename cmds_split_2016_2D.py
+./scripts/write_split_signal_mass_points_cmds.py --in_dir /net/cms24/cms24r0/pico/NanoAODv7/nano/2017/SMS-TChiHH_2D_unsplit_fastSimJmeCorrection 
+                                                 --target_dir /net/cms24/cms24r0/pico/NanoAODv7/nano/2017/SMS-TChiHH_2D_fastSimJmeCorrection 
+                                                 --dataset_filenames SMS-TChiHH_HToBB_HToBB_TuneCP2_13TeV-madgraphMLM-pythia8__RunIIFall17NanoAODv7__PUFall17Fast_Nano02Apr2020_102X_mc2017_realistic_v8-v1*.root
+                                                 --out_cmd_filename cmds_split_2017_1D.py
+./scripts/write_split_signal_mass_points_cmds.py --two_dim --in_dir /net/cms24/cms24r0/pico/NanoAODv7/nano/2017/SMS-TChiHH_2D_unsplit_fastSimJmeCorrection 
+                                                 --target_dir /net/cms24/cms24r0/pico/NanoAODv7/nano/2017/SMS-TChiHH_2D_fastSimJmeCorrection 
+                                                 --dataset_filenames SMS-TChiHH_HToBB_HToBB_2D_TuneCP2_13TeV-madgraphMLM-pythia8__RunIIFall17NanoAODv7__PUFall17Fast_Nano02Apr2020_102X_mc2017_realistic_v8-v1*.root
+                                                 --out_cmd_filename cmds_split_2017_2D.py
+./scripts/write_split_signal_mass_points_cmds.py --in_dir /net/cms24/cms24r0/pico/NanoAODv7/nano/2018/SMS-TChiHH_2D_unsplit_fastSimJmeCorrection 
+                                                 --target_dir /net/cms24/cms24r0/pico/NanoAODv7/nano/2018/SMS-TChiHH_2D_fastSimJmeCorrection 
+                                                 --dataset_filenames SMS-TChiHH_HToBB_HToBB_TuneCP2_13TeV-madgraphMLM-pythia8__RunIIAutumn18NanoAODv7__PUFall18Fast_Nano02Apr2020_102X_upgrade2018_realistic_v21-v1*.root
+                                                 --out_cmd_filename cmds_split_2018_1D.py
+./scripts/write_split_signal_mass_points_cmds.py --two_dim --in_dir /net/cms24/cms24r0/pico/NanoAODv7/nano/2018/SMS-TChiHH_2D_unsplit_fastSimJmeCorrection 
+                                                 --target_dir /net/cms24/cms24r0/pico/NanoAODv7/nano/2018/SMS-TChiHH_2D_fastSimJmeCorrection 
+                                                 --dataset_filenames SMS-TChiHH_HToBB_HToBB_2D_TuneCP2_13TeV-madgraphMLM-pythia8__RunIIAutumn18NanoAODv7__PUFall18Fast_Nano02Apr2020_102X_upgrade2018_realistic_v21-v1*.root
+                                                 --out_cmd_filename cmds_split_2018_2D.py
+
+convert_cl_to_jobs_info.py cmds_split.py cmds_split.py.json
+auto_submit_jobs.py cmds_split.py.json -c jobscript_check.py -n cms1
+~~~~
+
+~~~~bash 
+./scripts/write_split_gluino_mass_points_cmds.py --in_dir /net/cms24/cms24r0/pico/NanoAODv7/nano/2016/SMS-T5qqqqZH_unsplit_fastSimJmeCorrection 
+                                                 --out_cmd_filename split_gluino_2016.py 
+                                                 --target_dir /net/cms24/cms24r0/pico/NanoAODv7/nano/2016/SMS-T5qqqqZH_fastSimJmeCorrection 
+                                                 --model "SMS-T5qqqqZH_HToBB-mGluino"
+./scripts/write_split_gluino_mass_points_cmds.py --in_dir /net/cms24/cms24r0/pico/NanoAODv7/nano/2016/SMS-T5qqqqZH_unsplit_fastSimJmeCorrection 
+                                                 --out_cmd_filename split_gluino_mN2_2016.py 
+                                                 --target_dir /net/cms24/cms24r0/pico/NanoAODv7/nano/2016/SMS-T5qqqqZH_fastSimJmeCorrection 
+                                                 --model "SMS-T5qqqqZH_HToBB-mN2"
+
+convert_cl_to_jobs_info.py split_gluino_2016.py split_gluino_2016.json
+auto_submit_jobs.py split_gluino_2016.json -c jobscript_check.py -n cms1
+convert_cl_to_jobs_info.py split_gluino_mN2_2016.py split_gluino_mN2_2016.json
+auto_submit_jobs.py split_gluino_mN2_2016.json -c jobscript_check.py -n cms1
+
+./scripts/write_split_gluino_mass_points_cmds.py --in_dir /net/cms24/cms24r0/pico/NanoAODv7/nano/2017/SMS-T5qqqqZH_unsplit_fastSimJmeCorrection 
+                                                 --out_cmd_filename split_gluino_2017.py 
+                                                 --target_dir /net/cms24/cms24r0/pico/NanoAODv7/nano/2017/SMS-T5qqqqZH_fastSimJmeCorrection 
+                                                 --model "SMS-T5qqqqZH_HToBB-mGluino"
+./scripts/write_split_gluino_mass_points_cmds.py --in_dir /net/cms24/cms24r0/pico/NanoAODv7/nano/2017/SMS-T5qqqqZH_unsplit_fastSimJmeCorrection 
+                                                 --out_cmd_filename split_gluino_mN2_2017.py 
+                                                 --target_dir /net/cms24/cms24r0/pico/NanoAODv7/nano/2017/SMS-T5qqqqZH_fastSimJmeCorrection 
+                                                 --model "SMS-T5qqqqZH_HToBB-mN2"
+
+./scripts/write_split_gluino_mass_points_cmds.py --in_dir /net/cms24/cms24r0/pico/NanoAODv7/nano/2018/SMS-T5qqqqZH_unsplit_fastSimJmeCorrection 
+                                                 --out_cmd_filename split_gluino_2018.py 
+                                                 --target_dir /net/cms24/cms24r0/pico/NanoAODv7/nano/2018/SMS-T5qqqqZH_fastSimJmeCorrection 
+                                                 --model "SMS-T5qqqqZH_HToBB-mGluino"
+./scripts/write_split_gluino_mass_points_cmds.py --in_dir /net/cms24/cms24r0/pico/NanoAODv7/nano/2018/SMS-T5qqqqZH_unsplit_fastSimJmeCorrection 
+                                                 --out_cmd_filename split_gluino_mN2_2018.py 
+                                                 --target_dir /net/cms24/cms24r0/pico/NanoAODv7/nano/2018/SMS-T5qqqqZH_fastSimJmeCorrection 
+                                                 --model "SMS-T5qqqqZH_HToBB-mN2"
 ~~~~
 
 ~~~~bash 

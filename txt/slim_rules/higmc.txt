@@ -1,6 +1,7 @@
 drop *
 
 keep run
+keep lumiblock
 keep event
 keep type
 keep stitch*
