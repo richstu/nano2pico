@@ -8,7 +8,6 @@ bool stitch_ht
 bool stitch_htmet
 bool stitch_photon
 bool stitch_dy
-int nano2pico_version
 
 ####################   Global   ###################
 int npv
@@ -241,6 +240,7 @@ bool pass_badchhad
 bool pass_muon_jet
 bool pass_low_neutral_jet
 bool pass_htratio_dphi_tight
+bool pass_ecalnoisejet
 bool pass_badcalib
 bool pass_boosted
 bool pass
