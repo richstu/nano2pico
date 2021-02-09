@@ -434,9 +434,7 @@ vector<float> sys_isr
 vector<float> sys_pu
 vector<float> sys_prefire
 
-# vector<float> sys_mur
-# vector<float> sys_muf
-# vector<float> sys_murf
+vector<float> sys_murf
 
 # variations have index 0 (JER smearing), 1 (JEC up) and 2 (JEC down)
 # vector<float> sys_ht

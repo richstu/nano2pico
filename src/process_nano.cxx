@@ -345,6 +345,9 @@ int main(int argc, char *argv[]){
     else
       pico.out_w_lumi() = 1.;
 
+    //copy LHE scale variation weights
+    pico.out_sys_murf() = nano.LHEScaleWeight();
+
     // @todo, copy weights from babymaker
     pico.out_w_pu() = 1.;
     pico.out_sys_pu().resize(2, 1.);
