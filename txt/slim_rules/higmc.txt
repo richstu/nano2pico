@@ -1,6 +1,7 @@
 drop *
 
 keep run
+keep lumiblock
 keep event
 keep type
 keep stitch*
@@ -52,3 +53,4 @@ keep weight
 keep w_*
 keep eff_*
 
+keep sys_*

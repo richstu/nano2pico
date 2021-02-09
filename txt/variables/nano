@@ -245,12 +245,14 @@ array<float> Jet_eta
 array<float> Jet_jercCHF
 array<float> Jet_jercCHPUF
 array<float> Jet_mass
+array<float> Jet_mass_nom
 array<float> Jet_muEF
 array<float> Jet_muonSubtrFactor
 array<float> Jet_neEmEF
 array<float> Jet_neHEF
 array<float> Jet_phi
 array<float> Jet_pt
+array<float> Jet_pt_nom
 array<float> Jet_qgl
 array<float> Jet_rawFactor
 array<float> Jet_bRegCorr
@@ -352,6 +354,8 @@ float MET_covXY
 float MET_covYY
 float MET_phi
 float MET_pt
+float MET_T1_phi
+float MET_T1_pt
 float MET_significance
 float MET_sumEt
 float METFixEE2017_MetUnclustEnUpDeltaX
@@ -361,6 +365,8 @@ float METFixEE2017_covXY
 float METFixEE2017_covYY
 float METFixEE2017_phi
 float METFixEE2017_pt
+float METFixEE2017_T1_phi
+float METFixEE2017_T1_pt
 float METFixEE2017_significance
 float METFixEE2017_sumEt
 float CaloMET_phi

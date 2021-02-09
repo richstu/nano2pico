@@ -174,7 +174,7 @@ void FixLumi(corrections_tree &corr, const string &corr_path, int year){
     int mglu = GetGluinoMass(corr_path);
     xsec::higgsinoCrossSection(mglu, xsec, exsec);
   }else{
-    xsec = xsec::crossSection(corr_path, (year==2016));  
+    xsec = xsec::crossSection(corr_path, year);  
   }
 
   corr.out_w_lumi() = xsec*lumi/corr.out_neff();

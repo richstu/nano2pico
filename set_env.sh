@@ -37,3 +37,4 @@ unset -f blog
 function blog {
   cat /net/cms2/cms2r0/jbkim/log/$1.log
 }
+alias bproc="tail -f /net/cms2/cms2r0/${USER}/log/JobProc.log"

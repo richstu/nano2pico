@@ -13,7 +13,7 @@ class PrefireWeighter{
 public:
   PrefireWeighter(int year, bool use_jet_empt=true);
 
-  void EventWeight(nano_tree & nano, float & w_prefire, std::vector<float> & sys_prefire);
+  void EventWeight(nano_tree & nano, float & w_prefire, std::vector<float> & sys_prefire, bool isFastsim);
   
 private:
   bool use_jet_empt_;

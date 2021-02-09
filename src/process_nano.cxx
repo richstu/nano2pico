@@ -198,8 +198,8 @@ int main(int argc, char *argv[]){
     pico.out_nlep() = 0; pico.out_nvlep() = 0; // filled by lepton producers
     vector<int> sig_el_pico_idx = vector<int>();
     vector<int> sig_mu_pico_idx = vector<int>();
-    vector<int> sig_el_nano_idx = el_producer.WriteElectrons(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, sig_el_pico_idx, isZgamma);
-    vector<int> sig_mu_nano_idx = mu_producer.WriteMuons(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, sig_mu_pico_idx, isZgamma);
+    vector<int> sig_el_nano_idx = el_producer.WriteElectrons(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, sig_el_pico_idx, isZgamma, isFastsim);
+    vector<int> sig_mu_nano_idx = mu_producer.WriteMuons(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, sig_mu_pico_idx, isZgamma, isFastsim);
 
     // save a separate vector with just signal leptons ordered by pt
     struct SignalLepton{ float pt; float eta; float phi; int pdgid;};
@@ -225,7 +225,7 @@ int main(int argc, char *argv[]){
       vector<int> sig_ph_nano_idx = photon_producer.WritePhotons(nano, pico, jet_isphoton_nano_idx,
                                                                  sig_el_nano_idx, sig_mu_nano_idx);
 
-    tk_producer.WriteIsoTracks(nano, pico, sig_el_nano_idx, sig_mu_nano_idx);
+    tk_producer.WriteIsoTracks(nano, pico, sig_el_nano_idx, sig_mu_nano_idx, isFastsim);
 
     dilep_producer.WriteDileptons(pico, sig_el_pico_idx, sig_mu_pico_idx);
 
@@ -238,15 +238,15 @@ int main(int argc, char *argv[]){
 
     if (debug) cout<<"INFO:: Writing jets, MET and ISR vars"<<endl;
     vector<int> sig_jet_nano_idx = jet_producer.WriteJets(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, jet_isphoton_nano_idx,
-                                                          btag_wpts[year], btag_df_wpts[year]);
-    jet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year][1]); // usually w.r.t. medium WP
+                                                          btag_wpts[year], btag_df_wpts[year], isFastsim);
+    jet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year][1], isFastsim); // usually w.r.t. medium WP
     if(!isZgamma){
       jet_producer.WriteFatJets(nano, pico); // jet_producer.SetVerbose(nano.nSubJet()>0);
       jet_producer.WriteSubJets(nano, pico);
     }
     isr_tools.WriteISRJetMultiplicity(nano, pico);
 
-    met_producer.WriteMet(nano, pico);
+    met_producer.WriteMet(nano, pico, isFastsim);
     // Copy MET and ME ISR directly from NanoAOD
     //pico.out_met()         = nano.MET_pt();
     //pico.out_met_phi()     = nano.MET_phi();
@@ -258,11 +258,13 @@ int main(int argc, char *argv[]){
     // calculate mT only for single lepton events
     pico.out_mt() = -999; 
     if (pico.out_nlep()==1) {
+      float MET_pt, MET_phi;
+      getMETWithJEC(nano, year, isFastsim, MET_pt, MET_phi);
       if (sig_el_nano_idx.size()>0) {
-        pico.out_mt() = GetMT(nano.MET_pt(), nano.MET_phi(), 
+        pico.out_mt() = GetMT(MET_pt, MET_phi, 
           nano.Electron_pt()[sig_el_nano_idx[0]], nano.Electron_phi()[sig_el_nano_idx[0]]);
       } else {
-        pico.out_mt() = GetMT(nano.MET_pt(), nano.MET_phi(), 
+        pico.out_mt() = GetMT(MET_pt, MET_phi, 
           nano.Muon_pt()[sig_mu_nano_idx[0]], nano.Muon_phi()[sig_mu_nano_idx[0]]);
       }
     } 
@@ -358,7 +360,7 @@ int main(int argc, char *argv[]){
     // i.e. we SHOULD get less events!
     float w_prefire=1.;
     std::vector<float> sys_prefire(2, 1.);
-    prefire_weighter.EventWeight(nano, w_prefire, sys_prefire);
+    prefire_weighter.EventWeight(nano, w_prefire, sys_prefire, isFastsim);
     pico.out_w_prefire() = w_prefire;
     pico.out_sys_prefire() = sys_prefire;
 

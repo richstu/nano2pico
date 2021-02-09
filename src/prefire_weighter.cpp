@@ -75,9 +75,12 @@ PrefireWeighter::PrefireWeighter(int year, bool use_jet_empt){
 }
 
 
-void PrefireWeighter::EventWeight(nano_tree &nano, float & w_prefire, std::vector<float> & sys_prefire) {
+void PrefireWeighter::EventWeight(nano_tree &nano, float & w_prefire, std::vector<float> & sys_prefire, bool isFastsim) {
   //prefire weight procedure described at https://twiki.cern.ch/twiki/bin/viewauth/CMS/L1ECALPrefiringWeightRecipe
   //which links here: https://lathomas.web.cern.ch/lathomas/TSGStuff/L1Prefiring/PrefiringMaps_2016and2017/
+
+  vector<float> Jet_pt, Jet_mass;
+  getJetWithJEC(nano, isFastsim, Jet_pt, Jet_mass);
   
   std::vector<std::pair<double, double> > sfs;
   std::vector<std::pair<double, double> > photon_sfs;
@@ -99,8 +102,8 @@ void PrefireWeighter::EventWeight(nano_tree &nano, float & w_prefire, std::vecto
 
     //get prefiring SFs for jets and photons that overlap with jets
     for (unsigned int jet_idx = 0; jet_idx < static_cast<unsigned int>(nano.nJet()); jet_idx++) {
-      if (nano.Jet_pt()[jet_idx] < 2. || fabs(nano.Jet_eta()[jet_idx]) < 2.0 || fabs(nano.Jet_eta()[jet_idx]) > 3.0) continue;
-      float pt = nano.Jet_pt()[jet_idx];
+      if (Jet_pt[jet_idx] < 2. || fabs(nano.Jet_eta()[jet_idx]) < 2.0 || fabs(nano.Jet_eta()[jet_idx]) > 3.0) continue;
+      float pt = Jet_pt[jet_idx];
       std::pair<double,double> jet_sf{1.,0.};
       if (use_jet_empt_) {
         pt = pt*(nano.Jet_neEmEF()[jet_idx]+nano.Jet_chEmEF()[jet_idx]);

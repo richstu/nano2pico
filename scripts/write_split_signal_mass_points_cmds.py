@@ -12,7 +12,10 @@ def get_2d_mass_points(signal_chain, pdgId_1, pdgId_2):
   #print(number_variables, signal_chain.GetEntries())
   for iVar in range(number_variables):
     #print (mass_array_1[iVar], mass_array_2[iVar])
-    mass_points.add((int(round(mass_array_1[iVar]/25)*25), int(round(mass_array_2[iVar]/25)*25)))
+    if (mass_array_1[iVar] == 127):
+      mass_points.add((mass_array_1[iVar], int(round(mass_array_2[iVar]/25)*25)))
+    else:
+      mass_points.add((int(round(mass_array_1[iVar]/25)*25), int(round(mass_array_2[iVar]/25)*25)))
   return sorted(mass_points)
 
 if __name__ == '__main__':
@@ -52,8 +55,8 @@ for mass_point in mass_points:
 '''
   else:
     out_string = '''#!/bin/env python
-source_directory = "'''+source_directory+'''"
-target_directory = "'''+target_directory+'''"
+source_directory = "'''+source_directory+'''/"
+target_directory = "'''+target_directory+'''/"
 mass_points = [127, 150, 175, 
                200, 225, 250, 275, 
                300, 325, 350, 375, 
@@ -80,5 +83,5 @@ for mass in mass_points:
 
   os.chmod(args.out_cmd_filename, 0o755)
   print("To generate job json and submit jobs do: ")
-  print('convert_cl_to_jobs_info.py '+args.out_cmd_filename+' split_mass_points.json')
-  print('auto_submit_jobs.py split_mass_points.json -c scripts/check_apply_corrections_job.py')
+  print('convert_cl_to_jobs_info.py '+args.out_cmd_filename+' '+os.path.splitext(args.out_cmd_filename)[0]+'.json')
+  print('auto_submit_jobs.py '+os.path.splitext(args.out_cmd_filename)[0]+'.json -c jobscript_check.py -n cms1')

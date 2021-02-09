@@ -12,7 +12,10 @@ MuonProducer::MuonProducer(int year_, bool isData_){
 MuonProducer::~MuonProducer(){
 }
 
-vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<int> &jet_islep_nano_idx, vector<int> &jet_isvlep_nano_idx, vector<int> &sig_mu_pico_idx, bool isZgamma){
+vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<int> &jet_islep_nano_idx, vector<int> &jet_isvlep_nano_idx, vector<int> &sig_mu_pico_idx, bool isZgamma, bool isFastsim){
+  vector<float> Jet_pt, Jet_mass;
+  getJetWithJEC(nano, isFastsim, Jet_pt, Jet_mass);
+
   vector<int> sig_mu_nano_idx;
   pico.out_nmu() = 0; pico.out_nvmu() = 0;
   int pico_idx = 0;
@@ -64,7 +67,7 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
       // save indices of matching jets
       for (int ijet(0); ijet<nano.nJet(); ijet++) {
         if (dR(nano.Muon_eta()[imu], nano.Jet_eta()[ijet], nano.Muon_phi()[imu], nano.Jet_phi()[ijet])<0.4 &&
-          fabs(nano.Jet_pt()[ijet] - nano.Muon_pt()[imu])/nano.Muon_pt()[imu] < 1)
+          fabs(Jet_pt[ijet] - nano.Muon_pt()[imu])/nano.Muon_pt()[imu] < 1)
           jet_isvlep_nano_idx.push_back(ijet);
       }
     }
@@ -77,7 +80,7 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
       // save indices of matching jets
       for (int ijet(0); ijet<nano.nJet(); ijet++) {
         if (dR(nano.Muon_eta()[imu], nano.Jet_eta()[ijet], nano.Muon_phi()[imu], nano.Jet_phi()[ijet])<0.4 &&
-          fabs(nano.Jet_pt()[ijet] - nano.Muon_pt()[imu])/nano.Muon_pt()[imu] < 1)
+          fabs(Jet_pt[ijet] - nano.Muon_pt()[imu])/nano.Muon_pt()[imu] < 1)
           jet_islep_nano_idx.push_back(ijet);
       }
     }

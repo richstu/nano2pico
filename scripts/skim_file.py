@@ -10,7 +10,7 @@ def convert_name(file_paths_string, split_strings):
   # Below is not needed anymore.
   #for split_string in split_strings:
   #  converted_name = converted_name.replace(split_string, '_'+split_string)
-  converted_name = converted_name.replace('_*','')
+  converted_name = converted_name.replace('*','')
 
   return converted_name
 

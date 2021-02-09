@@ -29,8 +29,6 @@ keep jet_*
 drop jet_isphoton
 drop jet_hflavor
 drop jet_pflavor
-drop jet_h1d
-drop jet_h2d
 
 keep nfjet
 keep fjet*

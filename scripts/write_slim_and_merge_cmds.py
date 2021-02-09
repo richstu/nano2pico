@@ -7,12 +7,21 @@ def findBaseSampleNames(folder):
   infiles = set() # to remove duplicates
   for file in glob(folder+'/*.root'):
     dataset_tag = file.split('/')[-1]
+
     dataset_tag = dataset_tag.split('__RunIISummer16NanoAODv5__')[0]
     dataset_tag = dataset_tag.split('__RunIIFall17NanoAODv5__')[0]
     dataset_tag = dataset_tag.split('__RunIIAutumn18NanoAODv5__')[0]
-    dataset_tag = dataset_tag.split('_ext')[0]
     dataset_tag = dataset_tag.split('__Nano1June2019')[0]
     dataset_tag = dataset_tag.split('__Nano25Oct2019')[0]
+
+    # For NanoAODv7
+    dataset_tag = dataset_tag.split('__RunIISummer16NanoAODv7__')[0]
+    dataset_tag = dataset_tag.split('__RunIIFall17NanoAODv7__')[0]
+    dataset_tag = dataset_tag.split('__RunIIAutumn18NanoAODv7__')[0]
+    dataset_tag = dataset_tag.split('__Nano02Apr2020')[0] #mc
+    dataset_tag = dataset_tag.split('__02Apr2020')[0] #data
+
+    dataset_tag = dataset_tag.split('_ext')[0]
     dataset_tag = dataset_tag.replace('.root','')
     infiles.add(dataset_tag)
     sortedfiles = list()

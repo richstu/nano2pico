@@ -13,7 +13,9 @@ IsoTrackProducer::~IsoTrackProducer(){
 }
 
 void IsoTrackProducer::WriteIsoTracks(nano_tree &nano, pico_tree &pico, 
-                                      vector<int> &sig_el_nano_idx, vector<int> &sig_mu_nano_idx){
+                                      vector<int> &sig_el_nano_idx, vector<int> &sig_mu_nano_idx, bool isFastsim){
+  float MET_pt, MET_phi;
+  getMETWithJEC(nano, year, isFastsim, MET_pt, MET_phi);
   
   pico.out_ntk() = 0;
   // N.B. Objects that end up in the slimmedElecrtons or slimmedMuons collections are not stored 
@@ -24,7 +26,7 @@ void IsoTrackProducer::WriteIsoTracks(nano_tree &nano, pico_tree &pico,
              nano.IsoTrack_pt()[itk], nano.IsoTrack_eta()[itk], nano.IsoTrack_phi()[itk], 
              nano.IsoTrack_miniPFRelIso_chg()[itk], nano.IsoTrack_pfRelIso03_chg()[itk],
              nano.IsoTrack_dxy()[itk], nano.IsoTrack_dz()[itk],
-             GetMT(nano.MET_pt(), nano.MET_phi(),  nano.IsoTrack_pt()[itk], nano.IsoTrack_phi()[itk]));
+             GetMT(MET_pt, MET_phi,  nano.IsoTrack_pt()[itk], nano.IsoTrack_phi()[itk]));
   }
 
   // collect relevant Electrons
@@ -35,7 +37,7 @@ void IsoTrackProducer::WriteIsoTracks(nano_tree &nano, pico_tree &pico,
              nano.Electron_pt()[iel], nano.Electron_eta()[iel], nano.Electron_phi()[iel], 
              nano.Electron_miniPFRelIso_chg()[iel], nano.Electron_pfRelIso03_chg()[iel],
              nano.Electron_dxy()[iel], nano.Electron_dz()[iel],
-             GetMT(nano.MET_pt(), nano.MET_phi(),  nano.Electron_pt()[iel], nano.Electron_phi()[iel]));
+             GetMT(MET_pt, MET_phi,  nano.Electron_pt()[iel], nano.Electron_phi()[iel]));
   }
   
   // collect relevant Muons
@@ -46,7 +48,7 @@ void IsoTrackProducer::WriteIsoTracks(nano_tree &nano, pico_tree &pico,
              nano.Muon_pt()[imu], nano.Muon_eta()[imu], nano.Muon_phi()[imu], 
              nano.Muon_miniPFRelIso_chg()[imu], nano.Muon_pfRelIso03_chg()[imu],
              nano.Muon_dxy()[imu], nano.Muon_dz()[imu],
-             GetMT(nano.MET_pt(), nano.MET_phi(),  nano.Muon_pt()[imu], nano.Muon_phi()[imu]));
+             GetMT(MET_pt, MET_phi,  nano.Muon_pt()[imu], nano.Muon_phi()[imu]));
   }
   return;
 }
