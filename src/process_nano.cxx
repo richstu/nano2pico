@@ -237,8 +237,12 @@ int main(int argc, char *argv[]){
     isr_tools.WriteISRSystemPt(nano, pico);
 
     if (debug) cout<<"INFO:: Writing jets, MET and ISR vars"<<endl;
+    //jet producer uses sys_met_phi, so met_producer must be called first
+    met_producer.WriteMet(nano, pico, isFastsim);
+
+    vector<HiggsConstructionVariables> sys_higvars;
     vector<int> sig_jet_nano_idx = jet_producer.WriteJets(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, jet_isphoton_nano_idx,
-                                                          btag_wpts[year], btag_df_wpts[year], isFastsim);
+                                                          btag_wpts[year], btag_df_wpts[year], isFastsim, sys_higvars);
     jet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year][1], isFastsim); // usually w.r.t. medium WP
     if(!isZgamma){
       jet_producer.WriteFatJets(nano, pico); // jet_producer.SetVerbose(nano.nSubJet()>0);
@@ -246,7 +250,6 @@ int main(int argc, char *argv[]){
     }
     isr_tools.WriteISRJetMultiplicity(nano, pico);
 
-    met_producer.WriteMet(nano, pico, isFastsim);
     // Copy MET and ME ISR directly from NanoAOD
     //pico.out_met()         = nano.MET_pt();
     //pico.out_met_phi()     = nano.MET_phi();
@@ -284,8 +287,8 @@ int main(int argc, char *argv[]){
       zgamma_producer.WriteZGammaVars(nano, pico, sig_jet_nano_idx);
 
     //save higgs variables using DeepCSV and DeepFlavor
-    hig_producer.WriteHigVars(pico, false);
-    hig_producer.WriteHigVars(pico, true);
+    hig_producer.WriteHigVars(pico, false, isFastsim, sys_higvars);
+    hig_producer.WriteHigVars(pico, true, isFastsim, sys_higvars);
 
     if (debug) cout<<"INFO:: Writing filters and triggers"<<endl;
     // N.B. Jets: pico.out_pass_jets() and pico.out_pass_fsjets() filled in jet_producer

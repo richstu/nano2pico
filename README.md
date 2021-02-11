@@ -230,7 +230,8 @@ These refer to the branches obtained with `ZGamma = false`, i.e. higgsino produc
 * `type` - integer encoding the physics process, see [here](https://github.com/richstu/nano2pico/blob/5e62c553fb306f6c1f27bccafee037fb939c0f75/src/event_tools.cpp#L124).
 * `stitch` - include this variable in order to run on an inclusive sample together with an overlapping slice in a different dataset, e.g. stitch = false for events with GenMET > 150 in the inclusive TTJets sample, in order to remove them when using the inclusive sample together with the deidicated *genMET-150* samples, see [here](https://github.com/richstu/nano2pico/blob/f4b99417bd65c134796b703552522a7de5429f19/src/event_tools.cpp#L31-L45).
 * `npv` - number of reconstructed PV
-* `ht` - sum of pt of jets not associated with a lepton
+* `ht` - sum of pt of jets not associated with a lepton, including jets with |eta|<2.4
+* `ht5` - sum of pt of jets not associated with a lepton, including jets with |eta|<5
 * `met, met_phi, met_calo, met_tru, met_tru_phi` - as expected
 * `mt` - transverse mass, only calculated for nlep==1
 * `mt_tru` - transverse mass at truth level, only calculated for ntrulep==1
@@ -256,7 +257,7 @@ Filled in `jet_producer`:
   * `jet_h1d, jet_h2d` - booleans indicating whether this jet is one of the two jets in Higgs 1 or Higgs 2 of the 0th pair of Higgs candidates stored in `hig_cand_*`
   * `jet_fjet_idx` - index of any fat jets within 0.8
 
-* `int nfjet` - number of AK8 jets that pass the pt and eta cuts
+* `nfjet` - number of AK8 jets that pass the pt and eta cuts
 * `fjet_*` - basic fat jet related variables and also:
   * `fjet_deep_md_hbb_btv` - Mass-decorrelated Deep Double B, H->bb vs QCD discriminator, endorsed by BTV
   * `fjet_deep_md_hbb_jme` - Mass-decorrelated DeepAk8, H->bb vs QCD discriminator, endorsed by JME
@@ -331,6 +332,14 @@ Calculated in [process_nano](src/process_nano.cxx) and then re-normalized in sub
 
 * `HLT_*` - trigger decisions
 * `sys_*` - systematic variations of weights up=0, down=1
+
+* `sys_njet` - analysis variable systematic variations 0=JER up, 1=JER down, 2=JEC up, 3=JEC down
+* `sys_nb*` - analysis variable systematic variations 0=JER up, 1=JER down, 2=JEC up, 3=JEC down
+* `sys_met` - analysis variable systematic variations 0=JER up, 1=JER down, 2=JEC up, 3=JEC down
+* `sys_met_phi` - analysis variable systematic variations 0=JER up, 1=JER down, 2=JEC up, 3=JEC down
+* `sys_hig_cand_*` - analysis variable systematic variations 0=JER up, 1=JER down, 2=JEC up, 3=JEC down
+* `sys_low_dphi_met` - analysis variable systematic variations 0=JER up, 1=JER down, 2=JEC up, 3=JEC down
+* `sys_ht` - analysis variable systematic variations 0=JER up, 1=JER down, 2=JEC up, 3=JEC down
 
 ## Spliting Higgsino signal
 

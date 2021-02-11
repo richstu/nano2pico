@@ -436,15 +436,20 @@ vector<float> sys_prefire
 
 vector<float> sys_murf
 
-# variations have index 0 (JER smearing), 1 (JEC up) and 2 (JEC down)
-# vector<float> sys_ht
-# vector<int>   sys_njets
-# vector<int>   sys_nbm
+# variations have index 0 (JER smearing up), 1 (JER smearing down), 2 (JEC up) and 3 (JEC down)
+vector<float> sys_ht
+vector<int>   sys_njet
+vector<int>   sys_nbl
+vector<int>   sys_nbm
+vector<int>   sys_nbt
+vector<bool>  sys_low_dphi_met
 # vector<int>   sys_nbdl
 # vector<int>   sys_nbdm
 # vector<int>   sys_nbdt
-# vector<float> sys_met
+vector<float> sys_met
+vector<float> sys_met_phi
 # vector<float> sys_mt
-# vector<float> sys_higd_am
-# vector<float> sys_higd_dm
-# vector<float> sys_higd_drmax
+# vector<float> sys_mht
+vector<float> sys_hig_cand_am
+vector<float> sys_hig_cand_dm
+vector<float> sys_hig_cand_drmax

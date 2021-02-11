@@ -2,9 +2,11 @@
 
 #include <algorithm>
 #include <iomanip> 
+#include <vector>
 
 #include "TLorentzVector.h"
 
+#include "hig_producer.hpp"
 #include "utilities.hpp"
 
 using namespace std;
@@ -20,9 +22,14 @@ JetProducer::JetProducer(int year_, float min_jet_pt_, float max_jet_eta_, bool 
 JetProducer::~JetProducer(){
 }
 
-vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
-                                   vector<int> jet_islep_nano_idx, vector<int> jet_isvlep_nano_idx,  vector<int> jet_isphoton_nano_idx,
-                                   const vector<float> &btag_wpts, const vector<float> &btag_df_wpts, bool isFastsim){
+vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico, 
+                                   vector<int> jet_islep_nano_idx, 
+                                   vector<int> jet_isvlep_nano_idx,  
+                                   vector<int> jet_isphoton_nano_idx,
+                                   const vector<float> &btag_wpts, 
+                                   const vector<float> &btag_df_wpts, 
+                                   bool isFastsim, 
+                                   vector<HiggsConstructionVariables> &sys_higvars){
   vector<int> sig_jet_nano_idx;
   pico.out_njet() = 0; pico.out_ht() = 0; pico.out_ht5() = 0; 
   pico.out_nbl() = 0; pico.out_nbm() = 0; pico.out_nbt() = 0; 
@@ -36,13 +43,29 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
   // calculate MHT; needed when saving jet info
   TLorentzVector mht_vec;
   for(int ijet(0); ijet<nano.nJet(); ++ijet){
-    if (Jet_pt[ijet] <= min_jet_pt) continue;
-    TLorentzVector ijet_v4;
-    ijet_v4.SetPtEtaPhiM(Jet_pt[ijet], nano.Jet_eta()[ijet], nano.Jet_phi()[ijet], Jet_mass[ijet]);
-    mht_vec -= ijet_v4;
+    if (Jet_pt[ijet] > min_jet_pt) {
+      TLorentzVector ijet_v4;
+      ijet_v4.SetPtEtaPhiM(Jet_pt[ijet], nano.Jet_eta()[ijet], nano.Jet_phi()[ijet], Jet_mass[ijet]);
+      mht_vec -= ijet_v4;
+    }
   }
   pico.out_mht() = mht_vec.Pt();
   pico.out_mht_phi() = mht_vec.Phi();
+
+  vector<vector<float>> sys_jet_met_dphi;
+
+  //if (!isData_) {
+  //currently apply only to fastsim
+  if (isFastsim) {
+    pico.out_sys_njet().resize(4,0);
+    pico.out_sys_nbl().resize(4,0);
+    pico.out_sys_nbm().resize(4,0);
+    pico.out_sys_nbt().resize(4,0);
+    pico.out_sys_ht().resize(4,0.0);
+    sys_jet_met_dphi.resize(4,vector<float>({}));
+    sys_higvars.resize(4, HiggsConstructionVariables());
+    pico.out_sys_low_dphi_met().resize(4,false);
+  }
 
   // saving jet info on all jets passing pt cut, including endcap
   for(int ijet(0); ijet<nano.nJet(); ++ijet){
@@ -51,7 +74,7 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
                                     <<" phi = "<<setw(10)<<nano.Jet_phi()[ijet]
                                     <<" m = "<<setw(10)<<Jet_mass[ijet]
                                     <<endl;
-    if (Jet_pt[ijet] <= min_jet_pt) continue;
+
 
     // check overlap with signal leptons (or photons)
     bool islep = find(jet_islep_nano_idx.begin(), jet_islep_nano_idx.end(), ijet) != jet_islep_nano_idx.end();
@@ -64,6 +87,79 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
     if (!isFastsim) if (nano.Jet_jetId()[ijet] <1) pass_jetid = false;
 
     bool isgood = !islep && !isphoton && (fabs(nano.Jet_eta()[ijet]) <= max_jet_eta) && pass_jetid;
+
+    //sys_jetvar convention: [0] JER up, [1] JER down, [2] JEC up, [3] JEC down
+    //for now, only save sys_ variables
+    //if (!isData_) {
+    //currently apply only to fastsim
+    if (isFastsim) {
+      if (nano.Jet_pt_jerUp()[ijet] > min_jet_pt) {
+        if (isgood) {
+          pico.out_sys_njet()[0]++;
+          pico.out_sys_ht()[0] += nano.Jet_pt_jerUp()[ijet];
+          if (nano.Jet_btagDeepB()[ijet] > btag_wpts[0]) pico.out_sys_nbl()[0]++; 
+          if (nano.Jet_btagDeepB()[ijet] > btag_wpts[1]) pico.out_sys_nbm()[0]++; 
+          if (nano.Jet_btagDeepB()[ijet] > btag_wpts[2]) pico.out_sys_nbt()[0]++;
+          sys_higvars[0].jet_deepcsv.push_back(nano.Jet_btagDeepB()[ijet]);
+          TLorentzVector lv;
+          lv.SetPtEtaPhiM(nano.Jet_pt_jerUp()[ijet], nano.Jet_eta()[ijet],
+                          nano.Jet_phi()[ijet], nano.Jet_mass_jerUp()[ijet]);
+          sys_higvars[0].jet_lv.push_back(lv);
+        }
+        if (fabs(nano.Jet_eta()[ijet]) < 2.4)
+          sys_jet_met_dphi.at(0).push_back(DeltaPhi(nano.Jet_phi()[ijet], pico.out_sys_met_phi()[0]));
+      }
+      if (nano.Jet_pt_jerDown()[ijet] > min_jet_pt) {
+        if (isgood) {
+          pico.out_sys_njet()[1]++;
+          pico.out_sys_ht()[1] += nano.Jet_pt_jerDown()[ijet];
+          if (nano.Jet_btagDeepB()[ijet] > btag_wpts[0]) pico.out_sys_nbl()[1]++; 
+          if (nano.Jet_btagDeepB()[ijet] > btag_wpts[1]) pico.out_sys_nbm()[1]++; 
+          if (nano.Jet_btagDeepB()[ijet] > btag_wpts[2]) pico.out_sys_nbt()[1]++;
+          sys_higvars[1].jet_deepcsv.push_back(nano.Jet_btagDeepB()[ijet]);
+          TLorentzVector lv;
+          lv.SetPtEtaPhiM(nano.Jet_pt_jerDown()[ijet], nano.Jet_eta()[ijet],
+                          nano.Jet_phi()[ijet], nano.Jet_mass_jerDown()[ijet]);
+          sys_higvars[1].jet_lv.push_back(lv);
+        }
+        if (fabs(nano.Jet_eta()[ijet]) < 2.4)
+          sys_jet_met_dphi.at(1).push_back(DeltaPhi(nano.Jet_phi()[ijet], pico.out_sys_met_phi()[1]));
+      }
+      if (nano.Jet_pt_jesTotalUp()[ijet] > min_jet_pt) {
+        if (isgood) {
+          pico.out_sys_njet()[2]++;
+          pico.out_sys_ht()[2] += nano.Jet_pt_jesTotalUp()[ijet];
+          if (nano.Jet_btagDeepB()[ijet] > btag_wpts[0]) pico.out_sys_nbl()[2]++; 
+          if (nano.Jet_btagDeepB()[ijet] > btag_wpts[1]) pico.out_sys_nbm()[2]++; 
+          if (nano.Jet_btagDeepB()[ijet] > btag_wpts[2]) pico.out_sys_nbt()[2]++;
+          sys_higvars[2].jet_deepcsv.push_back(nano.Jet_btagDeepB()[ijet]);
+          TLorentzVector lv;
+          lv.SetPtEtaPhiM(nano.Jet_pt_jesTotalUp()[ijet], nano.Jet_eta()[ijet],
+                          nano.Jet_phi()[ijet], nano.Jet_mass_jesTotalUp()[ijet]);
+          sys_higvars[2].jet_lv.push_back(lv);
+        }
+        if (fabs(nano.Jet_eta()[ijet]) < 2.4)
+          sys_jet_met_dphi.at(2).push_back(DeltaPhi(nano.Jet_phi()[ijet], pico.out_sys_met_phi()[2]));
+      }
+      if (nano.Jet_pt_jesTotalDown()[ijet] > min_jet_pt) {
+        if (isgood) {
+          pico.out_sys_njet()[3]++;
+          pico.out_sys_ht()[3] += nano.Jet_pt_jesTotalDown()[ijet];
+          if (nano.Jet_btagDeepB()[ijet] > btag_wpts[0]) pico.out_sys_nbl()[3]++; 
+          if (nano.Jet_btagDeepB()[ijet] > btag_wpts[1]) pico.out_sys_nbm()[3]++; 
+          if (nano.Jet_btagDeepB()[ijet] > btag_wpts[2]) pico.out_sys_nbt()[3]++;
+          sys_higvars[3].jet_deepcsv.push_back(nano.Jet_btagDeepB()[ijet]);
+          TLorentzVector lv;
+          lv.SetPtEtaPhiM(nano.Jet_pt_jesTotalDown()[ijet], nano.Jet_eta()[ijet],
+                          nano.Jet_phi()[ijet], nano.Jet_mass_jesTotalDown()[ijet]);
+          sys_higvars[3].jet_lv.push_back(lv);
+        }
+        if (fabs(nano.Jet_eta()[ijet]) < 2.4)
+          sys_jet_met_dphi.at(3).push_back(DeltaPhi(nano.Jet_phi()[ijet], pico.out_sys_met_phi()[3]));
+      }
+    }
+
+    if (Jet_pt[ijet] <= min_jet_pt) continue;
 
     pico.out_jet_pt().push_back(Jet_pt[ijet]);
     pico.out_jet_eta().push_back(nano.Jet_eta()[ijet]);
@@ -127,6 +223,18 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
     if (pico.out_jet_met_dphi()[ijet]<=cut_) pico.out_low_dphi_met() = true;
     if (ijet_e24==3) break;
     ijet_e24++;
+  }
+
+  //if (!isData_) {
+  //currently apply only to fastsim
+  if (isFastsim) {
+    for (unsigned ijec(0); ijec < 4; ijec++) {
+      for (unsigned ijet(0); ijet < sys_jet_met_dphi[ijec].size(); ijet++) {
+        float cut_ = ijet<=1 ? 0.5 : 0.3;
+        if (sys_jet_met_dphi[ijec][ijet] <= cut_) pico.out_sys_low_dphi_met()[ijec] = true;
+        if (ijet==3) break;
+      }
+    }
   }
 
   if (verbose) cout<<"Done with AK4 jets"<<endl;

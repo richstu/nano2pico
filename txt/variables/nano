@@ -270,6 +270,14 @@ array<int> Jet_genJetIdx
 array<int> Jet_hadronFlavour
 array<int> Jet_partonFlavour
 array<char> Jet_cleanmask
+array<float> Jet_pt_jerUp
+array<float> Jet_pt_jerDown
+array<float> Jet_pt_jesTotalUp
+array<float> Jet_pt_jesTotalDown
+array<float> Jet_mass_jerUp
+array<float> Jet_mass_jerDown
+array<float> Jet_mass_jesTotalUp
+array<float> Jet_mass_jesTotalDown
 
 ################ Very soft Jets ################
 
@@ -384,6 +392,23 @@ float RawMET_sumEt
 float TkMET_phi
 float TkMET_pt
 float TkMET_sumEt
+
+float MET_T1Smear_pt_jerUp
+float MET_T1Smear_pt_jerDown
+float MET_T1Smear_phi_jerUp
+float MET_T1Smear_phi_jerDown
+float MET_T1_pt_jesTotalUp
+float MET_T1_pt_jesTotalDown
+float MET_T1_phi_jesTotalUp
+float MET_T1_phi_jesTotalDown
+float METFixEE2017_T1Smear_pt_jerUp
+float METFixEE2017_T1Smear_pt_jerDown
+float METFixEE2017_T1Smear_phi_jerUp
+float METFixEE2017_T1Smear_phi_jerDown
+float METFixEE2017_T1_pt_jesTotalUp
+float METFixEE2017_T1_pt_jesTotalDown
+float METFixEE2017_T1_phi_jesTotalUp
+float METFixEE2017_T1_phi_jesTotalDown
 
 int nCorrT1METJet
 array<float> CorrT1METJet_area
