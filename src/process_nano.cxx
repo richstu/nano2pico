@@ -416,6 +416,9 @@ int main(int argc, char *argv[]){
         wgt_sums.out_sys_isr()[i]        += pico.out_sys_isr()[i];
         wgt_sums.out_sys_pu()[i]         += pico.out_sys_pu()[i];
       }
+      for(size_t i = 0; i<pico.out_sys_murf().size(); ++i){ 
+        wgt_sums.out_sys_murf()[i]         += pico.out_sys_murf()[i];
+      }
     }
 
     if (debug) cout<<"INFO:: Filling tree"<<endl;
@@ -459,6 +462,7 @@ void Initialize(corrections_tree &wgt_sums){
   wgt_sums.out_sys_fs_udsghig().resize(2,0);
   wgt_sums.out_sys_isr().resize(2,0);
   wgt_sums.out_sys_pu().resize(2,0);
+  wgt_sums.out_sys_murf().resize(9,0);
 }
 
 void GetOptions(int argc, char *argv[]){

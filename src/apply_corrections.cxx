@@ -90,10 +90,12 @@ int main(int argc, char *argv[]){
       pico.out_sys_isr()[i]        = pico.sys_isr()[i]*corr.sys_isr()[i];
       pico.out_sys_pu()[i]         = pico.sys_pu()[i]*corr.sys_pu()[i];
 
-      // pico.out_sys_muf()[i]     = pico.sys_muf()[i]*corr.sys_muf()[i];
-      // pico.out_sys_mur()[i]     = pico.sys_mur()[i]*corr.sys_mur()[i];
-      // pico.out_sys_murf()[i]    = pico.sys_murf()[i]*corr.sys_murf()[i];
     } 
+    pico.out_sys_murf().resize(9);
+    for (unsigned i(0); i<9; i++) {        
+      pico.out_sys_murf()[i]      = pico.sys_murf()[i]*corr.sys_murf()[i];
+    }
+
 
     // for (unsigned i(0); i<pico.w_pdf().size(); i++) 
     //   pico.out_w_pdf()[i] = pico.w_pdf()[i]*corr.w_pdf()[i];    
