@@ -370,7 +370,7 @@ namespace xsec{
     return fneg;
   }
 
-
+  // xsec is pb, xsec_unc is relative uncertainty
   void higgsino2DCrossSection(int hig_mass, double &xsec, double &xsec_unc) {
     if(hig_mass ==127) { xsec = .5824*.5824*1.44725; xsec_unc = 0.0395277; return;}
     else if(hig_mass ==150) { xsec = .5824*.5824*0.71514; xsec_unc = 0.0421496; return;}
@@ -430,6 +430,7 @@ namespace xsec{
     else{ xsec = 0; xsec_unc = 0;}
   }
 
+  // xsec is pb, xsec_unc is relative uncertainty
   void higgsinoCrossSection(int hig_mass, double &xsec, double &xsec_unc) {
     if(hig_mass ==127) { xsec = .5824*.5824*7.6022; xsec_unc = 0.0393921; return;}
     else if(hig_mass ==150) { xsec = .5824*.5824*3.83231; xsec_unc = 0.0413612; return;}
