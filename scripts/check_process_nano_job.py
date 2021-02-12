@@ -7,9 +7,9 @@ import queue_system
 from ROOT import TChain
 
 # job_argument_string = "/net/top/homes/aovcharova/code/nano2pico/run/process_nano.exe -f DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISummer16NanoAODv5__PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1__250000__233E4358-D599-FE4A-B585-A6B18F4DDEF1.root -i /mnt/hadoop/pico/NanoAODv5/nano/2016/mc/ -o /net/cms29/cms29r0/pico/NanoAODv5/higgsino_angeles/2016/mc/"
-#job_log_string = queue_system.decompress_string(sys.argv[1])
-#job_argument_string = queue_system.decompress_string(sys.argv[2])
-job_argument_string = "--command=\"/net/cms37/data1/jbkim/analysis/nano2pico.inyo/run/process_nano.exe -f JetHT__Run2016H__02Apr2020-v1__40000__E316083A-DB8C-484C-8013-C9C3A301ED61.root -i /net/cms25/cms25r5/pico/NanoAODv7/nano/2016/data/ -o /net/cms25/cms25r5/pico/NanoAODv7/higgsino_inyo/2016/data/\""
+job_log_string = queue_system.decompress_string(sys.argv[1])
+job_argument_string = queue_system.decompress_string(sys.argv[2])
+#job_argument_string = "--command=\"/net/cms37/data1/jbkim/analysis/nano2pico.inyo/run/process_nano.exe -f JetHT__Run2016H__02Apr2020-v1__40000__E316083A-DB8C-484C-8013-C9C3A301ED61.root -i /net/cms25/cms25r5/pico/NanoAODv7/nano/2016/data/ -o /net/cms25/cms25r5/pico/NanoAODv7/higgsino_inyo/2016/data/\""
 
 print(job_argument_string)
 
