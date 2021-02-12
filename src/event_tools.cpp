@@ -163,6 +163,22 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
     break; //only apply to leading jet
   }
 
+  pico.out_pass_ecalnoisejet() = true;
+  if (year!=2016) {
+    int counter = 0;
+    bool goodjet[2] = {true, true};
+    double dphi = 0.;
+    for (int ijet(0); ijet < nano.nJet(); ijet++) {
+      if (counter >= 2) break;
+      if (nano.Jet_pt()[ijet]>30 && fabs(nano.Jet_eta()[ijet])>2.4 && fabs(nano.Jet_eta()[ijet])<5.0) {
+        dphi = DeltaPhi(nano.Jet_phi()[ijet], pico.out_met_phi());
+        if (nano.Jet_pt()[ijet]>250 && (dphi > 2.6 || dphi < 0.1)) goodjet[counter] = false;
+        ++counter;
+      }
+    }
+    pico.out_pass_ecalnoisejet() = goodjet[0] && goodjet[1];
+  }
+
   // filters directly from Nano
   pico.out_pass_hbhe() = nano.Flag_HBHENoiseFilter();
   pico.out_pass_hbheiso() = nano.Flag_HBHENoiseIsoFilter();

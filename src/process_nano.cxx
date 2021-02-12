@@ -43,7 +43,6 @@ namespace {
   // requirements for jets to be counted in njet, mofified for Zgamma below
   float min_jet_pt = 30.0;
   float max_jet_eta =  2.4;
-  int nano2pico_version = 1;
 }
 
 void WriteDataQualityFilters(nano_tree& nano, pico_tree& pico);
@@ -187,8 +186,6 @@ int main(int argc, char *argv[]){
       pico.out_npu_tru() = nano.Pileup_nPU();
       pico.out_npu_tru_mean() = nano.Pileup_nTrueInt();
     }
-    //nano2pico provenance
-    pico.out_nano2pico_version() = nano2pico_version;
 
     // ----------------------------------------------------------------------------------------------
     //            *** Writing physics objects ***
@@ -240,8 +237,12 @@ int main(int argc, char *argv[]){
     isr_tools.WriteISRSystemPt(nano, pico);
 
     if (debug) cout<<"INFO:: Writing jets, MET and ISR vars"<<endl;
+    //jet producer uses sys_met_phi, so met_producer must be called first
+    met_producer.WriteMet(nano, pico, isFastsim);
+
+    vector<HiggsConstructionVariables> sys_higvars;
     vector<int> sig_jet_nano_idx = jet_producer.WriteJets(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, jet_isphoton_nano_idx,
-                                                          btag_wpts[year], btag_df_wpts[year], isFastsim);
+                                                          btag_wpts[year], btag_df_wpts[year], isFastsim, sys_higvars);
     jet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year][1], isFastsim); // usually w.r.t. medium WP
     if(!isZgamma){
       jet_producer.WriteFatJets(nano, pico); // jet_producer.SetVerbose(nano.nSubJet()>0);
@@ -249,7 +250,6 @@ int main(int argc, char *argv[]){
     }
     isr_tools.WriteISRJetMultiplicity(nano, pico);
 
-    met_producer.WriteMet(nano, pico, isFastsim);
     // Copy MET and ME ISR directly from NanoAOD
     //pico.out_met()         = nano.MET_pt();
     //pico.out_met_phi()     = nano.MET_phi();
@@ -287,8 +287,8 @@ int main(int argc, char *argv[]){
       zgamma_producer.WriteZGammaVars(nano, pico, sig_jet_nano_idx);
 
     //save higgs variables using DeepCSV and DeepFlavor
-    hig_producer.WriteHigVars(pico, false);
-    hig_producer.WriteHigVars(pico, true);
+    hig_producer.WriteHigVars(pico, false, isFastsim, sys_higvars);
+    hig_producer.WriteHigVars(pico, true, isFastsim, sys_higvars);
 
     if (debug) cout<<"INFO:: Writing filters and triggers"<<endl;
     // N.B. Jets: pico.out_pass_jets() and pico.out_pass_fsjets() filled in jet_producer
@@ -349,6 +349,9 @@ int main(int argc, char *argv[]){
       pico.out_w_lumi() = nano.Generator_weight()>0 ? 1:-1;
     else
       pico.out_w_lumi() = 1.;
+
+    //copy LHE scale variation weights
+    pico.out_sys_murf() = nano.LHEScaleWeight();
 
     // @todo, copy weights from babymaker
     pico.out_w_pu() = 1.;
@@ -413,6 +416,9 @@ int main(int argc, char *argv[]){
         wgt_sums.out_sys_isr()[i]        += pico.out_sys_isr()[i];
         wgt_sums.out_sys_pu()[i]         += pico.out_sys_pu()[i];
       }
+      for(size_t i = 0; i<pico.out_sys_murf().size(); ++i){ 
+        wgt_sums.out_sys_murf()[i]         += pico.out_sys_murf()[i];
+      }
     }
 
     if (debug) cout<<"INFO:: Filling tree"<<endl;
@@ -456,6 +462,7 @@ void Initialize(corrections_tree &wgt_sums){
   wgt_sums.out_sys_fs_udsghig().resize(2,0);
   wgt_sums.out_sys_isr().resize(2,0);
   wgt_sums.out_sys_pu().resize(2,0);
+  wgt_sums.out_sys_murf().resize(9,0);
 }
 
 void GetOptions(int argc, char *argv[]){
