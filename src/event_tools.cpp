@@ -146,8 +146,6 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
 
   pico.out_pass_low_neutral_jet() = true;
   for(int ijet(0); ijet<nano.nJet(); ++ijet){  
-    //sync: currently, boosted does not have pt or eta cuts
-    //if (nano.Jet_pt()[ijet]<=min_jet_pt || fabs(nano.Jet_eta()[ijet])>max_jet_eta) continue;
     if (nano.Jet_neEmEF()[ijet] <0.03 && DeltaPhi(nano.Jet_phi()[ijet], pico.out_met_phi())>(TMath::Pi()-0.4))
       pico.out_pass_low_neutral_jet() = false;
     break; //only apply to leading jet
@@ -156,8 +154,6 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
   pico.out_pass_htratio_dphi_tight() = true;
   float htratio = pico.out_ht5()/pico.out_ht();
   for(int ijet(0); ijet<nano.nJet(); ++ijet){  
-    //sync: currently, boosted does not have pt or eta cuts
-    //if (nano.Jet_pt()[ijet]<=min_jet_pt || fabs(nano.Jet_eta()[ijet])>max_jet_eta) continue;
     if (htratio >= 1.2 && DeltaPhi(nano.Jet_phi()[ijet], pico.out_met_phi()) < (5.3*htratio - 4.78)) 
       pico.out_pass_htratio_dphi_tight() = false;
     break; //only apply to leading jet
@@ -170,7 +166,9 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
     double dphi = 0.;
     for (int ijet(0); ijet < nano.nJet(); ijet++) {
       if (counter >= 2) break;
-      if (nano.Jet_pt()[ijet]>30 && fabs(nano.Jet_eta()[ijet])>2.4 && fabs(nano.Jet_eta()[ijet])<5.0) {
+      float jet_pt = nano.Jet_pt()[ijet];
+      if (isFastsim) jet_pt = nano.Jet_pt_nom()[ijet];
+      if (jet_pt>30 && fabs(nano.Jet_eta()[ijet])>2.4 && fabs(nano.Jet_eta()[ijet])<5.0) {
         dphi = DeltaPhi(nano.Jet_phi()[ijet], pico.out_met_phi());
         if (nano.Jet_pt()[ijet]>250 && (dphi > 2.6 || dphi < 0.1)) goodjet[counter] = false;
         ++counter;
