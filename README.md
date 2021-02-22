@@ -526,6 +526,11 @@ sed -i 's/std::vector<double>\* xsecs;/std::vector<double>\* xsecs=0;/' get_gaug
 sed -i 's/std::vector<double>\* xsecUncs;/std::vector<double>\* xsecUncs=0;/' get_gaugino.C
 ~~~~
 
+## Getting Gluino cross-section
+
+wget https://raw.githubusercontent.com/fuenfundachtzig/xsec/master/json/pp13_gluino_NNLO%2BNNLL.json
+scripts/get_gluino_cross_sections.py
+
 ### Step 3. Run script for all mass points.
 
 Use model "CN" (mixing) or "N1N2" (no mixing).
