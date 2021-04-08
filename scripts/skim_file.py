@@ -62,12 +62,10 @@ def get_cuts(skim_name):
   if(skim_name=='higqcd'):  cuts = '&&'.join([njet_or_fjet_cut, 'nvlep==0', 'ntk==0', 'low_dphi_met'])
 
   # Loosen up just enough to do systematics - to be updated when needed
-  # sys_nbcut = 'max(nbdft,Max$(sys_nbdft))>=2'
-  # sys_njcut = '(njet==4||sys_njet[1]==4||sys_njet[2]==4||njet==5||sys_njet[1]==5||sys_njet[2]==5)'
-  # sys_higtrim = '&&'.join(['min(hig_cand_drmax,Min$(sys_hig_cand_drmax))<2.2',
-  #                          'min(hig_cand_dm,Min$(sys_hig_cand_dm))<=40',
-  #                          'min(hig_cand_am,Min$(sys_hig_cand_am))<=200'])
-  # if(skim_name=='higsys'):   cuts = '&&'.join([sys_njcut, sys_nbcut, 'max(met,Max$(sys_met))>150', 'nvlep==0', 'ntk==0', sys_higtrim])
+  sys_nbcut = 'max(nbt,Max$(sys_nbt))>=2'
+  sys_njcut = '(njet==4||sys_njet[0]==4||sys_njet[1]==4||sys_njet[2]==4||sys_njet[3]==4||njet==5||sys_njet[0]==5||sys_njet[1]==5||sys_njet[2]==5||sys_njet[3]==5)'
+  sys_higtrim = '&&'.join(['min(hig_cand_drmax,Min$(sys_hig_cand_drmax))<2.2','min(hig_cand_dm,Min$(sys_hig_cand_dm))<=40','min(hig_cand_am,Min$(sys_hig_cand_am))<=200'])
+  if(skim_name=='higsys'):   cuts = '&&'.join([sys_njcut, sys_nbcut, 'max(max(met,Max$(sys_met)),met_tru)>150', 'nvlep==0', 'ntk==0', sys_higtrim])
 
   return cuts
 

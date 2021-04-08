@@ -19,7 +19,7 @@ public:
   explicit HigVarProducer(int year);
   ~HigVarProducer();
 
-  void WriteHigVars(pico_tree& pico, bool doDeepFlav, bool isFastsim,
+  void WriteHigVars(pico_tree& pico, bool doDeepFlav, bool isSignal,
                     std::vector<HiggsConstructionVariables> sys_higvars);
 
 private:

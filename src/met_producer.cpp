@@ -18,7 +18,7 @@ MetProducer::MetProducer(int year_, bool isData_, bool verbose_){
 MetProducer::~MetProducer(){
 }
 
-void MetProducer::WriteMet(nano_tree &nano, pico_tree &pico, bool isFastsim){
+void MetProducer::WriteMet(nano_tree &nano, pico_tree &pico, bool isFastsim, bool isSignal){
   float MET_pt, MET_phi;
   getMETWithJEC(nano, year, isFastsim, MET_pt, MET_phi);
   // Copy MET and ME ISR directly from NanoAOD
@@ -31,10 +31,10 @@ void MetProducer::WriteMet(nano_tree &nano, pico_tree &pico, bool isFastsim){
 
   //if (!isData_) {
   //currently apply only to fastsim
-  if (isFastsim) {
+  if (isSignal) {
     pico.out_sys_met().resize(4,-999.0);
     pico.out_sys_met_phi().resize(4,-999.0);
-    if (year==2017) {
+    if (year==2017 && isFastsim) {
       pico.out_sys_met()[0] = nano.METFixEE2017_T1Smear_pt_jerUp();
       pico.out_sys_met()[1] = nano.METFixEE2017_T1Smear_pt_jerDown();
       pico.out_sys_met()[2] = nano.METFixEE2017_T1_pt_jesTotalUp();

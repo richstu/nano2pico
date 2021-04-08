@@ -54,6 +54,7 @@ Step 1. Make an output directory out/ with subdirectories `wgt_sums` and `raw_pi
 
 * flag `isData = infile.Contains("Run201") ? true : false;`
 * flag `isFastsim = infile.Contains("Fast") ? true : false;`
+* flag `isSignal = Contains(in_file, "TChiHH") || Contains(in_file, "T5qqqqZH") ? true : false;`
 * variable `year = infile.Contains("RunIISummer16") ? 2016 : (infile.Contains("RunIIFall17") ? 2017 : 2018)`
 * output branch `type` is set based on the presence of dataset name substrings (see event_tools.cpp)
 * branches related on ISR also depend on the presence of dataset name substrings
@@ -347,7 +348,7 @@ Calculated in [process_nano](src/process_nano.cxx) and then re-normalized in sub
 
   source set_env.sh
 
-### Step . Correct FastSim JEC on NanoAODs
+### Step . Correct FastSim JEC on NanoAODs / Add variations on FullSIM signal
 
 ~~~~bash 
 ./scripts/write_fastsim_jmeCorrection_cmds.py --inputNanoAodFolder /net/cms25/cms25r0/pico/NanoAODv7/nano/2016/SMS-TChiHH_2D_unsplit
@@ -381,6 +382,26 @@ Calculated in [process_nano](src/process_nano.cxx) and then re-normalized in sub
 auto_submit_jobs.py apply_fastsim_jmeCorrection_2016.json -c scripts/check_jmeCorrection.py
 auto_submit_jobs.py apply_fastsim_jmeCorrection_2017.json -c scripts/check_jmeCorrection.py
 auto_submit_jobs.py apply_fastsim_jmeCorrection_2018.json -c scripts/check_jmeCorrection.py
+~~~~
+
+For FullSIM, 
+
+~~~~bash
+./scripts/write_fullsim_jmeCorrection_cmds.py --inputNanoAodFolder /net/cms24/cms24r0/pico/NanoAODv7/nano/2016/SMS-T5qqqqZH_FullSim
+                                              --outputNanoAodFolder /net/cms24/cms24r0/pico/NanoAODv7/nano/2016/SMS-T5qqqqZH_FullSimJmeVariations
+                                              --commandFilename gluino_apply_fullsim_jmeCorrection_2016.py
+./scripts/write_fullsim_jmeCorrection_cmds.py --inputNanoAodFolder /net/cms24/cms24r0/pico/NanoAODv7/nano/2017/SMS-T5qqqqZH_FullSim
+                                              --outputNanoAodFolder /net/cms24/cms24r0/pico/NanoAODv7/nano/2017/SMS-T5qqqqZH_FullSimJmeVariations
+                                              --commandFilename gluino_apply_fullsim_jmeCorrection_2017.py
+./scripts/write_fullsim_jmeCorrection_cmds.py --inputNanoAodFolder /net/cms24/cms24r0/pico/NanoAODv7/nano/2018/SMS-T5qqqqZH_FullSim
+                                              --outputNanoAodFolder /net/cms24/cms24r0/pico/NanoAODv7/nano/2018/SMS-T5qqqqZH_FullSimJmeVariations
+                                              --commandFilename gluino_apply_fullsim_jmeCorrection_2018.py
+~~~~
+
+~~~~bash 
+auto_submit_jobs.py apply_fullsim_jmecorrection_2016.json -c scripts/check_jmeCorrection.py
+auto_submit_jobs.py apply_fullsim_jmecorrection_2017.json -c scripts/check_jmeCorrection.py
+auto_submit_jobs.py apply_fullsim_jmecorrection_2018.json -c scripts/check_jmeCorrection.py
 ~~~~
 
 ### Step 1. Split scan

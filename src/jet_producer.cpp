@@ -29,6 +29,7 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
                                    const vector<float> &btag_wpts, 
                                    const vector<float> &btag_df_wpts, 
                                    bool isFastsim, 
+                                   bool isSignal,
                                    vector<HiggsConstructionVariables> &sys_higvars){
   vector<int> sig_jet_nano_idx;
   pico.out_njet() = 0; pico.out_ht() = 0; pico.out_ht5() = 0; 
@@ -54,9 +55,7 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
 
   vector<vector<float>> sys_jet_met_dphi;
 
-  //if (!isData_) {
-  //currently apply only to fastsim
-  if (isFastsim) {
+  if (isSignal) {
     pico.out_sys_njet().resize(4,0);
     pico.out_sys_nbl().resize(4,0);
     pico.out_sys_nbm().resize(4,0);
@@ -90,9 +89,7 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
 
     //sys_jetvar convention: [0] JER up, [1] JER down, [2] JEC up, [3] JEC down
     //for now, only save sys_ variables
-    //if (!isData_) {
-    //currently apply only to fastsim
-    if (isFastsim) {
+    if (isSignal) {
       if (nano.Jet_pt_jerUp()[ijet] > min_jet_pt) {
         if (isgood) {
           pico.out_sys_njet()[0]++;
@@ -225,9 +222,7 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
     ijet_e24++;
   }
 
-  //if (!isData_) {
-  //currently apply only to fastsim
-  if (isFastsim) {
+  if (isSignal) {
     for (unsigned ijec(0); ijec < 4; ijec++) {
       for (unsigned ijet(0); ijet < sys_jet_met_dphi[ijec].size(); ijet++) {
         float cut_ = ijet<=1 ? 0.5 : 0.3;

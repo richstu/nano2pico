@@ -17,7 +17,7 @@ HigVarProducer::HigVarProducer(int year_){
 HigVarProducer::~HigVarProducer(){
 }
 
-void HigVarProducer::WriteHigVars(pico_tree &pico, bool doDeepFlav, bool isFastsim,
+void HigVarProducer::WriteHigVars(pico_tree &pico, bool doDeepFlav, bool isSignal,
                                   vector<HiggsConstructionVariables> sys_higvars){
 
   // get jet 4-vectors ordered by decreasing b-tag discriminator value,
@@ -96,9 +96,7 @@ void HigVarProducer::WriteHigVars(pico_tree &pico, bool doDeepFlav, bool isFasts
   } //if at least 4 good jets
 
   //make systematic variations
-  //if (!isData_) {
-  //currently apply only to fastsim
-  if (isFastsim && !doDeepFlav) {
+  if (isSignal && !doDeepFlav) {
     pico.out_sys_hig_cand_dm().resize(4, -999.0);
     pico.out_sys_hig_cand_am().resize(4, -999.0);
     pico.out_sys_hig_cand_drmax().resize(4, -999.0);
@@ -143,7 +141,7 @@ void HigVarProducer::WriteHigVars(pico_tree &pico, bool doDeepFlav, bool isFasts
         } //loop over Higgs pairings
       } //if at least 4 good jets
     } //loop over JEC/JER variations
-  } //if (isFastsim && !doDeepFlav)
+  } //if (isSignal && !doDeepFlav)
 
   return;
 }

@@ -19,7 +19,8 @@ public:
                              std::vector<int> jet_isphoton_nano_idx,
                              const std::vector<float> &btag_wpts, 
                              const std::vector<float> &btag_df_wpts, 
-                             bool isFastsim,
+                             bool isFastsim, 
+                             bool isSignal,
                              std::vector<HiggsConstructionVariables> &sys_higvars);
   void WriteFatJets(nano_tree &nano, pico_tree &pico);
   void WriteSubJets(nano_tree &nano, pico_tree &pico);
