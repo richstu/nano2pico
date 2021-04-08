@@ -25,7 +25,8 @@ if __name__ == '__main__':
   startTime = datetime.datetime.now()
 
   # Find gluino model: SMS-T5qqqqZH_HToBB-mGluino or SMS-T5qqqqZH_HToBB-mN2
-  if 'SMS-T5qqqqZH_HToBB-mGluino' in args.input_glob: model = 'SMS-T5qqqqZH_HToBB-mGluino'
+  if 'SMS-T5qqqqZH_HToBB-mGluino' in args.input_glob: model = 'SMS-T5qqqqZH_HToBB-mGluino' # FastSim
+  elif 'SMS-T5qqqqZH-mGluino' in args.input_glob: model = 'SMS-T5qqqqZH-mGluino' # FullSim
   elif 'SMS-T5qqqqZH_HToBB-mN2' in args.input_glob: model = 'SMS-T5qqqqZH_HToBB-mN2'
   else:
     print ('[Error] unknown model in input_glob')
@@ -36,6 +37,8 @@ if __name__ == '__main__':
   output_filename = dataset_name+'.root'
   if model == 'SMS-T5qqqqZH_HToBB-mGluino':
     output_filename = re.sub('mGluino.*mLSP[0-9]+to[0-9]+', 'mGluino-'+args.nlsp_mass+'_mChi-'+str(int(args.nlsp_mass)-50)+'_mLSP-'+args.lsp_mass, output_filename)
+  elif model == 'SMS-T5qqqqZH-mGluino':
+    output_filename = re.sub('mGluino-[0-9]+to[0-9]+', 'mGluino-'+args.nlsp_mass+'_mChi-'+str(int(args.nlsp_mass)-50)+'_mLSP-'+args.lsp_mass, output_filename)
   elif model == 'SMS-T5qqqqZH_HToBB-mN2':
     output_filename = re.sub('mN2.*[0-9]+to[0-9]+', 'mGluino-'+args.nlsp_mass+'_mChi-'+args.lsp_mass+'_mLSP-1', output_filename)
   output_filepath = args.output_directory+'/'+output_filename
@@ -44,7 +47,7 @@ if __name__ == '__main__':
   chain = ROOT.TChain(treename)
   chain.Add(args.input_glob)
 
-  if model == 'SMS-T5qqqqZH_HToBB-mGluino':
+  if model == 'SMS-T5qqqqZH_HToBB-mGluino' or model == 'SMS-T5qqqqZH-mGluino':
     entrylistName = "entrylist_GenModel_T5qqqqZH_"+args.nlsp_mass+"_"+args.lsp_mass
   elif model == 'SMS-T5qqqqZH_HToBB-mN2':
     entrylistName = "entrylist_GenModel_T5qqqqZH_"+args.nlsp_mass+"_"+args.lsp_mass+"_1"
@@ -52,9 +55,9 @@ if __name__ == '__main__':
   if args.entrylist_directory:
     entrylistFile = ROOT.TFile(args.entrylist_directory+"/split_"+entrylistName+".root");
     elist = ROOT.gDirectory.Get(entrylistName)
-    #elist.Print("all")
+    print('Found {} events satisfying the skim requirements.'.format(elist.GetN()))
   else:
-    if model == 'SMS-T5qqqqZH_HToBB-mGluino':
+    if model == 'SMS-T5qqqqZH_HToBB-mGluino' or model == 'SMS-T5qqqqZH-mGluino':
       cut_string = "GenModel_T5qqqqZH_"+args.nlsp_mass+"_"+args.lsp_mass
     elif model == 'SMS-T5qqqqZH_HToBB-mN2':
       cut_string = "GenModel_T5qqqqZH_"+args.nlsp_mass+"_"+args.lsp_mass+"_1"

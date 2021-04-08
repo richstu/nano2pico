@@ -58,13 +58,15 @@ void ISRTools::WriteISRSystemPt(nano_tree &nano, pico_tree &pico) {
       mc_v4.SetPtEtaPhiM(nano.GenPart_pt()[imc], nano.GenPart_eta()[imc], nano.GenPart_phi()[imc], nano.GenPart_mass()[imc]);
       if (mc_absid==6 && pico.out_type()>=1000 && pico.out_type()<2000) isr_p4 -= mc_v4;
       else if (mc_absid==23 && pico.out_type()>=6000 && pico.out_type()<7000) isr_p4 -= mc_v4;
-      else if (pico.out_type()==100e3 || pico.out_type()==102e3 || pico.out_type()==104e3) {
-        if (mc_absid==1000021) {
+      // 100e3: T1tttt, 102e3: T1bbbb, 104e3: T1qqqq, 107e3: T5qqqqZH
+      else if (pico.out_type()==100e3 || pico.out_type()==102e3 || pico.out_type()==104e3 || pico.out_type()==107e3 ) {
+        if (mc_absid==1000021) { // gluino
           isr_p4 -= mc_v4;
           mprod = nano.GenPart_mass()[imc];
-        } else if (mc_absid==1000022) {
+        } else if (mc_absid==1000022) { // chi^0_1
           mlsp = nano.GenPart_mass()[imc];
         }
+      // 106e3: TChiHH, 1000022: chi^0_1, 1000023: chi^0_2, 1000025: chi^0_3
       } else if ((mc_absid==1000023 || mc_absid==1000025) && pico.out_type()==106e3) {
         isr_p4 -= mc_v4;
         mprod = nano.GenPart_mass()[imc];

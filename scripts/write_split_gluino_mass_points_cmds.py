@@ -18,7 +18,7 @@ if __name__ == '__main__':
   parser.add_argument("-i","--in_dir", default="/net/cms24/cms24r0/pico/NanoAODv7/nano/2016/SMS-T5qqqqZH_unsplit_fastSimJmeCorrection", required=True,
                       help="Directory where the unsplit NanoAOD files are")
   parser.add_argument("-m","--model", default="", required=True,
-                      help="Model of signal: SMS-T5qqqqZH_HToBB-mGluino or SMS-T5qqqqZH_HToBB-mN2. Used for input glob and GenModel naming convention.")
+                      help="Model of signal: SMS-T5qqqqZH_HToBB-mGluino, SMS-T5qqqqZH_HToBB-mN2, SMS-T5qqqqZH-mGluino. Used for input file glob.")
   parser.add_argument("-t","--target_dir", default="/net/cms24/cms24r0/pico/NanoAODv7/nano/2016/SMS-T5qqqqZH_fastSimJmeCorrection", required=True,
                       help="Determines the output folder.")
   parser.add_argument("-o","--out_cmd_filename", default="cmds.py", required=True,
@@ -58,7 +58,7 @@ if __name__ == '__main__':
     #dataset_glob = "/net/cms24/cms24r0/pico/NanoAODv7/nano/2016/SMS-T5qqqqZH_unsplit_fastSimJmeCorrection/SMS-T5qqqqZH_HToBB-mN2-1000to1800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISummer16NanoAODv7__PUSummer16v3Fast_Nano02Apr2020_GridpackScan_102X_mcRun2_asymptotic_v8-v1__10000__EEF1A2CA-4794-EC45-BE9A-4CD629315C1C.root"
     if not os.path.exists(entrylist_dir): os.makedirs(entrylist_dir)
     command = 'root -q -l \'root_scripts/make_split_entrylists.cxx++("'+dataset_glob+'","'+entrylist_dir+'", 1)\''
-    print('Running below command')
+    print('Will run below command')
     print('  '+command)
     os.system(command)
     # Used for debugging

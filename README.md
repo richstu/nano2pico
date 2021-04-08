@@ -60,12 +60,13 @@ Step 1. Make an output directory out/ with subdirectories `wgt_sums` and `raw_pi
 * branches related on ISR also depend on the presence of dataset name substrings
 
 Step 2. If you are using data, you are done! If you are using MC, for each dataset, add up the sums of weights obtained for each file in step 1 and calculate the corrections needed to normalize each individual weight as well as the total weight. Note that the order of options is fixed with the arguments after the first being the input files. This is to allow arbitrary number of input files. Note that again functionality depends on the naming, e.g. correction file name is used to decide what cross-section to use.
+Make subdirectory `corrections` in `out`.
 
 ~~~~bash
 ./compile.sh && ./run/merge_corrections.exe out/corrections/corr_$INFILE out/wgt_sums/wgt_sums_$INFILE
 ~~~~
 
-Step 3. Using the pico file from step 1 and the corrections file from step 2 as input, we can renormalize the weight branches as follows:
+Step 3. Make subdirectory `unskimmed in `out`. Using the pico file from step 1 and the corrections file from step 2 as input, we can renormalize the weight branches as follows:
 
 ~~~~bash
 ./compile.sh && ./run/apply_corrections.exe --in_file raw_pico_$INFILE --in_dir out/raw_pico/ --corr_file corr_$INFILE
@@ -445,6 +446,9 @@ convert_cl_to_jobs_info.py cmds_split.py cmds_split.py.json
 auto_submit_jobs.py cmds_split.py.json -c jobscript_check.py -n cms1
 ~~~~
 
+
+model in the below commands are use for globbing files in the input directory.
+
 ~~~~bash 
 ./scripts/write_split_gluino_mass_points_cmds.py --in_dir /net/cms24/cms24r0/pico/NanoAODv7/nano/2016/SMS-T5qqqqZH_unsplit_fastSimJmeCorrection 
                                                  --out_cmd_filename split_gluino_2016.py 
@@ -528,6 +532,13 @@ select_resubmit_jobs.py checked_auto_cmds_split.py.json -c scripts/check_skim.py
 auto_submit_jobs.py resubmit_checked_auto_cmds_split.py.json -c scripts/check_skim.py
 ~~~~
 
+~~~~bash
+./scripts/write_split_gluino_mass_points_cmds.py --in_dir /net/cms24/cms24r0/pico/NanoAODv7/nano/2016/SMS-T5qqqqZH_FullSim_unsplit 
+                                                 --out_cmd_filename split_fullsim_gluino_2016.py 
+                                                 --target_dir /net/cms24/cms24r0/pico/NanoAODv7/nano/2016/SMS-T5qqqqZH_FullSim 
+                                                 --model "SMS-T5qqqqZH-mGluino"
+~~~~
+
 ## Getting Higgsino cross-section
 
 ### Step 1. Download cross-section files
@@ -546,6 +557,11 @@ sed -i 's/std::vector<double>\* masses;/std::vector<double>\* masses=0;/' get_ga
 sed -i 's/std::vector<double>\* xsecs;/std::vector<double>\* xsecs=0;/' get_gaugino.C
 sed -i 's/std::vector<double>\* xsecUncs;/std::vector<double>\* xsecUncs=0;/' get_gaugino.C
 ~~~~
+
+## Getting Gluino cross-section
+
+wget https://raw.githubusercontent.com/fuenfundachtzig/xsec/master/json/pp13_gluino_NNLO%2BNNLL.json
+scripts/get_gluino_cross_sections.py
 
 ### Step 3. Run script for all mass points.
 

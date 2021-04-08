@@ -72,8 +72,8 @@ int GenParticleProducer::GetMotherIdx(nano_tree & nano, int imc)
 void GenParticleProducer::WriteGenParticles(nano_tree &nano, pico_tree &pico){
 
   // Saves if isPrompt and isFirstCopy
-  // H, Z, W, gamma, b, t, d, u, s, c
-  vector<int> interested_mc_ids = {25, 23, 24, 22, 5, 6, 1, 2, 3, 4};
+  // H, Z, W, gamma, gluon, b, t, d, u, s, c
+  vector<int> interested_mc_ids = {25, 23, 24, 22, 21, 5, 6, 1, 2, 3, 4};
   // SUSY
   vector<pair<int, int> > interested_mc_ids_range = {{1000001, 2000015}};
 

@@ -33,7 +33,9 @@ void Normalize(vector<T> &v, double nent){
 
 void Initialize(corrections_tree &wgt_sums, corrections_tree &corr);
 void AddEntry(corrections_tree &wgt_sums, corrections_tree &corr);
+int GetHiggsinoMass(const string &path);
 int GetGluinoMass(const string &path);
+int GetSUSYMass(const string & patth, const string & tag);
 void FixLumi(corrections_tree &corr, const string &corr_path, int year);
 void FixISR(corrections_tree &corr, const string &corr_path, int year);
 void Normalize(corrections_tree &corr);
@@ -150,7 +152,7 @@ void AddEntry(corrections_tree &wgt_sums, corrections_tree &corr){
   // VecAdd(wgt_sums.sys_pdf(),           corr.out_sys_pdf());
 }
 
-int GetGluinoMass(const string &path){
+int GetHiggsinoMass(const string &path){
   string key = "_mChi-";
   // if (Contains(path, "T2tt")) key = "_mStop-"; 
   auto pos1 = path.rfind(key)+key.size();
@@ -163,12 +165,35 @@ int GetGluinoMass(const string &path){
   return rounded_mass;
 }
 
+// Tag examples: "_mChi-","-mGluino-" 
+int GetSUSYMass(const string & path, const string & tag) {
+  auto pos1 = path.rfind(tag)+tag.size();
+  auto pos2 = path.find("_", pos1);
+  string mass_string = path.substr(pos1, pos2-pos1);
+  int unrounded_mass = stoi(mass_string);
+  return unrounded_mass;
+}
+
+int GetGluinoMass(const string & path) {
+  return GetSUSYMass(path, "-mGluino-");
+}
+
 void FixLumi(corrections_tree &corr, const string &corr_path, int year){
   double xsec(0.); const float lumi = 1000.;
   if (Contains(corr_path, "SMS-TChi")){
     double exsec(0.);
-    int mglu = GetGluinoMass(corr_path);
+    int mglu = GetHiggsinoMass(corr_path);
     xsec::higgsinoCrossSection(mglu, xsec, exsec);
+  } else if (Contains(corr_path, "SMS-T5qqqqZH_HToBB")) {
+    double exsec(0.);
+    int mglu = GetGluinoMass(corr_path);
+    xsec::gluinoCrossSection(mglu, xsec, exsec);
+    xsec = xsec * .5824*.5824; // Add in H to bb branch ratio
+    exsec = exsec * .5824*.5824; // Add in H to bb branch ratio
+  } else if (Contains(corr_path, "SMS-T5qqqqZH-")) {
+    double exsec(0.);
+    int mglu = GetGluinoMass(corr_path);
+    xsec::gluinoCrossSection(mglu, xsec, exsec);
   }else{
     xsec = xsec::crossSection(corr_path, year);  
   }
@@ -180,7 +205,7 @@ void FixISR(corrections_tree &corr, const string &corr_path, int year){
   double corr_w_isr(1.);
   vector<double> corr_sys_isr(2,1.);
   double tot_w_isr = corr.out_w_isr();
-  if (Contains(corr_path,"TTJets_HT") || Contains(corr_path,"genMET-150")){
+  if (Contains(corr_path,"TTJets_HT") || Contains(corr_path,"genMET-150")){ // Full sim
   // in this case take correction from inclusive since should not norm. to unity
   //values consistent within 0.001 between 2016 and 2017 amazingly...
     if (Contains(corr_path,"TTJets_DiLept")) {
@@ -193,6 +218,8 @@ void FixISR(corrections_tree &corr, const string &corr_path, int year){
       corr_sys_isr[1] = 1/0.967;        
     }
   }else{
+    // out_nent is sum of entries, out_w_isr is sum of isr weights
+    // corr_w_isr scales out_w_isr to nent.
     corr_w_isr = corr.out_w_isr() ? corr.out_nent()/corr.out_w_isr() : 1.;
     for(size_t i = 0; i<corr.out_sys_isr().size(); i++){
       corr_sys_isr[i] = corr.out_sys_isr()[i] ? corr.out_nent()/corr.out_sys_isr()[i] : 1.;
@@ -217,6 +244,8 @@ void FixISR(corrections_tree &corr, const string &corr_path, int year){
     corr.out_weight() = (tot_w_isr*corr_w_isr)/(corr.out_tot_weight_l0()*w_corr_l0 + corr.out_tot_weight_l1());
   else
     corr.out_weight() = nent/(corr.out_tot_weight_l0()*w_corr_l0 + corr.out_tot_weight_l1());
+
+  //cout<<"tot_w_isr: "<<tot_w_isr<<" corr_w_isr: "<<corr_w_isr<<" nent: "<<corr.out_nent()<<" out_tot_weight_l0: "<<corr.out_tot_weight_l0()<<" w_corr_l0: "<<w_corr_l0<<" out_tot_weight_l1: "<<corr.out_tot_weight_l1()<<" out_weight: "<<corr.out_weight()<<endl;
 }
 
 void Fix0L(corrections_tree &corr){
