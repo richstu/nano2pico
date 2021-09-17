@@ -83,6 +83,8 @@ vector<float> jet_breg_corr
 vector<float> jet_breg_res
 vector<float> jet_deepcsv
 vector<float> jet_deepflav
+vector<int>   jet_puid
+vector<float> jet_puid_disc
 vector<float> jet_ne_emef
 vector<float> jet_qgl
 vector<bool>  jet_islep
@@ -92,12 +94,20 @@ vector<bool>  jet_isgood
 vector<bool>  jet_id
 vector<int>   jet_hflavor
 vector<int>   jet_pflavor
+vector<int>   jet_genjet_idx
 vector<float> jet_mht_dphi
 vector<float> jet_met_dphi
 vector<bool>  jet_h1d
 vector<bool>  jet_h2d
 vector<int>   jet_fjet_idx
 
+int ngenjet
+vector<float> genjet_pt
+vector<float> genjet_eta
+vector<float> genjet_phi
+vector<float> genjet_m
+vector<int>   genjet_hflavor
+vector<int>   genjet_pflavor
 ###################   AK8 Jets   ##################
 int nfjet
 

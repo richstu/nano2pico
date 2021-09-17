@@ -93,7 +93,11 @@ int main(int argc, char *argv[]){
     } 
     pico.out_sys_murf().resize(9);
     for (unsigned i(0); i<9; i++) {        
-      pico.out_sys_murf()[i]      = pico.sys_murf()[i]*corr.sys_murf()[i];
+      if (pico.sys_murf().size() != 0) {
+        pico.out_sys_murf()[i]      = pico.sys_murf()[i]*corr.sys_murf()[i];
+      } else {
+        pico.out_sys_murf()[i]      = 1.0;
+      }
     }
 
 
