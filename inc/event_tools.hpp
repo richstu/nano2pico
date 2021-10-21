@@ -29,6 +29,7 @@ private:
   bool isTTJets_LO_HT;
   bool isWJets_LO;
   bool isDYJets_LO;
+  bool isFastSim;
   int dataset;
 };
 

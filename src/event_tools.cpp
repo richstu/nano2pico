@@ -14,6 +14,7 @@ EventTools::EventTools(const string &name_, int year_):
   isTTJets_LO_HT(false),
   isWJets_LO(false),
   isDYJets_LO(false),
+  isFastSim(false),
   dataset(-1){
 
   if(Contains(name, "TTJets_") && Contains(name, "genMET-") && Contains(name, "madgraphMLM")) 
@@ -30,6 +31,9 @@ EventTools::EventTools(const string &name_, int year_):
   
   if(Contains(name, "DYJetsToLL_M-50_Tune")  && Contains(name,"madgraphMLM"))
     isDYJets_LO = true;
+
+  if(Contains(name, "Fast"))
+    isFastSim = true;
 
   if(Contains(name, "EGamma")) // looks like this replaced SingleElectron and DoubleEG starting in 2018
     dataset = Dataset::EGamma;
@@ -52,7 +56,7 @@ EventTools::~EventTools(){
 
 void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
   pico.out_stitch_photon() = pico.out_stitch_htmet() = pico.out_stitch() = pico.out_stitch_ht() = true;
-  if(isTTJets_LO_Incl) {
+  if(isTTJets_LO_Incl && !isFastSim) {
     if (nano.LHE_HTIncoming()>600) 
       pico.out_stitch_htmet() = pico.out_stitch_ht() = false;
     if(year==2018 && nano.GenMET_pt()>80)
@@ -61,30 +65,30 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
       pico.out_stitch_htmet() = pico.out_stitch() = false;
   }
 
-  if (isTTJets_LO_MET && nano.LHE_HTIncoming()>600) 
+  if (isTTJets_LO_MET && nano.LHE_HTIncoming()>600 && !isFastSim) 
       pico.out_stitch_htmet() = pico.out_stitch_ht() = false;
 
-  if (isTTJets_LO_Incl || isTTJets_LO_MET || isTTJets_LO_HT) {
+  if ((isTTJets_LO_Incl || isTTJets_LO_MET || isTTJets_LO_HT) && !isFastSim) {
     //remove events covered by TTG, see AN-17-197 (TOP-18-010)
     //stitch if prompt photon w pt>13 |eta|<3 deltaR(genPart[pt>5])>0.2
     for (unsigned int mc_idx = 0; mc_idx < nano.GenPart_pdgId().size(); mc_idx++) {
       if (nano.GenPart_pdgId().at(mc_idx) == 22) {
-	float ph_pt = nano.GenPart_pt().at(mc_idx);
-	float ph_eta = nano.GenPart_eta().at(mc_idx);
-	float ph_phi = nano.GenPart_phi().at(mc_idx);
+	      float ph_pt = nano.GenPart_pt().at(mc_idx);
+	      float ph_eta = nano.GenPart_eta().at(mc_idx);
+	      float ph_phi = nano.GenPart_phi().at(mc_idx);
         if (ph_pt > 13 && fabs(ph_eta)<3.0 && (nano.GenPart_statusFlags().at(mc_idx) & 0x1) == 1) {
-	  //check if another genparticle nearby
-	  bool deltar_fail = false;
+	       //check if another genparticle nearby
+	       bool deltar_fail = false;
           for (unsigned int mc_idx_2 = 0; mc_idx_2 < nano.GenPart_pdgId().size(); mc_idx_2++) {
             if (nano.GenPart_pt().at(mc_idx_2)>5 && dR(ph_eta,nano.GenPart_eta().at(mc_idx_2),ph_phi,nano.GenPart_phi().at(mc_idx_2))<0.2) {
               deltar_fail = true;
-	      break;
-	    }
+	            break;
+	          }
           }
           if (!deltar_fail) {
             pico.out_stitch_photon() = pico.out_stitch() = false;
           }
-	}
+       	}
       }
     }
   }
