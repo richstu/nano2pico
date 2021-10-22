@@ -59,6 +59,9 @@ vector<float> llphoton_dr
 vector<float> llphoton_dphi
 vector<float> llphoton_deta
 vector<float> llphoton_costhj
+vector<float> llphoton_costheta
+vector<float> llphoton_cosTheta
+vector<float> llphoton_psi
 vector<int>   llphoton_iph
 vector<int>   llphoton_ill
 

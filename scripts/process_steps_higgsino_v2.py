@@ -272,6 +272,12 @@ def processSignal(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, PICO_DIR, NANOAOD_VE
     './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/'+SIGNAL_FOLDER_NAME+'/merged_higmc_met150/ --skim_name higqcd --tag '+sig_tag,
     'auto_submit_jobs.py skim_higqcd_cmds_'+sig_tag+'.json -c scripts/check_skim.py -f',
     notify_script+' "Finished skim higqcd '+sig_tag+'"'],
+    
+    #12 higsys skim from unksimmed
+    [notify_script+' "Start skim higsys '+sig_tag+'"',
+    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/'+SIGNAL_FOLDER_NAME+'/unskimmed/ --skim_name higsys --tag '+sig_tag,
+    'auto_submit_jobs.py skim_higsys_cmds_'+sig_tag+'.json -c scripts/check_skim.py -f',
+    notify_script+' "Finished skim higsys '+sig_tag+'"'],
 
   ]
   return processSteps(process_commands, YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, PICO_DIR, NANOAOD_VERSION, FIRST_COMMAND, NO_RUN, sig_tag)
