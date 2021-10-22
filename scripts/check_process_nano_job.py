@@ -93,6 +93,8 @@ out_nent = outfile.GetEntries()
 
 print('DEBUG: input entries: {} output entries: {}'.format(in_nent, out_nent))
 
+if infile.GetNbranches() == 0:
+  print('[For queue_system] fail: input ({}) has no branches.'.format(infile_path))
 if outfile.GetNbranches() == 0:
   print('[For queue_system] fail: output ({}) has no branches.'.format(outfile_path))
 elif in_nent == out_nent:
