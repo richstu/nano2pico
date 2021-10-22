@@ -61,7 +61,8 @@ def slimFile(slim_rules_file_name, out_file_path, input_file_paths, test_mode):
         if branch in kept_branches: in_tree.SetBranchStatus(branch, True)
         else:                       in_tree.SetBranchStatus(branch, False)
 
-    out_file = TFile(out_file_path, "recreate")
+    #out_file = TFile(out_file_path, "recreate")
+    out_file = TFile(out_file_path, "recreate", "", 0)
     in_tree.Merge(out_file, 0, "fast keep")
 
 if __name__ == "__main__":
