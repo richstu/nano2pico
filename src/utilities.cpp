@@ -209,8 +209,13 @@ void getMETWithJEC(nano_tree & nano, int year, bool isFastsim, float & MET_pt, f
       MET_phi = nano.MET_T1_phi();
     }
   } else {
-    MET_pt = nano.MET_pt();
-    MET_phi = nano.MET_phi();
+    if (year == 2017) {
+      MET_pt = nano.METFixEE2017_pt();
+      MET_phi = nano.METFixEE2017_phi();
+    } else {
+      MET_pt = nano.MET_pt();
+      MET_phi = nano.MET_phi();
+    }
   }
 }
 void getJetWithJEC(nano_tree & nano, bool isFastsim, vector<float> & Jet_pt, vector<float> & Jet_mass) {
