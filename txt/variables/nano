@@ -266,6 +266,7 @@ array<int> Jet_nConstituents
 array<int> Jet_nElectrons
 array<int> Jet_nMuons
 array<int> Jet_puId
+array<float> Jet_puIdDisc
 array<int> Jet_genJetIdx
 array<int> Jet_hadronFlavour
 array<int> Jet_partonFlavour
@@ -451,8 +452,8 @@ array<float> GenJet_eta
 array<float> GenJet_mass
 array<float> GenJet_phi
 array<float> GenJet_pt
-array<int> GenJet_partonFlavour
 array<char> GenJet_hadronFlavour
+array<int> GenJet_partonFlavour
 
 int nGenJetAK8
 array<float> GenJetAK8_eta

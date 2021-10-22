@@ -35,6 +35,7 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
   pico.out_njet() = 0; pico.out_ht() = 0; pico.out_ht5() = 0; 
   pico.out_nbl() = 0; pico.out_nbm() = 0; pico.out_nbt() = 0; 
   pico.out_nbdfl() = 0; pico.out_nbdfm() = 0; pico.out_nbdft() = 0; 
+  pico.out_ngenjet() = 0;
 
   vector<float> Jet_pt, Jet_mass;
   getJetWithJEC(nano, isFastsim, Jet_pt, Jet_mass);
@@ -175,10 +176,14 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
     pico.out_jet_id().push_back(nano.Jet_jetId()[ijet]);
     pico.out_jet_mht_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], mht_vec.Phi()));
     pico.out_jet_met_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], MET_phi));
+    pico.out_jet_puid().push_back(nano.Jet_puId()[ijet]);
+    pico.out_jet_puid_disc().push_back(nano.Jet_puIdDisc()[ijet]);
     if (!isData) {
       pico.out_jet_hflavor().push_back(nano.Jet_hadronFlavour()[ijet]);
       pico.out_jet_pflavor().push_back(nano.Jet_partonFlavour()[ijet]);
+      pico.out_jet_genjet_idx().push_back(nano.Jet_genJetIdx()[ijet]);
     }
+    // TODO if signal save jesTotalUpDown, jerUp,jerDown
     
     // will be overwritten with the overlapping fat jet index, if such exists, in WriteFatJets
     pico.out_jet_fjet_idx().push_back(-999);
@@ -229,6 +234,19 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
         if (sys_jet_met_dphi[ijec][ijet] <= cut_) pico.out_sys_low_dphi_met()[ijec] = true;
         if (ijet==3) break;
       }
+    }
+  }
+
+  // Saving GenJet information
+  if (!isData) {
+    pico.out_ngenjet() = nano.nGenJet();
+    for(int ijet(0); ijet<nano.nGenJet(); ++ijet){
+      pico.out_genjet_pt().push_back(nano.GenJet_pt()[ijet]);
+      pico.out_genjet_eta().push_back(nano.GenJet_eta()[ijet]);
+      pico.out_genjet_phi().push_back(nano.GenJet_phi()[ijet]);
+      pico.out_genjet_m().push_back(nano.GenJet_mass()[ijet]);
+      pico.out_genjet_pflavor().push_back(nano.GenJet_partonFlavour()[ijet]);
+      pico.out_genjet_hflavor().push_back(int(nano.GenJet_hadronFlavour()[ijet]));
     }
   }
 
