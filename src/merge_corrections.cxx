@@ -180,7 +180,13 @@ int GetGluinoMass(const string & path) {
 
 void FixLumi(corrections_tree &corr, const string &corr_path, int year){
   double xsec(0.); const float lumi = 1000.;
-  if (Contains(corr_path, "SMS-TChi")){
+  if (Contains(corr_path, "SMS-TChiHH_HToAll")){
+    double exsec(0.);
+    int mglu = GetHiggsinoMass(corr_path);
+    xsec::higgsinoCrossSection(mglu, xsec, exsec);
+    xsec = xsec / .5824/.5824; // Remove H to bb branch ratio
+    exsec = exsec / .5824/.5824; // Remove H to bb branch ratio
+  } else if (Contains(corr_path, "SMS-TChi")){
     double exsec(0.);
     int mglu = GetHiggsinoMass(corr_path);
     xsec::higgsinoCrossSection(mglu, xsec, exsec);
