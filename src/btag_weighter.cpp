@@ -21,8 +21,8 @@ BTagWeighter::BTagWeighter(int year_, bool isFastsim_, bool doDeepFlav_, const v
   isFastsim(isFastsim_),
   doDeepFlav(doDeepFlav_),
   wp_loose(btag_wpts[0]),
-  wp_medium(btag_wpts[0]),
-  wp_tight(btag_wpts[0]){
+  wp_medium(btag_wpts[1]),
+  wp_tight(btag_wpts[2]){
 
   // setup SFs and WPs depending on the year
   btag_efficiencies_deep_ = vector<TH3D>(); btag_efficiencies_deep_.resize(op_pts_.size());
@@ -207,6 +207,8 @@ double BTagWeighter::JetBTagWeight(pico_tree &pico, size_t ijet, const vector<BT
   }
 
   float csv = pico.out_jet_deepcsv().at(ijet);
+  if (doDeepFlav)
+    csv = pico.out_jet_deepflav().at(ijet);
 
   int tag = -1;
   for (unsigned iop(0); iop<opcuts.size(); iop++) 
