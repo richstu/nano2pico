@@ -83,8 +83,8 @@ string FixName(string name){
 
 int GetArrayLength(const std::string var_name){
   const string var_type = var_name.substr(0,var_name.find_first_of('_'));
-  if      (var_type == "Electron") return 40;
-  else if (var_type == "Muon") return 40;
+  if      (var_type == "Electron") return 60;
+  else if (var_type == "Muon") return 60;
   else if (var_type == "Tau") return 30;
   else if (var_type == "IsoTrack") return 30;
   else if (var_type == "Photon") return 200;
