@@ -15,6 +15,10 @@ def getTag(path):
   tag = tag.split("RunIIFall17NanoAODv7")[0]
   tag = tag.split("RunIIAutumn18NanoAODv7")[0]
 
+  tag = tag.split("RunIISummer20UL16NanoAODv9")[0]
+  tag = tag.split("RunIISummer20UL17NanoAODv9")[0]
+  tag = tag.split("RunIISummer20UL18NanoAODv9")[0]
+
   tag = tag.split("_ext")[0]
   tag = tag.replace("raw_pico_","")
   tag = tag.strip("_")
@@ -64,6 +68,6 @@ json_name = cmdfile_name.replace('.py','.json')
 print('To print a sample command:')
 print('cat '+cmdfile_name+' | tail -n 1\n')
 print("To generate job json and submit jobs do: ")
-os.system('convert_cl_to_jobs_info.py '+cmdfile_name+' '+json_name)
+os.system('convert_cl_to_jobs_info.py -f '+cmdfile_name+' '+json_name)
 print('auto_submit_jobs.py '+json_name+' -c scripts/check_apply_corrections_job.py')
   

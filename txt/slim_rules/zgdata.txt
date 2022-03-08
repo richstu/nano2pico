@@ -3,7 +3,6 @@ drop *
 keep run
 keep event
 keep type
-keep stitch*
 
 keep npv
 
@@ -13,6 +12,8 @@ drop jet_m?t_dphi
 drop jet_h?d
 drop *fjet*
 drop *hig*
+drop jet_hflavor
+drop jet_pflavor
 
 keep photon_*
 keep el_*
@@ -31,12 +32,6 @@ keep nphoton
 
 keep pass*
 
-keep mc_*
-keep *tru*
-
 keep weight
-keep w_*
-keep eff_*
 
 keep HLT*
-drop *met*

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+import re
 import os, sys, argparse
 from glob import glob
 
@@ -40,12 +40,7 @@ if args['dataset_list']!='':
       if ds[0]!="/": # in case of empty lines or comments
         continue
       tmp_ = ds.split("/")
-      if("NanoAODv4" in tmp_[2]):
-        wanted_file_substr.append(tmp_[1]+'__'+tmp_[2].replace("NanoAODv4-","NanoAODv4__"))
-      elif("NanoAODv5" in tmp_[2]):
-        wanted_file_substr.append(tmp_[1]+'__'+tmp_[2].replace("NanoAODv5-","NanoAODv5__"))
-      else:
-        wanted_file_substr.append(tmp_[1]+'__'+tmp_[2].replace("NanoAODv7-","NanoAODv7__"))
+      wanted_file_substr.append(re.sub(r'(NanoAODv\d+)-', r'\1__',tmp_[1]+'__'+tmp_[2]))
     for istr in wanted_file_substr:
       for ifile in all_file_paths:
         if (istr in ifile):
@@ -74,7 +69,7 @@ cmdfile.close()
 os.chmod(cmdfile_name, 0o755)
 
 json_name = cmdfile_name.replace('.py','.json')
-os.system('convert_cl_to_jobs_info.py '+cmdfile_name+' '+json_name)
+os.system('convert_cl_to_jobs_info.py -f '+cmdfile_name+' '+json_name)
 
 print("To generate job json and submit jobs do: ")
 print('auto_submit_jobs.py '+json_name+' -c scripts/check_process_nano_job.py')

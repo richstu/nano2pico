@@ -62,7 +62,12 @@ int main(int argc, char *argv[]){
   bool isData = Contains(in_file, "Run201") ? true : false;
   bool isFastsim = Contains(in_file, "Fast") ? true : false;
   bool isSignal = Contains(in_file, "TChiHH") || Contains(in_file, "T5qqqqZH") ? true : false;
-  int year = Contains(in_file, "RunIISummer16") ? 2016 : (Contains(in_file, "RunIIFall17") ? 2017 : 2018);
+  int year;
+  if (Contains(in_file, "RunIISummer20")) { 
+    year = Contains(in_file, "RunIISummer20UL16") ? 2016 : (Contains(in_file, "RunIISummer20UL17") ? 2017 : 2018);
+  } else {
+    year = Contains(in_file, "RunIISummer16") ? 2016 : (Contains(in_file, "RunIIFall17") ? 2017 : 2018);
+  }
   if (isData) {
     year = Contains(in_file, "Run2016") ? 2016 : (Contains(in_file, "Run2017") ? 2017 : 2018);
   }

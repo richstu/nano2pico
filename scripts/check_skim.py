@@ -41,6 +41,7 @@ print(job_argument_string)
 
 args = job_argument_string.split('--command="')[1].split('"')[0]
 tmp = args.split(' ')
+#print(tmp)
 infile_path = tmp[4]
 lsp_mass = 0
 if (tmp[1]=='-m'):
@@ -104,9 +105,11 @@ else:
     outfile = TChain("tree");
     outfile.Add(outfile_path);
     out_nent = outfile.GetEntries()
+    nbranches = outfile.GetNbranches()
   else:
     out_nent = 0
-  if outfile.GetNbranches() == 0:
+    nbranches = 0
+  if os.path.exists(outfile_path) and nbranches == 0:
     print('[For queue_system] fail: output ({}) has no branches.'.format(outfile_path))
   elif in_nent == out_nent:
     print('[For queue_system] success')

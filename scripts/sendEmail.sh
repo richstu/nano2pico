@@ -1,1 +1,1 @@
-mail -s "$1" $USER@hep.physics.ucsb.edu < /dev/null
+echo "$2" | mail -s "$2" $1

@@ -11,15 +11,20 @@ def findBaseSampleNames(folder):
     dataset_tag = dataset_tag.split('__RunIISummer16NanoAODv5__')[0]
     dataset_tag = dataset_tag.split('__RunIIFall17NanoAODv5__')[0]
     dataset_tag = dataset_tag.split('__RunIIAutumn18NanoAODv5__')[0]
-    dataset_tag = dataset_tag.split('__Nano1June2019')[0]
-    dataset_tag = dataset_tag.split('__Nano25Oct2019')[0]
+    #dataset_tag = dataset_tag.split('__Nano1June2019')[0]
+    #dataset_tag = dataset_tag.split('__Nano25Oct2019')[0]
 
     # For NanoAODv7
     dataset_tag = dataset_tag.split('__RunIISummer16NanoAODv7__')[0]
     dataset_tag = dataset_tag.split('__RunIIFall17NanoAODv7__')[0]
     dataset_tag = dataset_tag.split('__RunIIAutumn18NanoAODv7__')[0]
-    dataset_tag = dataset_tag.split('__Nano02Apr2020')[0] #mc
-    dataset_tag = dataset_tag.split('__02Apr2020')[0] #data
+    #dataset_tag = dataset_tag.split('__Nano02Apr2020')[0] #mc
+    #dataset_tag = dataset_tag.split('__02Apr2020')[0] #data
+
+    # For NanoAODv9
+    dataset_tag = dataset_tag.split('__RunIISummer20UL16NanoAODv9__')[0]
+    dataset_tag = dataset_tag.split('__RunIISummer20UL17NanoAODv9__')[0]
+    dataset_tag = dataset_tag.split('__RunIISummer20UL18NanoAODv9__')[0]
 
     dataset_tag = dataset_tag.split('_ext')[0]
     dataset_tag = dataset_tag.replace('.root','')

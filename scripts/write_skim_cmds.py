@@ -59,7 +59,7 @@ if __name__ == '__main__':
     print('Found existing {} output files, which will be overwritten.\n'.format(nexisting))
 
   json_name = cmdfile_name.replace('.py','.json')
-  os.system('convert_cl_to_jobs_info.py '+cmdfile_name+' '+json_name)
+  os.system('convert_cl_to_jobs_info.py -f '+cmdfile_name+' '+json_name)
 
   print('To print a sample command:')
   print('cat '+cmdfile_name+' | tail -n 1\n')
