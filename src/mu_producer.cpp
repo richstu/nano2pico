@@ -33,6 +33,11 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
            nano.Muon_sip3d()[imu] < 4)
         isSignal = true;
       pico.out_mu_sip3d().push_back(nano.Muon_sip3d()[imu]);
+      pico.out_mu_ptErr().push_back(nano.Muon_ptErr()[imu]);
+      pico.out_mu_mediumid().push_back(nano.Muon_mediumId()[imu]);
+      pico.out_mu_tightid().push_back(nano.Muon_tightId()[imu]);
+      pico.out_mu_highptid().push_back(nano.Muon_highPtId()[imu]);
+      pico.out_mu_fsrphotonid().push_back(nano.Muon_fsrPhotonIdx()[imu]);
     }
     else {
       if (!nano.Muon_mediumId()[imu]) continue;

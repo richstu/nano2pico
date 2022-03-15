@@ -48,6 +48,7 @@ array<float> Electron_sieie
 array<float> Electron_sip3d
 array<float> Electron_mvaTTH
 array<int> Electron_charge
+array<float> Electron_scEtOverPt
 # cut-based ID Fall17 V2 (0:fail, 1:veto, 2:loose, 3:medium, 4:tight)
 array<int> Electron_cutBased
 array<int> Electron_cutBased_Fall17_V1
@@ -56,6 +57,7 @@ array<int> Electron_pdgId
 array<int> Electron_photonIdx
 array<int> Electron_tightCharge
 array<int> Electron_vidNestedWPBitmap
+array<int> Electron_vidNestedWPBitmapHEEP
 array<bool> Electron_convVeto
 array<bool> Electron_cutBased_HEEP
 array<bool> Electron_isPFcand
@@ -104,6 +106,7 @@ array<float> Muon_tkRelIso
 array<float> Muon_tunepRelPt
 array<float> Muon_mvaLowPt
 array<float> Muon_mvaTTH
+array<int> Muon_fsrPhotonIdx
 array<int> Muon_charge
 array<int> Muon_jetIdx
 array<int> Muon_nStations
@@ -228,6 +231,16 @@ array<char> Photon_seedGain
 array<int> Photon_genPartIdx
 array<char> Photon_genPartFlav
 array<char> Photon_cleanmask
+
+############### FsrPhotons ###############
+
+int nFsrPhoton
+array<float> FsrPhoton_dROverEt2
+array<float> FsrPhoton_eta
+array<int> FsrPhoton_muonIdx
+array<float> FsrPhoton_phi
+array<float> FsrPhoton_pt
+array<float> FsrPhoton_relIso03
 
 ################ AK4 Jets ################
 

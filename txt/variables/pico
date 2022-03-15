@@ -55,6 +55,9 @@ vector<float> llphoton_pt
 vector<float> llphoton_eta
 vector<float> llphoton_phi
 vector<float> llphoton_m
+vector<float> llphoton_dml1
+vector<float> llphoton_dml2
+vector<float> llphoton_dmph
 vector<float> llphoton_dr
 vector<float> llphoton_dphi
 vector<float> llphoton_deta
@@ -64,6 +67,9 @@ vector<float> llphoton_cosTheta
 vector<float> llphoton_psi
 vector<int>   llphoton_iph
 vector<int>   llphoton_ill
+vector<float> llphoton_dijet_dphi
+vector<float> llphoton_dijet_balance
+vector<float> llphoton_pTt2
 
 ###################   Jets   ##################
 int njet
@@ -100,6 +106,8 @@ vector<float> jet_met_dphi
 vector<bool>  jet_h1d
 vector<bool>  jet_h2d
 vector<int>   jet_fjet_idx
+vector<float> jet_pt1
+vector<float> jet_pt2
 
 int ngenjet
 vector<float> genjet_pt
@@ -164,6 +172,7 @@ int nvmu
 vector<float> mu_pt
 vector<float> mu_eta
 vector<float> mu_phi
+vector<float> mu_ptErr
 vector<float> mu_miniso
 vector<float> mu_reliso
 vector<float> mu_dz
@@ -171,9 +180,13 @@ vector<float> mu_dxy
 vector<float> mu_ip3d
 vector<float> mu_sip3d
 vector<bool>  mu_id
+vector<bool>  mu_mediumid
+vector<bool>  mu_tightid
+vector<char>  mu_highptid
 vector<bool>  mu_sig
 vector<int>   mu_charge
 vector<int>   mu_pflavor
+vector<int>   mu_fsrphotonid
 
 int nel
 int nvel
@@ -181,6 +194,10 @@ vector<float> el_pt
 vector<float> el_eta
 vector<float> el_etasc
 vector<float> el_phi
+vector<float> el_etPt
+vector<float> el_eminusp
+vector<float> el_energyErr
+vector<int>   el_phidx
 vector<float> el_miniso
 vector<float> el_reliso
 vector<float> el_dz
@@ -189,10 +206,14 @@ vector<float> el_ip3d
 vector<float> el_sip3d
 vector<float> el_idmva
 vector<bool>  el_id
+vector<bool>  el_id80
+vector<bool>  el_id90
+vector<bool>  el_idLoose
 vector<bool>  el_sig
 vector<bool>  el_ispf
 vector<int>   el_charge
 vector<int>   el_pflavor
+vector<bool>  el_ecal
 
 ##################   Di-Leptons   ################
 int nll
@@ -200,6 +221,8 @@ vector<float> ll_pt
 vector<float> ll_eta
 vector<float> ll_phi
 vector<float> ll_m
+vector<int>   ll_dml1
+vector<int>   ll_dml2
 vector<float> ll_dr
 vector<float> ll_dphi
 vector<float> ll_deta
@@ -221,12 +244,24 @@ vector<float> photon_hoe
 vector<float> photon_idmva
 vector<int>   photon_pflavor
 vector<bool>  photon_id
+vector<bool>  photon_id80
 vector<bool>  photon_elveto
 vector<bool>  photon_sig
+vector<int>   photon_elidx
+vector<float> photon_jet_mindr
+vector<float> photon_zeppenfeld
+
+#################   FsrPhotons  ##################
+int nfsrphoton
+vector<float> fsrphoton_droveret2
+vector<float> fsrphoton_eta
+vector<float> fsrphoton_phi
+vector<float> fsrphoton_pt
+vector<float> fsrphoton_reliso
+vector<int>   fsrphoton_muonidx
 
 ###################   Tracks    ##################
 int ntk
-
 vector<float> tk_pt
 vector<float> tk_eta
 vector<float> tk_phi
@@ -238,7 +273,6 @@ vector<float> tk_reliso_chg
 vector<float> tk_mt
 vector<bool>  tk_nano_electron
 vector<bool>  tk_nano_muon
-
 
 ###################   Quality   ##################
 bool pass_jets

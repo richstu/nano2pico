@@ -599,7 +599,7 @@ int EventTools::GetEventType(){
     return code;
   }else{
     int code = 1000*sample+100*category+bin;
-    if(code < 0 || code > 107000){
+    if(code < 0 || code > 207000){
       cout<<"ERROR:: Type code out of range for " << name << ": sample=" << sample << ", category=" << category << ", bin=" << bin;
     }
     return code;

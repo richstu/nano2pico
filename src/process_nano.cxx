@@ -95,7 +95,8 @@ int main(int argc, char *argv[]){
   string out_path;
   out_path = out_dir+"/raw_pico/raw_pico_"+in_file;
 
-  bool isZgamma = Contains(out_dir, "zgamma");
+  // bool isZgamma = Contains(out_dir, "zgamma");
+  bool isZgamma = true;
 
   time_t begtime, endtime;
   time(&begtime);
@@ -121,7 +122,7 @@ int main(int argc, char *argv[]){
   MuonProducer mu_producer(year, isData);
   DileptonProducer dilep_producer(year);
   IsoTrackProducer tk_producer(year);
-  PhotonProducer photon_producer(year);
+  PhotonProducer photon_producer(year, isData);
   JetProducer jet_producer(year, min_jet_pt, max_jet_eta, isData);
   MetProducer met_producer(year, isData);
   HigVarProducer hig_producer(year);
