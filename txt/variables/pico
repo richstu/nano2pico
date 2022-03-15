@@ -238,6 +238,7 @@ vector<float> photon_eta
 vector<float> photon_phi
 vector<float> photon_reliso
 vector<float> photon_r9
+vector<float> photon_sieie
 vector<float> photon_drmin
 vector<float> photon_pterr
 vector<float> photon_hoe

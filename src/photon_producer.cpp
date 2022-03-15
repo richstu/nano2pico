@@ -73,6 +73,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
     pico.out_photon_phi()   .insert(pico.out_photon_phi()   .begin()+shift, phi);
     pico.out_photon_reliso().insert(pico.out_photon_reliso().begin()+shift, nano.Photon_pfRelIso03_all()[iph]);
     pico.out_photon_r9()    .insert(pico.out_photon_r9()    .begin()+shift, nano.Photon_r9()[iph]);
+    pico.out_photon_sieie() .insert(pico.out_photon_sieie() .begin()+shift, nano.Photon_sieie()[iph]);
     pico.out_photon_pterr() .insert(pico.out_photon_pterr() .begin()+shift, nano.Photon_energyErr()[iph]);
     pico.out_photon_hoe()   .insert(pico.out_photon_hoe()   .begin()+shift, nano.Photon_hoe()[iph]);
     pico.out_photon_elveto().insert(pico.out_photon_elveto().begin()+shift, eVeto);
