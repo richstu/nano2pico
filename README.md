@@ -7,7 +7,11 @@ Utility package for converting CMS NanoAOD to analysis-ready ntuples called "pic
 Use one of the servers supporting CMSSW, e.g. cms1,cms3,cms4,cms5...
 
 ~~~~bash
+# Setup git version for SL6.5
+. /cvmfs/cms.cern.ch/cmsset_default.sh;cd /net/cms29/cms29r0/pico/CMSSW_10_2_11_patch1/src;eval `scramv1 runtime -sh`;cd -
+# Clone git
 git clone --recurse-submodules https://github.com/richstu/nano2pico
+# Setup environemnt
 source set_env.sh
 ~~~~
 
