@@ -56,12 +56,13 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
       if(tempDR < minLepDR) minLepDR = tempDR;
     }
 
+    bool isSignal = (pt > SignalPhotonPtCut);
     bool isSig = (((fabs(eta) < 1.4442 && mva > -0.4) ||
 		  (fabs(eta) > 1.566 && fabs(eta) < 2.5 && mva > -0.58)) &&
 		  eVeto && minLepDR > 0.4 && 
 		  pt > SignalPhotonPtCut);
 
-    // Sig photon with highest pT gets put at the front
+    // Photons passing the Run 2 selections are placed at the front
     if(isSig) {
       shift = ndr;
       ndr++;
@@ -87,7 +88,8 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
     if (!isData)
       pico.out_photon_pflavor().insert(pico.out_photon_pflavor().begin()+shift, nano.Photon_genPartFlav()[iph]);
 
-    if(isSig) {
+    // All photons with pt > 15 GeV are considered for creating the ZGamma candidates
+    if(isSignal) {
       pico.out_nphoton()++;
       sig_photon_nano_idx.push_back(iph);
       // save indices of matching jets

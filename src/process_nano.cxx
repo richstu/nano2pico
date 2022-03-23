@@ -95,8 +95,7 @@ int main(int argc, char *argv[]){
   string out_path;
   out_path = out_dir+"/raw_pico/raw_pico_"+in_file;
 
-  // bool isZgamma = Contains(out_dir, "zgamma");
-  bool isZgamma = true;
+  bool isZgamma = Contains(out_dir, "zgamma");
 
   time_t begtime, endtime;
   time(&begtime);

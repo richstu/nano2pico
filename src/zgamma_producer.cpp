@@ -55,8 +55,6 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
 	  pico.out_llphoton_dijet_balance().push_back((dilep+photon+j1+j2).Pt()/(dilep.Pt()+photon.Pt()+j1.Pt()+j2.Pt()));
 	  pico.out_photon_jet_mindr().push_back(min(photon.DeltaR(j1), photon.DeltaR(j2)));
 	  pico.out_photon_zeppenfeld().push_back(abs(photon.Eta() - (j1.Eta() + j2.Eta())/2));
-	  pico.out_jet_pt1().push_back(j1.Pt());
-	  pico.out_jet_pt2().push_back(j2.Pt());
 	  TVector3 g = photon.Vect();
 	  TVector3 h = llg.Vect();
 	  TVector3 z = dilep.Vect();
@@ -126,9 +124,9 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
           dml2 = (lep1 + l2err + photon).M() - (lep1 + lep2 + photon).M();
           dmph = (lep1 + lep2 + pherr).M() - (lep1 + lep2 + photon).M();
         }
-        pico.out_llphoton_dml1().push_back(dml1);
-        pico.out_llphoton_dml2().push_back(dml2);
-        pico.out_llphoton_dmph().push_back(dmph);
+        pico.out_llphoton_l1_masserr().push_back(dml1);
+        pico.out_llphoton_l2_masserr().push_back(dml2);
+        pico.out_llphoton_ph_masserr().push_back(dmph);
 
         // Variables used for defining kinematic angles presented in https://arxiv.org/pdf/1108.2274.pdf
         double M = llg.M(), mll = dilep.M();

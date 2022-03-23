@@ -55,9 +55,9 @@ vector<float> llphoton_pt
 vector<float> llphoton_eta
 vector<float> llphoton_phi
 vector<float> llphoton_m
-vector<float> llphoton_dml1
-vector<float> llphoton_dml2
-vector<float> llphoton_dmph
+vector<float> llphoton_l1_masserr
+vector<float> llphoton_l2_masserr
+vector<float> llphoton_ph_masserr
 vector<float> llphoton_dr
 vector<float> llphoton_dphi
 vector<float> llphoton_deta
@@ -106,8 +106,6 @@ vector<float> jet_met_dphi
 vector<bool>  jet_h1d
 vector<bool>  jet_h2d
 vector<int>   jet_fjet_idx
-vector<float> jet_pt1
-vector<float> jet_pt2
 
 int ngenjet
 vector<float> genjet_pt
@@ -221,8 +219,8 @@ vector<float> ll_pt
 vector<float> ll_eta
 vector<float> ll_phi
 vector<float> ll_m
-vector<int>   ll_dml1
-vector<int>   ll_dml2
+vector<int>   ll_l1_masserr
+vector<int>   ll_l2_masserr
 vector<float> ll_dr
 vector<float> ll_dphi
 vector<float> ll_deta

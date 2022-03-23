@@ -224,6 +224,10 @@ Use `parameterize_efficiency.cxx`, giving the directory with all the MC files an
 ./compile.sh && ./run/parameterize_efficiency.exe -i /mnt/hadoop/jbkim/2019_09_30/2016/mc/ -y 2016
 ~~~~
 
+## Pico production for ZGamma
+
+The 'out_dir' should contain "zgamma" in the name. This is to ensure that 'isZgamma' signal can asserted and ensures the appropriate variables are correctly stored in the picos. For customization See line 98 of process_nano.cxx.
+
 
 ## Description of pico branches
 
