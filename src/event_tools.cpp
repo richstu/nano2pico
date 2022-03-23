@@ -73,22 +73,22 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
     //stitch if prompt photon w pt>13 |eta|<3 deltaR(genPart[pt>5])>0.2
     for (unsigned int mc_idx = 0; mc_idx < nano.GenPart_pdgId().size(); mc_idx++) {
       if (nano.GenPart_pdgId().at(mc_idx) == 22) {
-	      float ph_pt = nano.GenPart_pt().at(mc_idx);
-	      float ph_eta = nano.GenPart_eta().at(mc_idx);
-	      float ph_phi = nano.GenPart_phi().at(mc_idx);
+        float ph_pt = nano.GenPart_pt().at(mc_idx);
+        float ph_eta = nano.GenPart_eta().at(mc_idx);
+        float ph_phi = nano.GenPart_phi().at(mc_idx);
         if (ph_pt > 13 && fabs(ph_eta)<3.0 && (nano.GenPart_statusFlags().at(mc_idx) & 0x1) == 1) {
-	       //check if another genparticle nearby
-	       bool deltar_fail = false;
+          //check if another genparticle nearby
+          bool deltar_fail = false;
           for (unsigned int mc_idx_2 = 0; mc_idx_2 < nano.GenPart_pdgId().size(); mc_idx_2++) {
             if (nano.GenPart_pt().at(mc_idx_2)>5 && dR(ph_eta,nano.GenPart_eta().at(mc_idx_2),ph_phi,nano.GenPart_phi().at(mc_idx_2))<0.2) {
               deltar_fail = true;
-	            break;
-	          }
+              break;
+            }
           }
           if (!deltar_fail) {
             pico.out_stitch_photon() = pico.out_stitch() = false;
           }
-       	}
+        }
       }
     }
   }
@@ -233,15 +233,15 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
 
   bool egamma_trigs = nano.HLT_Ele25_WPTight_Gsf() || nano.HLT_Ele27_WPTight_Gsf() || 
                       nano.HLT_Ele28_WPTight_Gsf() || nano.HLT_Ele32_WPTight_Gsf() ||
-	              nano.HLT_Ele32_WPTight_Gsf_L1DoubleEG() || nano.HLT_Ele35_WPTight_Gsf() || 
+                      nano.HLT_Ele32_WPTight_Gsf_L1DoubleEG() || nano.HLT_Ele35_WPTight_Gsf() || 
                       nano.HLT_Ele20_WPLoose_Gsf() || nano.HLT_Ele45_WPLoose_Gsf() ||
                       nano.HLT_Ele105_CaloIdVT_GsfTrkIdT() || nano.HLT_Ele115_CaloIdVT_GsfTrkIdT() ||
                       nano.HLT_Ele135_CaloIdVT_GsfTrkIdT() || nano.HLT_Ele145_CaloIdVT_GsfTrkIdT() ||
                       nano.HLT_Ele25_eta2p1_WPTight_Gsf() || nano.HLT_Ele27_eta2p1_WPTight_Gsf() || 
                       nano.HLT_Ele20_eta2p1_WPLoose_Gsf() || nano.HLT_Ele25_eta2p1_WPLoose_Gsf() ||
                       nano.HLT_Ele27_eta2p1_WPLoose_Gsf() || nano.HLT_Ele15_IsoVVVL_PFHT350() ||
-		      nano.HLT_Ele15_IsoVVVL_PFHT400() || nano.HLT_Ele15_IsoVVVL_PFHT450() ||
-		      nano.HLT_Ele15_IsoVVVL_PFHT600() || nano.HLT_Ele50_IsoVVVL_PFHT450();
+                      nano.HLT_Ele15_IsoVVVL_PFHT400() || nano.HLT_Ele15_IsoVVVL_PFHT450() ||
+                      nano.HLT_Ele15_IsoVVVL_PFHT600() || nano.HLT_Ele50_IsoVVVL_PFHT450();
 
   pico.out_HLT_Ele25_WPTight_Gsf() = nano.HLT_Ele25_WPTight_Gsf();
   pico.out_HLT_Ele27_WPTight_Gsf() = nano.HLT_Ele27_WPTight_Gsf();
@@ -296,7 +296,7 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
 
   bool met_trigs = nano.HLT_PFMET90_PFMHT90_IDTight() || nano.HLT_PFMETNoMu90_PFMHTNoMu90_IDTight() || 
                    nano.HLT_PFMET100_PFMHT100_IDTight() || nano.HLT_PFMETNoMu100_PFMHTNoMu100_IDTight() || 
-		   nano.HLT_PFMET110_PFMHT110_IDTight() || nano.HLT_PFMETNoMu110_PFMHTNoMu110_IDTight() || 
+                   nano.HLT_PFMET110_PFMHT110_IDTight() || nano.HLT_PFMETNoMu110_PFMHTNoMu110_IDTight() || 
                    nano.HLT_PFMET120_PFMHT120_IDTight() || nano.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight() || 
                    nano.HLT_PFMET130_PFMHT130_IDTight() || nano.HLT_PFMETNoMu130_PFMHTNoMu130_IDTight() || 
                    nano.HLT_PFMET140_PFMHT140_IDTight() || nano.HLT_PFMETNoMu140_PFMHTNoMu140_IDTight() || 
@@ -343,11 +343,11 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
   // Jet/HT trigger
   bool jetht_trigs = nano.HLT_PFJet500() || nano.HLT_PFHT125() || nano.HLT_PFHT200() || nano.HLT_PFHT300() || 
                                             nano.HLT_PFHT400() || nano.HLT_PFHT475() || nano.HLT_PFHT600() || 
-					    nano.HLT_PFHT650() || nano.HLT_PFHT800() || nano.HLT_PFHT900() || 
-					    nano.HLT_PFHT180() || nano.HLT_PFHT370() || nano.HLT_PFHT430() || 
-					    nano.HLT_PFHT510() || nano.HLT_PFHT590() || nano.HLT_PFHT680() || 
-					    nano.HLT_PFHT780() || nano.HLT_PFHT890() || nano.HLT_PFHT1050() || 
-					    nano.HLT_PFHT250() || nano.HLT_PFHT350();
+                                            nano.HLT_PFHT650() || nano.HLT_PFHT800() || nano.HLT_PFHT900() || 
+                                            nano.HLT_PFHT180() || nano.HLT_PFHT370() || nano.HLT_PFHT430() || 
+                                            nano.HLT_PFHT510() || nano.HLT_PFHT590() || nano.HLT_PFHT680() || 
+                                            nano.HLT_PFHT780() || nano.HLT_PFHT890() || nano.HLT_PFHT1050() || 
+                                            nano.HLT_PFHT250() || nano.HLT_PFHT350();
   pico.out_HLT_PFJet500() = nano.HLT_PFJet500();
   pico.out_HLT_PFHT125() = nano.HLT_PFHT125();
   pico.out_HLT_PFHT200() = nano.HLT_PFHT125();

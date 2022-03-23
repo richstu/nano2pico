@@ -46,21 +46,21 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
         pico.out_llphoton_deta().push_back(fabs(dilep.Eta() - photon.Eta()));
         pico.out_llphoton_iph().push_back(igamma);
         pico.out_llphoton_ill().push_back(ill);
-	if(sig_jet_nano_idx.size() > 1) {
-	  TLorentzVector j1, j2, dijet;
-	  j1.SetPtEtaPhiM(nano.Jet_pt()[sig_jet_nano_idx[0]], nano.Jet_eta()[sig_jet_nano_idx[0]], nano.Jet_phi()[sig_jet_nano_idx[0]], nano.Jet_mass()[sig_jet_nano_idx[0]]);
-	  j2.SetPtEtaPhiM(nano.Jet_pt()[sig_jet_nano_idx[1]], nano.Jet_eta()[sig_jet_nano_idx[1]], nano.Jet_phi()[sig_jet_nano_idx[1]], nano.Jet_mass()[sig_jet_nano_idx[1]]);
-	  dijet = j1 + j2;
-	  pico.out_llphoton_dijet_dphi().push_back(llg.DeltaPhi(dijet));
-	  pico.out_llphoton_dijet_balance().push_back((dilep+photon+j1+j2).Pt()/(dilep.Pt()+photon.Pt()+j1.Pt()+j2.Pt()));
-	  pico.out_photon_jet_mindr().push_back(min(photon.DeltaR(j1), photon.DeltaR(j2)));
-	  pico.out_photon_zeppenfeld().push_back(abs(photon.Eta() - (j1.Eta() + j2.Eta())/2));
-	  TVector3 g = photon.Vect();
-	  TVector3 h = llg.Vect();
-	  TVector3 z = dilep.Vect();
-	  g.SetZ(0); h.SetZ(0); z.SetZ(0);
-	  pico.out_llphoton_pTt2().push_back(h.Cross(z-g).Mag()/h.Mag());
-	}
+        if(sig_jet_nano_idx.size() > 1) {
+          TLorentzVector j1, j2, dijet;
+          j1.SetPtEtaPhiM(nano.Jet_pt()[sig_jet_nano_idx[0]], nano.Jet_eta()[sig_jet_nano_idx[0]], nano.Jet_phi()[sig_jet_nano_idx[0]], nano.Jet_mass()[sig_jet_nano_idx[0]]);
+          j2.SetPtEtaPhiM(nano.Jet_pt()[sig_jet_nano_idx[1]], nano.Jet_eta()[sig_jet_nano_idx[1]], nano.Jet_phi()[sig_jet_nano_idx[1]], nano.Jet_mass()[sig_jet_nano_idx[1]]);
+          dijet = j1 + j2;
+          pico.out_llphoton_dijet_dphi().push_back(llg.DeltaPhi(dijet));
+          pico.out_llphoton_dijet_balance().push_back((dilep+photon+j1+j2).Pt()/(dilep.Pt()+photon.Pt()+j1.Pt()+j2.Pt()));
+          pico.out_photon_jet_mindr().push_back(min(photon.DeltaR(j1), photon.DeltaR(j2)));
+          pico.out_photon_zeppenfeld().push_back(abs(photon.Eta() - (j1.Eta() + j2.Eta())/2));
+          TVector3 g = photon.Vect();
+          TVector3 h = llg.Vect();
+          TVector3 z = dilep.Vect();
+          g.SetZ(0); h.SetZ(0); z.SetZ(0);
+          pico.out_llphoton_pTt2().push_back(h.Cross(z-g).Mag()/h.Mag());
+        }
         TLorentzVector lminus, lplus;
         TLorentzVector lep1, lep2;
         TLorentzVector l1err, l2err, pherr;
@@ -92,7 +92,7 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
                              pico.out_el_eta()[iel1], pico.out_el_phi()[iel1], 0.000511);
           l2err.SetPtEtaPhiM(pico.out_el_pt()[iel2] + ptl2err,
                              pico.out_el_eta()[iel2], pico.out_el_phi()[iel2], 0.000511);
-	  
+          
           dml1 = (l1err + lep2 + photon).M() - (lep1 + lep2 + photon).M();
           dml2 = (lep1 + l2err + photon).M() - (lep1 + lep2 + photon).M();
           dmph = (lep1 + lep2 + pherr).M() - (lep1 + lep2 + photon).M();
@@ -172,25 +172,25 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
         pico.out_llphoton_psi().push_back(psi);
 
         // // Cosine of angle between incoming quarks and outgoing Zs in Higgs frame (Alternate formulation)
-	// double cosThetaT = cos(dilep.Angle(q.Vect()));
+        // double cosThetaT = cos(dilep.Angle(q.Vect()));
 
-	// // Angle phi (Alternate formulation)
-	// TVector3 zAxis = dilep.Vect().Unit();
-	// TVector3 yAxis = qvec.Cross(zAxis.Unit()).Unit();
-	// TVector3 xAxis = (yAxis.Unit().Cross(zAxis.Unit())).Unit();
-	// TRotation rotation;
-	// rotation = rotation.RotateAxes(xAxis,yAxis,zAxis).Inverse();
-	// lminus.Transform(rotation);
-	// double psiT = lminus.Phi();
-	
-	// // Cosine of angle between lepton 1 and parent Z (Alternate formulation)
-	// lminus.Boost(-1*zBoost);
-	// lplus.Boost(-1*zBoost);
-	// double costhetaT = cos(dilep.Angle(lplus.Vect()));
-	
-	// cout << "Phi: " << psi << " " << psiT << endl;
-	// cout << "costheta: " << costheta << " " << costhetaT << endl;
-	// cout << "cosTheta: " << cosTheta << " " << cosThetaT << endl;
+        // // Angle phi (Alternate formulation)
+        // TVector3 zAxis = dilep.Vect().Unit();
+        // TVector3 yAxis = qvec.Cross(zAxis.Unit()).Unit();
+        // TVector3 xAxis = (yAxis.Unit().Cross(zAxis.Unit())).Unit();
+        // TRotation rotation;
+        // rotation = rotation.RotateAxes(xAxis,yAxis,zAxis).Inverse();
+        // lminus.Transform(rotation);
+        // double psiT = lminus.Phi();
+        
+        // // Cosine of angle between lepton 1 and parent Z (Alternate formulation)
+        // lminus.Boost(-1*zBoost);
+        // lplus.Boost(-1*zBoost);
+        // double costhetaT = cos(dilep.Angle(lplus.Vect()));
+        
+        // cout << "Phi: " << psi << " " << psiT << endl;
+        // cout << "costheta: " << costheta << " " << costhetaT << endl;
+        // cout << "cosTheta: " << cosTheta << " " << cosThetaT << endl;
 
         pico.out_llphoton_costhj().push_back(cosThetaJeff(lminus,lplus,photon));
       }
