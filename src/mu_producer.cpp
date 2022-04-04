@@ -33,7 +33,6 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
            nano.Muon_sip3d()[imu] < 4)
         isSignal = true;
       pico.out_mu_sip3d().push_back(nano.Muon_sip3d()[imu]);
-      pico.out_mu_ptErr().push_back(nano.Muon_ptErr()[imu]);
       pico.out_mu_mediumid().push_back(nano.Muon_mediumId()[imu]);
       pico.out_mu_tightid().push_back(nano.Muon_tightId()[imu]);
       pico.out_mu_highptid().push_back(nano.Muon_highPtId()[imu]);
@@ -50,6 +49,7 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
         isSignal = true;
     }
     pico.out_mu_pt().push_back(pt);
+    pico.out_mu_ptErr().push_back(nano.Muon_ptErr()[imu]);
     pico.out_mu_eta().push_back(eta);
     pico.out_mu_phi().push_back(nano.Muon_phi()[imu]);
     pico.out_mu_miniso().push_back(nano.Muon_miniPFRelIso_all()[imu]);
