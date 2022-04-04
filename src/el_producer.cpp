@@ -39,7 +39,6 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
       isSignal = nano.Electron_mvaFall17V2Iso_WPL()[iel];
       pico.out_el_idmva().push_back(nano.Electron_mvaFall17V2Iso()[iel]);
       pico.out_el_sip3d().push_back(nano.Electron_sip3d()[iel]);
-      pico.out_el_energyErr().push_back(nano.Electron_energyErr()[iel]);
       pico.out_el_phidx().push_back(nano.Electron_photonIdx()[iel]);
       pico.out_el_id80().push_back(nano.Electron_mvaFall17V2Iso_WP80()[iel]);
       pico.out_el_id90().push_back(nano.Electron_mvaFall17V2Iso_WP90()[iel]);
@@ -66,6 +65,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
         isSignal = true;
     }
     pico.out_el_pt().push_back(pt);
+    pico.out_el_energyErr().push_back(nano.Electron_energyErr()[iel]);
     pico.out_el_eta().push_back(eta);
     pico.out_el_etasc().push_back(etasc);
     pico.out_el_phi().push_back(phi);
