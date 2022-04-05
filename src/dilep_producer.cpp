@@ -30,8 +30,6 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
         int imu2 = sig_mu_pico_idx.at(j);
         TLorentzVector mu1, mu2, dimu;
 
-        if ((pico.out_mu_charge()[imu1]+pico.out_mu_charge()[imu2])!=0)
-          continue;
         mu1.SetPtEtaPhiM(pico.out_mu_pt()[imu1], pico.out_mu_eta()[imu1],
                          pico.out_mu_phi()[imu1], 0.10566);
         mu2.SetPtEtaPhiM(pico.out_mu_pt()[imu2], pico.out_mu_eta()[imu2],
@@ -67,6 +65,7 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
         pico.out_ll_i2()   .insert(pico.out_ll_i2()   .begin()+shift, imu2);
         pico.out_ll_l1_masserr() .insert(pico.out_ll_l1_masserr() .begin()+shift, dml1);
         pico.out_ll_l2_masserr() .insert(pico.out_ll_l2_masserr() .begin()+shift, dml2);
+        pico.out_ll_charge()     .insert(pico.out_ll_charge()     .begin()+shift, pico.out_mu_charge()[imu1]+pico.out_mu_charge()[imu2]);
         nll++;
       }
   if (pico.out_nel()>=2)
@@ -76,8 +75,6 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
         int iel2 = sig_el_pico_idx.at(j);
         TLorentzVector el1, el2, diel;
 
-        if ((pico.out_el_charge()[iel1]+pico.out_el_charge()[iel2])!=0)
-          continue;
         el1.SetPtEtaPhiM(pico.out_el_pt()[iel1] ,pico.out_el_eta()[iel1],
                          pico.out_el_phi()[iel1],0.000511);
         el2.SetPtEtaPhiM(pico.out_el_pt()[iel2], pico.out_el_eta()[iel2],
@@ -113,7 +110,7 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
         pico.out_ll_i2()   .insert(pico.out_ll_i2()   .begin()+shift, iel2);
         pico.out_ll_l1_masserr() .insert(pico.out_ll_l1_masserr() .begin()+shift, dml1);
         pico.out_ll_l2_masserr() .insert(pico.out_ll_l2_masserr() .begin()+shift, dml2);
-
+        pico.out_ll_charge()     .insert(pico.out_ll_charge()     .begin()+shift, pico.out_el_charge()[iel1]+pico.out_el_charge()[iel2]);
         nll++;
       }
   return;
