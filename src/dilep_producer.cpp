@@ -37,8 +37,6 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
         mu2.SetPtEtaPhiM(pico.out_mu_pt()[imu2], pico.out_mu_eta()[imu2],
                          pico.out_mu_phi()[imu2], 0.10566);
         dimu = mu1 + mu2;
-        if (dimu.M() < 50)
-          continue;
         // Dilepton closest to Z mass gets put at the front
         if(abs(dimu.M() - zmass) < mindm) { 
           mindm = abs(dimu.M() - zmass);
@@ -85,8 +83,6 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
         el2.SetPtEtaPhiM(pico.out_el_pt()[iel2], pico.out_el_eta()[iel2],
                          pico.out_el_phi()[iel2],0.000511);
         diel = el1 + el2;
-        if (diel.M() < 50)
-          continue;
         // Dilepton closest to Z mass gets put at the front
         if(abs(diel.M() - zmass) < mindm) {
           mindm = abs(diel.M() - zmass);
