@@ -58,7 +58,7 @@ PhotonWeighter::PhotonWeighter(int year, bool isZgamma){
       in_full_photon_ev_ = "zgamma/CSEV_ScaleFactors_2017.root"; hist_full_photon_ev_ = "MVA_ID";
     } else {
       in_full_photon_id_ = "zgamma/2018_PhotonsMVAwp90.root"; hist_full_photon_id_ = "EGamma_SF2D";
-      in_full_photon_ev_ = "zgamma/CSEV_2018.root";           hist_full_photon_ev_ = "MVA_ID";
+      in_full_photon_ev_ = "zgamma/CSEV_2018.root";           hist_full_photon_ev_ = "eleVeto_SF";
     }
     do_full_photon_id_ = (in_full_photon_id_!=""); do_full_photon_ev_ = (in_full_photon_ev_!="");
 
