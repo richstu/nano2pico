@@ -378,6 +378,8 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
   pico.out_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL()        = nano.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL();
   pico.out_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ()       = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ();
   pico.out_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ()     = nano.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ();
+  pico.out_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8();
+  pico.out_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8()   = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8();
   pico.out_HLT_Photon175()                             = nano.HLT_Photon175();
 
 
