@@ -56,14 +56,13 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
       if(tempDR < minLepDR) minLepDR = tempDR;
     }
 
-    bool isSignal = (pt > SignalPhotonPtCut);
-    bool isSig = (((fabs(eta) < 1.4442 && mva > -0.4) ||
-                  (fabs(eta) > 1.566 && fabs(eta) < 2.5 && mva > -0.58)) &&
-                  eVeto && minLepDR > 0.4 && 
-                  pt > SignalPhotonPtCut);
+    bool isSignal = (((fabs(eta) < 1.4442 && mva > -0.4) ||
+                     (fabs(eta) > 1.566 && fabs(eta) < 2.5 && mva > -0.58)) &&
+                     eVeto && minLepDR > 0.4 && 
+                     pt > SignalPhotonPtCut);
 
     // Photons passing the Run 2 selections are placed at the front
-    if(isSig) {
+    if(isSignal) {
       shift = ndr;
       ndr++;
     }
@@ -81,7 +80,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
     pico.out_photon_id()    .insert(pico.out_photon_id()    .begin()+shift, nano.Photon_mvaID_WP90()[iph]);
     pico.out_photon_id80()  .insert(pico.out_photon_id80()  .begin()+shift, nano.Photon_mvaID_WP80()[iph]);
     pico.out_photon_idmva() .insert(pico.out_photon_idmva() .begin()+shift, mva);
-    pico.out_photon_sig()   .insert(pico.out_photon_sig()   .begin()+shift, isSig);
+    pico.out_photon_sig()   .insert(pico.out_photon_sig()   .begin()+shift, isSignal);
     pico.out_photon_drmin() .insert(pico.out_photon_drmin() .begin()+shift, minLepDR);
     pico.out_photon_elidx() .insert(pico.out_photon_elidx() .begin()+shift, nano.Photon_electronIdx()[iph]);
     nphotons++;
