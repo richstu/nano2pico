@@ -175,7 +175,9 @@ int main(int argc, char *argv[]){
     }
 
     bool passed_trig = event_tools.SaveTriggerDecisions(nano, pico, isZgamma);
-    if (isData && !passed_trig) continue;
+    if (isData && !passed_trig) {
+      continue;
+    }
 
     // event info
     pico.out_event()     = nano.event();

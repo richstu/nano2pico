@@ -370,8 +370,14 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
   pico.out_HLT_PFHT250() = nano.HLT_PFHT250();
   pico.out_HLT_PFHT350() = nano.HLT_PFHT350();
 
-  // ZGamma triggers
-  pico.out_HLT_Mu17_Photon30_IsoCaloId()               = nano.HLT_Mu17_Photon30_IsoCaloId();
+  // Dilepton triggers
+  bool doubleelectron_trigs = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ() ||
+      nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL() || nano.HLT_DoubleEle25_CaloIdL_MW();
+  bool doublemuon_trigs = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL() ||
+      nano.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL() || nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ() ||
+      nano.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ() || nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8() || 
+      nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8() || nano.HLT_Mu37_TkMu27();
+
   pico.out_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ() = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ();
   pico.out_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL()    = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL();
   pico.out_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL()          = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL();
@@ -380,11 +386,22 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
   pico.out_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ()     = nano.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ();
   pico.out_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8();
   pico.out_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8()   = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8();
+  pico.out_HLT_DoubleEle25_CaloIdL_MW()                = nano.HLT_DoubleEle25_CaloIdL_MW();
+  pico.out_HLT_Mu37_TkMu27()                           = nano.HLT_Mu37_TkMu27();
+
+  // Photon triggers
+  pico.out_HLT_Mu17_Photon30_IsoCaloId()               = nano.HLT_Mu17_Photon30_IsoCaloId();
   pico.out_HLT_Photon175()                             = nano.HLT_Photon175();
 
-
-  if (isZgamma)
-    return true;
+  if (isZgamma) {
+    // this assumes that we process either all the datasets or at least an ordered subset starting with the dilepton datasets
+    if (dataset==Dataset::DoubleMuon                                                                 && doublemuon_trigs) return true;
+    else if (year>=2018 && dataset==Dataset::EGamma       && (doubleelectron_trigs || egamma_trigs) && !doublemuon_trigs) return true;
+    else if (year<2018 && dataset==Dataset::DoubleEG                        && doubleelectron_trigs && !doublemuon_trigs) return true;
+    else if (year<2018 && dataset==Dataset::SingleElectron && egamma_trigs && !doubleelectron_trigs && !doublemuon_trigs) return true;
+    else if (dataset==Dataset::SingleMuon   && muon_trigs && !egamma_trigs && !doubleelectron_trigs && !doublemuon_trigs) return true;
+    else return false;
+  }
   else {
     // this assumes that we process either all the datasets or at least an ordered subset starting with the MET 
     // e.g. after measuring trigger efficiency, it would no longer be necessary to run on JetHT
