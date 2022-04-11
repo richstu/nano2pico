@@ -115,10 +115,16 @@ int main(int argc, char *argv[]){
     {2018, vector<float>({0.0494, 0.2770, 0.7264})}
   };
 
+  string rocco_file = "data/RoccoR2016.txt";
+  if (year==2017)
+    rocco_file = "data/RoccoR2017.txt";
+  else if (year==2018)
+    rocco_file = "data/RoccoR2018.txt";
+
   //Initialize object producers
   GenParticleProducer mc_producer(year);
   ElectronProducer el_producer(year, isData);
-  MuonProducer mu_producer(year, isData);
+  MuonProducer mu_producer(year, isData, rocco_file);
   DileptonProducer dilep_producer(year);
   IsoTrackProducer tk_producer(year);
   PhotonProducer photon_producer(year, isData);

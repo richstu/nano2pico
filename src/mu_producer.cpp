@@ -1,12 +1,15 @@
 #include "mu_producer.hpp"
 
+
 #include "utilities.hpp"
 
 using namespace std;
 
-MuonProducer::MuonProducer(int year_, bool isData_){
-    year = year_;
-    isData = isData_;
+MuonProducer::MuonProducer(int year_, bool isData_, std::string rocco_file) :
+  year(year_),
+  isData(isData_),
+  rc(rocco_file),
+  rng(4357) {
 }
 
 MuonProducer::~MuonProducer(){
@@ -60,6 +63,24 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
     pico.out_mu_id().push_back(nano.Muon_looseId()[imu]);
     pico.out_mu_sig().push_back(isSignal);
     pico.out_mu_charge().push_back(nano.Muon_charge()[imu]);
+    //Rochester corrections, see https://github.com/cms-nanoAOD/nanoAOD-tools/blob/master/python/postprocessing/modules/common/muonScaleResProducer.py
+    if (isData) {
+      pico.out_mu_corrected_pt().push_back(pt*rc.kScaleDT(nano.Muon_charge()[imu],pt,eta,nano.Muon_phi()[imu]));
+      pico.out_mu_corrected_ptErr().push_back(pt*rc.kScaleDTerror(nano.Muon_charge()[imu],pt,eta,nano.Muon_phi()[imu]));
+    }
+    else {
+      if (nano.Muon_genPartIdx()[imu] > 0 && nano.Muon_genPartIdx()[imu] < nano.nGenPart()) {
+        float gen_pt = nano.GenPart_pt()[nano.Muon_genPartIdx()[imu]];
+        pico.out_mu_corrected_pt().push_back(pt*rc.kSpreadMC(nano.Muon_charge()[imu],pt,eta,nano.Muon_phi()[imu],gen_pt));
+        pico.out_mu_corrected_ptErr().push_back(pt*rc.kSpreadMCerror(nano.Muon_charge()[imu],pt,eta,nano.Muon_phi()[imu],gen_pt));
+      }
+      else {
+        float unif_rand = rng.Uniform();
+        pico.out_mu_corrected_pt().push_back(pt*rc.kSmearMC(nano.Muon_charge()[imu],pt,eta,nano.Muon_phi()[imu],nano.Muon_nTrackerLayers()[imu],unif_rand));
+        pico.out_mu_corrected_ptErr().push_back(pt*rc.kSmearMCerror(nano.Muon_charge()[imu],pt,eta,nano.Muon_phi()[imu],nano.Muon_nTrackerLayers()[imu],unif_rand));
+      }
+    }
+
     if (!isData)
       pico.out_mu_pflavor().push_back(nano.Muon_genPartFlav()[imu]);
 

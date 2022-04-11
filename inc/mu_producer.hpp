@@ -1,14 +1,18 @@
 #ifndef H_MU_PRODUCER
 #define H_MU_PRODUCER
 
+#include <string>
+
+#include "TRandom3.h"
 
 #include "nano_tree.hpp"
 #include "pico_tree.hpp"
+#include "RoccoR.hpp"
 
 class MuonProducer{
 public:
 
-  explicit MuonProducer(int year, bool isData);
+  explicit MuonProducer(int year, bool isData, std::string rocco_file);
   ~MuonProducer();
 
   const float SignalMuonPtCut  = 20.0;
@@ -23,6 +27,8 @@ public:
 private:
   int year;
   bool isData;
+  RoccoR rc;
+  TRandom3 rng;
   
 };
 
