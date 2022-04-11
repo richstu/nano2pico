@@ -1,7 +1,7 @@
 #ifndef ElectroWeakAnalysis_RoccoR_H
 #define ElectroWeakAnalysis_RoccoR_H
 
-#include <boost/math/special_functions/erf.hpp>
+#include "TMath.h"
 
 struct CrystalBall{
     static const double pi;
@@ -37,7 +37,7 @@ struct CrystalBall{
   double ex = exp(-fa*fa/2);
   double A  = pow(n/fa, n) * ex;
   double C1 = n/fa/(n-1) * ex; 
-  double D1 = 2 * sqrtPiOver2 * erf(fa/sqrt2);
+  double D1 = 2 * sqrtPiOver2 * TMath::Erf(fa/sqrt2);
 
   B = n/fa-fa;
   C = (D1+2*C1)/C1;   
@@ -74,13 +74,13 @@ struct CrystalBall{
   double d = (x-m)/s;
   if(d<-a) return NC / pow(F-s*d/G, n-1);
   if(d>a) return NC * (C - pow(F+s*d/G, 1-n) );
-  return Ns * (D - sqrtPiOver2 * erf(-d/sqrt2));
+  return Ns * (D - sqrtPiOver2 * TMath::Erf(-d/sqrt2));
     }
 
     double invcdf(double u) const{
   if(u<cdfMa) return m + G*(F - pow(NC/u, k));
   if(u>cdfPa) return m - G*(F - pow(C-u/NC, -k) );
-  return m - sqrt2 * s * boost::math::erf_inv((D - u/Ns )/sqrtPiOver2);
+  return m - sqrt2 * s * TMath::ErfInverse((D - u/Ns )/sqrtPiOver2);
     }
 };
 
