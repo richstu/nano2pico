@@ -8,6 +8,7 @@ bool stitch_ht
 bool stitch_htmet
 bool stitch_photon
 bool stitch_dy
+bool old_stitch_dy
 
 ####################   Global   ###################
 int npv

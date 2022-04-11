@@ -111,21 +111,44 @@ void GenParticleProducer::WriteGenParticles(nano_tree &nano, pico_tree &pico){
       }
     }
     // Checking for faked photons for DY stitch
-    if(mc_id == 22 && nano.GenPart_status().at(imc) == 1) // Stable photons
-      if(mc_statusFlags[0] || mc_statusFlags[8])  // Which are prompt or fromHardProcess
-        for(size_t igamma(0); igamma < pico.out_photon_pt().size(); igamma++)
+    pico.out_old_stitch_dy() = true;
+    pico.out_stitch_dy() = true;
+    if(mc_id == 22 && nano.GenPart_status().at(imc) == 1){ // Stable photons
+      if(mc_statusFlags[0] || mc_statusFlags[8]){  // Which are isPrompt or fromHardProcess
+       
+       TVector3 compPart,genPhoton;
+       genPhoton.SetPtEtaPhi(nano.GenPart_pt().at(imc), 
+                             nano.GenPart_eta().at(imc), 
+                             nano.GenPart_phi().at(imc));
+
+        if( genPhoton.Pt() >15.0 && fabs(genPhoton.Eta())< 2.6 ){
+        //check if another generator particle nearby
+          for (int imc2 = 0; imc2 < nano.nGenPart(); imc2++) {
+            compPart.SetPtEtaPhi(nano.GenPart_pt().at(imc2), 
+                                 nano.GenPart_eta().at(imc2), 
+                                 nano.GenPart_phi().at(imc2)); 
+ 
+            //isPrompt and fromHardProcess already applied
+            if ( (compPart.Pt() > 5.0) && (genPhoton.DeltaR(compPart) > 0.05) && (imc != imc2) ) {
+              pico.out_stitch_dy() = false;
+              //Basically saying that a photon was found so this is not DY + FP sample!
+            } 
+          }
+        }
+        
+        
+        for(size_t igamma(0); igamma < pico.out_photon_pt().size(); igamma++){
           if(pico.out_photon_sig()[igamma]){
-            TVector3 genPhoton, recoPhoton;
-            genPhoton.SetPtEtaPhi(nano.GenPart_pt().at(imc), 
-                                  nano.GenPart_eta().at(imc), 
-                                  nano.GenPart_phi().at(imc));
-            recoPhoton.SetPtEtaPhi(pico.out_photon_pt().at(igamma), 
+             compPart.SetPtEtaPhi(pico.out_photon_pt().at(igamma), 
                                    pico.out_photon_eta().at(igamma), 
                                    pico.out_photon_phi().at(igamma));
-            if(genPhoton.DeltaR(recoPhoton) < 0.1)
-              pico.out_stitch_dy() = false;
+            if(genPhoton.DeltaR(compPart) < 0.1){
+              pico.out_old_stitch_dy() = false;
+            }
           }
-
+        }
+      }
+    }
 
     // store information
     if (save_index) {
