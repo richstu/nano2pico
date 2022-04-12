@@ -246,6 +246,8 @@ int main(int argc, char *argv[]){
     if (debug) cout<<"INFO:: Writing gen particles"<<endl;
 
     pico.out_stitch_dy() = true;
+    pico.out_old_stitch_dy() = true;
+
     if (!isData) mc_producer.WriteGenParticles(nano, pico);
     isr_tools.WriteISRSystemPt(nano, pico);
 

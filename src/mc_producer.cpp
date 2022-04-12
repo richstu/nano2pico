@@ -111,8 +111,7 @@ void GenParticleProducer::WriteGenParticles(nano_tree &nano, pico_tree &pico){
       }
     }
     // Checking for faked photons for DY stitch
-    pico.out_old_stitch_dy() = true;
-    pico.out_stitch_dy() = true;
+    bool found_other_particles = false;
     if(mc_id == 22 && nano.GenPart_status().at(imc) == 1){ // Stable photons
       if(mc_statusFlags[0] || mc_statusFlags[8]){  // Which are isPrompt or fromHardProcess
        
@@ -124,18 +123,22 @@ void GenParticleProducer::WriteGenParticles(nano_tree &nano, pico_tree &pico){
         if( genPhoton.Pt() >15.0 && fabs(genPhoton.Eta())< 2.6 ){
         //check if another generator particle nearby
           for (int imc2 = 0; imc2 < nano.nGenPart(); imc2++) {
+            bitset<15> mc_statusFlags2(nano.GenPart_statusFlags().at(imc2));
             compPart.SetPtEtaPhi(nano.GenPart_pt().at(imc2), 
                                  nano.GenPart_eta().at(imc2), 
                                  nano.GenPart_phi().at(imc2)); 
  
             //isPrompt and fromHardProcess already applied
-            if ( (compPart.Pt() > 5.0) && (genPhoton.DeltaR(compPart) > 0.05) && (imc != imc2) ) {
-              pico.out_stitch_dy() = false;
+            if ( (compPart.Pt() > 5.0) && (genPhoton.DeltaR(compPart) < 0.05) && (imc != imc2) && mc_statusFlags2[8] ) {
+              found_other_particles = true;
               //Basically saying that a photon was found so this is not DY + FP sample!
-            } 
+            }
           }
         }
-        
+
+        if(!found_other_particles){
+          pico.out_stitch_dy() = false;
+        }
         
         for(size_t igamma(0); igamma < pico.out_photon_pt().size(); igamma++){
           if(pico.out_photon_sig()[igamma]){
