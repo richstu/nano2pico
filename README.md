@@ -593,3 +593,21 @@ Checking out tag: `git checkout <tagname>`
 In case didn't checkout submodule: `git submodule init` and `git submodule update`
 
 Update all submodules: `git submodule update --recursive --remote --merge` and then commit.
+
+## Validation
+
+Validation is done by running `./script/process_unit_test*` on nano2pico code versions and then using `./script/validate_unit_test*` to compare between results.
+
+Below are examples
+
+~~~bash
+# Compares picos file between old code and new code. Also compares production time.
+[In old code folder] ./scripts/validate_unit_test_htozgamma_NanoAODv9.py --output_folder unit_test_htozgamma_nanoaodv9 --output_log unit_test_htozgamma_nanoaodv9.log
+[In new code folder] ./scripts/validate_unit_test_htozgamma_NanoAODv9.py --output_folder unit_test_htozgamma_nanoaodv9 --output_log unit_test_htozgamma_nanoaodv9.log
+./scripts/validate_unit_test_picos.py --output_log_filename validate_unit_test_htozgamma_nanoaodv9.log --unit_test_log_filename unit_test_htozgamma_nanoaodv9.log --golden_base_folder OLD_CODE/unit_test_htozgamma_nanoaodv9 -validate_base_folder NEW_CODE/unit_test_htozgamma_nanoaodv9
+
+# Compares cross section between old code and new code.
+[In old code folder] ./scripts/validate_unit_test_cross_section.py --output_log unit_test_cross_section.log
+[In new code folder] ./scripts/validate_unit_test_cross_section.py --output_log unit_test_cross_section.log
+./scripts/validate_unit_test_cross_section.py --output_filename validate_unit_test_cross_section.log --golden_cross_section_log OLD_CODE/unit_test_cross_section.log --validate_cross_section_log NEW_CODE/unit_test_cross_section.log
+~~~
