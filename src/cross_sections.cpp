@@ -308,7 +308,7 @@ namespace xsec{
         if(file.Contains("WZTo2L2Q"))   xsec = 5.606;
         if(file.Contains("WZTo3LNu_TuneCP5"))   xsec = 4.42965;
         if(file.Contains("VVTo2L2Nu"))   xsec = 11.95;
-        if(file.Contains("ZZ_TuneCP5"))   xsec = 16.91; //from twiki NLO
+        if(file.Contains("ZZ_TuneCP5"))   xsec = 16.91; // https://arxiv.org/pdf/1405.2219.pdf
 
         // Calculated at 13 TeV in
         // https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt1314TeV
@@ -332,9 +332,9 @@ namespace xsec{
     if(file.Contains("TGJets") && !file.Contains("TTGJets")) xsec = 2.967;
 
     if(file.Contains("LLAJJ"))                xsec = 0.1084; // from XSDB
-    if(file.Contains("WZ_Tune"))              xsec = 51.11;
-    if(file.Contains("WW_Tune"))              xsec = 118.7;
-    if(file.Contains("WWG_Tune"))             xsec = 0.2147;
+    if(file.Contains("WZ_Tune"))              xsec = 51.11; // https://arxiv.org/pdf/1604.08576.pdf 
+    if(file.Contains("WW_Tune"))              xsec = 118.7; // https://arxiv.org/pdf/1408.5243.pdf
+    if(file.Contains("WWG_Tune"))             xsec = 0.2147; // from XSDB
     if(file.Contains("WZG_Tune"))             xsec = 0.04345; // from XSDB
 
     if(file.Contains("GluGluHToGG"))          xsec = HToGG * 48.58;
