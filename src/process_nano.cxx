@@ -190,8 +190,9 @@ int main(int argc, char *argv[]){
     pico.out_lumiblock() = nano.luminosityBlock();
     pico.out_run()       = nano.run();
     pico.out_type()      = event_type;
-    if (isData) pico.out_stitch() = true;
-    else event_tools.WriteStitch(nano, pico);
+    pico.out_stitch_dy() = true;
+    pico.out_old_stitch_dy() = true;
+
     // number of reconstructed primary vertices
     pico.out_npv() = nano.PV_npvs();
     pico.out_npv_good() = nano.PV_npvsGood();
@@ -239,14 +240,14 @@ int main(int argc, char *argv[]){
       vector<int> sig_ph_nano_idx = photon_producer.WritePhotons(nano, pico, jet_isphoton_nano_idx,
                                                                  sig_el_nano_idx, sig_mu_nano_idx);
 
+    if (isData) pico.out_stitch() = true;
+    else event_tools.WriteStitch(nano, pico);
+ 
     tk_producer.WriteIsoTracks(nano, pico, sig_el_nano_idx, sig_mu_nano_idx, isFastsim);
 
     dilep_producer.WriteDileptons(pico, sig_el_pico_idx, sig_mu_pico_idx);
 
     if (debug) cout<<"INFO:: Writing gen particles"<<endl;
-
-    pico.out_stitch_dy() = true;
-    pico.out_old_stitch_dy() = true;
 
     if (!isData) mc_producer.WriteGenParticles(nano, pico);
     isr_tools.WriteISRSystemPt(nano, pico);
@@ -300,6 +301,8 @@ int main(int argc, char *argv[]){
     // might need as input sig_el_nano_idx, sig_mu_nano_idx, sig_ph_nano_idx
     if(isZgamma)
       zgamma_producer.WriteZGammaVars(nano, pico, sig_jet_nano_idx);
+
+  
 
     //save higgs variables using DeepCSV and DeepFlavor
     hig_producer.WriteHigVars(pico, false, isSignal, sys_higvars);

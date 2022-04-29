@@ -1,8 +1,8 @@
 #include "event_tools.hpp"
-
 #include "utilities.hpp"
 #include "hig_trig_eff.hpp"
 #include "TMath.h"
+#include <bitset>
 
 using namespace std;
 
@@ -90,6 +90,57 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
           }
         }
       }
+    }
+  }
+
+  for(int mc_idx(0); mc_idx<nano.nGenPart(); mc_idx++) {
+
+    bitset<15> mc_statusFlags(nano.GenPart_statusFlags().at(mc_idx));
+    if( nano.GenPart_pdgId().at(mc_idx) == 22 ){ // Stable photons 
+      TVector3 compPart,genPhoton;
+
+      if( (mc_statusFlags[0] || mc_statusFlags[8]) && (mc_statusFlags[12]) ){  // Which are isPrompt or fromHardProcess and isFirstCopy     
+        genPhoton.SetPtEtaPhi(nano.GenPart_pt().at(mc_idx), 
+                            nano.GenPart_eta().at(mc_idx), 
+                            nano.GenPart_phi().at(mc_idx));
+
+        if( genPhoton.Pt() >15.0 && fabs(genPhoton.Eta())< 2.6 ){
+          //check if another generator particle nearby
+          bool found_other_particles = false;
+          for (int mc_idx_2 = 0; mc_idx_2 < nano.nGenPart(); mc_idx_2++) {
+            bitset<15> mc_statusFlags2(nano.GenPart_statusFlags().at(mc_idx_2));
+            compPart.SetPtEtaPhi(nano.GenPart_pt().at(mc_idx_2), 
+                                 nano.GenPart_eta().at(mc_idx_2), 
+                                 nano.GenPart_phi().at(mc_idx_2)); 
+            
+
+            //isPrompt and fromHardProcess already applied
+            if ( (compPart.Pt() > 5.0) && (genPhoton.DeltaR(compPart) < 0.05) && (mc_idx != mc_idx_2) && (mc_statusFlags2[8]) && (mc_statusFlags2[12]) && (nano.GenPart_pdgId().at(mc_idx_2) != 22 )  ) {
+              found_other_particles = true;
+              //Basically saying that a photon was found so this is not DY + RP sample!
+            }
+          }
+
+          if(!found_other_particles){
+            pico.out_stitch_dy() = false;
+          }       
+
+        }
+    }
+
+    if(mc_statusFlags[0] || mc_statusFlags[8]){  // Which are isPrompt or fromHardProcess and isFirstCopy
+        for(size_t reco_idx(0); reco_idx < pico.out_photon_pt().size(); reco_idx++){
+          if(pico.out_photon_sig()[reco_idx]){
+             compPart.SetPtEtaPhi(pico.out_photon_pt().at(reco_idx), 
+                                  pico.out_photon_eta().at(reco_idx), 
+                                  pico.out_photon_phi().at(reco_idx));
+            if(genPhoton.DeltaR(compPart) < 0.1){
+              pico.out_old_stitch_dy() = false;
+            }
+          }
+        }
+      }
+
     }
   }
 
