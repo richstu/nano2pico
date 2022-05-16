@@ -246,16 +246,16 @@ namespace xsec{
         if (file.Contains("ST_tW_antitop_5f_NoFullyHadronicDecays"))     xsec = 34.97*0.530775; //XSDB/GenXSecAnalyzer * PDG BR; 35.85*0.543 in Humboldtv3+earlier
         if (file.Contains("ST_tW_top_5f_NoFullyHadronicDecays"))     xsec = 34.91*0.530775; //XSDB/GenXSecAnalyzer * PDG BR; 35.85*0.543 in Humboldtv3+earlier
 
-        if(file.Contains("DYJetsToLL_M-50_TuneCP5"))     xsec = 2075.14*3;
+        if(file.Contains("DYJetsToLL_M-50_TuneCP5"))     xsec = 6077.22; // https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat13TeV
 
-        if(file.Contains("DYJetsToLL_M-50_HT-70to100_TuneCP5"))    xsec = 0.0275032*2075.14*3;
-        if(file.Contains("DYJetsToLL_M-50_HT-100to200_TuneCP5"))    xsec = 0.0302083*2075.14*3;
-        if(file.Contains("DYJetsToLL_M-50_HT-200to400_TuneCP5"))    xsec = 0.00907651*2075.14*3;
-        if(file.Contains("DYJetsToLL_M-50_HT-400to600_TuneCP5"))    xsec = 0.00129238*2075.14*3;
-        if(file.Contains("DYJetsToLL_M-50_HT-600to800_TuneCP5"))    xsec = 0.000316039*2075.14*3;
-        if(file.Contains("DYJetsToLL_M-50_HT-800to1200_TuneCP5"))    xsec = 0.000137432*2075.14*3;
-        if(file.Contains("DYJetsToLL_M-50_HT-1200to2500_TuneCP5"))    xsec = 3.09368e-05*2075.14*3;
-        if(file.Contains("DYJetsToLL_M-50_HT-2500toInf_TuneCP5"))    xsec = 4.39860e-07*2075.14*3;
+        if(file.Contains("DYJetsToLL_M-50_HT-70to100_TuneCP5"))    xsec = 0.0275032*6077.22;
+        if(file.Contains("DYJetsToLL_M-50_HT-100to200_TuneCP5"))    xsec = 0.0302083*6077.22;
+        if(file.Contains("DYJetsToLL_M-50_HT-200to400_TuneCP5"))    xsec = 0.00907651*6077.22;
+        if(file.Contains("DYJetsToLL_M-50_HT-400to600_TuneCP5"))    xsec = 0.00129238*6077.22;
+        if(file.Contains("DYJetsToLL_M-50_HT-600to800_TuneCP5"))    xsec = 0.000316039*6077.22;
+        if(file.Contains("DYJetsToLL_M-50_HT-800to1200_TuneCP5"))    xsec = 0.000137432*6077.22;
+        if(file.Contains("DYJetsToLL_M-50_HT-1200to2500_TuneCP5"))    xsec = 3.09368e-05*6077.22;
+        if(file.Contains("DYJetsToLL_M-50_HT-2500toInf_TuneCP5"))    xsec = 4.39860e-07*6077.22;
 
         // k-factor from DYJets 1.165
         if(file.Contains("ZJetsToNuNu_HT-100To200")) {
