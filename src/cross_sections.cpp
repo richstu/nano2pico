@@ -356,11 +356,11 @@ namespace xsec{
     // Zgamma signal
     if(file.Contains("GluGluHToZG"))          xsec = HToZG * ZToLL * 48.58 ;
     if(file.Contains("VBFHToZG"))             xsec = HToZG * ZToLL * 3.782 ;
-    if(file.Contains("WplusH_HToZG"))         xsec = HToZG * ZToLL * 0.831 ;
-    if(file.Contains("WminusH_HToZG"))        xsec = HToZG * ZToLL * 0.527 ;
-    if(file.Contains("ZH_HToZG"))             xsec = HToZG * ZToLL * 0.8839;
-    if(file.Contains("ZH_ZToAll_HToZG"))      xsec = HToZG * ZToLL * 0.8839;
-    if(file.Contains("ttHToZG"))              xsec = HToZG * ZToLL * 0.5071;
+    if(file.Contains("WplusH_HToZG"))         xsec = HToZG * 0.831 ; // WplusH, WminusH, ZH, ttH samples do not require decay of Z to leptons
+    if(file.Contains("WminusH_HToZG"))        xsec = HToZG * 0.527 ; // New samples are requested with this decay incorporated
+    if(file.Contains("ZH_HToZG"))             xsec = HToZG * 0.8839; // Add ZToLL when updated samples are available
+    if(file.Contains("ZH_ZToAll_HToZG"))      xsec = HToZG * 0.8839;
+    if(file.Contains("ttHToZG"))              xsec = HToZG * 0.5071;
 
 
     if(xsec<=0) std::cout<<"ERROR:: Cross section not found for "<<file<<std::endl;
