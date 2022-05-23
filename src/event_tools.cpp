@@ -96,10 +96,10 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
   for(int mc_idx(0); mc_idx<nano.nGenPart(); mc_idx++) {
 
     bitset<15> mc_statusFlags(nano.GenPart_statusFlags().at(mc_idx));
-    if( nano.GenPart_pdgId().at(mc_idx) == 22 ){ // Stable photons 
+    if( nano.GenPart_pdgId().at(mc_idx) == 22 ){ // photons 
       TVector3 compPart,genPhoton;
 
-      if( (mc_statusFlags[0] || mc_statusFlags[8]) && (mc_statusFlags[12]) ){  // Which are isPrompt or fromHardProcess and isFirstCopy     
+      if( (mc_statusFlags[0] || mc_statusFlags[8]) ){  // Which are isPrompt or fromHardProcess
         genPhoton.SetPtEtaPhi(nano.GenPart_pt().at(mc_idx), 
                             nano.GenPart_eta().at(mc_idx), 
                             nano.GenPart_phi().at(mc_idx));
@@ -115,9 +115,9 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
             
 
             //isPrompt and fromHardProcess already applied
-            if ( (compPart.Pt() > 5.0) && (genPhoton.DeltaR(compPart) < 0.05) && (mc_idx != mc_idx_2) && (mc_statusFlags2[8]) && (mc_statusFlags2[12]) && (nano.GenPart_pdgId().at(mc_idx_2) != 22 )  ) {
+            if ( (compPart.Pt() > 5.0) && (genPhoton.DeltaR(compPart) < 0.05) && (mc_idx != mc_idx_2) && (mc_statusFlags2[8]) && (nano.GenPart_pdgId().at(mc_idx_2) != 22 )  ) {
               found_other_particles = true;
-              //Basically saying that a photon was found so this is not DY + RP sample!
+              //Basically saying that a photon is not isolated so this is not SM Zgamma sample!
             }
           }
 
@@ -128,7 +128,7 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
         }
     }
 
-    if(mc_statusFlags[0] || mc_statusFlags[8]){  // Which are isPrompt or fromHardProcess and isFirstCopy
+    if( (mc_statusFlags[0] || mc_statusFlags[8]) && nano.GenPart_status().at(mc_idx) == 1 ){  // Which are isPrompt or fromHardProcess and stable
         for(size_t reco_idx(0); reco_idx < pico.out_photon_pt().size(); reco_idx++){
           if(pico.out_photon_sig()[reco_idx]){
              compPart.SetPtEtaPhi(pico.out_photon_pt().at(reco_idx), 
