@@ -146,6 +146,20 @@ void compare_root_tuples(string root_filename_a="", string root_filename_b="", s
             }
           }
         }
+      } else if (branchNameToType_a[branch_name] == "vector<char>") { // Compare vector<char>
+        if (helper_a.v_char(branch_name).GetSize() != helper_b.v_char(branch_name).GetSize()) { // Compare size
+          if (different_branches.find(branch_name) == different_branches.end()) cout<<"[Info] "<<branch_name<<" has different sizes: "<<helper_a.v_char(branch_name).GetSize()<<" "<<helper_b.v_char(branch_name).GetSize()<<endl;
+          different_branches[branch_name].push_back({entry_a, -2});
+        } else { // Compare values
+          for (unsigned iValue=0; iValue < helper_a.v_char(branch_name).GetSize(); ++iValue) {
+            if (!std::isnan(helper_a.v_char(branch_name)[iValue]) || !std::isnan(helper_b.v_char(branch_name)[iValue])) {
+             if (helper_a.v_char(branch_name)[iValue] != helper_b.v_char(branch_name)[iValue]) {
+               if (different_branches.find(branch_name) == different_branches.end()) cout<<"[Info] "<<branch_name<<"["<<iValue<<"] has different values: "<<helper_a.v_char(branch_name)[iValue]<<" "<<helper_b.v_char(branch_name)[iValue]<<endl;
+               different_branches[branch_name].push_back({entry_a, iValue});
+             }
+            }
+          }
+        }
       } else if (branchNameToType_a[branch_name] == "vector<int>") { // Compare vector<int>
         if (helper_a.v_int(branch_name).GetSize() != helper_b.v_int(branch_name).GetSize()) { // Compare size
           if (different_branches.find(branch_name) == different_branches.end()) cout<<"[Info] "<<branch_name<<" has different sizes: "<<helper_a.v_int(branch_name).GetSize()<<" "<<helper_b.v_int(branch_name).GetSize()<<endl;

@@ -76,13 +76,16 @@ int main(int argc, char *argv[]){
   if (isData) {
     switch (year) {
       case 2016:
-        VVRunLumi = MakeVRunLumi("golden2016");
+        if (Contains(in_file, "UL2016")) VVRunLumi = MakeVRunLumi("goldenUL2016");
+        else VVRunLumi = MakeVRunLumi("golden2016");
         break;
       case 2017:
-        VVRunLumi = MakeVRunLumi("golden2017");
+        if (Contains(in_file, "UL2017")) VVRunLumi = MakeVRunLumi("goldenUL2017");
+        else VVRunLumi = MakeVRunLumi("golden2017");
         break;
       case 2018:
-        VVRunLumi = MakeVRunLumi("golden2018");
+        if (Contains(in_file, "UL2018")) VVRunLumi = MakeVRunLumi("goldenUL2018");
+        else VVRunLumi = MakeVRunLumi("golden2018");
         break;
       default:
         cout << "ERROR: no golden cert for given year" << endl;

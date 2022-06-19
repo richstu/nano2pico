@@ -181,7 +181,7 @@ vector<float> mu_sip3d
 vector<bool>  mu_id
 vector<bool>  mu_mediumid
 vector<bool>  mu_tightid
-vector<char>  mu_highptid
+vector<int>  mu_highptid
 vector<bool>  mu_sig
 vector<int>   mu_charge
 vector<int>   mu_pflavor
