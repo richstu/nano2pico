@@ -31,6 +31,7 @@
 #include "photon_weighter.hpp"
 #include "event_tools.hpp"
 #include "isr_tools.hpp"
+#include "egamma_weighter.hpp"
 
 using namespace std;
 
@@ -148,6 +149,7 @@ int main(int argc, char *argv[]){
   LeptonWeighter lep_weighter16gh(year, isZgamma, true);
   PrefireWeighter prefire_weighter(year, true);
   PhotonWeighter photon_weighter(year, isZgamma);
+  EgammaWeighter egamma_weighter(year);
 
   // Other tools
   EventTools event_tools(in_path, year);
@@ -174,7 +176,7 @@ int main(int argc, char *argv[]){
   for(size_t entry(0); entry<nentries; ++entry){
     if (debug) cout << "GetEntry: " << entry <<" event = "<< endl;
     nano.GetEntry(entry);
-    if (entry%1000==0 || entry == nentries-1) {
+    if (entry%2000==0 || entry == nentries-1) {
       cout<<"Processing event: "<<entry<<endl;
     }
 
@@ -323,8 +325,17 @@ int main(int argc, char *argv[]){
     if (debug) cout<<"INFO:: Calculating weights"<<endl;
     float w_lep(1.), w_fs_lep(1.);
     float w_photon(1.);
+    float w_el(1.);
+    float w_photon_id(1.);
+    float w_photon_csev(1.);
     vector<float> sys_lep(2,1.), sys_fs_lep(2,1.);
     vector<float> sys_photon(2,1.);
+    egamma_weighter.GetSF(pico, w_el);
+    if (isZgamma) {
+      egamma_weighter.IDSF(pico, w_photon_id);
+      egamma_weighter.CSEVSF(pico, w_photon_csev);
+      cout << w_el << " " << w_photon_id << " " << w_photon_csev << " " << pico.out_photon_pt().size() << endl;
+    }
     if(isZgamma) {
       photon_weighter.FullSim(pico, w_photon, sys_photon);
       if(nano.event() % 3516 <= 1887) lep_weighter.FullSim(pico, w_lep, sys_lep);
@@ -335,10 +346,13 @@ int main(int argc, char *argv[]){
     }
     if(isFastsim) lep_weighter.FastSim(pico, w_fs_lep, sys_fs_lep);
     pico.out_w_lep()      = w_lep;
+    pico.out_w_el()       = w_el;
     pico.out_w_fs_lep()   = w_fs_lep;
     pico.out_sys_lep()    = sys_lep; 
     pico.out_sys_fs_lep() = sys_fs_lep;
     pico.out_w_photon()   = w_photon;
+    pico.out_w_photon_id()   = w_photon_id;
+    pico.out_w_photon_csev() = w_photon_csev;
     pico.out_sys_photon() = sys_photon; 
     if(isZgamma || isData) {
       pico.out_w_btag()    = 1.; 

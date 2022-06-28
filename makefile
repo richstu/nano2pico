@@ -1,16 +1,19 @@
 EXEDIR := run
 OBJDIR := bin
+ZOBJDIR := zlib-1.2.12
 SRCDIR := src
 INCDIR := inc
+ZLIBDIR := include
 MAKEDIR := bin
 LIBFILE := $(OBJDIR)/libStatObj.a
 
 CXX := $(shell root-config --cxx)
-EXTRA_WARNINGS := -Wcast-align -Wcast-qual -Wdisabled-optimization -Wformat=2 -Wformat-nonliteral -Wformat-security -Wformat-y2k -Winit-self -Winvalid-pch -Wlong-long -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-noreturn -Wpacked -Wpointer-arith -Wredundant-decls -Wstack-protector -Wswitch-default -Wswitch-enum -Wundef -Wunused -Wvariadic-macros -Wwrite-strings -Wctor-dtor-privacy -Wnon-virtual-dtor -Wsign-promo -Wsign-compare #-Wunsafe-loop-optimizations -Wfloat-equal -Wsign-conversion -Wunreachable-code
-CXXFLAGS := -isystem $(shell root-config --incdir) -Wall -Wextra -pedantic -Werror -Wshadow -Woverloaded-virtual -Wold-style-cast $(EXTRA_WARNINGS) $(shell root-config --cflags) -O2 -I $(INCDIR)
+EXTRA_WARNINGS := -Wcast-align -Wcast-qual -Wdisabled-optimization -Wformat=2 -Wformat-nonliteral -Wformat-security -Wformat-y2k -Winit-self -Winvalid-pch -Wlong-long -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-noreturn -Wpacked -Wpointer-arith -Wredundant-decls -Wstack-protector -Wundef -Wvariadic-macros -Wwrite-strings -Wctor-dtor-privacy -Wnon-virtual-dtor -Wsign-promo -Wsign-compare -Wno-unused-variable # -Wunsafe-loop-optimizations -Wfloat-equal -Wsign-conversion -Wunreachable-code -Wswitch-enum -Wunused
+CXXFLAGS := -isystem $(shell root-config --incdir) -Wall -Wextra -pedantic -Werror -Wold-style-cast $(EXTRA_WARNINGS) -pthread -std=c++17 -m64 -I/cvmfs/cms.cern.ch/slc6_amd64_gcc700/cms/cmssw-patch/CMSSW_10_2_11_patch1/external/slc6_amd64_gcc700/bin/../../../../../../../slc6_amd64_gcc700/lcg/root/6.12.07-gnimlf5/include -O2 -I $(INCDIR) -I $(ZLIBDIR) # -Wshadow -Woverloaded-virtual
 LD := $(shell root-config --ld)
 LDFLAGS := $(shell root-config --ldflags) -lGenVector
-LDLIBS := $(shell root-config --libs) -lMinuit -lRooStats -lTreePlayer 
+LDLIBS := -L/homes/psiddire/Central/nano2pico/lib -lz $(shell root-config --libs) -lMinuit -lRooStats -lTreePlayer
+# root-config --cflags
 
 EXECUTABLES := $(addprefix $(EXEDIR)/, $(addsuffix .exe, $(notdir $(basename $(wildcard $(SRCDIR)/*.cxx))))) 
 OBJECTS := $(addprefix $(OBJDIR)/, $(addsuffix .o, $(notdir $(basename $(wildcard $(SRCDIR)/*.cpp)))))
@@ -24,7 +27,9 @@ LINK = $(LD) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 vpath %.cpp $(SRCDIR)
 vpath %.cxx $(SRCDIR)
 vpath %.hpp $(INCDIR)
+vpath %.h $(ZLIBDIR)
 vpath %.o $(OBJDIR)
+vpath %.o $(ZOBJDIR)
 vpath %.exe $(EXEDIR)
 vpath %.d $(MAKEDIR)
 
