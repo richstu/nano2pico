@@ -34,16 +34,21 @@ def addRootEnv(_env):
 
 def addWarningEnv(_env):
   _env.Append (CCFLAGS = ['-pedantic', 
-                          '-Wall', '-Wextra', '-Werror', '-Wshadow', '-Woverloaded-virtual', '-Wold-style-cast', 
+                          '-Wall', '-Wextra', '-Werror', '-Wold-style-cast', 
                           '-Wcast-align', '-Wcast-qual', '-Wdisabled-optimization', 
                           '-Wformat=2', '-Wformat-nonliteral', '-Wformat-security', 
                           '-Wformat-y2k', '-Winit-self', '-Winvalid-pch', '-Wlong-long', 
-                          '-Wmissing-format-attribute', '-Wmissing-include-dirs', '-Wmissing-noreturn', 
+                          '-Wmissing-format-attribute', '-Wmissing-include-dirs',
                           '-Wpacked', '-Wpointer-arith', '-Wredundant-decls', '-Wstack-protector', 
-                          '-Wswitch-default', '-Wswitch-enum', '-Wundef', '-Wunused', '-Wvariadic-macros', 
+                          '-Wundef', '-Wvariadic-macros', '-Wmissing-noreturn', 
                           '-Wwrite-strings', '-Wctor-dtor-privacy', '-Wnon-virtual-dtor', '-Wsign-promo', '-Wsign-compare', 
-                          #'-Wunsafe-loop-optimizations', '-Wfloat-equal', '-Wsign-conversion', '-Wunreachable-code',
+                          '-Wunreachable-code', 
+                          '-Woverloaded-virtual', '-Wshadow', '-Wswitch-default', '-Wswitch-enum', '-Wunused', 
+                          #'-Wsign-conversion', '-Wfloat-equal', '-Wunsafe-loop-optimizations', 
                          ])
+
+def addExternalEnv(_env):
+  _env.Append (CCFLAGS = '-isystem external_inc' )
 
 def addBasicEnv(_env):
   _env.Append (CCFLAGS = '-O2')
@@ -66,6 +71,7 @@ addBasicEnv(analysisEnv)
 addKernelEnv(analysisEnv)
 addRootEnv(analysisEnv)
 addWarningEnv(analysisEnv)
+addExternalEnv(analysisEnv)
 
 exportEnv = analysisEnv
 SConscript('SConscript', variant_dir='build/'+analysisEnv['kernel'], duplicate=0, exports="exportEnv")

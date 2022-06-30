@@ -32,6 +32,9 @@
 #include "event_tools.hpp"
 #include "isr_tools.hpp"
 
+#include "correction.hpp"
+
+
 using namespace std;
 
 namespace {
@@ -53,6 +56,12 @@ void GetOptions(int argc, char *argv[]);
 int main(int argc, char *argv[]){
   // gErrorIgnoreLevel=6000; // Turns off ROOT errors due to missing branches       
   GetOptions(argc, argv);
+
+  string in_json_file = "data/zgamma/2016preVFP_UL/electron.json";
+  auto cs = correction::CorrectionSet::from_file(in_json_file);
+  auto Map = cs->at("UL-Electron-ID-SF");
+  auto sf = Map->evaluate({"2016preVFP", "sf", "wp90iso", std::abs(1.1), 30.});
+  cout<<"Got scale factor: "<<sf<<endl;
 
   if(in_file=="" || in_dir=="" || out_dir == "") {
     cout<<"ERROR: Input file, sum-of-weights and/or output directory not specified. Exit."<<endl;
