@@ -322,8 +322,13 @@ int mlsp
 float weight
 float w_lumi
 float w_lep
+float w_el_id
+float w_mu_id
+float w_mu_iso
 float w_fs_lep
 float w_photon
+float w_photon_id
+float w_photon_csev
 float w_btag
 float w_btag_df
 float w_bhig
