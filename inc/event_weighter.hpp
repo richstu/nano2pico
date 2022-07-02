@@ -9,6 +9,8 @@
 
 #include "pico_tree.hpp"
 
+#include "correction.hpp"
+
 class EventWeighter{
 public:
   EventWeighter(int year, bool preVFP = false);
@@ -32,6 +34,17 @@ private:
   std::string in_file_pu_;
   std::string key_;
   std::string puName_;
+  std::unique_ptr<correction::CorrectionSet> cs_electron_;
+  std::unique_ptr<correction::CorrectionSet> cs_photon_;
+  std::unique_ptr<correction::CorrectionSet> cs_muon_;
+  std::unique_ptr<correction::CorrectionSet> cs_pileup_;
+  correction::Correction::Ref map_electron_;
+  correction::Correction::Ref map_photon_id_;
+  correction::Correction::Ref map_photon_csev_;
+  correction::Correction::Ref map_muon_looseid_;
+  correction::Correction::Ref map_muon_highptid_;
+  correction::Correction::Ref map_muon_iso_;
+  correction::Correction::Ref map_pileup_;
 };
 
 #endif
