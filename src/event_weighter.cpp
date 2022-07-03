@@ -108,7 +108,6 @@ void EventWeighter::PhotonCSEVSF(pico_tree &pico, float &w_photon_csev){
 // Muon ID Scale Factors
 void EventWeighter::MuonIDSF(pico_tree &pico, float &w_muon_id){
   double sf_tot = 1.0;
-  cs_muon_ = correction::CorrectionSet::from_file(in_file_muon_);
   for(size_t i = 0; i < pico.out_mu_pt().size(); ++i){
     if(pico.out_mu_pt().at(i) > 15.){
       if(pico.out_mu_id().at(i)){
@@ -127,7 +126,6 @@ void EventWeighter::MuonIDSF(pico_tree &pico, float &w_muon_id){
 // Muon Iso Scale Factors
 void EventWeighter::MuonIsoSF(pico_tree &pico, float &w_muon_iso){
   double sf_tot = 1.0;
-  cs_muon_ = correction::CorrectionSet::from_file(in_file_muon_);
   for(size_t i = 0; i < pico.out_mu_pt().size(); ++i){
     if(pico.out_mu_pt().at(i) > 15.){
       if(pico.out_mu_reliso().at(i) < 0.35){
@@ -141,7 +139,6 @@ void EventWeighter::MuonIsoSF(pico_tree &pico, float &w_muon_iso){
 
 // Pileup Scale Factors
 void EventWeighter::PileupSF(pico_tree &pico, float &w_pu){
-  cs_pileup_ = correction::CorrectionSet::from_file(in_file_pu_);
   auto sf = map_pileup_->evaluate({float(pico.out_npu_tru_mean()), "nominal"});
   w_pu = sf;
 }
