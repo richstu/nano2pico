@@ -334,6 +334,7 @@ float w_btag_df
 float w_bhig
 float w_bhig_df
 float w_isr
+float w_btag_dc
 float w_pu
 float w_prefire
 float eff_trig

@@ -332,6 +332,7 @@ int main(int argc, char *argv[]){
     float w_mu_iso(1.);
     float w_photon_id(1.);
     float w_photon_csev(1.);
+    float w_btag_dc(1.);
     float w_pu(1.);
     vector<float> sys_lep(2,1.), sys_fs_lep(2,1.);
     vector<float> sys_photon(2,1.);
@@ -341,6 +342,7 @@ int main(int argc, char *argv[]){
     event_weighter.PileupSF(pico, w_pu);
     event_weighter.PhotonIDSF(pico, w_photon_id);
     event_weighter.PhotonCSEVSF(pico, w_photon_csev);
+    event_weighter.bTaggingSF(pico, w_btag_dc);
 
     if(isZgamma) {
       photon_weighter.FullSim(pico, w_photon, sys_photon);
@@ -362,6 +364,7 @@ int main(int argc, char *argv[]){
     pico.out_w_photon()   = w_photon;
     pico.out_w_photon_id()   = w_photon_id;
     pico.out_w_photon_csev() = w_photon_csev;
+    pico.out_w_btag_dc()    = w_btag_dc;
     pico.out_sys_photon() = sys_photon; 
     if(isZgamma || isData) {
       pico.out_w_btag()    = 1.; 
