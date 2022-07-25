@@ -1,0 +1,13 @@
+#!/bin/bash
+# Setup ROOT
+source ~/Linux/root-6.18.00/bin/thisroot.sh
+
+# Setup for scons
+export SCONSFLAGS="-j 4" # multi-core build
+export SET_ENV_PATH=set_env.sh.mac # environment to use for build
+
+# Change python to be in unbuffer mode for scripts to run commands
+export PYTHONUNBUFFERED=1
+
+# Prevent asking password using x11-gui
+unset SSH_ASKPASS

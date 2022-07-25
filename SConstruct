@@ -26,7 +26,7 @@ def returnEnviornment(scriptname):
 
 def addRootEnv(_env):
   _env.Append (CCFLAGS = '-isystem `root-config --incdir`' )
-  _env.Append (CCFLAGS = '-g' )
+  #_env.Append (CCFLAGS = '-g' )
   _env.Append (CCFLAGS = '`root-config --cflags`' )
   _env.Append (LINKFLAGS = '`root-config --glibs`') 
   _env.Append (LINKFLAGS = '`root-config --ldflags`')
@@ -48,7 +48,7 @@ def addWarningEnv(_env):
                          ])
 
 def addExternalEnv(_env):
-  _env.Append (CCFLAGS = '-isystem external_inc' )
+  _env.Append (CCFLAGS = '-isystem external_inc -std=c++17' )
 
 def addBasicEnv(_env):
   _env.Append (CCFLAGS = '-O2')
@@ -65,13 +65,14 @@ SConsignFile('kernel/'+getKernel()+'/sconsign.dblite')
 if (subprocess.check_output("uname", shell=True, universal_newlines=True).rstrip() != 'Darwin'):
   analysisEnv = Environment(ENV = returnEnviornment('set_env.sh'))
 else:
-  analysisEnv = Environment()
+  # [Requried] Export SET_ENV_PATH to script that sets root and scons environment
+  analysisEnv = Environment(ENV = returnEnviornment(os.environ['SET_ENV_PATH']))
 
 addBasicEnv(analysisEnv)
 addKernelEnv(analysisEnv)
 addRootEnv(analysisEnv)
-addWarningEnv(analysisEnv)
 addExternalEnv(analysisEnv)
+addWarningEnv(analysisEnv)
 
 exportEnv = analysisEnv
 SConscript('SConscript', variant_dir='build/'+analysisEnv['kernel'], duplicate=0, exports="exportEnv")
