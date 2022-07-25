@@ -241,22 +241,22 @@ int main(int argc, char *argv[]){
   //   cout << it->first  <<", ";
   // } // Needs c++11
 
-  if(false){
-    TString txtname(outfolder+"/runs_"+basename+".txt");
-    ofstream txtfile(txtname);
-    int prevrun(0);
-    for(map<int, map<int, set<Long64_t> > >::const_iterator it = runs.begin(); it != runs.end(); ++it) {
-      run = it->first;
-      if(run/1000 != prevrun){
-        prevrun = run/1000;
-        txtfile<<endl;
-      }
-      txtfile << run << "  ";
-    }
-    txtfile<<endl;
-    txtfile.close();
-    cout<<endl<<"Written run numbers in "<<txtname<<endl;
-  }
+  //if(false){
+  //  TString txtname(outfolder+"/runs_"+basename+".txt");
+  //  ofstream txtfile(txtname);
+  //  int prevrun(0);
+  //  for(map<int, map<int, set<Long64_t> > >::const_iterator it = runs.begin(); it != runs.end(); ++it) {
+  //    run = it->first;
+  //    if(run/1000 != prevrun){
+  //      prevrun = run/1000;
+  //      txtfile<<endl;
+  //    }
+  //    txtfile << run << "  ";
+  //  }
+  //  txtfile<<endl;
+  //  txtfile.close();
+  //  cout<<endl<<"Written run numbers in "<<txtname<<endl;
+  //}
   cout<<endl<<endl;
 
   return 0;

@@ -10,6 +10,7 @@ MuonProducer::MuonProducer(int year_, bool isData_, std::string rocco_file) :
   isData(isData_),
   rc(rocco_file),
   rng(4357) {
+    (void) year;
 }
 
 MuonProducer::~MuonProducer(){

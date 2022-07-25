@@ -200,7 +200,7 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
   }
 
   pico.out_pass_low_neutral_jet() = true;
-  for(int ijet(0); ijet<nano.nJet(); ++ijet){  
+  for(int ijet(0); ijet<nano.nJet();){  
     if (nano.Jet_neEmEF()[ijet] <0.03 && DeltaPhi(nano.Jet_phi()[ijet], pico.out_met_phi())>(TMath::Pi()-0.4))
       pico.out_pass_low_neutral_jet() = false;
     break; //only apply to leading jet
@@ -208,7 +208,7 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
 
   pico.out_pass_htratio_dphi_tight() = true;
   float htratio = pico.out_ht5()/pico.out_ht();
-  for(int ijet(0); ijet<nano.nJet(); ++ijet){  
+  for(int ijet(0); ijet<nano.nJet();){  
     if (htratio >= 1.2 && DeltaPhi(nano.Jet_phi()[ijet], pico.out_met_phi()) < (5.3*htratio - 4.78)) 
       pico.out_pass_htratio_dphi_tight() = false;
     break; //only apply to leading jet
