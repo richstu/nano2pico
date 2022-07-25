@@ -15,6 +15,7 @@ cd -
 
 # Do multi-core scons
 export SCONSFLAGS="-j $(nproc --all)"
+export SET_ENV_PATH=set_env.sh # environment to use for build
 
 # Change python to be in unbuffer mode for scripts to run commands
 export PYTHONUNBUFFERED=1

@@ -62,11 +62,8 @@ def getKernel():
 
 SConsignFile('kernel/'+getKernel()+'/sconsign.dblite')
 
-if (subprocess.check_output("uname", shell=True, universal_newlines=True).rstrip() != 'Darwin'):
-  analysisEnv = Environment(ENV = returnEnviornment('set_env.sh'))
-else:
-  # [Requried] Export SET_ENV_PATH to script that sets root and scons environment
-  analysisEnv = Environment(ENV = returnEnviornment(os.environ['SET_ENV_PATH']))
+# [Requried] Export SET_ENV_PATH to script that sets root and scons environment
+analysisEnv = Environment(ENV = returnEnviornment(os.environ['SET_ENV_PATH']))
 
 addBasicEnv(analysisEnv)
 addKernelEnv(analysisEnv)
