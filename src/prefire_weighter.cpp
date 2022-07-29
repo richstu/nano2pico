@@ -92,7 +92,7 @@ void PrefireWeighter::EventWeight(nano_tree &nano, float & w_prefire, std::vecto
     for (unsigned int ph_idx = 0; ph_idx < static_cast<unsigned int>(nano.nPhoton()); ph_idx++) {
       //note: TreeMaker seems to use a lower pt cut of 2. GeV while nanoAOD-tools uses a lower cut of 20. GeV
       if (nano.Photon_pt()[ph_idx] < 2. || fabs(nano.Photon_eta()[ph_idx]) < 2.0 || fabs(nano.Photon_eta()[ph_idx]) > 3.0) {
-	//insert dummy SFs for unaffected photons to make indexing easier for overlap removal
+        //insert dummy SFs for unaffected photons to make indexing easier for overlap removal
         photon_sfs.push_back(std::pair<double,double>{1.,0.});
       }
       else {
@@ -119,14 +119,14 @@ void PrefireWeighter::EventWeight(nano_tree &nano, float & w_prefire, std::vecto
         if (nano.Photon_pt()[ph_idx] < 2. || fabs(nano.Photon_eta()[ph_idx]) < 2.0 || fabs(nano.Photon_eta()[ph_idx]) > 3.0) continue;
         if (dR(nano.Photon_eta()[ph_idx], nano.Jet_eta()[jet_idx], nano.Photon_phi()[ph_idx], nano.Jet_phi()[jet_idx])<0.4) {
           overlapping_photons = true;
-	  if (jet_sf.first < photon_sfs[ph_idx].first) 
+          if (jet_sf.first < photon_sfs[ph_idx].first) 
             //if jet non-prefire weight is lower, replace photon SF
             photon_sfs[ph_idx] = jet_sf;
         }
       }
       if (!overlapping_photons) {
         //if no overlapping photon directly add jet SF to overall SF
-	sfs.push_back(jet_sf);
+        sfs.push_back(jet_sf);
       }
     } // /jet loop
 

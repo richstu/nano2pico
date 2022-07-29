@@ -8,6 +8,7 @@ bool stitch_ht
 bool stitch_htmet
 bool stitch_photon
 bool stitch_dy
+bool old_stitch_dy
 
 ####################   Global   ###################
 int npv
@@ -55,6 +56,9 @@ vector<float> llphoton_pt
 vector<float> llphoton_eta
 vector<float> llphoton_phi
 vector<float> llphoton_m
+vector<float> llphoton_l1_masserr
+vector<float> llphoton_l2_masserr
+vector<float> llphoton_ph_masserr
 vector<float> llphoton_dr
 vector<float> llphoton_dphi
 vector<float> llphoton_deta
@@ -64,6 +68,9 @@ vector<float> llphoton_cosTheta
 vector<float> llphoton_psi
 vector<int>   llphoton_iph
 vector<int>   llphoton_ill
+vector<float> llphoton_dijet_dphi
+vector<float> llphoton_dijet_balance
+vector<float> llphoton_pTt2
 
 ###################   Jets   ##################
 int njet
@@ -164,6 +171,7 @@ int nvmu
 vector<float> mu_pt
 vector<float> mu_eta
 vector<float> mu_phi
+vector<float> mu_ptErr
 vector<float> mu_miniso
 vector<float> mu_reliso
 vector<float> mu_dz
@@ -171,9 +179,15 @@ vector<float> mu_dxy
 vector<float> mu_ip3d
 vector<float> mu_sip3d
 vector<bool>  mu_id
+vector<bool>  mu_mediumid
+vector<bool>  mu_tightid
+vector<int>  mu_highptid
 vector<bool>  mu_sig
 vector<int>   mu_charge
 vector<int>   mu_pflavor
+vector<int>   mu_fsrphotonid
+vector<float> mu_corrected_pt
+vector<float> mu_corrected_ptErr
 
 int nel
 int nvel
@@ -181,6 +195,10 @@ vector<float> el_pt
 vector<float> el_eta
 vector<float> el_etasc
 vector<float> el_phi
+vector<float> el_etPt
+vector<float> el_eminusp
+vector<float> el_energyErr
+vector<int>   el_phidx
 vector<float> el_miniso
 vector<float> el_reliso
 vector<float> el_dz
@@ -189,10 +207,14 @@ vector<float> el_ip3d
 vector<float> el_sip3d
 vector<float> el_idmva
 vector<bool>  el_id
+vector<bool>  el_id80
+vector<bool>  el_id90
+vector<bool>  el_idLoose
 vector<bool>  el_sig
 vector<bool>  el_ispf
 vector<int>   el_charge
 vector<int>   el_pflavor
+vector<bool>  el_ecal
 
 ##################   Di-Leptons   ################
 int nll
@@ -200,6 +222,8 @@ vector<float> ll_pt
 vector<float> ll_eta
 vector<float> ll_phi
 vector<float> ll_m
+vector<int>   ll_l1_masserr
+vector<int>   ll_l2_masserr
 vector<float> ll_dr
 vector<float> ll_dphi
 vector<float> ll_deta
@@ -215,18 +239,31 @@ vector<float> photon_eta
 vector<float> photon_phi
 vector<float> photon_reliso
 vector<float> photon_r9
+vector<float> photon_sieie
 vector<float> photon_drmin
 vector<float> photon_pterr
 vector<float> photon_hoe
 vector<float> photon_idmva
 vector<int>   photon_pflavor
 vector<bool>  photon_id
+vector<bool>  photon_id80
 vector<bool>  photon_elveto
 vector<bool>  photon_sig
+vector<int>   photon_elidx
+vector<float> photon_jet_mindr
+vector<float> photon_zeppenfeld
+
+#################   FsrPhotons  ##################
+int nfsrphoton
+vector<float> fsrphoton_droveret2
+vector<float> fsrphoton_eta
+vector<float> fsrphoton_phi
+vector<float> fsrphoton_pt
+vector<float> fsrphoton_reliso
+vector<int>   fsrphoton_muonidx
 
 ###################   Tracks    ##################
 int ntk
-
 vector<float> tk_pt
 vector<float> tk_eta
 vector<float> tk_phi
@@ -238,7 +275,6 @@ vector<float> tk_reliso_chg
 vector<float> tk_mt
 vector<bool>  tk_nano_electron
 vector<bool>  tk_nano_muon
-
 
 ###################   Quality   ##################
 bool pass_jets
@@ -286,13 +322,19 @@ int mlsp
 float weight
 float w_lumi
 float w_lep
+float w_el_id
+float w_mu_id
+float w_mu_iso
 float w_fs_lep
 float w_photon
+float w_photon_id
+float w_photon_csev
 float w_btag
 float w_btag_df
 float w_bhig
 float w_bhig_df
 float w_isr
+float w_btag_dc
 float w_pu
 float w_prefire
 float eff_trig
@@ -420,14 +462,20 @@ bool HLT_PFHT1050
 bool HLT_PFHT250
 bool HLT_PFHT350
 
-# ZGamma triggers
-bool HLT_Mu17_Photon30_IsoCaloId
+# Dilepton triggers
 bool HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ
 bool HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL
 bool HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL
 bool HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL
 bool HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ
 bool HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ
+bool HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8
+bool HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8
+bool HLT_DoubleEle25_CaloIdL_MW
+bool HLT_Mu37_TkMu27
+
+# Photon triggers
+bool HLT_Mu17_Photon30_IsoCaloId
 bool HLT_Photon175
 
 ################  Systematic variations  - to be implemented as needed  ##################

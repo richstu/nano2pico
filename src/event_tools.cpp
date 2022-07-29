@@ -1,8 +1,8 @@
 #include "event_tools.hpp"
-
 #include "utilities.hpp"
 #include "hig_trig_eff.hpp"
 #include "TMath.h"
+#include <bitset>
 
 using namespace std;
 
@@ -73,23 +73,74 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
     //stitch if prompt photon w pt>13 |eta|<3 deltaR(genPart[pt>5])>0.2
     for (unsigned int mc_idx = 0; mc_idx < nano.GenPart_pdgId().size(); mc_idx++) {
       if (nano.GenPart_pdgId().at(mc_idx) == 22) {
-	      float ph_pt = nano.GenPart_pt().at(mc_idx);
-	      float ph_eta = nano.GenPart_eta().at(mc_idx);
-	      float ph_phi = nano.GenPart_phi().at(mc_idx);
+        float ph_pt = nano.GenPart_pt().at(mc_idx);
+        float ph_eta = nano.GenPart_eta().at(mc_idx);
+        float ph_phi = nano.GenPart_phi().at(mc_idx);
         if (ph_pt > 13 && fabs(ph_eta)<3.0 && (nano.GenPart_statusFlags().at(mc_idx) & 0x1) == 1) {
-	       //check if another genparticle nearby
-	       bool deltar_fail = false;
+          //check if another genparticle nearby
+          bool deltar_fail = false;
           for (unsigned int mc_idx_2 = 0; mc_idx_2 < nano.GenPart_pdgId().size(); mc_idx_2++) {
             if (nano.GenPart_pt().at(mc_idx_2)>5 && dR(ph_eta,nano.GenPart_eta().at(mc_idx_2),ph_phi,nano.GenPart_phi().at(mc_idx_2))<0.2) {
               deltar_fail = true;
-	            break;
-	          }
+              break;
+            }
           }
           if (!deltar_fail) {
             pico.out_stitch_photon() = pico.out_stitch() = false;
           }
-       	}
+        }
       }
+    }
+  }
+
+  for(int mc_idx(0); mc_idx<nano.nGenPart(); mc_idx++) {
+
+    bitset<15> mc_statusFlags(nano.GenPart_statusFlags().at(mc_idx));
+    if( nano.GenPart_pdgId().at(mc_idx) == 22 ){ // photons 
+      TVector3 compPart,genPhoton;
+
+      if( (mc_statusFlags[0] || mc_statusFlags[8]) ){  // Which are isPrompt or fromHardProcess
+        genPhoton.SetPtEtaPhi(nano.GenPart_pt().at(mc_idx), 
+                            nano.GenPart_eta().at(mc_idx), 
+                            nano.GenPart_phi().at(mc_idx));
+
+        if( genPhoton.Pt() >15.0 && fabs(genPhoton.Eta())< 2.6 ){
+          //check if another generator particle nearby
+          bool found_other_particles = false;
+          for (int mc_idx_2 = 0; mc_idx_2 < nano.nGenPart(); mc_idx_2++) {
+            bitset<15> mc_statusFlags2(nano.GenPart_statusFlags().at(mc_idx_2));
+            compPart.SetPtEtaPhi(nano.GenPart_pt().at(mc_idx_2), 
+                                 nano.GenPart_eta().at(mc_idx_2), 
+                                 nano.GenPart_phi().at(mc_idx_2)); 
+            
+
+            //isPrompt and fromHardProcess already applied
+            if ( (compPart.Pt() > 5.0) && (genPhoton.DeltaR(compPart) < 0.05) && (mc_idx != mc_idx_2) && (mc_statusFlags2[8]) && (nano.GenPart_pdgId().at(mc_idx_2) != 22 )  ) {
+              found_other_particles = true;
+              //Basically saying that a photon is not isolated so this is not SM Zgamma sample!
+            }
+          }
+
+          if(!found_other_particles){
+            pico.out_stitch_dy() = false;
+          }       
+
+        }
+    }
+
+    if( (mc_statusFlags[0] || mc_statusFlags[8]) && nano.GenPart_status().at(mc_idx) == 1 ){  // Which are isPrompt or fromHardProcess and stable
+        for(size_t reco_idx(0); reco_idx < pico.out_photon_pt().size(); reco_idx++){
+          if(pico.out_photon_sig()[reco_idx]){
+             compPart.SetPtEtaPhi(pico.out_photon_pt().at(reco_idx), 
+                                  pico.out_photon_eta().at(reco_idx), 
+                                  pico.out_photon_phi().at(reco_idx));
+            if(genPhoton.DeltaR(compPart) < 0.1){
+              pico.out_old_stitch_dy() = false;
+            }
+          }
+        }
+      }
+
     }
   }
 
@@ -149,7 +200,7 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
   }
 
   pico.out_pass_low_neutral_jet() = true;
-  for(int ijet(0); ijet<nano.nJet(); ++ijet){  
+  for(int ijet(0); ijet<nano.nJet();){  
     if (nano.Jet_neEmEF()[ijet] <0.03 && DeltaPhi(nano.Jet_phi()[ijet], pico.out_met_phi())>(TMath::Pi()-0.4))
       pico.out_pass_low_neutral_jet() = false;
     break; //only apply to leading jet
@@ -157,7 +208,7 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
 
   pico.out_pass_htratio_dphi_tight() = true;
   float htratio = pico.out_ht5()/pico.out_ht();
-  for(int ijet(0); ijet<nano.nJet(); ++ijet){  
+  for(int ijet(0); ijet<nano.nJet();){  
     if (htratio >= 1.2 && DeltaPhi(nano.Jet_phi()[ijet], pico.out_met_phi()) < (5.3*htratio - 4.78)) 
       pico.out_pass_htratio_dphi_tight() = false;
     break; //only apply to leading jet
@@ -233,15 +284,15 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
 
   bool egamma_trigs = nano.HLT_Ele25_WPTight_Gsf() || nano.HLT_Ele27_WPTight_Gsf() || 
                       nano.HLT_Ele28_WPTight_Gsf() || nano.HLT_Ele32_WPTight_Gsf() ||
-	              nano.HLT_Ele32_WPTight_Gsf_L1DoubleEG() || nano.HLT_Ele35_WPTight_Gsf() || 
+                      nano.HLT_Ele32_WPTight_Gsf_L1DoubleEG() || nano.HLT_Ele35_WPTight_Gsf() || 
                       nano.HLT_Ele20_WPLoose_Gsf() || nano.HLT_Ele45_WPLoose_Gsf() ||
                       nano.HLT_Ele105_CaloIdVT_GsfTrkIdT() || nano.HLT_Ele115_CaloIdVT_GsfTrkIdT() ||
                       nano.HLT_Ele135_CaloIdVT_GsfTrkIdT() || nano.HLT_Ele145_CaloIdVT_GsfTrkIdT() ||
                       nano.HLT_Ele25_eta2p1_WPTight_Gsf() || nano.HLT_Ele27_eta2p1_WPTight_Gsf() || 
                       nano.HLT_Ele20_eta2p1_WPLoose_Gsf() || nano.HLT_Ele25_eta2p1_WPLoose_Gsf() ||
                       nano.HLT_Ele27_eta2p1_WPLoose_Gsf() || nano.HLT_Ele15_IsoVVVL_PFHT350() ||
-		      nano.HLT_Ele15_IsoVVVL_PFHT400() || nano.HLT_Ele15_IsoVVVL_PFHT450() ||
-		      nano.HLT_Ele15_IsoVVVL_PFHT600() || nano.HLT_Ele50_IsoVVVL_PFHT450();
+                      nano.HLT_Ele15_IsoVVVL_PFHT400() || nano.HLT_Ele15_IsoVVVL_PFHT450() ||
+                      nano.HLT_Ele15_IsoVVVL_PFHT600() || nano.HLT_Ele50_IsoVVVL_PFHT450();
 
   pico.out_HLT_Ele25_WPTight_Gsf() = nano.HLT_Ele25_WPTight_Gsf();
   pico.out_HLT_Ele27_WPTight_Gsf() = nano.HLT_Ele27_WPTight_Gsf();
@@ -296,7 +347,7 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
 
   bool met_trigs = nano.HLT_PFMET90_PFMHT90_IDTight() || nano.HLT_PFMETNoMu90_PFMHTNoMu90_IDTight() || 
                    nano.HLT_PFMET100_PFMHT100_IDTight() || nano.HLT_PFMETNoMu100_PFMHTNoMu100_IDTight() || 
-		   nano.HLT_PFMET110_PFMHT110_IDTight() || nano.HLT_PFMETNoMu110_PFMHTNoMu110_IDTight() || 
+                   nano.HLT_PFMET110_PFMHT110_IDTight() || nano.HLT_PFMETNoMu110_PFMHTNoMu110_IDTight() || 
                    nano.HLT_PFMET120_PFMHT120_IDTight() || nano.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight() || 
                    nano.HLT_PFMET130_PFMHT130_IDTight() || nano.HLT_PFMETNoMu130_PFMHTNoMu130_IDTight() || 
                    nano.HLT_PFMET140_PFMHT140_IDTight() || nano.HLT_PFMETNoMu140_PFMHTNoMu140_IDTight() || 
@@ -343,11 +394,11 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
   // Jet/HT trigger
   bool jetht_trigs = nano.HLT_PFJet500() || nano.HLT_PFHT125() || nano.HLT_PFHT200() || nano.HLT_PFHT300() || 
                                             nano.HLT_PFHT400() || nano.HLT_PFHT475() || nano.HLT_PFHT600() || 
-					    nano.HLT_PFHT650() || nano.HLT_PFHT800() || nano.HLT_PFHT900() || 
-					    nano.HLT_PFHT180() || nano.HLT_PFHT370() || nano.HLT_PFHT430() || 
-					    nano.HLT_PFHT510() || nano.HLT_PFHT590() || nano.HLT_PFHT680() || 
-					    nano.HLT_PFHT780() || nano.HLT_PFHT890() || nano.HLT_PFHT1050() || 
-					    nano.HLT_PFHT250() || nano.HLT_PFHT350();
+                                            nano.HLT_PFHT650() || nano.HLT_PFHT800() || nano.HLT_PFHT900() || 
+                                            nano.HLT_PFHT180() || nano.HLT_PFHT370() || nano.HLT_PFHT430() || 
+                                            nano.HLT_PFHT510() || nano.HLT_PFHT590() || nano.HLT_PFHT680() || 
+                                            nano.HLT_PFHT780() || nano.HLT_PFHT890() || nano.HLT_PFHT1050() || 
+                                            nano.HLT_PFHT250() || nano.HLT_PFHT350();
   pico.out_HLT_PFJet500() = nano.HLT_PFJet500();
   pico.out_HLT_PFHT125() = nano.HLT_PFHT125();
   pico.out_HLT_PFHT200() = nano.HLT_PFHT125();
@@ -370,19 +421,38 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
   pico.out_HLT_PFHT250() = nano.HLT_PFHT250();
   pico.out_HLT_PFHT350() = nano.HLT_PFHT350();
 
-  // ZGamma triggers
-  pico.out_HLT_Mu17_Photon30_IsoCaloId()               = nano.HLT_Mu17_Photon30_IsoCaloId();
+  // Dilepton triggers
+  bool doubleelectron_trigs = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ() ||
+      nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL() || nano.HLT_DoubleEle25_CaloIdL_MW();
+  bool doublemuon_trigs = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL() ||
+      nano.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL() || nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ() ||
+      nano.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ() || nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8() || 
+      nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8() || nano.HLT_Mu37_TkMu27();
+
   pico.out_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ() = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ();
   pico.out_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL()    = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL();
   pico.out_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL()          = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL();
   pico.out_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL()        = nano.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL();
   pico.out_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ()       = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ();
   pico.out_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ()     = nano.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ();
+  pico.out_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8();
+  pico.out_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8()   = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8();
+  pico.out_HLT_DoubleEle25_CaloIdL_MW()                = nano.HLT_DoubleEle25_CaloIdL_MW();
+  pico.out_HLT_Mu37_TkMu27()                           = nano.HLT_Mu37_TkMu27();
+
+  // Photon triggers
+  pico.out_HLT_Mu17_Photon30_IsoCaloId()               = nano.HLT_Mu17_Photon30_IsoCaloId();
   pico.out_HLT_Photon175()                             = nano.HLT_Photon175();
 
-
-  if (isZgamma)
-    return true;
+  if (isZgamma) {
+    // this assumes that we process either all the datasets or at least an ordered subset starting with the dilepton datasets
+    if (dataset==Dataset::DoubleMuon                                                                 && doublemuon_trigs) return true;
+    else if (year>=2018 && dataset==Dataset::EGamma       && (doubleelectron_trigs || egamma_trigs) && !doublemuon_trigs) return true;
+    else if (year<2018 && dataset==Dataset::DoubleEG                        && doubleelectron_trigs && !doublemuon_trigs) return true;
+    else if (year<2018 && dataset==Dataset::SingleElectron && egamma_trigs && !doubleelectron_trigs && !doublemuon_trigs) return true;
+    else if (dataset==Dataset::SingleMuon   && muon_trigs && !egamma_trigs && !doubleelectron_trigs && !doublemuon_trigs) return true;
+    else return false;
+  }
   else {
     // this assumes that we process either all the datasets or at least an ordered subset starting with the MET 
     // e.g. after measuring trigger efficiency, it would no longer be necessary to run on JetHT
@@ -599,7 +669,7 @@ int EventTools::GetEventType(){
     return code;
   }else{
     int code = 1000*sample+100*category+bin;
-    if(code < 0 || code > 107000){
+    if(code < 0 || code > 207000){
       cout<<"ERROR:: Type code out of range for " << name << ": sample=" << sample << ", category=" << category << ", bin=" << bin;
     }
     return code;

@@ -4,6 +4,7 @@ keep run
 keep event
 keep type
 keep stitch*
+keep old_stitch*
 
 keep npv
 

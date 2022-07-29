@@ -122,7 +122,7 @@ if __name__ == "__main__":
 
   # Make sure so file for compare_script exists
   print("Making .so file for compare script")
-  os.system("root -b -l -q "+compare_script+"+")
+  os.system("root -b -l -q "+compare_script+"++")
 
   ## Run command list
   #for command in command_list:

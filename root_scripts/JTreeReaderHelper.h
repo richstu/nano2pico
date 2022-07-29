@@ -32,6 +32,8 @@ class JTreeReaderHelper {
         } else if (branchType == "Double_t") {
           if (it->second) delete static_cast<double *> (it->second);
 
+        } else if (branchType == "vector<char>") {
+          if (it->second) delete static_cast<vector<char> *> (it->second);
         } else if (branchType == "vector<int>") {
           if (it->second) delete static_cast<vector<int> *> (it->second);
         } else if (branchType == "vector<double>") {
@@ -95,6 +97,11 @@ class JTreeReaderHelper {
         } else if (branchType == "vector<bool>") {
           if (it->second) {
             delete static_cast<TTreeReaderValue<vector<bool>> *> (it->second);
+            it->second = 0;
+          }
+        } else if (branchType == "vector<char>") {
+          if (it->second) {
+            delete static_cast<TTreeReaderValue<vector<char>> *> (it->second);
             it->second = 0;
           }
         } else if (branchType == "vector<int>") {
@@ -209,6 +216,8 @@ class JTreeReaderHelper {
 
         } else if (branchType == "vector<bool>" || branchType == "vector<Bool_t>") {
           m_storage[branchName] = new TTreeReaderArray<bool> (treeReader, branchName.c_str());
+        } else if (branchType == "vector<char>" || branchType == "vector<Char_t>") {
+          m_storage[branchName] = new TTreeReaderArray<char> (treeReader, branchName.c_str());
         } else if (branchType == "vector<int>" || branchType == "vector<Int_t>") {
           m_storage[branchName] = new TTreeReaderArray<int> (treeReader, branchName.c_str());
         } else if (branchType == "vector<float>" || branchType == "vector<Float_t>") {
@@ -332,6 +341,19 @@ class JTreeReaderHelper {
       #endif
       return *(static_cast<TTreeReaderArray<bool> *> (m_storage.at(member)));
     }
+    TTreeReaderArray<char> const & v_char(string const & member) const {
+      #ifdef JDEBUG
+      if (m_branchNameToType.find(member) == m_branchNameToType.end()) {
+        cout<<"[Error] JTreeReaderHelper::v_char(): No branch called "<<member<<endl;
+        throw;
+      }
+      if (m_branchNameToType.at(member) != "vector<Char_t>" && m_branchNameToType.at(member) != "vector<char>") {
+        cout<<"[Error] JTreeReaderHelper::v_char(): "<<member<<" type is "<<m_branchNameToType.at(member)<<endl;
+        throw;
+      }
+      #endif
+      return *(static_cast<TTreeReaderArray<char> *> (m_storage.at(member)));
+    }
     TTreeReaderArray<int> const & v_int(string const & member) const {
       #ifdef JDEBUG
       if (m_branchNameToType.find(member) == m_branchNameToType.end()) {
@@ -423,6 +445,15 @@ class JTreeReaderHelper {
       // Set variable
       (*static_cast<double *>(m_variable[member])) = value;
     }
+    void usr_v_char(string const & member, vector<char> const & value) {
+      // Check if already defined
+      if (m_variableNameToType.find(member) == m_variableNameToType.end()) {
+        m_variable[member] = new vector<char>;
+        m_variableNameToType[member] = "vector<char>";
+      }
+      // Set variable
+      (*static_cast<vector<char> *>(m_variable[member])) = value;
+    }
     void usr_v_int(string const & member, vector<int> const & value) {
       // Check if already defined
       if (m_variableNameToType.find(member) == m_variableNameToType.end()) {
@@ -503,6 +534,19 @@ class JTreeReaderHelper {
       }
       #endif
       return *(static_cast<double *> (m_variable.at(member)));
+    }
+    vector<char> const & usr_v_char(string const & member) const {
+      #ifdef JDEBUG
+      if (m_variableNameToType.find(member) == m_variableNameToType.end()) {
+        cout<<"[Error] JTreeReaderHelper::usr_v_char(): No branch called "<<member<<endl;
+        throw;
+      }
+      if (m_variableNameToType.at(member) != "vector<int>") {
+        cout<<"[Error] JTreeReaderHelper::usr_v_char(): "<<member<<" type is "<<m_variableNameToType.at(member)<<endl;
+        throw;
+      }
+      #endif
+      return *(static_cast<vector<char> *> (m_variable.at(member)));
     }
     vector<int> const & usr_v_int(string const & member) const {
       #ifdef JDEBUG

@@ -22,67 +22,67 @@
 using namespace std; 
 
 bool same_era(int run_a, int run_b) {
-	if (run_a >= 272007 && run_a <= 275376) {
-		if (run_b >= 272007 && run_b <= 275376) {
-			return true;
-		}
-	}
-	else if (run_a >= 275657 && run_a <= 276283) {
-		if (run_b >= 275657 && run_b <= 276283) {
-			return true;
-		}
-	}
-	else if (run_a >= 276315 && run_a <= 276811) {
-		if (run_b >= 276315 && run_b <= 276811) {
-			return true;
-		}
-	}
-	else if (run_a >= 276831 && run_a <= 277420) {
-		if (run_b >= 276831 && run_b <= 277420) {
-			return true;
-		}
-	}
-	else if (run_a >= 277772 && run_a <= 278808) {
-		if (run_b >= 277772 && run_b <= 278808) {
-			return true;
-		}
-	}
-	else if (run_a >= 278820 && run_a <= 280385) {
-		if (run_b >= 278820 && run_b <= 280385) {
-			return true;
-		}
-	}
-	else if (run_a >= 280919 && run_a <= 284044) {
-		if (run_b >= 280919 && run_b <= 284044) {
-			return true;
-		}
-	}
-	return false;
+  if (run_a >= 272007 && run_a <= 275376) {
+    if (run_b >= 272007 && run_b <= 275376) {
+      return true;
+    }
+  }
+  else if (run_a >= 275657 && run_a <= 276283) {
+    if (run_b >= 275657 && run_b <= 276283) {
+      return true;
+    }
+  }
+  else if (run_a >= 276315 && run_a <= 276811) {
+    if (run_b >= 276315 && run_b <= 276811) {
+      return true;
+    }
+  }
+  else if (run_a >= 276831 && run_a <= 277420) {
+    if (run_b >= 276831 && run_b <= 277420) {
+      return true;
+    }
+  }
+  else if (run_a >= 277772 && run_a <= 278808) {
+    if (run_b >= 277772 && run_b <= 278808) {
+      return true;
+    }
+  }
+  else if (run_a >= 278820 && run_a <= 280385) {
+    if (run_b >= 278820 && run_b <= 280385) {
+      return true;
+    }
+  }
+  else if (run_a >= 280919 && run_a <= 284044) {
+    if (run_b >= 280919 && run_b <= 284044) {
+      return true;
+    }
+  }
+  return false;
 }
 
 TString get_era(int run) {
-	if (run >= 272007 && run <= 275376) {
-		return TString("Run2016B");
-	}
-	else if (run >= 275657 && run <= 276283) {
-		return TString("Run2016C");
-	}
-	else if (run >= 276315 && run <= 276811) {
-		return TString("Run2016D");
-	}
-	else if (run >= 276831 && run <= 277420) {
-		return TString("Run2016E");
-	}
-	else if (run >= 277772 && run <= 278808) {
-		return TString("Run2016F");
-	}
-	else if (run >= 278820 && run <= 280385) {
-		return TString("Run2016G");
-	}
-	else if (run >= 280919 && run <= 284044) {
-		return TString("Run2016H");
-	}
-	return TString("Error");
+  if (run >= 272007 && run <= 275376) {
+    return TString("Run2016B");
+  }
+  else if (run >= 275657 && run <= 276283) {
+    return TString("Run2016C");
+  }
+  else if (run >= 276315 && run <= 276811) {
+    return TString("Run2016D");
+  }
+  else if (run >= 276831 && run <= 277420) {
+    return TString("Run2016E");
+  }
+  else if (run >= 277772 && run <= 278808) {
+    return TString("Run2016F");
+  }
+  else if (run >= 278820 && run <= 280385) {
+    return TString("Run2016G");
+  }
+  else if (run >= 280919 && run <= 284044) {
+    return TString("Run2016H");
+  }
+  return TString("Error");
 }
 
 int main(int argc, char *argv[]){
@@ -122,7 +122,7 @@ int main(int argc, char *argv[]){
   }
   if(file_datasets=="" || infolder==""){
     cout<<endl<<"Specify input folder and datasets: "
-	<<"./run/combine_datasets.exe -i <infolder> -o <outfolder=out> -f <file_datasets=txt/combine_datasets/singlelep.txt> -b  <begrun=-1> -e <endrun=-1> -n <basename>"<<endl<<endl;
+        <<"./run/combine_datasets.exe -i <infolder> -o <outfolder=out> -f <file_datasets=txt/combine_datasets/singlelep.txt> -b  <begrun=-1> -e <endrun=-1> -n <basename>"<<endl<<endl;
     return 1;
   }
 
@@ -137,7 +137,7 @@ int main(int argc, char *argv[]){
   if(begrun>0){
     if(endrun<begrun){
       cout<<"You set begrun to "<<begrun<<", and endrun to "<<endrun
-	  <<", but endrun has to be >= to begrun. Exiting"<<endl<<endl;
+          <<", but endrun has to be >= to begrun. Exiting"<<endl<<endl;
       return 1;
     }
     cout<<"Combining "<<run_s<<" of ntuples in "<<infolder<<endl;
@@ -166,7 +166,7 @@ int main(int argc, char *argv[]){
     TChain chain("tree");
     TString filename(infolder+"/*"+datasets[idata]+"*.root");
     if (is_single_era) {
-	    filename = (infolder+"/*"+datasets[idata]+"*"+get_era(begrun)+"*.root");
+            filename = (infolder+"/*"+datasets[idata]+"*"+get_era(begrun)+"*.root");
     }
     int files = chain.Add(filename);
     if(files<1) {
@@ -178,9 +178,9 @@ int main(int argc, char *argv[]){
     //gSystem->mkdir(outfolder, kTRUE);
     TString outname(outfolder+"/pico_");
     if (is_single_era) 
-    	outname += get_era(begrun) + "_";
+      outname += get_era(begrun) + "_";
     else
-	outname += yearname + "_";
+    outname += yearname + "_";
     outname += idata;
     outname += "_"+basename;
     if (begrun > 0) outname += run_s;
@@ -203,12 +203,12 @@ int main(int argc, char *argv[]){
     time(&startTime);
     for(int entry(0); entry<entries; entry++){
       if(entry!=0 && entry%250000==0) {
-	time(&curTime);
-	int seconds(difftime(curTime,startTime));
-	
-	cout<<"Doing entry "<<setw(10)<<addCommas(entry)<<" of "<<addCommas(entries)
-	    <<"    Took "<<setw(6)<<seconds<<" seconds at "
-	    <<setw(4)<<roundNumber(entry,1,seconds*1000.)<<" kHz"<<endl;
+        time(&curTime);
+        int seconds(difftime(curTime,startTime));
+        
+        cout<<"Doing entry "<<setw(10)<<addCommas(entry)<<" of "<<addCommas(entries)
+            <<"    Took "<<setw(6)<<seconds<<" seconds at "
+            <<setw(4)<<roundNumber(entry,1,seconds*1000.)<<" kHz"<<endl;
       }
       
       // Load "run" first, and check if it's in the range we care about
@@ -223,10 +223,10 @@ int main(int argc, char *argv[]){
       if(lumiblocks.find(lumiblock) == lumiblocks.end()) lumiblocks.emplace(lumiblock, set<Long64_t>{}); // New lumiblock
       auto &events = lumiblocks.at(lumiblock);
       if(events.find(event) == events.end()){ // New event
-	events.emplace(event);
-	// You need to load all branches to copy them into outtree
-	chain.GetEntry(entry);
-	outtree->Fill();
+        events.emplace(event);
+        // You need to load all branches to copy them into outtree
+        chain.GetEntry(entry);
+        outtree->Fill();
       } 
     } // Loop over entries
     outtree->Write();
@@ -241,22 +241,22 @@ int main(int argc, char *argv[]){
   //   cout << it->first  <<", ";
   // } // Needs c++11
 
-  if(false){
-    TString txtname(outfolder+"/runs_"+basename+".txt");
-    ofstream txtfile(txtname);
-    int prevrun(0);
-    for(map<int, map<int, set<Long64_t> > >::const_iterator it = runs.begin(); it != runs.end(); ++it) {
-      run = it->first;
-      if(run/1000 != prevrun){
-	prevrun = run/1000;
-	txtfile<<endl;
-      }
-      txtfile << run << "  ";
-    }
-    txtfile<<endl;
-    txtfile.close();
-    cout<<endl<<"Written run numbers in "<<txtname<<endl;
-  }
+  //if(false){
+  //  TString txtname(outfolder+"/runs_"+basename+".txt");
+  //  ofstream txtfile(txtname);
+  //  int prevrun(0);
+  //  for(map<int, map<int, set<Long64_t> > >::const_iterator it = runs.begin(); it != runs.end(); ++it) {
+  //    run = it->first;
+  //    if(run/1000 != prevrun){
+  //      prevrun = run/1000;
+  //      txtfile<<endl;
+  //    }
+  //    txtfile << run << "  ";
+  //  }
+  //  txtfile<<endl;
+  //  txtfile.close();
+  //  cout<<endl<<"Written run numbers in "<<txtname<<endl;
+  //}
   cout<<endl<<endl;
 
   return 0;

@@ -19,12 +19,26 @@ def findBaseSampleNames(folder):
     dataset_tag = dataset_tag.split('__RunIIFall17NanoAODv7__')[0]
     dataset_tag = dataset_tag.split('__RunIIAutumn18NanoAODv7__')[0]
     #dataset_tag = dataset_tag.split('__Nano02Apr2020')[0] #mc
-    #dataset_tag = dataset_tag.split('__02Apr2020')[0] #data
+    dataset_tag = dataset_tag.split('__02Apr2020')[0] #data
 
     # For NanoAODv9
+    # mc
     dataset_tag = dataset_tag.split('__RunIISummer20UL16NanoAODv9__')[0]
     dataset_tag = dataset_tag.split('__RunIISummer20UL17NanoAODv9__')[0]
     dataset_tag = dataset_tag.split('__RunIISummer20UL18NanoAODv9__')[0]
+    # data
+    dataset_tag = dataset_tag.split('__ver1_HIPM_UL2016_MiniAODv2_NanoAODv9-v1__')[0]
+    dataset_tag = dataset_tag.split('__ver1_HIPM_UL2016_MiniAODv2_NanoAODv9-v2__')[0]
+    dataset_tag = dataset_tag.split('__ver2_HIPM_UL2016_MiniAODv2_NanoAODv9-v1__')[0]
+    dataset_tag = dataset_tag.split('__ver2_HIPM_UL2016_MiniAODv2_NanoAODv9-v2__')[0]
+    dataset_tag = dataset_tag.split('__HIPM_UL2016_MiniAODv2_NanoAODv9-v1__')[0]
+    dataset_tag = dataset_tag.split('__HIPM_UL2016_MiniAODv2_NanoAODv9-v2__')[0]
+    dataset_tag = dataset_tag.split('__UL2016_MiniAODv2_NanoAODv9-v1__')[0]
+    dataset_tag = dataset_tag.split('__UL2016_MiniAODv2_NanoAODv9-v2__')[0]
+    dataset_tag = dataset_tag.split('__UL2017_MiniAODv2_NanoAODv9-v1__')[0]
+    dataset_tag = dataset_tag.split('__UL2018_MiniAODv2_NanoAODv9-v1__')[0]
+    dataset_tag = dataset_tag.split('__UL2018_MiniAODv2_NanoAODv9-v2__')[0]
+    dataset_tag = dataset_tag.split('__UL2018_MiniAODv2_NanoAODv9-v3__')[0]
 
     dataset_tag = dataset_tag.split('_ext')[0]
     dataset_tag = dataset_tag.replace('.root','')

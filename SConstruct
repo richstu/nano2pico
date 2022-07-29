@@ -26,7 +26,7 @@ def returnEnviornment(scriptname):
 
 def addRootEnv(_env):
   _env.Append (CCFLAGS = '-isystem `root-config --incdir`' )
-  _env.Append (CCFLAGS = '-g' )
+  #_env.Append (CCFLAGS = '-g' )
   _env.Append (CCFLAGS = '`root-config --cflags`' )
   _env.Append (LINKFLAGS = '`root-config --glibs`') 
   _env.Append (LINKFLAGS = '`root-config --ldflags`')
@@ -34,16 +34,21 @@ def addRootEnv(_env):
 
 def addWarningEnv(_env):
   _env.Append (CCFLAGS = ['-pedantic', 
-                          '-Wall', '-Wextra', '-Werror', '-Wshadow', '-Woverloaded-virtual', '-Wold-style-cast', 
+                          '-Wall', '-Wextra', '-Werror', '-Wold-style-cast', 
                           '-Wcast-align', '-Wcast-qual', '-Wdisabled-optimization', 
                           '-Wformat=2', '-Wformat-nonliteral', '-Wformat-security', 
                           '-Wformat-y2k', '-Winit-self', '-Winvalid-pch', '-Wlong-long', 
-                          '-Wmissing-format-attribute', '-Wmissing-include-dirs', '-Wmissing-noreturn', 
+                          '-Wmissing-format-attribute', '-Wmissing-include-dirs',
                           '-Wpacked', '-Wpointer-arith', '-Wredundant-decls', '-Wstack-protector', 
-                          '-Wswitch-default', '-Wswitch-enum', '-Wundef', '-Wunused', '-Wvariadic-macros', 
+                          '-Wundef', '-Wvariadic-macros', '-Wmissing-noreturn', 
                           '-Wwrite-strings', '-Wctor-dtor-privacy', '-Wnon-virtual-dtor', '-Wsign-promo', '-Wsign-compare', 
-                          #'-Wunsafe-loop-optimizations', '-Wfloat-equal', '-Wsign-conversion', '-Wunreachable-code',
+                          '-Wunreachable-code', 
+                          '-Woverloaded-virtual', '-Wshadow', '-Wswitch-default', '-Wswitch-enum', '-Wunused', 
+                          #'-Wsign-conversion', '-Wfloat-equal', '-Wunsafe-loop-optimizations', 
                          ])
+
+def addExternalEnv(_env):
+  _env.Append (CCFLAGS = '-isystem external_inc -std=c++17' )
 
 def addBasicEnv(_env):
   _env.Append (CCFLAGS = '-O2')
@@ -57,14 +62,13 @@ def getKernel():
 
 SConsignFile('kernel/'+getKernel()+'/sconsign.dblite')
 
-if (subprocess.check_output("uname", shell=True, universal_newlines=True).rstrip() != 'Darwin'):
-  analysisEnv = Environment(ENV = returnEnviornment('set_env.sh'))
-else:
-  analysisEnv = Environment()
+# [Requried] Export SET_ENV_PATH to script that sets root and scons environment
+analysisEnv = Environment(ENV = returnEnviornment(os.environ['SET_ENV_PATH']))
 
 addBasicEnv(analysisEnv)
 addKernelEnv(analysisEnv)
 addRootEnv(analysisEnv)
+addExternalEnv(analysisEnv)
 addWarningEnv(analysisEnv)
 
 exportEnv = analysisEnv

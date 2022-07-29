@@ -1,6 +1,8 @@
 #!/bin/bash
-. /cvmfs/cms.cern.ch/cmsset_default.sh
+# Sets root, python, scons, ssh, and batch enviornment for ucsb servers
 
+# Setup root environment according to kernel of ucsb server
+. /cvmfs/cms.cern.ch/cmsset_default.sh
 RUN_KERNEL=$(uname -r | cut -d '-' -f1)
 if [ "$RUN_KERNEL" == "3.10.0" ]; then
   export SCRAM_ARCH=slc7_amd64_gcc700
@@ -8,21 +10,22 @@ if [ "$RUN_KERNEL" == "3.10.0" ]; then
 elif [ "$RUN_KERNEL" == "2.6.32" ]; then
   cd /net/cms29/cms29r0/pico/CMSSW_10_2_11_patch1/src
 fi
-
 eval `scramv1 runtime -sh`
 cd -
 
+# Do multi-core scons
 export SCONSFLAGS="-j $(nproc --all)"
+export SET_ENV_PATH=set_env.sh # environment to use for build
 
 # Change python to be in unbuffer mode for scripts to run commands
 export PYTHONUNBUFFERED=1
 
-source $(dirname $(readlink -e "$BASH_SOURCE"))/modules/jb_utils/set_env.sh
-source $(dirname $(readlink -e "$BASH_SOURCE"))/modules/queue_system/set_env.sh
-
+# Prevent asking password using x11-gui
 unset SSH_ASKPASS
 
-# Setup batch
+# Setup environment for batch submission
+source $(dirname $(readlink -e "$BASH_SOURCE"))/modules/jb_utils/set_env.sh
+source $(dirname $(readlink -e "$BASH_SOURCE"))/modules/queue_system/set_env.sh
 export JOBBIN=/net/cms2/cms2r0/Job
 export JOBS=/net/cms2/cms2r0/${USER}/jobs
 export LOG=/net/cms2/cms2r0/${USER}/log

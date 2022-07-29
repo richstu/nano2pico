@@ -31,6 +31,7 @@
 #include "photon_weighter.hpp"
 #include "event_tools.hpp"
 #include "isr_tools.hpp"
+#include "event_weighter.hpp"
 
 using namespace std;
 
@@ -65,6 +66,8 @@ int main(int argc, char *argv[]){
   int year;
   if (Contains(in_file, "RunIISummer20")) { 
     year = Contains(in_file, "RunIISummer20UL16") ? 2016 : (Contains(in_file, "RunIISummer20UL17") ? 2017 : 2018);
+  } else if (Contains(in_file, "RunIISummer19")) { 
+    year = Contains(in_file, "RunIISummer19UL16") ? 2016 : (Contains(in_file, "RunIISummer19UL17") ? 2017 : 2018);
   } else {
     year = Contains(in_file, "RunIISummer16") ? 2016 : (Contains(in_file, "RunIIFall17") ? 2017 : 2018);
   }
@@ -76,13 +79,16 @@ int main(int argc, char *argv[]){
   if (isData) {
     switch (year) {
       case 2016:
-        VVRunLumi = MakeVRunLumi("golden2016");
+        if (Contains(in_file, "UL2016")) VVRunLumi = MakeVRunLumi("goldenUL2016");
+        else VVRunLumi = MakeVRunLumi("golden2016");
         break;
       case 2017:
-        VVRunLumi = MakeVRunLumi("golden2017");
+        if (Contains(in_file, "UL2017")) VVRunLumi = MakeVRunLumi("goldenUL2017");
+        else VVRunLumi = MakeVRunLumi("golden2017");
         break;
       case 2018:
-        VVRunLumi = MakeVRunLumi("golden2018");
+        if (Contains(in_file, "UL2018")) VVRunLumi = MakeVRunLumi("goldenUL2018");
+        else VVRunLumi = MakeVRunLumi("golden2018");
         break;
       default:
         cout << "ERROR: no golden cert for given year" << endl;
@@ -115,13 +121,19 @@ int main(int argc, char *argv[]){
     {2018, vector<float>({0.0494, 0.2770, 0.7264})}
   };
 
+  string rocco_file = "data/RoccoR2016.txt";
+  if (year==2017)
+    rocco_file = "data/RoccoR2017.txt";
+  else if (year==2018)
+    rocco_file = "data/RoccoR2018.txt";
+
   //Initialize object producers
   GenParticleProducer mc_producer(year);
   ElectronProducer el_producer(year, isData);
-  MuonProducer mu_producer(year, isData);
+  MuonProducer mu_producer(year, isData, rocco_file);
   DileptonProducer dilep_producer(year);
   IsoTrackProducer tk_producer(year);
-  PhotonProducer photon_producer(year);
+  PhotonProducer photon_producer(year, isData);
   JetProducer jet_producer(year, min_jet_pt, max_jet_eta, isData);
   MetProducer met_producer(year, isData);
   HigVarProducer hig_producer(year);
@@ -139,6 +151,7 @@ int main(int argc, char *argv[]){
   LeptonWeighter lep_weighter16gh(year, isZgamma, true);
   PrefireWeighter prefire_weighter(year, true);
   PhotonWeighter photon_weighter(year, isZgamma);
+  EventWeighter event_weighter(year);
 
   // Other tools
   EventTools event_tools(in_path, year);
@@ -165,7 +178,7 @@ int main(int argc, char *argv[]){
   for(size_t entry(0); entry<nentries; ++entry){
     if (debug) cout << "GetEntry: " << entry <<" event = "<< endl;
     nano.GetEntry(entry);
-    if (entry%1000==0 || entry == nentries-1) {
+    if (entry%2000==0 || entry == nentries-1) {
       cout<<"Processing event: "<<entry<<endl;
     }
 
@@ -175,15 +188,18 @@ int main(int argc, char *argv[]){
     }
 
     bool passed_trig = event_tools.SaveTriggerDecisions(nano, pico, isZgamma);
-    if (isData && !passed_trig) continue;
+    if (isData && !passed_trig) {
+      continue;
+    }
 
     // event info
     pico.out_event()     = nano.event();
     pico.out_lumiblock() = nano.luminosityBlock();
     pico.out_run()       = nano.run();
     pico.out_type()      = event_type;
-    if (isData) pico.out_stitch() = true;
-    else event_tools.WriteStitch(nano, pico);
+    pico.out_stitch_dy() = true;
+    pico.out_old_stitch_dy() = true;
+
     // number of reconstructed primary vertices
     pico.out_npv() = nano.PV_npvs();
     pico.out_npv_good() = nano.PV_npvsGood();
@@ -231,15 +247,16 @@ int main(int argc, char *argv[]){
       vector<int> sig_ph_nano_idx = photon_producer.WritePhotons(nano, pico, jet_isphoton_nano_idx,
                                                                  sig_el_nano_idx, sig_mu_nano_idx);
 
+    if (isData) pico.out_stitch() = true;
+    else event_tools.WriteStitch(nano, pico);
+ 
     tk_producer.WriteIsoTracks(nano, pico, sig_el_nano_idx, sig_mu_nano_idx, isFastsim);
 
     dilep_producer.WriteDileptons(pico, sig_el_pico_idx, sig_mu_pico_idx);
 
     if (debug) cout<<"INFO:: Writing gen particles"<<endl;
 
-    pico.out_stitch_dy() = true;
-    if (!isData)
-	    mc_producer.WriteGenParticles(nano, pico);
+    if (!isData) mc_producer.WriteGenParticles(nano, pico);
     isr_tools.WriteISRSystemPt(nano, pico);
 
     if (debug) cout<<"INFO:: Writing jets, MET and ISR vars"<<endl;
@@ -292,6 +309,8 @@ int main(int argc, char *argv[]){
     if(isZgamma)
       zgamma_producer.WriteZGammaVars(nano, pico, sig_jet_nano_idx);
 
+  
+
     //save higgs variables using DeepCSV and DeepFlavor
     hig_producer.WriteHigVars(pico, false, isSignal, sys_higvars);
     hig_producer.WriteHigVars(pico, true, isSignal, sys_higvars);
@@ -308,8 +327,23 @@ int main(int argc, char *argv[]){
     if (debug) cout<<"INFO:: Calculating weights"<<endl;
     float w_lep(1.), w_fs_lep(1.);
     float w_photon(1.);
+    float w_el_id(1.);
+    float w_mu_id(1.);
+    float w_mu_iso(1.);
+    float w_photon_id(1.);
+    float w_photon_csev(1.);
+    float w_btag_dc(1.);
+    float w_pu(1.);
     vector<float> sys_lep(2,1.), sys_fs_lep(2,1.);
     vector<float> sys_photon(2,1.);
+    event_weighter.ElectronIDSF(pico, w_el_id);
+    event_weighter.MuonIDSF(pico, w_mu_id);
+    event_weighter.MuonIsoSF(pico, w_mu_iso);
+    event_weighter.PileupSF(pico, w_pu);
+    event_weighter.PhotonIDSF(pico, w_photon_id);
+    event_weighter.PhotonCSEVSF(pico, w_photon_csev);
+    event_weighter.bTaggingSF(pico, w_btag_dc);
+
     if(isZgamma) {
       photon_weighter.FullSim(pico, w_photon, sys_photon);
       if(nano.event() % 3516 <= 1887) lep_weighter.FullSim(pico, w_lep, sys_lep);
@@ -320,10 +354,17 @@ int main(int argc, char *argv[]){
     }
     if(isFastsim) lep_weighter.FastSim(pico, w_fs_lep, sys_fs_lep);
     pico.out_w_lep()      = w_lep;
+    pico.out_w_pu()       = w_pu;
+    pico.out_w_el_id()    = w_el_id;
+    pico.out_w_mu_id()    = w_mu_id;
+    pico.out_w_mu_iso()   = w_mu_iso;
     pico.out_w_fs_lep()   = w_fs_lep;
     pico.out_sys_lep()    = sys_lep; 
     pico.out_sys_fs_lep() = sys_fs_lep;
     pico.out_w_photon()   = w_photon;
+    pico.out_w_photon_id()   = w_photon_id;
+    pico.out_w_photon_csev() = w_photon_csev;
+    pico.out_w_btag_dc()    = w_btag_dc;
     pico.out_sys_photon() = sys_photon; 
     if(isZgamma || isData) {
       pico.out_w_btag()    = 1.; 

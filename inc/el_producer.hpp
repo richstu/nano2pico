@@ -25,7 +25,8 @@ private:
   bool isData;
 
   bool idElectron_noIso(int bitmap, int level);
-  
+  bool EcalDriven(int bitmap);
+
 };
 
 #endif

@@ -56,8 +56,13 @@ int main(int argc, char *argv[]){
   string output_path = argv[optind];
   vector<string> input_paths(argv+optind+1, argv+argc);
 
-  int year = Contains(input_paths[0], "RunIISummer16") ? 2016 : (Contains(input_paths[0], "RunIIFall17") ? 2017 : 2018);
-  cout << "Running with settings for year = "<<year<<"."<<endl; 
+  int year;
+  if (Contains(input_paths[0], "RunIISummer20")) {
+    year = Contains(input_paths[0], "RunIISummer20UL16") ? 2016 : (Contains(input_paths[0], "RunIISummer20UL17") ? 2017 : 2018);
+  } else {
+    year = Contains(input_paths[0], "RunIISummer16") ? 2016 : (Contains(input_paths[0], "RunIIFall17") ? 2017 : 2018);
+  }
+  cout << "Running with settings for year = "<<year<<"."<<endl;
 
   corrections_tree corr("", output_path.c_str());
   corrections_tree wgt_sums(input_paths.front().c_str());

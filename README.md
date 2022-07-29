@@ -11,6 +11,7 @@ Use one of the servers supporting CMSSW, e.g. cms1,cms3,cms4,cms5...
 . /cvmfs/cms.cern.ch/cmsset_default.sh;cd /net/cms29/cms29r0/pico/CMSSW_10_2_11_patch1/src;eval `scramv1 runtime -sh`;cd -
 # Clone git
 git clone --recurse-submodules https://github.com/richstu/nano2pico
+# If did not use recurse at clone, use following command: git submodule update --init --remote --recursive
 # Setup environemnt
 source set_env.sh
 ~~~~
@@ -223,6 +224,10 @@ Use `parameterize_efficiency.cxx`, giving the directory with all the MC files an
 ~~~~bash
 ./compile.sh && ./run/parameterize_efficiency.exe -i /mnt/hadoop/jbkim/2019_09_30/2016/mc/ -y 2016
 ~~~~
+
+## Pico production for ZGamma
+
+The 'out_dir' should contain "zgamma" in the name. This is to ensure that 'isZgamma' signal can asserted and ensures the appropriate variables are correctly stored in the picos. For customization See line 98 of process_nano.cxx.
 
 
 ## Description of pico branches
@@ -602,12 +607,12 @@ Below are examples
 
 ~~~bash
 # Compares picos file between old code and new code. Also compares production time.
-[In old code folder] ./scripts/validate_unit_test_htozgamma_NanoAODv9.py --output_folder unit_test_htozgamma_nanoaodv9 --output_log unit_test_htozgamma_nanoaodv9.log
-[In new code folder] ./scripts/validate_unit_test_htozgamma_NanoAODv9.py --output_folder unit_test_htozgamma_nanoaodv9 --output_log unit_test_htozgamma_nanoaodv9.log
-./scripts/validate_unit_test_picos.py --output_log_filename validate_unit_test_htozgamma_nanoaodv9.log --unit_test_log_filename unit_test_htozgamma_nanoaodv9.log --golden_base_folder OLD_CODE/unit_test_htozgamma_nanoaodv9 -validate_base_folder NEW_CODE/unit_test_htozgamma_nanoaodv9
+[In old code folder] ./scripts/produce_unit_test_htozgamma_NanoAODv9.py --output_folder unit_test_htozgamma_nanoaodv9 --output_log unit_test_htozgamma_nanoaodv9.log
+[In new code folder] ./scripts/produce_unit_test_htozgamma_NanoAODv9.py --output_folder unit_test_htozgamma_nanoaodv9 --output_log unit_test_htozgamma_nanoaodv9.log
+./scripts/validate_unit_test_picos.py --output_log_filename validate_unit_test_htozgamma_nanoaodv9.log --unit_test_log_filename unit_test_htozgamma_nanoaodv9.log --golden_base_folder OLD_CODE/unit_test_htozgamma_nanoaodv9 --validate_base_folder NEW_CODE/unit_test_htozgamma_nanoaodv9
 
 # Compares cross section between old code and new code.
-[In old code folder] ./scripts/validate_unit_test_cross_section.py --output_log unit_test_cross_section.log
-[In new code folder] ./scripts/validate_unit_test_cross_section.py --output_log unit_test_cross_section.log
+[In old code folder] ./scripts/produce_unit_test_cross_sections.py --output_log unit_test_cross_section.log
+[In new code folder] ./scripts/produce_unit_test_cross_sections.py --output_log unit_test_cross_section.log
 ./scripts/validate_unit_test_cross_section.py --output_filename validate_unit_test_cross_section.log --golden_cross_section_log OLD_CODE/unit_test_cross_section.log --validate_cross_section_log NEW_CODE/unit_test_cross_section.log
 ~~~

@@ -19,6 +19,12 @@ std::vector< std::vector<int> > MakeVRunLumi(std::string input){
     fullpath = "txt/json/golden_Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17.json";
   } else if(input == "golden2018"){
     fullpath = "txt/json/golden_Cert_314472-325175_13TeV_PromptReco_Collisions18.json";
+  } else if(input == "goldenUL2016") {
+    fullpath = "txt/json/golden_Cert_271036-284044_13TeV_Legacy2016_Collisions16_JSON.txt";
+  } else if(input == "goldenUL2017") {
+    fullpath = "txt/json/golden_Cert_294927-306462_13TeV_UL2017_Collisions17_GoldenJSON.txt";
+  } else if(input == "goldenUL2018") {
+    fullpath = "txt/json/golden_Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt";
   } else{
     fullpath = input;
   }

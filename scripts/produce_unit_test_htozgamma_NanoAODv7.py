@@ -42,14 +42,14 @@ def makeTestCommands(mc_nanoaod_directory, mc_nanoaod_filename, data_nanoaod_dir
     "mkdir "+pico_directory+"/mc/merged_llg",
     "./scripts/slim_and_merge.py -s txt/slim_rules/zgmc.txt -i "+pico_directory+"/mc/llg/pico_llg_"+mc_nanoaod_filename+" -o "+pico_directory+"/mc/merged_llg/merged_"+mc_nanoaod_filename,
 
-    ## data commands
-    #"mkdir -p "+pico_directory+"/data/raw_pico",
-    #"mkdir "+pico_directory+"/data/wgt_sums",
-    #"./run/process_nano.exe -f "+data_nanoaod_filename+" -i "+data_nanoaod_directory+" -o "+pico_directory+"/data --nent "+str(n_entries),
-    #"mkdir "+pico_directory+"/data/llg",
-    #"./scripts/skim_file.py -k llg -i "+pico_directory+"/data/raw_pico/raw_pico_"+data_nanoaod_filename+" -o "+pico_directory+"/data/llg/",
-    #"mkdir "+pico_directory+"/data/merged_llg",
-    #"./scripts/slim_and_merge.py -s txt/slim_rules/zgdata.txt -i "+pico_directory+"/data/llg/raw_pico_llg_"+data_nanoaod_filename+" -o "+pico_directory+"/data/merged_llg/merged_"+data_nanoaod_filename,
+    # data commands
+    "mkdir -p "+pico_directory+"/data/raw_pico",
+    "mkdir "+pico_directory+"/data/wgt_sums",
+    "./run/process_nano.exe -f "+data_nanoaod_filename+" -i "+data_nanoaod_directory+" -o "+pico_directory+"/data --nent "+str(n_entries),
+    "mkdir "+pico_directory+"/data/llg",
+    "./scripts/skim_file.py -k llg -i "+pico_directory+"/data/raw_pico/raw_pico_"+data_nanoaod_filename+" -o "+pico_directory+"/data/llg/",
+    "mkdir "+pico_directory+"/data/merged_llg",
+    "./scripts/slim_and_merge.py -s txt/slim_rules/zgdata.txt -i "+pico_directory+"/data/llg/raw_pico_llg_"+data_nanoaod_filename+" -o "+pico_directory+"/data/merged_llg/merged_"+data_nanoaod_filename,
 
   ]
   return higgsino_test_commands
@@ -57,8 +57,8 @@ def makeTestCommands(mc_nanoaod_directory, mc_nanoaod_filename, data_nanoaod_dir
 if __name__ == "__main__":
 
   parser = argparse.ArgumentParser(description='''Runs production on a few NanoAOD files.''', formatter_class=argparse.RawTextHelpFormatter)
-  parser.add_argument('-f','--output_folder', required=True, help='Ouptut folder containing picos.')
-  parser.add_argument('-l','--output_log', required=True, help='Ouptut log filename.')
+  parser.add_argument('-f','--output_folder', required=True, help='Output folder containing picos.')
+  parser.add_argument('-l','--output_log', required=True, help='Output log filename.')
   args = parser.parse_args()
 
   if 'zgamma' not in args.output_folder:
@@ -78,9 +78,9 @@ if __name__ == "__main__":
   higgsino_test_commands.extend(makeTestCommands(mc_nanoaod_directory="/net/cms17/cms17r0/pico/NanoAODv7/nano/2017/mc", mc_nanoaod_filename="DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8__RunIIFall17NanoAODv7__PU2017RECOSIMstep_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8_ext1-v1__100000__0FD3A2B8-9BD9-2442-83C7-B43CC073443F.root", 
                                                  data_nanoaod_directory="/net/cms17/cms17r0/pico/NanoAODv7/nano/2017/data", data_nanoaod_filename="DoubleEG__Run2017B__02Apr2020-v1__30000__08F99D33-012C-1641-BB33-1204571842F9.root", 
                                                  pico_directory=pico_directory, n_entries=n_entries))
-  #higgsino_test_commands.extend(makeTestCommands(mc_nanoaod_directory="/net/cms17/cms17r0/pico/NanoAODv7/nano/2018/mc", mc_nanoaod_filename="DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8__RunIIAutumn18NanoAODv7__Nano02Apr2020_102X_upgrade2018_realistic_v21-v1__100000__3391856D-092B-624A-A3BB-F6112936F5D9.root", 
-  #                                               data_nanoaod_directory="/net/cms17/cms17r0/pico/NanoAODv7/nano/2018/data", data_nanoaod_filename="EGamma__Run2018A__02Apr2020-v1__2410000__1D1F868C-0C62-E447-B2D7-2C37CC7EAAD1.root", 
-  #                                               pico_directory=pico_directory, n_entries=n_entries))
+  higgsino_test_commands.extend(makeTestCommands(mc_nanoaod_directory="/net/cms17/cms17r0/pico/NanoAODv7/nano/2018/mc", mc_nanoaod_filename="DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8__RunIIAutumn18NanoAODv7__Nano02Apr2020_102X_upgrade2018_realistic_v21-v1__100000__3391856D-092B-624A-A3BB-F6112936F5D9.root", 
+                                                 data_nanoaod_directory="/net/cms17/cms17r0/pico/NanoAODv7/nano/2018/data", data_nanoaod_filename="EGamma__Run2018A__02Apr2020-v1__2410000__1D1F868C-0C62-E447-B2D7-2C37CC7EAAD1.root", 
+                                                 pico_directory=pico_directory, n_entries=n_entries))
 
   os.makedirs(pico_directory)
   log_file = open(pico_directory+"/"+log_filename, 'w')
