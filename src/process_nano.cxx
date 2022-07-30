@@ -347,9 +347,10 @@ int main(int argc, char *argv[]){
       photon_weighter.FullSim(pico, w_photon, sys_photon);
       if(nano.event() % 3516 <= 1887) lep_weighter.FullSim(pico, w_lep, sys_lep);
       else lep_weighter16gh.FullSim(pico, w_lep, sys_lep);
+      if (!isData)
+	event_weighter.bTaggingSF(pico, w_btag_dc);
     }
     else if (!isData) {
-      event_weighter.bTaggingSF(pico, w_btag_dc);
       lep_weighter.FullSim(pico, w_lep, sys_lep);
     }
     if(isFastsim) lep_weighter.FastSim(pico, w_fs_lep, sys_fs_lep);
