@@ -57,7 +57,7 @@ int main(int argc, char *argv[]){
 
   if(in_file=="" || in_dir=="" || out_dir == "") {
     cout<<"ERROR: Input file, sum-of-weights and/or output directory not specified. Exit."<<endl;
-    exit(0);
+    exit(1);
   }
 
   bool isData = Contains(in_file, "Run201") ? true : false;
@@ -92,7 +92,7 @@ int main(int argc, char *argv[]){
         break;
       default:
         cout << "ERROR: no golden cert for given year" << endl;
-        return 0;
+        exit(1);
     }
   }
 
@@ -164,6 +164,10 @@ int main(int argc, char *argv[]){
   size_t nentries(nent_test>0 ? nent_test : nano.GetEntries());
   cout << "Nano file: " << in_path << endl;
   cout << "Input number of events: " << nentries << endl;
+  if (nent_test > nano.GetEntries()) {
+    cout << "ERROR: nent: " << nent_test << " is larger than nano.GetEntries(): "<< nano.GetEntries() << endl;
+    exit(1);
+  }
   // cout << "Running on "<< (isFastsim ? "FastSim" : "FullSim") << endl;
   // cout << "Calculating weights based on " << year << " scale factors." << endl;
 
