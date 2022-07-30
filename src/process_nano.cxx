@@ -346,12 +346,13 @@ int main(int argc, char *argv[]){
     event_weighter.PileupSF(pico, w_pu);
     event_weighter.PhotonIDSF(pico, w_photon_id);
     event_weighter.PhotonCSEVSF(pico, w_photon_csev);
-    event_weighter.bTaggingSF(pico, w_btag_dc);
 
     if(isZgamma) {
       photon_weighter.FullSim(pico, w_photon, sys_photon);
       if(nano.event() % 3516 <= 1887) lep_weighter.FullSim(pico, w_lep, sys_lep);
       else lep_weighter16gh.FullSim(pico, w_lep, sys_lep);
+      if (!isData)
+	event_weighter.bTaggingSF(pico, w_btag_dc);
     }
     else if (!isData) {
       lep_weighter.FullSim(pico, w_lep, sys_lep);
