@@ -406,7 +406,7 @@ int main(int argc, char *argv[]){
     pico.out_sys_murf() = nano.LHEScaleWeight();
 
     // @todo, copy weights from babymaker
-    pico.out_w_pu() = 1.;
+    if (!isZgamma) pico.out_w_pu() = 1.;
     pico.out_sys_pu().resize(2, 1.);
 
     isr_tools.WriteISRWeights(pico);
