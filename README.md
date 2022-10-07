@@ -601,7 +601,7 @@ Update all submodules: `git submodule update --recursive --remote --merge` and t
 
 ## Validation
 
-Validation is done by running `./script/process_unit_test*` on nano2pico code versions and then using `./script/validate_unit_test*` to compare between results.
+Validation is done by running `./script/produce_unit_test*` on nano2pico code versions and then using `./script/validate_unit_test*` to compare between results.
 
 Below are examples
 
