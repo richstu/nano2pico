@@ -104,6 +104,7 @@ namespace xsec{
 
         if(file.Contains("TTZToQQ_TuneCUETP8M1"))                       xsec = 0.5297; //XSDB
         if(file.Contains("TTZToLLNuNu_M-10_TuneCUETP8M1"))              xsec = 0.2529; //XSDB
+        if(file.Contains("ttZJets_Tune"))                               xsec = 0.5407; //<-HIG samples that link to parent MiniAODs on DAS. 0.6529<-For TOP samples; //XSDB/GenXSecAnalyzer
         if(file.Contains("TTWJetsToQQ_TuneCUETP8M1"))                   xsec = 0.4062; //TWiki table (NLO)
         if(file.Contains("TTWJetsToLNu_TuneCUETP8M1"))                  xsec = 0.2043; //TWiki table (NLO)
 
@@ -336,6 +337,16 @@ namespace xsec{
     if(file.Contains("WW_Tune"))              xsec = 118.7; // https://arxiv.org/pdf/1408.5243.pdf
     if(file.Contains("WWG_Tune"))             xsec = 0.2147; // from XSDB
     if(file.Contains("WZG_Tune"))             xsec = 0.04345; // from XSDB
+    if(file.Contains("ZZGTo4L_Tune"))         xsec = 0.02202; // from XSDB
+
+
+    // From https://arxiv.org/pdf/2006.11191.pdf Using Measured XSec for WWW,WWZ, and WZZ. For ZZZ used SM prediction
+    if(file.Contains("WWW_4F_Tune"))                xsec = 0.509;   // 
+    if(file.Contains("WWW_4F_DiLeptonFilter_Tune")) xsec = 0.509 * WToLNu * WToLNu;   // 
+    if(file.Contains("WWZ_Tune"))                   xsec = 0.354;    // 
+    if(file.Contains("WWZJetsTo4L2Nu_4F_Tune"))     xsec = 0.354 * WToLNu * WToLNu * ZToLL;    // 
+    if(file.Contains("WZZ_Tune"))                   xsec = 0.0916;    // 
+    if(file.Contains("ZZZ_Tune"))                   xsec = 0.0371; // 
 
     if(file.Contains("GluGluHToGG"))          xsec = HToGG * 48.58;
     if(file.Contains("GluGluHToTauTau"))      xsec = HToTT * 48.58;
