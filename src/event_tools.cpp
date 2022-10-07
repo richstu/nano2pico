@@ -28,7 +28,16 @@ EventTools::EventTools(const string &name_, int year_):
 
   if(Contains(name, "WJetsToLNu_Tune")  && Contains(name,"madgraphMLM"))
     isWJets_LO = true;
-  
+
+  if(Contains(name, "WW")) 
+    isWWG = true;
+ 
+  if(Contains(name, "WZ")) 
+    isWZG = true;
+ 
+  if(Contains(name, "ZZ")) 
+    isZZG = true;
+
   if(Contains(name, "DYJetsToLL_M-50_Tune")  && Contains(name,"madgraphMLM"))
     isDYJets_LO = true;
 
@@ -93,6 +102,20 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
     }
   }
 
+
+
+  double ptmin = 15.0;
+  double etamax = 2.6;
+  double isocone = 0.05;
+  if(isWWG || isZZG){
+    ptmin = 10.0;
+    etamax= 99.0;
+  }
+
+  if(isWWG){
+    isocone = 0.1;
+  }
+
   for(int mc_idx(0); mc_idx<nano.nGenPart(); mc_idx++) {
 
     bitset<15> mc_statusFlags(nano.GenPart_statusFlags().at(mc_idx));
@@ -104,7 +127,7 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
                             nano.GenPart_eta().at(mc_idx), 
                             nano.GenPart_phi().at(mc_idx));
 
-        if( genPhoton.Pt() >15.0 && fabs(genPhoton.Eta())< 2.6 ){
+        if( genPhoton.Pt() > ptmin && fabs(genPhoton.Eta())< etamax ){
           //check if another generator particle nearby
           bool found_other_particles = false;
           for (int mc_idx_2 = 0; mc_idx_2 < nano.nGenPart(); mc_idx_2++) {
@@ -115,7 +138,7 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
             
 
             //isPrompt and fromHardProcess already applied
-            if ( (compPart.Pt() > 5.0) && (genPhoton.DeltaR(compPart) < 0.05) && (mc_idx != mc_idx_2) && (mc_statusFlags2[8]) && (nano.GenPart_pdgId().at(mc_idx_2) != 22 )  ) {
+            if ( (compPart.Pt() > 5.0) && (genPhoton.DeltaR(compPart) < isocone) && (mc_idx != mc_idx_2) && (mc_statusFlags2[8]) && (nano.GenPart_pdgId().at(mc_idx_2) != 22 )  ) {
               found_other_particles = true;
               //Basically saying that a photon is not isolated so this is not SM Zgamma sample!
             }
