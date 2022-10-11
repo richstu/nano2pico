@@ -57,7 +57,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
     }
 
     bool isSignal = (((fabs(eta) < 1.4442 && mva > -0.4) ||
-                     (fabs(eta) > 1.566 && fabs(eta) < 2.5 && mva > -0.58)) &&
+                     (fabs(eta) > 1.566 && fabs(eta) < 2.5 && mva > -0.59)) &&
                      eVeto && minLepDR > 0.4 && 
                      pt > SignalPhotonPtCut);
 
