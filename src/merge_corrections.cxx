@@ -105,6 +105,7 @@ void Initialize(corrections_tree &wgt_sums, corrections_tree &corr){
   corr.out_w_bhig_df() = 0.;
   corr.out_w_isr() = 0.;
   corr.out_w_pu() = 0.;
+  corr.out_w_photon() = 0.;
   // w_prefire should not be normalized!!
 
   corr.out_neff() = 0;
@@ -143,6 +144,7 @@ void AddEntry(corrections_tree &wgt_sums, corrections_tree &corr){
   corr.out_w_btag_df()         += wgt_sums.w_btag_df();
   corr.out_w_isr()             += wgt_sums.w_isr();
   corr.out_w_pu()              += wgt_sums.w_pu();
+  corr.out_w_photon()          += wgt_sums.w_photon();
 
   VecAdd(wgt_sums.sys_lep(),           corr.out_sys_lep());
   VecAdd(wgt_sums.sys_fs_lep(),        corr.out_sys_fs_lep());
@@ -290,6 +292,8 @@ void Normalize(corrections_tree &corr){
 
   // w_isr done in FixISR()
   Normalize(corr.out_w_pu(), nent);
+
+  Normalize(corr.out_w_photon(), nent);
 
   Normalize(corr.out_sys_bchig(), nent);
   Normalize(corr.out_sys_udsghig(), nent);

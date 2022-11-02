@@ -36,7 +36,7 @@ bool GenParticleProducer::IsInteresting(vector<int> const & interested_mc_ids, v
   return false;
 }
 
-int GenParticleProducer::GetFirstCopyIdx(nano_tree & nano, int imc)
+int GenParticleProducer::GetFirstCopyIdxOrInterestingIdx(nano_tree & nano, int imc, map<int, int> & mc_index_to_interested_index)
 {
   if (imc <= 0) {
     return imc;
@@ -53,7 +53,10 @@ int GenParticleProducer::GetFirstCopyIdx(nano_tree & nano, int imc)
   }
   int mc_mom_id = nano.GenPart_pdgId().at(mc_mom_index);
   //cout<<mc_id<<":"<<mc_mom_index<<" mc_id:"<<mc_id<<" mc_mom_id: "<<mc_mom_id<<endl;
-  if (mc_id == mc_mom_id) return GetFirstCopyIdx(nano, mc_mom_index);
+  if (mc_id == mc_mom_id && mc_index_to_interested_index.find(mc_mom_index) != mc_index_to_interested_index.end()) {
+    return mc_mom_index;
+  }
+  if (mc_id == mc_mom_id) return GetFirstCopyIdxOrInterestingIdx(nano, mc_mom_index, mc_index_to_interested_index);
   // if (bitset<15>(nano.GenPart_statusFlags().at(imc))[12] != 1) 
   // {
   //   cout<<"[Error] GenParticleProducer::GetFirstCopyIdx is not firstCopy."<<endl;
@@ -62,17 +65,17 @@ int GenParticleProducer::GetFirstCopyIdx(nano_tree & nano, int imc)
   return imc;
 }
 
-int GenParticleProducer::GetMotherIdx(nano_tree & nano, int imc)
+int GenParticleProducer::GetMotherIdx(nano_tree & nano, int imc, map<int, int> & mc_index_to_interested_index)
 {
   if (imc == 0) return -1;
   int mc_mom_index = nano.GenPart_genPartIdxMother().at(imc);
-  return GetFirstCopyIdx(nano, mc_mom_index);
+  return GetFirstCopyIdxOrInterestingIdx(nano, mc_mom_index, mc_index_to_interested_index);
 }
 
 void GenParticleProducer::WriteGenParticles(nano_tree &nano, pico_tree &pico){
 
   // Saves if isPrompt and isFirstCopy
-  // H, Z, W, gamma, gluon, b, t, d, u, s, c
+  //                               H, Z,  W, gamma, gluon, b, t, d, u, s, c
   vector<int> interested_mc_ids = {25, 23, 24, 22, 21, 5, 6, 1, 2, 3, 4};
   // SUSY
   vector<pair<int, int> > interested_mc_ids_range = {{1000001, 2000015}};
@@ -100,12 +103,21 @@ void GenParticleProducer::WriteGenParticles(nano_tree &nano, pico_tree &pico){
     if (is_interesting) {
       // 0: isPrompt, 12: isFirstCopy, 
       if (mc_statusFlags[0]==1 && mc_statusFlags[12]==1) save_index = true;
+      // 0: isPrompt, 13: isLastCopy, 
+      if (mc_statusFlags[0]==1 && mc_statusFlags[13]==1) save_index = true;
     }
     if (lepton_interesting) {
       // 0: isPrompt, 12: isFirstCopy, 
       if (mc_statusFlags[0]==1 && mc_statusFlags[12]==1) save_index = true;
+      // 0: isPrompt, 13: isLastCopy, 
+      if (mc_statusFlags[0]==1 && mc_statusFlags[13]==1) save_index = true;
       // 5: isDirectPromptTauDecayProduct, 12: isFirstCopy, 
       if (mc_statusFlags[5]==1 && mc_statusFlags[12]==1) {
+        save_index = true;
+        is_tauDecayProduct = true;
+      }
+      // 5: isDirectPromptTauDecayProduct, 13: isLastCopy, 
+      if (mc_statusFlags[5]==1 && mc_statusFlags[13]==1) {
         save_index = true;
         is_tauDecayProduct = true;
       }
@@ -130,7 +142,7 @@ void GenParticleProducer::WriteGenParticles(nano_tree &nano, pico_tree &pico){
   for (unsigned interested_index=0; interested_index<interested_mc_indices.size() ; ++interested_index) {
     int imc = interested_mc_indices[interested_index];
     mc_index_to_interested_index[imc] = interested_index;
-    //cout<<"imc: "<<imc<<" idx: "<<interested_index<<endl;
+    //cout<<"[interesting] imc: "<<imc<<" id: "<<nano.GenPart_pdgId().at(imc)<<" idx: "<<interested_index<<endl;
   }
 
   // Save interesting particles
@@ -143,13 +155,13 @@ void GenParticleProducer::WriteGenParticles(nano_tree &nano, pico_tree &pico){
     int mc_id = nano.GenPart_pdgId().at(imc);
     // Find index of mother that is not itself.
     //int mc_mom_index = nano.GenPart_genPartIdxMother().at(imc);
-    int mc_mom_index = GetMotherIdx(nano, imc);
-    //cout<<"imc: "<<imc<<" mc_mom_index: "<<mc_mom_index<<endl;
+    int mc_mom_index = GetMotherIdx(nano, imc, mc_index_to_interested_index);
     int mc_mom = mc_mom_index>=0 ? nano.GenPart_pdgId().at(mc_mom_index): -1;
     int mc_mom_idx = -1;
     if (mc_index_to_interested_index.find(mc_mom_index) != mc_index_to_interested_index.end()) {
       mc_mom_idx = mc_index_to_interested_index[mc_mom_index];
     }
+    //cout<<"imc: "<<imc<<" id: "<<mc_id<<" mc_mom_index: "<<mc_mom_index<<" mc_mom_idx: "<<mc_mom_idx<<endl;
     int mc_status     = nano.GenPart_status().at(imc);
     int mc_statusflag = nano.GenPart_statusFlags().at(imc);
 

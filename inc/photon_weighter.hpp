@@ -21,9 +21,12 @@ private:
 
   bool do_full_photon_id_, do_full_photon_ev_;
 
+  int year_;
+
   TH2F sf_full_photon_id_;
   TH2F sf_full_photon_ev_;
 
+  float GetRegion(float const & eta, float const & r9);
   std::pair<double, double> GetPhotonScaleFactor(pico_tree &pico, std::size_t iph);
 };
 

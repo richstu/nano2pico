@@ -33,9 +33,29 @@ namespace{
       if(bin_y <= 0) bin_y = 1;
       if(bin_y > h.GetNbinsY()) bin_y = h.GetNbinsY();
       sf = {h.GetBinContent(bin_x, bin_y), h.GetBinError(bin_x, bin_y)};
+      //cout<<"  below's overflow/underflow: "<<sf.first<<endl;
     }else{
       sf = {h.GetBinContent(bin), h.GetBinError(bin)};
     }
+    //cout<<"eta: "<<x<<" pt: "<<y<<" overflow: "<<h.IsBinUnderflow(bin)<<" underflow: "<<h.IsBinUnderflow(bin)<<" binContent: "<<h.GetBinContent(bin)<<endl;
+    if(ignore_error) sf.second = 0.;
+    return sf;
+  }
+  template<typename T>
+    pair<double, double> GetSF(const T &h, double x, bool ignore_error = false){
+    pair<double, double> sf;
+    auto bin = h.FindFixBin(x);
+    if((h.IsBinOverflow(bin) || h.IsBinUnderflow(bin))
+       && h.GetBinContent(bin) == 0. && h.GetBinError(bin) == 0.){
+      auto bin_x = h.GetXaxis()->FindFixBin(x);
+      if(bin_x <= 0) bin_x = 1;
+      if(bin_x > h.GetNbinsX()) bin_x = h.GetNbinsX();
+      sf = {h.GetBinContent(bin_x), h.GetBinError(bin_x)};
+      //cout<<"  [oneVar] below's overflow/underflow: "<<sf.first<<endl;
+    }else{
+      sf = {h.GetBinContent(bin), h.GetBinError(bin)};
+    }
+    //cout<<"[oneVar] eta: "<<x<<" overflow: "<<h.IsBinUnderflow(bin)<<" underflow: "<<h.IsBinUnderflow(bin)<<" binContent: "<<h.GetBinContent(bin)<<endl;
     if(ignore_error) sf.second = 0.;
     return sf;
   }
@@ -49,6 +69,7 @@ namespace{
 }
 
 PhotonWeighter::PhotonWeighter(int year, bool isZgamma){
+  year_ = year;
   if (isZgamma) {
     if (year==2016) {
       in_full_photon_id_ = "zgamma/Fall17V2_2016_MVAwp90_photons.root"; hist_full_photon_id_ = "EGamma_SF2D";
@@ -70,6 +91,7 @@ PhotonWeighter::PhotonWeighter(int year, bool isZgamma){
 void PhotonWeighter::FullSim(pico_tree &pico, float &w_photon, vector<float> &sys_photon){
   pair<double, double> sf(1., 0.);
   for(size_t i = 0; i < pico.out_photon_sig().size(); ++i){
+    //cout<<"Photon["<<i<<"] sf: "<<GetPhotonScaleFactor(pico, i).first<<endl;
     if(pico.out_photon_sig().at(i)){
       sf = MergeSF(sf, GetPhotonScaleFactor(pico, i));
     }
@@ -77,6 +99,17 @@ void PhotonWeighter::FullSim(pico_tree &pico, float &w_photon, vector<float> &sy
   w_photon = sf.first;
   sys_photon = vector<float>{static_cast<float>(sf.first+sf.second),
                              static_cast<float>(sf.first-sf.second)};
+}
+
+// Returns 1.5(EB high R9), 2.5(EB low R9), 4.5(EE high R9), 5.5(EE low R9)
+float PhotonWeighter::GetRegion(float const & eta, float const & r9) {
+  if (fabs(eta) < 1.4442) { //EB
+    if (fabs(r9) > 0.94) return 1.5;
+    else return 2.5;
+  } else if (fabs(eta) < 2.5) {
+    if (fabs(r9) > 0.94) return 4.5;
+    else return 5.5;
+  } else return -0.5;
 }
 
 std::pair<double, double> PhotonWeighter::GetPhotonScaleFactor(pico_tree &pico, size_t iph){
@@ -87,7 +120,10 @@ std::pair<double, double> PhotonWeighter::GetPhotonScaleFactor(pico_tree &pico, 
   vector<pair<double, double> > sfs;
   //Axes swapped, asymmetric in eta
   if (do_full_photon_id_) sfs.push_back(GetSF(sf_full_photon_id_, eta, pt));
-  if (do_full_photon_ev_) sfs.push_back(GetSF(sf_full_photon_ev_, eta, pt));
+  if (do_full_photon_ev_) {
+    if (year_ != 2017) sfs.push_back(GetSF(sf_full_photon_ev_, eta, pt));
+    else sfs.push_back(GetSF(sf_full_photon_ev_, GetRegion(pico.out_photon_eta().at(iph), pico.out_photon_r9().at(iph))));
+  }
   sfs.push_back(make_pair(1., pt<20. || pt >80. ? 0.01 : 0.));//Systematic uncertainty
   return accumulate(sfs.cbegin(), sfs.cend(), make_pair(1., 0.), MergeSF);
 }

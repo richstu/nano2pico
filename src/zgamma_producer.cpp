@@ -190,7 +190,7 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
       // cout << "costheta: " << costheta << " " << costhetaT << endl;
       // cout << "cosTheta: " << cosTheta << " " << cosThetaT << endl;
 
-      pico.out_llphoton_costhj().push_back(cosThetaJeff(lminus,lplus,photon));
+      //pico.out_llphoton_costhj().push_back(cosThetaJeff(lminus,lplus,photon));
     }
   return;
 }

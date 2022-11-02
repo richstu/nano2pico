@@ -13,9 +13,9 @@ IsoTrackProducer::~IsoTrackProducer(){
 }
 
 void IsoTrackProducer::WriteIsoTracks(nano_tree &nano, pico_tree &pico, 
-                                      vector<int> &sig_el_nano_idx, vector<int> &sig_mu_nano_idx, bool isFastsim){
+                                      vector<int> &sig_el_nano_idx, vector<int> &sig_mu_nano_idx, bool isFastsim, bool isUL){
   float MET_pt, MET_phi;
-  getMETWithJEC(nano, year, isFastsim, MET_pt, MET_phi);
+  getMETWithJEC(nano, year, isFastsim, MET_pt, MET_phi, isUL);
   
   pico.out_ntk() = 0;
   // N.B. Objects that end up in the slimmedElecrtons or slimmedMuons collections are not stored 
