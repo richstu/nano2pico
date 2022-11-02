@@ -152,7 +152,8 @@ int main(int argc, char *argv[]){
         features.out_llphoton_dr()     = pico.llphoton_dr()[izg];
         features.out_llphoton_dphi()   = pico.llphoton_dphi()[izg];
         features.out_llphoton_deta()   = pico.llphoton_deta()[izg];
-        features.out_llphoton_costhj() = pico.llphoton_costhj()[izg];
+        //features.out_llphoton_costhj() = pico.llphoton_costhj()[izg];
+        features.out_llphoton_costhj() = pico.llphoton_costheta()[izg];
         continue;
       }
       
