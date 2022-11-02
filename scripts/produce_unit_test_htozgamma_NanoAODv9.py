@@ -81,7 +81,7 @@ if __name__ == "__main__":
                                                  data_nanoaod_directory="/net/cms17/cms17r0/pico/NanoAODv9/nano/2016/data", data_nanoaod_filename="DoubleEG__Run2016B__ver1_HIPM_UL2016_MiniAODv2_NanoAODv9-v1__280000__0475EF51-B32B-3842-87A1-4401BB753DD9.root", 
                                                  pico_directory=pico_directory, n_entries=n_entries))
   higgsino_test_commands.extend(makeTestCommands(mc_nanoaod_directory="/net/cms17/cms17r0/pico/NanoAODv9/nano/2016APV/mc", 
-                                                 mc_nanoaod_filename="DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8__RunIISummer20UL16NanoAODAPVv9__106X_mcRun2_asymptotic_preVFP_v11-v1__280000__52E5237A-EB6F-4F43-A91F-20E2EAAD9E7D.root"),
+                                                 mc_nanoaod_filename="DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8__RunIISummer20UL16NanoAODAPVv9__106X_mcRun2_asymptotic_preVFP_v11-v1__280000__52E5237A-EB6F-4F43-A91F-20E2EAAD9E7D.root",
                                                  pico_directory=pico_directory, n_entries=n_entries))
   higgsino_test_commands.extend(makeTestCommands(mc_nanoaod_directory="/net/cms17/cms17r0/pico/NanoAODv9/nano/2017/mc", mc_nanoaod_filename="DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8__RunIISummer20UL17NanoAODv9__106X_mc2017_realistic_v9-v2__100000__04620FA2-DB18-7F4A-B30C-BAFD1C5B673D.root", 
                                                  data_nanoaod_directory="/net/cms17/cms17r0/pico/NanoAODv9/nano/2017/data", data_nanoaod_filename="DoubleEG__Run2017B__UL2017_MiniAODv2_NanoAODv9-v1__70000__04646CDD-F24C-DA40-BCC8-6EB722486EAF.root", 
