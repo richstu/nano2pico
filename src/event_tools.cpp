@@ -512,7 +512,7 @@ int EventTools::GetEventType(){
       //2015A=1, ..., 2015D=4, ..., 2016A=27, 2016B=28, 2016C=29, ...
       if(bin > 99) bin = 0;//Sanity check
     }
-  }else if((Contains(name, "TTJets") || Contains(name, "TT_")) && !Contains(name, "TTTT_")){ sample = 1;
+  }else if((Contains(name, "TTJets") || Contains(name, "TT_") || Contains(name,"TTTo2L2Nu")) && !Contains(name, "TTTT_")){ sample = 1;
     if(Contains(name, "TTJets_Tune")){ category = 0; bin = 0;
     }else if(Contains(name, "SingleLept")){ category = 1; bin = 0;
       if(Contains(name, "genMET-150")) bin = 1;
@@ -526,8 +526,9 @@ int EventTools::GetEventType(){
       }
     }else if(Contains(name, "TT_")){ category = 4; bin = 0;
     }else if(Contains(name, "TTJets_Mtt")){ category = 5; bin = 0;
+    }else if(Contains(name, "TTTo2L2Nu")){ category = 6; bin = 0;
     }
-  }else if(Contains(name, "WJets") && !Contains(name, "TTWJets")){ sample = 2;
+  }else if(Contains(name, "WJets") && !Contains(name, "TTWJets") && !Contains(name,"ttWJets")){ sample = 2;
     if(Contains(name, "WJetsToLNu_Tune")){ category = 0; bin = 0;
     }else if(Contains(name, "WJetsToLNu_HT")){ category = 1;
       if(Contains(name, "HT-70To100")){ bin = 0;
@@ -551,13 +552,16 @@ int EventTools::GetEventType(){
     }else if(Contains(name, "ST_tW_top")){ category = 3; bin = 0;
     }else if(Contains(name, "ST_tW_antitop")){ category = 4; bin = 0;
     }
-  }else if(Contains(name, "TTWJets")){ sample = 4;
+  }else if(Contains(name, "TTWJets") || Contains(name,"ttW")){ sample = 4;
     if(Contains(name, "TTWJetsToLNu")){ category = 0; bin = 0;
     }else if(Contains(name, "TTWJetsToQQ")){ category = 1; bin = 0;
+    }else if(Contains(name, "ttWJets_Tune")){ category = 2; bin = 0;
+    }else if(Contains(name, "ttWJetsToLNu")){ category = 3; bin = 0;
     }
-  }else if(Contains(name, "TTZ")){ sample = 5;
+  }else if(Contains(name, "TTZ") || Contains(name,"ttZ")){ sample = 5;
     if(Contains(name, "TTZToLLNuNu")){ category = 0; bin = 0;
     }else if(Contains(name, "TTZToQQ")){ category = 1; bin = 0;
+    }else if(Contains(name, "ttZJets_Tune")){ category = 2; bin = 0;
     }
   }else if(Contains(name, "DYJetsToLL")){ sample = 6;
     if(Contains(name, "DYJetsToLL_M-50_Tune") && Contains(name, "madgraphMLM")){ category = 0; bin = 0;
@@ -645,19 +649,19 @@ int EventTools::GetEventType(){
   }else if(Contains(name, "ZH") && !Contains(name,"HToZG") && !Contains(name, "T5qqqqZH")){ sample = 13;
     if(Contains(name, "ZH_HToBB_ZToNuNu")){ category = 0; bin = 0;
     }
-  }else if(Contains(name, "WW") && !Contains(name,"TChiHH")){ sample = 14;
+  }else if(Contains(name, "WW") && !Contains(name,"WWG") && !Contains(name,"WWW") && !Contains(name,"WWZ") && !Contains(name,"HToWW") && !Contains(name,"TChiHH")){ sample = 14;
     if(Contains(name, "WWToLNuQQ")){ category = 0; bin = 0;
     }else if(Contains(name, "WWTo2L2Nu")){ category = 1; bin = 0;
     }else if(Contains(name, "WW_Tune"))  { category = 2; bin = 0;
     }
-  }else if(Contains(name, "WZ") && !Contains(name,"TChiHH")){ sample = 15;
+  }else if(Contains(name, "WZ") && !Contains(name,"WZG") && !Contains(name,"WWZ") && !Contains(name,"WZZ") && !Contains(name,"TChiHH")){ sample = 15;
     if(Contains(name, "WZTo1L3Nu")){ category = 0; bin = 0;
     }else if(Contains(name, "WZTo1L1Nu2Q")){ category = 1; bin = 0;
     }else if(Contains(name, "WZTo2L2Q")){    category = 2; bin = 0;
     }else if(Contains(name, "WZTo3LNu")){    category = 3; bin = 0;
     }else if(Contains(name, "WZ_Tune")){     category = 4; bin = 0;
     }
-  }else if(Contains(name, "ZZ") && !Contains(name,"TChiHH")){ sample = 16;
+  }else if(Contains(name, "ZZ") && !Contains(name,"ZZG") && !Contains(name,"ZZZ") && !Contains(name,"HToZZ") && !Contains(name,"TChiHH")){ sample = 16;
     if(Contains(name, "ZZ_Tune")){ category = 0; bin = 0;
     }
   }else if(Contains(name, "ZGTo")) { sample = 17; bin = 0;
@@ -667,6 +671,27 @@ int EventTools::GetEventType(){
     if(Contains(name, "TGJets_Tune")) category = 0;
   }else if(Contains(name, "LLAJJ")) { sample = 19; bin = 0;
     if(Contains(name,"EWK_MLL-50")) category = 0;
+  }else if(Contains(name, "EWKZ2Jets")){ sample = 20; category = 0; bin = 0;
+  }else if(Contains(name, "WWG")){ sample = 21; category = 0; bin = 0;
+  }else if(Contains(name, "WZG")){ sample = 22; category = 0; bin = 0;
+  }else if(Contains(name, "ZZG")){ sample = 23; category = 0; bin = 0;
+  }else if(Contains(name, "WWW")){ sample = 24;
+    if(Contains(name, "WWW_4F_Tune")){ category = 0; bin = 0;
+    }else if(Contains(name, "WWW_4F_DileptonFilter")){ category = 1; bin = 0;
+    }
+  }else if(Contains(name, "WWZ")){ sample = 25;
+    if(Contains(name, "WWZ_4F_Tune")){ category = 0; bin = 0;
+    }else if(Contains(name, "WWZJetsTo4L2Nu")){ category = 1; bin = 0;
+    }
+  }else if(Contains(name, "WZZ")){ sample = 26; category = 0; bin = 0;
+  }else if(Contains(name, "ZZZ")){ sample = 27; category = 0; bin = 0;
+  }else if(Contains(name, "GluGluH") && !Contains(name,"HToZG")){ sample = 28;
+    if(Contains(name, "HToGG")){           category = 0; bin = 0;
+    }else if(Contains(name, "HToZZ")){     category = 1; bin = 0;
+    }else if(Contains(name, "HToWW")){     category = 2; bin = 0;
+    }else if(Contains(name, "HToTauTau")){ category = 3; bin = 0;
+    }else if(Contains(name, "HToBB")){     category = 4; bin = 0;
+    }
   }else if(Contains(name, "T1tttt")){ sample = 100; category = 0; bin = 0;
   }else if(Contains(name, "T2tt")){   sample = 101; category = 0; bin = 0;
   }else if(Contains(name, "T1bbbb")){ sample = 102; category = 0; bin = 0;
