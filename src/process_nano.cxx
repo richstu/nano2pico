@@ -162,7 +162,7 @@ int main(int argc, char *argv[]){
   PhotonWeighter photon_weighter(year, isZgamma);
   // UL scale factors
   EventWeighter event_weighter(year, isAPV);
-  cout<<"Is APV: "<<isAPV<<endl;
+  //cout<<"Is APV: "<<isAPV<<endl;
 
   // Other tools
   EventTools event_tools(in_path, year);
