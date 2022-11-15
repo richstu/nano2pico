@@ -303,7 +303,8 @@ int main(int argc, char *argv[]){
     } 
     if (pico.out_ntrulep()==1) {
       for (unsigned imc(0); imc<pico.out_mc_id().size(); imc++){
-        if (abs(pico.out_mc_id()[imc])==11 || abs(pico.out_mc_id()[imc])==13) {
+        // statusflag: 12 = isFirstCopy
+        if ((abs(pico.out_mc_id()[imc])==11 || abs(pico.out_mc_id()[imc])==13) && (pico.out_mc_statusflag()[12]==1)) {
           pico.out_mt_tru() = GetMT(pico.out_met_tru(), pico.out_met_tru_phi(), 
                                 pico.out_mc_pt()[imc], pico.out_mc_phi()[imc]);
           break;
@@ -376,7 +377,6 @@ int main(int argc, char *argv[]){
         pico.out_w_lep() = w_el_id * w_mu_id * w_mu_iso;
         pico.out_w_fs_lep() = 1.; // Need to be implemented
         pico.out_sys_lep().resize(2,0); pico.out_sys_fs_lep().resize(2,0); // Need to be implemented
-        pico.out_w_pu() = 1.;
         pico.out_sys_pu().resize(2, 0.); // Need to be implemented
         event_weighter.PhotonIDSF(pico, w_photon_id);
         event_weighter.PhotonCSEVSF(pico, w_photon_csev);

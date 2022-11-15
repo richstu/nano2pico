@@ -126,10 +126,10 @@ void GenParticleProducer::WriteGenParticles(nano_tree &nano, pico_tree &pico){
     // store information
     if (save_index) {
       interested_mc_indices.push_back(imc);
-      if (abs(mc_id) == 11 && !is_tauDecayProduct && mc_statusFlags[13]==1) ntruel++;
-      if (abs(mc_id) == 13 && !is_tauDecayProduct && mc_statusFlags[13]==1) ntrumu++;
-      if (abs(mc_id) == 11 && is_tauDecayProduct && mc_statusFlags[13]==1) ntrutaul++;
-      if (abs(mc_id) == 13 && is_tauDecayProduct && mc_statusFlags[13]==1) ntrutaul++;
+      if (abs(mc_id) == 11 && !is_tauDecayProduct && mc_statusFlags[12]==1) ntruel++;
+      if (abs(mc_id) == 13 && !is_tauDecayProduct && mc_statusFlags[12]==1) ntrumu++;
+      if (abs(mc_id) == 11 && is_tauDecayProduct && mc_statusFlags[12]==1) ntrutaul++;
+      if (abs(mc_id) == 13 && is_tauDecayProduct && mc_statusFlags[12]==1) ntrutaul++;
       if (abs(mc_id) == 15 && mc_statusFlags[12]==1) ntrutau++;
     }
   }
