@@ -30,7 +30,8 @@ def get_cuts(skim_name):
   if(skim_name=='1e4j'): cuts = '&&'.join(['nel>=1', 'njet>=4'])
   if(skim_name=='2l'): cuts = 'nlep>=2'
   if(skim_name=='3l'): cuts = 'nlep==3'
-  if(skim_name=='llg'): cuts = '(nmu > 1 || nel > 1) && nphoton > 0'
+  if(skim_name=='ll'):  cuts = '(nmu >= 2 || nel >= 2)'
+  if(skim_name=='llg'): cuts = '(nmu >= 2 || nel >= 2) && nphoton > 0'
 
   # Higgsino loose
   nb_or_fjet_cut = '(nbt>=2 || nbdft>=2 || Sum$(fjet_pt>300 && fjet_msoftdrop>50)>0)'

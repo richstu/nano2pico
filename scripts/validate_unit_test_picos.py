@@ -94,14 +94,16 @@ if __name__ == "__main__":
 
   # Find folders to compare in golden folder
   compare_folders = []
-  for data_type in os.listdir(golden_base_folder):
-    if os.path.isfile(os.path.join(golden_base_folder,data_type)): continue
-    for production in os.listdir(os.path.join(golden_base_folder,data_type)): 
-      if production == "wgt_sums": continue
-      if production == "corrections": continue
-      if production == "raw_pico" and data_type != "data": continue
-      path = os.path.join(data_type,production)
-      compare_folders.append(path)
+  for year in os.listdir(golden_base_folder):
+    if os.path.isfile(os.path.join(golden_base_folder,year)): continue
+    for data_type in os.listdir(os.path.join(golden_base_folder,year)):
+      if os.path.isfile(os.path.join(golden_base_folder,year,data_type)): continue
+      for production in os.listdir(os.path.join(golden_base_folder,year,data_type)): 
+        if production == "wgt_sums": continue
+        if production == "corrections": continue
+        if production == "raw_pico" and data_type != "data": continue
+        path = os.path.join(year,data_type,production)
+        compare_folders.append(path)
   print("[Info] Will compare following folders: "+", ".join(compare_folders))
 
   # Make command list

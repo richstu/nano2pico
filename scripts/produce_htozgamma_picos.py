@@ -198,6 +198,19 @@ def processMc(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, 
     './scripts/confirm_slim.py '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/skim_llg '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/merged_zgmc_llg',
     notify_script+' "Finished merge llg '+mc_tag+'"'],
 
+    #5
+    [notify_script+' "Start skim ll '+mc_tag+'"',
+    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/unskimmed/ --skim_name ll --tag '+mc_tag,
+    'auto_submit_jobs.py skim_lg_cmds_'+mc_tag+'.json -c scripts/check_skim.py -f',
+    notify_script+' "Finished skim ll '+mc_tag+'"'],
+    
+    #6
+    [notify_script+' "Start merge ll '+mc_tag+'"',
+    './scripts/write_slim_and_merge_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/skim_ll/ --slim_name zgmc --tag '+mc_tag,
+    'auto_submit_jobs.py '+mc_tag+'_slim_zgmc_ll_cmds.json -f',
+    './scripts/confirm_slim.py '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/skim_ll '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/merged_zgmc_ll',
+    notify_script+' "Finished merge ll '+mc_tag+'"'],
+
   ]
   return processSteps(process_commands, YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, NANOAOD_VERSION, FIRST_COMMAND, NO_RUN, mc_tag)
 
@@ -229,6 +242,19 @@ def processData(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR
     'auto_submit_jobs.py '+data_tag+'_slim_zgdata_llg_cmds.json -c scripts/check_slim_and_merge.py -f',
     './scripts/confirm_slim.py '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/skim_llg '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/merged_zgdata_llg',
     notify_script+' "Finished merge llg '+data_tag+'"'],
+
+    #3
+    [notify_script+' "Started skim ll '+data_tag+'"',
+    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/raw_pico/ --skim_name ll --tag '+data_tag,
+    'auto_submit_jobs.py skim_ll_cmds_'+data_tag+'.json -c scripts/check_skim.py -f',
+    notify_script+' "Finished skim ll '+data_tag+'"'],
+    
+    #4
+    [notify_script+' "Started merge ll '+data_tag+'"',
+    './scripts/write_slim_and_merge_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/skim_ll/ --slim_name zgdata --tag '+data_tag,
+    'auto_submit_jobs.py '+data_tag+'_slim_zgdata_ll_cmds.json -c scripts/check_slim_and_merge.py -f',
+    './scripts/confirm_slim.py '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/skim_ll '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/merged_zgdata_ll',
+    notify_script+' "Finished merge ll '+data_tag+'"'],
 
   ]
 
