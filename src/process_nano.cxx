@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <iomanip>
+#include <bitset>
 
 #include <getopt.h>
 
@@ -303,11 +304,14 @@ int main(int argc, char *argv[]){
     } 
     if (pico.out_ntrulep()==1) {
       for (unsigned imc(0); imc<pico.out_mc_id().size(); imc++){
-        // statusflag: 12 = isFirstCopy
-        if ((abs(pico.out_mc_id()[imc])==11 || abs(pico.out_mc_id()[imc])==13) && (pico.out_mc_statusflag()[12]==1)) {
-          pico.out_mt_tru() = GetMT(pico.out_met_tru(), pico.out_met_tru_phi(), 
-                                pico.out_mc_pt()[imc], pico.out_mc_phi()[imc]);
-          break;
+        if (abs(pico.out_mc_id()[imc])==11 || abs(pico.out_mc_id()[imc])==13) {
+          // statusflag: 12 = isFirstCopy
+          bitset<15> mc_statusFlags(pico.out_mc_statusflag().at(imc));
+          if  ((mc_statusFlags[12]==1)) {
+            pico.out_mt_tru() = GetMT(pico.out_met_tru(), pico.out_met_tru_phi(), 
+                                  pico.out_mc_pt()[imc], pico.out_mc_phi()[imc]);
+            break;
+          }
         }
       }
     } 

@@ -79,7 +79,8 @@ if __name__ == "__main__":
   higgsino_test_commands = []
   # For DYJets and EG data
   higgsino_test_commands.extend(makeTestCommands(mc_nanoaod_directory="/net/cms17/cms17r0/pico/NanoAODv9/nano/2016/mc", mc_nanoaod_filename="DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8__RunIISummer20UL16NanoAODv9__106X_mcRun2_asymptotic_v17-v1__30000__0082C29D-E74C-024A-BE9B-97B29EE7A4A2.root", 
-                                                 data_nanoaod_directory="/net/cms17/cms17r0/pico/NanoAODv9/nano/2016/data", data_nanoaod_filename="DoubleEG__Run2016B__ver1_HIPM_UL2016_MiniAODv2_NanoAODv9-v1__280000__0475EF51-B32B-3842-87A1-4401BB753DD9.root", 
+                                                 #data_nanoaod_directory="/net/cms17/cms17r0/pico/NanoAODv9/nano/2016/data", data_nanoaod_filename="DoubleEG__Run2016B__ver1_HIPM_UL2016_MiniAODv2_NanoAODv9-v1__280000__0475EF51-B32B-3842-87A1-4401BB753DD9.root", 
+                                                 data_nanoaod_directory="/net/cms17/cms17r0/pico/NanoAODv9/nano/2016/data", data_nanoaod_filename="DoubleEG__Run2016B__ver1_HIPM_UL2016_MiniAODv2_NanoAODv9-v2__2530000__BD01422E-8128-834F-93FE-07E8F922A3D9.root", 
                                                  year = "2016",
                                                  pico_directory=pico_directory, n_entries=n_entries))
   higgsino_test_commands.extend(makeTestCommands(mc_nanoaod_directory="/net/cms17/cms17r0/pico/NanoAODv9/nano/2016APV/mc", 
