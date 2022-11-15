@@ -46,6 +46,18 @@ def getProcessTime(log_path):
         process_information.append([command, return_code, execution_time])
   return process_information
 
+# ./run/process_nano.exe -f DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8__RunIISummer20UL16NanoAODv9__106X_mcRun2_asymptotic_v17-v1__30000__0082C29D-E74C-024A-BE9B-97B29EE7A4A2.root -i /net/cms17/cms17r0/pico/NanoAODv9/nano/2016/mc -o unit_test_htozgamma_nanoaodv9/2016/mc --nent 30000
+def strip_input(command):
+  no_input_list = []
+  input_arg = 0
+  for arg in command.split():
+    if input_arg == 2: input_arg = 0
+    if input_arg == 1: input_arg += 1
+    if arg == "-i": input_arg = 1
+    if input_arg == 0:
+      no_input_list.append(arg)
+  return ''.join(no_input_list)
+
 if __name__ == "__main__":
 
   parser = argparse.ArgumentParser(description='''Compares unit test pico files and logs. Prints speed of production and root file differences.''', formatter_class=argparse.RawTextHelpFormatter)
@@ -82,7 +94,8 @@ if __name__ == "__main__":
     golden_execution_time = process[2]
     validate_execution_time = -1
     for validate_process in validate_process_information:
-      if validate_process[0] == command: 
+      # Ignore input directory
+      if strip_input(validate_process[0]) == strip_input(command): 
         validate_execution_time = validate_process[2]
         break
     print("Command: "+process[0])
