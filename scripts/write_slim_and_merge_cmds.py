@@ -24,6 +24,7 @@ def findBaseSampleNames(folder):
     # For NanoAODv9
     # mc
     dataset_tag = dataset_tag.split('__RunIISummer20UL16NanoAODv9__')[0]
+    dataset_tag = dataset_tag.split('__RunIISummer20UL16NanoAODAPVv9__')[0]
     dataset_tag = dataset_tag.split('__RunIISummer20UL17NanoAODv9__')[0]
     dataset_tag = dataset_tag.split('__RunIISummer20UL18NanoAODv9__')[0]
     # data
@@ -31,6 +32,7 @@ def findBaseSampleNames(folder):
     dataset_tag = dataset_tag.split('__ver1_HIPM_UL2016_MiniAODv2_NanoAODv9-v2__')[0]
     dataset_tag = dataset_tag.split('__ver2_HIPM_UL2016_MiniAODv2_NanoAODv9-v1__')[0]
     dataset_tag = dataset_tag.split('__ver2_HIPM_UL2016_MiniAODv2_NanoAODv9-v2__')[0]
+    dataset_tag = dataset_tag.split('__ver2_HIPM_UL2016_MiniAODv2_NanoAODv9-v3__')[0]
     dataset_tag = dataset_tag.split('__HIPM_UL2016_MiniAODv2_NanoAODv9-v1__')[0]
     dataset_tag = dataset_tag.split('__HIPM_UL2016_MiniAODv2_NanoAODv9-v2__')[0]
     dataset_tag = dataset_tag.split('__UL2016_MiniAODv2_NanoAODv9-v1__')[0]
@@ -63,6 +65,7 @@ if __name__ == '__main__':
                     help='Process all input files regardless whether output exists.')
   parser.add_argument('-t', '--tag', default='',
                     help='Optionally specify a tag to be used to differentiate helper files for batch submission.')
+  parser.add_argument('-f', '--force_run', action='store_true')
   args = vars(parser.parse_args())
 
   in_dir = args['in_dir']
@@ -108,7 +111,9 @@ if __name__ == '__main__':
   json_name = cmdfile_name.replace('.py','.json')
   print('To print a sample command:')
   print('cat '+cmdfile_name+' | tail -n 1\n')
-  os.system('convert_cl_to_jobs_info.py '+cmdfile_name+' '+json_name)
+  force_run_arg = ''
+  if args['force_run']: force_run_arg = ' -f '
+  os.system('convert_cl_to_jobs_info.py '+force_run_arg+cmdfile_name+' '+json_name)
   print('\nTo generate job json and submit jobs:')
   print('auto_submit_jobs.py '+json_name)
 

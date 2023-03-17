@@ -16,6 +16,7 @@ def getTag(path):
   tag = tag.split("RunIIAutumn18NanoAODv7")[0]
 
   tag = tag.split("RunIISummer20UL16NanoAODv9")[0]
+  tag = tag.split("RunIISummer20UL16NanoAODAPVv9")[0]
   tag = tag.split("RunIISummer20UL17NanoAODv9")[0]
   tag = tag.split("RunIISummer20UL18NanoAODv9")[0]
 

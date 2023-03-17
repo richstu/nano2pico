@@ -34,7 +34,7 @@ def get_nanoaod_files(folders):
     for obj in os.listdir(folder):
       if ".root" not in obj: continue
       path = os.path.join(folder,obj)
-      year = re.findall("nano/(\d\d\d\d)/", folder)[0]
+      year = re.findall("nano/(\d\d\d\d|\d\d\d\dAPV)/", folder)[0]
       nanoaod_files.append([path, year])
   return nanoaod_files
   
@@ -99,9 +99,10 @@ if __name__ == "__main__":
 
   # Print cross sections for NanoAODv9 mc files
   # Get all NanoAODv9 filenames
-  nanoaodv9_folders = ["/net/cms17/cms17r0/pico/NanoAODv9/nano/2016/mc", 
-                       "/net/cms17/cms17r0/pico/NanoAODv9/nano/2017/mc",
-                       "/net/cms17/cms17r0/pico/NanoAODv9/nano/2018/mc",
+  nanoaodv9_folders = ["/net/cms11/cms11r0/pico/NanoAODv9/nano/2016/mc", 
+                       "/net/cms11/cms11r0/pico/NanoAODv9/nano/2016APV/mc", 
+                       "/net/cms11/cms11r0/pico/NanoAODv9/nano/2017/mc",
+                       "/net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc",
                        ]
   nanoaodv9_files = get_nanoaod_files(nanoaodv9_folders)
   #nanoaodv9_cross_sections = [(path, cross section in pb)]

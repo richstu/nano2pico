@@ -15,6 +15,7 @@ parser.add_argument('-t', '--tag', default='',
                     help='Optionally specify a tag to be used to differentiate helper files for batch submission.')
 parser.add_argument("-l","--list_format", default="DAS", choices=["DAS","filename"],
                     help="Sets whether the dataset list is in DAS format or filename format.")
+parser.add_argument("--data", action="store_true", help='For DAS data datasets')
 args = vars(parser.parse_args())
 
 in_dir = args['in_dir']
@@ -36,11 +37,19 @@ if args['dataset_list']!='':
     datasets = f.readlines()
   if (list_format == "DAS"):
     wanted_file_substr = []
-    for ds in datasets: 
-      if ds[0]!="/": # in case of empty lines or comments
-        continue
-      tmp_ = ds.split("/")
-      wanted_file_substr.append(re.sub(r'(NanoAODv\d+)-', r'\1__',tmp_[1]+'__'+tmp_[2]))
+    if args['data']:
+      for ds in datasets:
+        ds_split = ds.split("/")
+        dataset = ds_split[1]
+        run_condition = ds_split[2]
+        run, condition =  re.search('(Run.+?)-(.*)', run_condition).groups()
+        wanted_file_substr.append(dataset+"__"+run+"__"+condition)
+    else:
+      for ds in datasets: 
+        if ds[0]!="/": # in case of empty lines or comments
+          continue
+        tmp_ = ds.split("/")
+        wanted_file_substr.append(re.sub(r'(NanoAODv\d+|NanoAODAPVv\d+)-', r'\1__',tmp_[1]+'__'+tmp_[2]))
     for istr in wanted_file_substr:
       for ifile in all_file_paths:
         if (istr in ifile):
