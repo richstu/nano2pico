@@ -43,6 +43,17 @@ EventWeighter::EventWeighter(int year, bool preVFP){
     in_file_btag_     = "data/zgamma/2018_UL/btagging.json";
     key_              = "2018";
     puName_           = "Collisions18_UltraLegacy_goldenJSON";
+  } else if (year==2022){
+    std::cout<<"Using 2018 JSONs by default for now in event_weighter.cpp"<<endl;
+    in_file_electron_ = "data/zgamma/2018_UL/electron.json";
+    in_file_photon_   = "data/zgamma/2018_UL/photon.json";
+    in_file_muon_     = "data/zgamma/2018_UL/muon_Z.json";
+    in_file_pu_       = "data/zgamma/2018_UL/puWeights.json";
+    in_file_btag_     = "data/zgamma/2018_UL/btagging.json";
+    key_              = "2018";
+    puName_           = "Collisions18_UltraLegacy_goldenJSON";
+  } else {
+    std::cout<<"Year has not been implemented in event_weighter"<<endl;
   }
   cs_electron_        = correction::CorrectionSet::from_file(in_file_electron_);
   cs_photon_          = correction::CorrectionSet::from_file(in_file_photon_);

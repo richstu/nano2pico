@@ -320,17 +320,24 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
   pico.out_HLT_Ele25_WPTight_Gsf() = nano.HLT_Ele25_WPTight_Gsf();
   pico.out_HLT_Ele27_WPTight_Gsf() = nano.HLT_Ele27_WPTight_Gsf();
   pico.out_HLT_Ele28_WPTight_Gsf() = nano.HLT_Ele28_WPTight_Gsf();
+  pico.out_HLT_Ele30_WPTight_Gsf() = nano.HLT_Ele30_WPTight_Gsf();
   pico.out_HLT_Ele32_WPTight_Gsf() = nano.HLT_Ele32_WPTight_Gsf();
   pico.out_HLT_Ele32_WPTight_Gsf_L1DoubleEG() = nano.HLT_Ele32_WPTight_Gsf_L1DoubleEG();
   pico.out_HLT_Ele35_WPTight_Gsf() = nano.HLT_Ele35_WPTight_Gsf();
   pico.out_HLT_Ele20_WPLoose_Gsf() = nano.HLT_Ele20_WPLoose_Gsf();
   pico.out_HLT_Ele45_WPLoose_Gsf() = nano.HLT_Ele45_WPLoose_Gsf();
+  pico.out_HLT_Ele8_CaloIdL_TrackIdL_IsoVL_PFJet30() = nano.HLT_Ele8_CaloIdL_TrackIdL_IsoVL_PFJet30();
+  pico.out_HLT_Ele8_CaloIdM_TrackIdM_PFJet30() = nano.HLT_Ele8_CaloIdM_TrackIdM_PFJet30();
+  pico.out_HLT_Ele17_CaloIdM_TrackIdM_PFJet30() = nano.HLT_Ele17_CaloIdM_TrackIdM_PFJet30();
+  pico.out_HLT_Ele23_CaloIdM_TrackIdM_PFJet30() = nano.HLT_Ele23_CaloIdM_TrackIdM_PFJet30();
+  pico.out_HLT_Ele23_CaloIdL_TrackIdL_IsoVL_PFJet30() = nano.HLT_Ele23_CaloIdL_TrackIdL_IsoVL_PFJet30();
   pico.out_HLT_Ele105_CaloIdVT_GsfTrkIdT() = nano.HLT_Ele105_CaloIdVT_GsfTrkIdT();
   pico.out_HLT_Ele115_CaloIdVT_GsfTrkIdT() = nano.HLT_Ele115_CaloIdVT_GsfTrkIdT();
   pico.out_HLT_Ele135_CaloIdVT_GsfTrkIdT() = nano.HLT_Ele135_CaloIdVT_GsfTrkIdT();
   pico.out_HLT_Ele145_CaloIdVT_GsfTrkIdT() = nano.HLT_Ele145_CaloIdVT_GsfTrkIdT();
   pico.out_HLT_Ele25_eta2p1_WPTight_Gsf() = nano.HLT_Ele25_eta2p1_WPTight_Gsf();
   pico.out_HLT_Ele27_eta2p1_WPTight_Gsf() = nano.HLT_Ele27_eta2p1_WPTight_Gsf();
+  pico.out_HLT_Ele28_eta2p1_WPTight_Gsf_HT150() = nano.HLT_Ele28_eta2p1_WPTight_Gsf_HT150();
   pico.out_HLT_Ele20_eta2p1_WPLoose_Gsf() = nano.HLT_Ele20_eta2p1_WPLoose_Gsf();
   pico.out_HLT_Ele25_eta2p1_WPLoose_Gsf() = nano.HLT_Ele25_eta2p1_WPLoose_Gsf();
   pico.out_HLT_Ele27_eta2p1_WPLoose_Gsf() = nano.HLT_Ele27_eta2p1_WPLoose_Gsf();
@@ -452,6 +459,7 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
       nano.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ() || nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8() || 
       nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8() || nano.HLT_Mu37_TkMu27();
 
+  pico.out_HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL() = nano.HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL();
   pico.out_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ() = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ();
   pico.out_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL()    = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL();
   pico.out_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL()          = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL();
@@ -466,6 +474,12 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
   // Photon triggers
   pico.out_HLT_Mu17_Photon30_IsoCaloId()               = nano.HLT_Mu17_Photon30_IsoCaloId();
   pico.out_HLT_Photon175()                             = nano.HLT_Photon175();
+  // Double and di photon trigger
+  pico.out_HLT_DoublePhoton70()                        = nano.HLT_DoublePhoton70();
+  pico.out_HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId() = nano.HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId();
+	pico.out_HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId_Mass55() = nano.HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId_Mass55();
+	pico.out_HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90() = nano.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90();
+	pico.out_HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95() = nano.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95();
 
   if (isZgamma) {
     // this assumes that we process either all the datasets or at least an ordered subset starting with the dilepton datasets
@@ -492,7 +506,7 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
 
 int EventTools::GetEventType(){
   int sample = -999, category = -9, bin = -99;
-  if(Contains(name, "Run201")){ sample = 0;
+  if(Contains(name, "Run20")){ sample = 0;
     if(Contains(name, "SingleElectron") || Contains(name, "EGamma")){ category = 0;
     }else if(Contains(name, "SingleMuon")){ category = 1;
     }else if(Contains(name, "DoubleEG")){   category = 2;
@@ -501,7 +515,7 @@ int EventTools::GetEventType(){
     }else if(Contains(name, "HTMHT")){      category = 5;
     }else if(Contains(name, "JetHT")){      category = 6;
     }
-    auto pos = name.find("Run201")+7;
+    auto pos = name.find("Run20")+7;
     if(pos < name.size()
        && isalpha(name.at(pos))
        && pos-1 < name.size()

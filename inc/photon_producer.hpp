@@ -28,6 +28,7 @@ private:
   bool isData;
 
   bool idPhoton(int bitmap, int level);
+  void getZGammaPhBr(nano_tree & nano, pico_tree & pico, int yearnum, int iph, int shift, float pt, float eta, float phi, bool eVeto, float mva, bool isSignal, double minLepDR);
 };
 
 #endif

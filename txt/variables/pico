@@ -373,11 +373,17 @@ bool HLT_Mu50_IsoVVVL_PFHT450
 bool HLT_Ele25_WPTight_Gsf
 bool HLT_Ele27_WPTight_Gsf
 bool HLT_Ele28_WPTight_Gsf
+bool HLT_Ele30_WPTight_Gsf
 bool HLT_Ele32_WPTight_Gsf_L1DoubleEG
 bool HLT_Ele32_WPTight_Gsf
 bool HLT_Ele35_WPTight_Gsf
 bool HLT_Ele20_WPLoose_Gsf
 bool HLT_Ele45_WPLoose_Gsf
+bool HLT_Ele8_CaloIdL_TrackIdL_IsoVL_PFJet30
+bool HLT_Ele8_CaloIdM_TrackIdM_PFJet30
+bool HLT_Ele17_CaloIdM_TrackIdM_PFJet30
+bool HLT_Ele23_CaloIdL_TrackIdL_IsoVL_PFJet30
+bool HLT_Ele23_CaloIdM_TrackIdM_PFJet30
 bool HLT_Ele105_CaloIdVT_GsfTrkIdT
 bool HLT_Ele115_CaloIdVT_GsfTrkIdT
 bool HLT_Ele135_CaloIdVT_GsfTrkIdT
@@ -387,6 +393,7 @@ bool HLT_Ele27_eta2p1_WPTight_Gsf
 bool HLT_Ele20_eta2p1_WPLoose_Gsf
 bool HLT_Ele25_eta2p1_WPLoose_Gsf
 bool HLT_Ele27_eta2p1_WPLoose_Gsf
+bool HLT_Ele28_eta2p1_WPTight_Gsf_HT150
 bool HLT_Ele15_IsoVVVL_PFHT350
 bool HLT_Ele15_IsoVVVL_PFHT400
 bool HLT_Ele15_IsoVVVL_PFHT450
@@ -472,10 +479,19 @@ bool HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8
 bool HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8
 bool HLT_DoubleEle25_CaloIdL_MW
 bool HLT_Mu37_TkMu27
+bool HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL
 
 # Photon triggers
 bool HLT_Mu17_Photon30_IsoCaloId
 bool HLT_Photon175
+
+# Diphoton triggers
+bool HLT_DoublePhoton70
+bool HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId
+bool HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId_Mass55
+bool HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90
+bool HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95
+
 
 ################  Systematic variations  - to be implemented as needed  ##################
 
