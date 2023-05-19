@@ -96,5 +96,4 @@ void SplitFilePath(const std::string &path, std::string &dir_name, std::string &
 void getMETWithJEC(nano_tree & nano, int year, bool isFastsim, float & MET_pt, float & MET_phi, bool isUL);
 void getJetWithJEC(nano_tree & nano, bool isFastsim, std::vector<float> & Jet_pt, std::vector<float> & Jet_mass);
 
-
 #endif
