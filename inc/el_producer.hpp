@@ -26,7 +26,6 @@ private:
 
   bool idElectron_noIso(int bitmap, int level);
   bool EcalDriven(int bitmap);
-  void getZGammaElBr(nano_tree &nano, pico_tree &pico, int yearnum, int iel, bool &isSignal);
 
 };
 

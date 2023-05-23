@@ -69,7 +69,48 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
     else
       shift = nphotons;
     
-    getZGammaPhBr(nano, pico, year, iph, shift, pt, eta, phi, eVeto, mva, isSignal, minLepDR);
+    switch(year) {
+      case 2016:
+      case 2017:
+      case 2018:
+        pico.out_photon_pt()    .insert(pico.out_photon_pt()    .begin()+shift, pt);
+        pico.out_photon_eta()   .insert(pico.out_photon_eta()   .begin()+shift, eta);
+        pico.out_photon_phi()   .insert(pico.out_photon_phi()   .begin()+shift, phi);
+        pico.out_photon_reliso().insert(pico.out_photon_reliso().begin()+shift, nano.Photon_pfRelIso03_all()[iph]);
+        pico.out_photon_r9()    .insert(pico.out_photon_r9()    .begin()+shift, nano.Photon_r9()[iph]);
+        pico.out_photon_sieie() .insert(pico.out_photon_sieie() .begin()+shift, nano.Photon_sieie()[iph]);
+        pico.out_photon_pterr() .insert(pico.out_photon_pterr() .begin()+shift, nano.Photon_energyErr()[iph]);
+        pico.out_photon_hoe()   .insert(pico.out_photon_hoe()   .begin()+shift, nano.Photon_hoe()[iph]);
+        pico.out_photon_elveto().insert(pico.out_photon_elveto().begin()+shift, eVeto);
+        pico.out_photon_id()    .insert(pico.out_photon_id()    .begin()+shift, nano.Photon_mvaID_WP90()[iph]);
+        pico.out_photon_id80()  .insert(pico.out_photon_id80()  .begin()+shift, nano.Photon_mvaID_WP80()[iph]);
+        pico.out_photon_idmva() .insert(pico.out_photon_idmva() .begin()+shift, mva);
+        pico.out_photon_sig()   .insert(pico.out_photon_sig()   .begin()+shift, isSignal);
+        pico.out_photon_drmin() .insert(pico.out_photon_drmin() .begin()+shift, minLepDR);
+        pico.out_photon_elidx() .insert(pico.out_photon_elidx() .begin()+shift, nano.Photon_electronIdx()[iph]);
+        break;
+      case 2022:
+        pico.out_photon_pt()    .insert(pico.out_photon_pt()    .begin()+shift, pt);
+        pico.out_photon_eta()   .insert(pico.out_photon_eta()   .begin()+shift, eta);
+        pico.out_photon_phi()   .insert(pico.out_photon_phi()   .begin()+shift, phi);
+        pico.out_photon_reliso().insert(pico.out_photon_reliso().begin()+shift, nano.Photon_pfRelIso03_all_quadratic()[iph]);
+        pico.out_photon_r9()    .insert(pico.out_photon_r9()    .begin()+shift, nano.Photon_r9()[iph]);
+        pico.out_photon_sieie() .insert(pico.out_photon_sieie() .begin()+shift, nano.Photon_sieie()[iph]);
+        pico.out_photon_pterr() .insert(pico.out_photon_pterr() .begin()+shift, nano.Photon_energyErr()[iph]);
+        pico.out_photon_hoe()   .insert(pico.out_photon_hoe()   .begin()+shift, nano.Photon_hoe()[iph]);
+        pico.out_photon_elveto().insert(pico.out_photon_elveto().begin()+shift, eVeto);
+        pico.out_photon_id()    .insert(pico.out_photon_id()    .begin()+shift, nano.Photon_mvaID_WP90()[iph]);
+        pico.out_photon_id80()  .insert(pico.out_photon_id80()  .begin()+shift, nano.Photon_mvaID_WP80()[iph]);
+        pico.out_photon_idmva() .insert(pico.out_photon_idmva() .begin()+shift, mva);
+        pico.out_photon_sig()   .insert(pico.out_photon_sig()   .begin()+shift, isSignal);
+        pico.out_photon_drmin() .insert(pico.out_photon_drmin() .begin()+shift, minLepDR);
+        pico.out_photon_elidx() .insert(pico.out_photon_elidx() .begin()+shift, nano.Photon_electronIdx()[iph]);
+        break;
+      default:
+        std::cout<<"Need code for new year in getZGammaPhBr (in photon_producer.cpp)"<<endl;
+        exit(1);
+    }
+
 
     nphotons++;
     if (!isData)
@@ -107,47 +148,3 @@ bool PhotonProducer::idPhoton(int bitmap, int level){
   return pass;
 }
 
-void PhotonProducer::getZGammaPhBr(nano_tree & nano, pico_tree & pico, int yearnum, int iph, int shift, float pt, float eta, float phi, bool eVeto, float mva, bool isSignal, double minLepDR){
-  switch(yearnum) {
-    case 2016:
-    case 2017:
-    case 2018:
-      pico.out_photon_pt()    .insert(pico.out_photon_pt()    .begin()+shift, pt);
-      pico.out_photon_eta()   .insert(pico.out_photon_eta()   .begin()+shift, eta);
-      pico.out_photon_phi()   .insert(pico.out_photon_phi()   .begin()+shift, phi);
-      pico.out_photon_reliso().insert(pico.out_photon_reliso().begin()+shift, nano.Photon_pfRelIso03_all()[iph]);
-      pico.out_photon_r9()    .insert(pico.out_photon_r9()    .begin()+shift, nano.Photon_r9()[iph]);
-      pico.out_photon_sieie() .insert(pico.out_photon_sieie() .begin()+shift, nano.Photon_sieie()[iph]);
-      pico.out_photon_pterr() .insert(pico.out_photon_pterr() .begin()+shift, nano.Photon_energyErr()[iph]);
-      pico.out_photon_hoe()   .insert(pico.out_photon_hoe()   .begin()+shift, nano.Photon_hoe()[iph]);
-      pico.out_photon_elveto().insert(pico.out_photon_elveto().begin()+shift, eVeto);
-      pico.out_photon_id()    .insert(pico.out_photon_id()    .begin()+shift, nano.Photon_mvaID_WP90()[iph]);
-      pico.out_photon_id80()  .insert(pico.out_photon_id80()  .begin()+shift, nano.Photon_mvaID_WP80()[iph]);
-      pico.out_photon_idmva() .insert(pico.out_photon_idmva() .begin()+shift, mva);
-      pico.out_photon_sig()   .insert(pico.out_photon_sig()   .begin()+shift, isSignal);
-      pico.out_photon_drmin() .insert(pico.out_photon_drmin() .begin()+shift, minLepDR);
-      pico.out_photon_elidx() .insert(pico.out_photon_elidx() .begin()+shift, nano.Photon_electronIdx()[iph]);
-      break;
-    case 2022:
-      pico.out_photon_pt()    .insert(pico.out_photon_pt()    .begin()+shift, pt);
-      pico.out_photon_eta()   .insert(pico.out_photon_eta()   .begin()+shift, eta);
-      pico.out_photon_phi()   .insert(pico.out_photon_phi()   .begin()+shift, phi);
-      pico.out_photon_reliso().insert(pico.out_photon_reliso().begin()+shift, nano.Photon_pfRelIso03_all_quadratic()[iph]);
-      pico.out_photon_r9()    .insert(pico.out_photon_r9()    .begin()+shift, nano.Photon_r9()[iph]);
-      pico.out_photon_sieie() .insert(pico.out_photon_sieie() .begin()+shift, nano.Photon_sieie()[iph]);
-      pico.out_photon_pterr() .insert(pico.out_photon_pterr() .begin()+shift, nano.Photon_energyErr()[iph]);
-      pico.out_photon_hoe()   .insert(pico.out_photon_hoe()   .begin()+shift, nano.Photon_hoe()[iph]);
-      pico.out_photon_elveto().insert(pico.out_photon_elveto().begin()+shift, eVeto);
-      pico.out_photon_id()    .insert(pico.out_photon_id()    .begin()+shift, nano.Photon_mvaID_WP90()[iph]);
-      pico.out_photon_id80()  .insert(pico.out_photon_id80()  .begin()+shift, nano.Photon_mvaID_WP80()[iph]);
-      pico.out_photon_idmva() .insert(pico.out_photon_idmva() .begin()+shift, mva);
-      pico.out_photon_sig()   .insert(pico.out_photon_sig()   .begin()+shift, isSignal);
-      pico.out_photon_drmin() .insert(pico.out_photon_drmin() .begin()+shift, minLepDR);
-      pico.out_photon_elidx() .insert(pico.out_photon_elidx() .begin()+shift, nano.Photon_electronIdx()[iph]);
-      break;
-    default:
-      std::cout<<"Need code for new year in getZGammaPhBr (in photon_producer.cpp)"<<endl;
-      exit(1);
-  }
-
-}

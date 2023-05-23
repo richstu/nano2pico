@@ -35,8 +35,6 @@ private:
   float min_jet_pt;
   float max_jet_eta;
   bool isData;
-  void getZGammaJetBr(nano_tree & nano, pico_tree & pico, int yearnum, int ijet, std::vector<float> Jet_pt, std::vector<float> Jet_mass, bool islep, bool isvlep, bool isphoton, bool isgood, TLorentzVector mht_vec, 
-                      float MET_phi);
 };
 
 #endif

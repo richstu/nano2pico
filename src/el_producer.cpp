@@ -36,7 +36,37 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
       if (fabs(etasc) > ElectronEtaCut) continue;
       if (fabs(dz) > 1.0)  continue;
       if (fabs(dxy) > 0.5) continue; 
-      getZGammaElBr(nano, pico, year, iel, isSignal);
+      switch(year) {
+        case 2016:
+        case 2017:
+        case 2018:
+          isSignal = nano.Electron_mvaFall17V2Iso_WPL()[iel];
+          pico.out_el_idmva().push_back(nano.Electron_mvaFall17V2Iso()[iel]);
+          pico.out_el_sip3d().push_back(nano.Electron_sip3d()[iel]);
+          pico.out_el_phidx().push_back(nano.Electron_photonIdx()[iel]);
+          pico.out_el_id80().push_back(nano.Electron_mvaFall17V2Iso_WP80()[iel]);
+          pico.out_el_id90().push_back(nano.Electron_mvaFall17V2Iso_WP90()[iel]);
+          pico.out_el_idLoose().push_back(nano.Electron_mvaFall17V2Iso_WPL()[iel]);
+          pico.out_el_etPt().push_back(nano.Electron_scEtOverPt()[iel]);
+          pico.out_el_eminusp().push_back(nano.Electron_eInvMinusPInv()[iel]);
+          break;
+        case 2022:
+          isSignal = nano.Electron_mvaIso_WP80()[iel];
+          pico.out_el_idmva().push_back(nano.Electron_mvaIso()[iel]);
+          pico.out_el_sip3d().push_back(nano.Electron_sip3d()[iel]);
+          pico.out_el_phidx().push_back(nano.Electron_photonIdx()[iel]);
+          pico.out_el_id80().push_back(nano.Electron_mvaIso_WP80()[iel]);
+          pico.out_el_id90().push_back(nano.Electron_mvaIso_WP90()[iel]);
+          pico.out_el_idLoose().push_back(nano.Electron_mvaIso_WP80()[iel]);
+          pico.out_el_etPt().push_back(nano.Electron_scEtOverPt()[iel]);
+          pico.out_el_eminusp().push_back(nano.Electron_eInvMinusPInv()[iel]);
+          break;
+        default:
+          std::cout<<"Need code for new year in getZGammaElBr (in el_producer.cpp)"<<endl;
+          exit(1);
+      }
+
+
       int bitmap = nano.Electron_vidNestedWPBitmapHEEP()[iel];
       pico.out_el_ecal().push_back(EcalDriven(bitmap));
     }
@@ -141,34 +171,4 @@ bool ElectronProducer::EcalDriven(int bitmap){
   return ecaldriven;
 }
 //Branches change in run3
-void ElectronProducer::getZGammaElBr(nano_tree & nano, pico_tree & pico, int yearnum, int iel, bool & isSignal) {
-  switch(yearnum) {
-    case 2016:
-    case 2017:
-    case 2018:
-      isSignal = nano.Electron_mvaFall17V2Iso_WPL()[iel];
-      pico.out_el_idmva().push_back(nano.Electron_mvaFall17V2Iso()[iel]);
-      pico.out_el_sip3d().push_back(nano.Electron_sip3d()[iel]);
-      pico.out_el_phidx().push_back(nano.Electron_photonIdx()[iel]);
-      pico.out_el_id80().push_back(nano.Electron_mvaFall17V2Iso_WP80()[iel]);
-      pico.out_el_id90().push_back(nano.Electron_mvaFall17V2Iso_WP90()[iel]);
-      pico.out_el_idLoose().push_back(nano.Electron_mvaFall17V2Iso_WPL()[iel]);
-      pico.out_el_etPt().push_back(nano.Electron_scEtOverPt()[iel]);
-      pico.out_el_eminusp().push_back(nano.Electron_eInvMinusPInv()[iel]);
-      break;
-    case 2022:
-      isSignal = nano.Electron_mvaIso_WP80()[iel];
-      pico.out_el_idmva().push_back(nano.Electron_mvaIso()[iel]);
-      pico.out_el_sip3d().push_back(nano.Electron_sip3d()[iel]);
-      pico.out_el_phidx().push_back(nano.Electron_photonIdx()[iel]);
-      pico.out_el_id80().push_back(nano.Electron_mvaIso_WP80()[iel]);
-      pico.out_el_id90().push_back(nano.Electron_mvaIso_WP90()[iel]);
-      pico.out_el_idLoose().push_back(nano.Electron_mvaIso_WP80()[iel]);
-      pico.out_el_etPt().push_back(nano.Electron_scEtOverPt()[iel]);
-      pico.out_el_eminusp().push_back(nano.Electron_eInvMinusPInv()[iel]);
-      break;
-    default:
-      std::cout<<"Need code for new year in getZGammaElBr (in el_producer.cpp)"<<endl;
-      exit(1);
-  }
-}
+
