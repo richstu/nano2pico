@@ -68,21 +68,21 @@ int main(int argc, char *argv[]){
   bool isZgamma = Contains(out_dir, "zgamma");
   int year;
   int isAPV = false;
-  int isUL = false;
+  int is_preUL = true;
   if (Contains(in_file, "RunIISummer20")) { 
-    isUL = true;
+    is_preUL = false;
     if (Contains(in_file, "RunIISummer20UL16NanoAODAPV")) isAPV = true;
     if (Contains(in_file, "RunIISummer20UL16")) year = 2016;
     else if (Contains(in_file, "RunIISummer20UL17")) year = 2017;
     else year = 2018;
   } else if (Contains(in_file, "RunIISummer19")) { 
-    isUL = true;
+    is_preUL = false;
     if (Contains(in_file, "RunIISummer19UL16NanoAODAPV")) isAPV = true;
     if (Contains(in_file, "RunIISummer19UL16")) year = 2016;
     else if (Contains(in_file, "RunIISummer19UL17")) year = 2017;
     else year = 2018;
   } else if (Contains(in_file, "Run3Summer22")){ //Run 3 MC is UL, right?
-    isUL = true;
+    is_preUL = false;
     if (Contains(in_file, "Run3_2022")){
       year = 2022;
       cout<<"Using 2018 btag wpts by default currently."<<endl;
@@ -159,7 +159,7 @@ int main(int argc, char *argv[]){
   IsoTrackProducer tk_producer(year);
   PhotonProducer photon_producer(year, isData);
   JetProducer jet_producer(year, min_jet_pt, max_jet_eta, isData);
-  MetProducer met_producer(year, isData, isUL);
+  MetProducer met_producer(year, isData, is_preUL);
   HigVarProducer hig_producer(year);
   ZGammaVarProducer zgamma_producer(year);
 
@@ -280,7 +280,7 @@ int main(int argc, char *argv[]){
     if (isData) pico.out_stitch() = true;
     else event_tools.WriteStitch(nano, pico);
  
-    tk_producer.WriteIsoTracks(nano, pico, sig_el_nano_idx, sig_mu_nano_idx, isFastsim, isUL);
+    tk_producer.WriteIsoTracks(nano, pico, sig_el_nano_idx, sig_mu_nano_idx, isFastsim, is_preUL);
 
     dilep_producer.WriteDileptons(pico, sig_el_pico_idx, sig_mu_pico_idx);
 
@@ -291,11 +291,11 @@ int main(int argc, char *argv[]){
 
     if (debug) cout<<"INFO:: Writing jets, MET and ISR vars"<<endl;
     //jet producer uses sys_met_phi, so met_producer must be called first
-    met_producer.WriteMet(nano, pico, isFastsim, isSignal, isUL);
+    met_producer.WriteMet(nano, pico, isFastsim, isSignal, is_preUL);
 
     vector<HiggsConstructionVariables> sys_higvars;
     vector<int> sig_jet_nano_idx = jet_producer.WriteJets(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, jet_isphoton_nano_idx,
-                                                          btag_wpts[year], btag_df_wpts[year], isFastsim, isSignal, isUL, sys_higvars);
+                                                          btag_wpts[year], btag_df_wpts[year], isFastsim, isSignal, is_preUL, sys_higvars);
     jet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year][1], isFastsim); // usually w.r.t. medium WP
     if(!isZgamma){
       jet_producer.WriteFatJets(nano, pico); // jet_producer.SetVerbose(nano.nSubJet()>0);
@@ -307,7 +307,7 @@ int main(int argc, char *argv[]){
     pico.out_mt() = -999; 
     if (pico.out_nlep()==1) {
       float MET_pt, MET_phi;
-      getMETWithJEC(nano, year, isFastsim, MET_pt, MET_phi, isUL);
+      getMETWithJEC(nano, year, isFastsim, MET_pt, MET_phi, is_preUL);
       if (sig_el_nano_idx.size()>0) {
         pico.out_mt() = GetMT(MET_pt, MET_phi, 
           nano.Electron_pt()[sig_el_nano_idx[0]], nano.Electron_phi()[sig_el_nano_idx[0]]);
@@ -343,7 +343,7 @@ int main(int argc, char *argv[]){
 
     if (debug) cout<<"INFO:: Writing filters and triggers"<<endl;
     // N.B. Jets: pico.out_pass_jets() and pico.out_pass_fsjets() filled in jet_producer
-    event_tools.WriteDataQualityFilters(nano, pico, sig_jet_nano_idx, min_jet_pt, isData, isFastsim, isUL);
+    event_tools.WriteDataQualityFilters(nano, pico, sig_jet_nano_idx, min_jet_pt, isData, isFastsim, is_preUL);
 
     event_tools.WriteTriggerEfficiency(pico);
 
@@ -378,7 +378,7 @@ int main(int argc, char *argv[]){
       pico.out_w_photon() = 1.;
       pico.out_sys_photon().resize(2,0);
     } else { // MC
-      if (isUL) {
+      if (!is_preUL) {
         event_weighter.ElectronIDSF(pico, w_el_id);
         // ElectronISO SF need to be implemented for non-HToZgamma
         event_weighter.MuonIDSF(pico, w_mu_id);

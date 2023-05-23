@@ -177,9 +177,9 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
 
 
 void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vector<int> sig_jet_nano_idx,
-                                         float min_jet_pt, bool isData, bool isFastsim, bool isUL){
+                                         float min_jet_pt, bool isData, bool isFastsim, bool is_preUL){
   float MET_pt, MET_phi;
-  getMETWithJEC(nano, year, isFastsim, MET_pt, MET_phi, isUL);
+  getMETWithJEC(nano, year, isFastsim, MET_pt, MET_phi, is_preUL);
   vector<float> Jet_pt, Jet_mass;
   getJetWithJEC(nano, isFastsim, Jet_pt, Jet_mass);
 

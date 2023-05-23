@@ -30,7 +30,7 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
                                    const vector<float> &btag_df_wpts, 
                                    bool isFastsim, 
                                    bool isSignal,
-                                   bool isUL,
+                                   bool is_preUL,
                                    vector<HiggsConstructionVariables> &sys_higvars){
   vector<int> sig_jet_nano_idx;
   pico.out_njet() = 0; pico.out_ht() = 0; pico.out_ht5() = 0; 
@@ -41,7 +41,7 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
   vector<float> Jet_pt, Jet_mass;
   getJetWithJEC(nano, isFastsim, Jet_pt, Jet_mass);
   float MET_pt, MET_phi;
-  getMETWithJEC(nano, year, isFastsim, MET_pt, MET_phi, isUL);
+  getMETWithJEC(nano, year, isFastsim, MET_pt, MET_phi, is_preUL);
   
   // calculate MHT; needed when saving jet info
   TLorentzVector mht_vec;
