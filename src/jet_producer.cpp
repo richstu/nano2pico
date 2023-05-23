@@ -160,7 +160,7 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
 
     if (Jet_pt[ijet] <= min_jet_pt) continue;
 
-    switch(yearnum) {
+    switch(year) {
       case 2016:
       case 2017:
       case 2018:
