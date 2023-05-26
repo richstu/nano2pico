@@ -199,9 +199,9 @@ void SplitFilePath(const string &path, string &dir_name, string &base_name){
   base_name = basename(&cstr.at(0));
 }
 
-void getMETWithJEC(nano_tree & nano, int year, bool isFastsim, float & MET_pt, float & MET_phi, bool isUL) {
+void getMETWithJEC(nano_tree & nano, int year, bool isFastsim, float & MET_pt, float & MET_phi, bool is_preUL) {
   if (isFastsim) { 
-    if (year==2017 && !isUL) {
+    if (year==2017 && is_preUL) {
       MET_pt = nano.METFixEE2017_T1_pt(); 
       MET_phi = nano.METFixEE2017_T1_phi();
     } else {
@@ -209,7 +209,7 @@ void getMETWithJEC(nano_tree & nano, int year, bool isFastsim, float & MET_pt, f
       MET_phi = nano.MET_T1_phi();
     }
   } else {
-    if (year == 2017 && !isUL) {
+    if (year == 2017 && is_preUL) {
       MET_pt = nano.METFixEE2017_pt();
       MET_phi = nano.METFixEE2017_phi();
     } else {
@@ -230,4 +230,7 @@ void getJetWithJEC(nano_tree & nano, bool isFastsim, vector<float> & Jet_pt, vec
       Jet_mass[ijet] = nano.Jet_mass()[ijet];
     }
   };
+
+
+
 }

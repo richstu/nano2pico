@@ -15,7 +15,7 @@ public:
 
   void WriteStitch(nano_tree &nano, pico_tree &pico);
   void WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, std::vector<int> sig_jet_nano_idx,
-                               float min_jet_pt, bool isData, bool isFastsim, bool isUL);
+                               float min_jet_pt, bool isData, bool isFastsim, bool is_preUL);
   bool SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZgamma);
   void WriteTriggerEfficiency(pico_tree &pico);
   int GetEventType();

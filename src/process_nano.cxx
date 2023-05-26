@@ -61,30 +61,38 @@ int main(int argc, char *argv[]){
     exit(1);
   }
 
-  bool isData = Contains(in_file, "Run201") ? true : false;
+  //bool isData = Contains(in_file, "Run201") ? true : false;
+  bool isData = Contains(in_file, "Run20") ? true : false; //Changed to allow for Run 3 data
   bool isFastsim = Contains(in_file, "Fast") ? true : false;
   bool isSignal = Contains(in_file, "TChiHH") || Contains(in_file, "T5qqqqZH") ? true : false;
   bool isZgamma = Contains(out_dir, "zgamma");
   int year;
   int isAPV = false;
-  int isUL = false;
+  int is_preUL = true;
   if (Contains(in_file, "RunIISummer20")) { 
-    isUL = true;
+    is_preUL = false;
     if (Contains(in_file, "RunIISummer20UL16NanoAODAPV")) isAPV = true;
     if (Contains(in_file, "RunIISummer20UL16")) year = 2016;
     else if (Contains(in_file, "RunIISummer20UL17")) year = 2017;
     else year = 2018;
   } else if (Contains(in_file, "RunIISummer19")) { 
-    isUL = true;
+    is_preUL = false;
     if (Contains(in_file, "RunIISummer19UL16NanoAODAPV")) isAPV = true;
     if (Contains(in_file, "RunIISummer19UL16")) year = 2016;
     else if (Contains(in_file, "RunIISummer19UL17")) year = 2017;
     else year = 2018;
+  } else if (Contains(in_file, "Run3Summer22")){ //Run 3 MC is UL, right?
+    is_preUL = false;
+    if (Contains(in_file, "Run3_2022")){
+      year = 2022;
+      cout<<"Using 2018 btag wpts by default currently."<<endl;
+    } 
+    else cout<<"Add code for new year!"<<endl;
   } else {
     year = Contains(in_file, "RunIISummer16") ? 2016 : (Contains(in_file, "RunIIFall17") ? 2017 : 2018);
   }
   if (isData) {
-    year = Contains(in_file, "Run2016") ? 2016 : (Contains(in_file, "Run2017") ? 2017 : 2018);
+    year = Contains(in_file, "Run2016") ? 2016 : (Contains(in_file, "Run2017") ? 2017 : (Contains(in_file, "Run2018") ? 2018: 2022));
   }
 
   vector<vector<int>> VVRunLumi;
@@ -101,6 +109,9 @@ int main(int argc, char *argv[]){
       case 2018:
         if (Contains(in_file, "UL2018")) VVRunLumi = MakeVRunLumi("goldenUL2018");
         else VVRunLumi = MakeVRunLumi("golden2018");
+        break;
+      case 2022:
+        if (Contains(in_file, "2022")) VVRunLumi = MakeVRunLumi("golden2022");
         break;
       default:
         cout << "ERROR: no golden cert for given year" << endl;
@@ -123,12 +134,14 @@ int main(int argc, char *argv[]){
   map<int, vector<float>> btag_wpts{
     {2016, vector<float>({0.2217, 0.6321, 0.8953})},
     {2017, vector<float>({0.1522, 0.4941, 0.8001})},
-    {2018, vector<float>({0.1241, 0.4184, 0.7527})}
+    {2018, vector<float>({0.1241, 0.4184, 0.7527})},
+    {2022, vector<float>({0.1241, 0.4184, 0.7527})}
   };
   map<int, vector<float>> btag_df_wpts{
     {2016, vector<float>({0.0614, 0.3093, 0.7221})},
     {2017, vector<float>({0.0521, 0.3033, 0.7489})},
-    {2018, vector<float>({0.0494, 0.2770, 0.7264})}
+    {2018, vector<float>({0.0494, 0.2770, 0.7264})},
+    {2022, vector<float>({0.0494, 0.2770, 0.7264})}
   };
 
   // Rochester corrections
@@ -146,11 +159,12 @@ int main(int argc, char *argv[]){
   IsoTrackProducer tk_producer(year);
   PhotonProducer photon_producer(year, isData);
   JetProducer jet_producer(year, min_jet_pt, max_jet_eta, isData);
-  MetProducer met_producer(year, isData, isUL);
+  MetProducer met_producer(year, isData, is_preUL);
   HigVarProducer hig_producer(year);
   ZGammaVarProducer zgamma_producer(year);
 
   //Initialize scale factor tools
+  std::cout<<"For years past 2018, currently using 2018 weights in Prefire, BTag, Lepton, Photon, and event by default. Remove this message only when this has been fixed."<<endl;
   const string ctr = "central";
   const vector<string> updn = {"up","down"};
   PrefireWeighter prefire_weighter(year, true);
@@ -266,7 +280,7 @@ int main(int argc, char *argv[]){
     if (isData) pico.out_stitch() = true;
     else event_tools.WriteStitch(nano, pico);
  
-    tk_producer.WriteIsoTracks(nano, pico, sig_el_nano_idx, sig_mu_nano_idx, isFastsim, isUL);
+    tk_producer.WriteIsoTracks(nano, pico, sig_el_nano_idx, sig_mu_nano_idx, isFastsim, is_preUL);
 
     dilep_producer.WriteDileptons(pico, sig_el_pico_idx, sig_mu_pico_idx);
 
@@ -277,11 +291,11 @@ int main(int argc, char *argv[]){
 
     if (debug) cout<<"INFO:: Writing jets, MET and ISR vars"<<endl;
     //jet producer uses sys_met_phi, so met_producer must be called first
-    met_producer.WriteMet(nano, pico, isFastsim, isSignal, isUL);
+    met_producer.WriteMet(nano, pico, isFastsim, isSignal, is_preUL);
 
     vector<HiggsConstructionVariables> sys_higvars;
     vector<int> sig_jet_nano_idx = jet_producer.WriteJets(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, jet_isphoton_nano_idx,
-                                                          btag_wpts[year], btag_df_wpts[year], isFastsim, isSignal, isUL, sys_higvars);
+                                                          btag_wpts[year], btag_df_wpts[year], isFastsim, isSignal, is_preUL, sys_higvars);
     jet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year][1], isFastsim); // usually w.r.t. medium WP
     if(!isZgamma){
       jet_producer.WriteFatJets(nano, pico); // jet_producer.SetVerbose(nano.nSubJet()>0);
@@ -293,7 +307,7 @@ int main(int argc, char *argv[]){
     pico.out_mt() = -999; 
     if (pico.out_nlep()==1) {
       float MET_pt, MET_phi;
-      getMETWithJEC(nano, year, isFastsim, MET_pt, MET_phi, isUL);
+      getMETWithJEC(nano, year, isFastsim, MET_pt, MET_phi, is_preUL);
       if (sig_el_nano_idx.size()>0) {
         pico.out_mt() = GetMT(MET_pt, MET_phi, 
           nano.Electron_pt()[sig_el_nano_idx[0]], nano.Electron_phi()[sig_el_nano_idx[0]]);
@@ -329,7 +343,7 @@ int main(int argc, char *argv[]){
 
     if (debug) cout<<"INFO:: Writing filters and triggers"<<endl;
     // N.B. Jets: pico.out_pass_jets() and pico.out_pass_fsjets() filled in jet_producer
-    event_tools.WriteDataQualityFilters(nano, pico, sig_jet_nano_idx, min_jet_pt, isData, isFastsim, isUL);
+    event_tools.WriteDataQualityFilters(nano, pico, sig_jet_nano_idx, min_jet_pt, isData, isFastsim, is_preUL);
 
     event_tools.WriteTriggerEfficiency(pico);
 
@@ -364,7 +378,7 @@ int main(int argc, char *argv[]){
       pico.out_w_photon() = 1.;
       pico.out_sys_photon().resize(2,0);
     } else { // MC
-      if (isUL) {
+      if (!is_preUL) {
         event_weighter.ElectronIDSF(pico, w_el_id);
         // ElectronISO SF need to be implemented for non-HToZgamma
         event_weighter.MuonIDSF(pico, w_mu_id);

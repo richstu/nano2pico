@@ -30,7 +30,7 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
                                    const vector<float> &btag_df_wpts, 
                                    bool isFastsim, 
                                    bool isSignal,
-                                   bool isUL,
+                                   bool is_preUL,
                                    vector<HiggsConstructionVariables> &sys_higvars){
   vector<int> sig_jet_nano_idx;
   pico.out_njet() = 0; pico.out_ht() = 0; pico.out_ht5() = 0; 
@@ -41,7 +41,7 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
   vector<float> Jet_pt, Jet_mass;
   getJetWithJEC(nano, isFastsim, Jet_pt, Jet_mass);
   float MET_pt, MET_phi;
-  getMETWithJEC(nano, year, isFastsim, MET_pt, MET_phi, isUL);
+  getMETWithJEC(nano, year, isFastsim, MET_pt, MET_phi, is_preUL);
   
   // calculate MHT; needed when saving jet info
   TLorentzVector mht_vec;
@@ -160,25 +160,56 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
 
     if (Jet_pt[ijet] <= min_jet_pt) continue;
 
-    pico.out_jet_pt().push_back(Jet_pt[ijet]);
-    pico.out_jet_eta().push_back(nano.Jet_eta()[ijet]);
-    pico.out_jet_phi().push_back(nano.Jet_phi()[ijet]);
-    pico.out_jet_m().push_back(Jet_mass[ijet]);
-    pico.out_jet_breg_corr().push_back(nano.Jet_bRegCorr()[ijet]);
-    pico.out_jet_breg_res().push_back(nano.Jet_bRegRes()[ijet]);
-    pico.out_jet_deepcsv().push_back(nano.Jet_btagDeepB()[ijet]);
-    pico.out_jet_deepflav().push_back(nano.Jet_btagDeepFlavB()[ijet]);
-    pico.out_jet_ne_emef().push_back(nano.Jet_neEmEF()[ijet]);
-    pico.out_jet_qgl().push_back(nano.Jet_qgl()[ijet]);
-    pico.out_jet_islep().push_back(islep);
-    pico.out_jet_isvlep().push_back(isvlep);
-    pico.out_jet_isphoton().push_back(isphoton);
-    pico.out_jet_isgood().push_back(isgood);
-    pico.out_jet_id().push_back(nano.Jet_jetId()[ijet]);
-    pico.out_jet_mht_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], mht_vec.Phi()));
-    pico.out_jet_met_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], MET_phi));
-    pico.out_jet_puid().push_back(nano.Jet_puId()[ijet]);
-    pico.out_jet_puid_disc().push_back(nano.Jet_puIdDisc()[ijet]);
+    switch(year) {
+      case 2016:
+      case 2017:
+      case 2018:
+        pico.out_jet_pt().push_back(Jet_pt[ijet]);
+        pico.out_jet_eta().push_back(nano.Jet_eta()[ijet]);
+        pico.out_jet_phi().push_back(nano.Jet_phi()[ijet]);
+        pico.out_jet_m().push_back(Jet_mass[ijet]);
+        pico.out_jet_breg_corr().push_back(nano.Jet_bRegCorr()[ijet]);
+        pico.out_jet_breg_res().push_back(nano.Jet_bRegRes()[ijet]);
+        pico.out_jet_deepcsv().push_back(nano.Jet_btagDeepB()[ijet]);
+        pico.out_jet_deepflav().push_back(nano.Jet_btagDeepFlavB()[ijet]);
+        pico.out_jet_ne_emef().push_back(nano.Jet_neEmEF()[ijet]);
+        pico.out_jet_qgl().push_back(nano.Jet_qgl()[ijet]);
+        pico.out_jet_islep().push_back(islep);
+        pico.out_jet_isvlep().push_back(isvlep);
+        pico.out_jet_isphoton().push_back(isphoton);
+        pico.out_jet_isgood().push_back(isgood);
+        pico.out_jet_id().push_back(nano.Jet_jetId()[ijet]);
+        pico.out_jet_mht_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], mht_vec.Phi()));
+        pico.out_jet_met_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], MET_phi));
+        pico.out_jet_puid().push_back(nano.Jet_puId()[ijet]);
+        pico.out_jet_puid_disc().push_back(nano.Jet_puIdDisc()[ijet]);
+        break;
+      case 2022:
+        pico.out_jet_pt().push_back(Jet_pt[ijet]);
+        pico.out_jet_eta().push_back(nano.Jet_eta()[ijet]);
+        pico.out_jet_phi().push_back(nano.Jet_phi()[ijet]);
+        pico.out_jet_m().push_back(Jet_mass[ijet]);
+        //pico.out_jet_breg_corr().push_back(nano.Jet_bRegCorr()[ijet]);
+        //pico.out_jet_breg_res().push_back(nano.Jet_bRegRes()[ijet]);
+        pico.out_jet_deepcsv().push_back(nano.Jet_btagDeepB()[ijet]);
+        pico.out_jet_deepflav().push_back(nano.Jet_btagDeepFlavB()[ijet]);
+        pico.out_jet_ne_emef().push_back(nano.Jet_neEmEF()[ijet]);
+        //pico.out_jet_qgl().push_back(nano.Jet_qgl()[ijet]);
+        pico.out_jet_islep().push_back(islep);
+        pico.out_jet_isvlep().push_back(isvlep);
+        pico.out_jet_isphoton().push_back(isphoton);
+        pico.out_jet_isgood().push_back(isgood);
+        pico.out_jet_id().push_back(nano.Jet_jetId()[ijet]);
+        pico.out_jet_mht_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], mht_vec.Phi()));
+        pico.out_jet_met_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], MET_phi));
+        //pico.out_jet_puid().push_back(nano.Jet_puId()[ijet]);
+        //pico.out_jet_puid_disc().push_back(nano.Jet_puIdDisc()[ijet]);
+        break;
+      default:
+        std::cout<<"Need code for new year in getZGammaJetBr in jet_producer.cpp"<<endl;
+        exit(1);
+    }
+
     if (!isData) {
       pico.out_jet_hflavor().push_back(nano.Jet_hadronFlavour()[ijet]);
       pico.out_jet_pflavor().push_back(nano.Jet_partonFlavour()[ijet]);
@@ -366,3 +397,5 @@ void JetProducer::WriteJetSystemPt(nano_tree &nano, pico_tree &pico,
   }
   return;
 }
+
+

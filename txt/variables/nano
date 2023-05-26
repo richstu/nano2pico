@@ -39,6 +39,7 @@ array<float> Electron_mvaFall17V1Iso
 array<float> Electron_mvaFall17V1noIso
 array<float> Electron_mvaFall17V2Iso
 array<float> Electron_mvaFall17V2noIso
+array<float> Electron_mvaIso
 array<float> Electron_pfRelIso03_all
 array<float> Electron_pfRelIso03_chg
 array<float> Electron_phi
@@ -74,6 +75,8 @@ array<bool> Electron_mvaFall17V2Iso_WPL
 array<bool> Electron_mvaFall17V2noIso_WP80
 array<bool> Electron_mvaFall17V2noIso_WP90
 array<bool> Electron_mvaFall17V2noIso_WPL
+array<bool> Electron_mvaIso_WP80
+array<bool> Electron_mvaIso_WP90
 array<char> Electron_seedGain
 array<int> Electron_genPartIdx
 array<char> Electron_genPartFlav
@@ -209,6 +212,7 @@ array<float> Photon_mass
 array<float> Photon_mvaID
 array<float> Photon_mvaIDV1
 array<float> Photon_pfRelIso03_all
+array<float> Photon_pfRelIso03_all_quadratic
 array<float> Photon_pfRelIso03_chg
 array<float> Photon_phi
 array<float> Photon_pt
@@ -621,7 +625,7 @@ bool L1simulation_step
 bool HLTriggerFirstPath
 bool HLTriggerFinalPath
 
-# Single lepton triggers
+# Single lepton triggers #Added recommended run 3 electron and muon triggers
 bool HLT_IsoMu20
 bool HLT_IsoMu22
 bool HLT_IsoMu24
@@ -635,10 +639,10 @@ bool HLT_TkMu50
 bool HLT_Mu45_eta2p1
 bool HLT_IsoMu22_eta2p1
 bool HLT_IsoMu24_eta2p1
-
 bool HLT_Ele25_WPTight_Gsf
 bool HLT_Ele27_WPTight_Gsf
 bool HLT_Ele28_WPTight_Gsf
+bool HLT_Ele30_WPTight_Gsf
 bool HLT_Ele32_WPTight_Gsf_L1DoubleEG
 bool HLT_Ele32_WPTight_Gsf
 bool HLT_Ele35_WPTight_Gsf
@@ -648,11 +652,18 @@ bool HLT_Ele105_CaloIdVT_GsfTrkIdT
 bool HLT_Ele115_CaloIdVT_GsfTrkIdT
 bool HLT_Ele135_CaloIdVT_GsfTrkIdT
 bool HLT_Ele145_CaloIdVT_GsfTrkIdT
+bool HLT_Ele8_CaloIdL_TrackIdL_IsoVL_PFJet30
+bool HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL
+bool HLT_Ele23_CaloIdL_TrackIdL_IsoVL_PFJet30
+bool HLT_Ele8_CaloIdM_TrackIdM_PFJet30
+bool HLT_Ele17_CaloIdM_TrackIdM_PFJet30
+bool HLT_Ele23_CaloIdM_TrackIdM_PFJet30
 bool HLT_Ele25_eta2p1_WPTight_Gsf
 bool HLT_Ele27_eta2p1_WPTight_Gsf
 bool HLT_Ele20_eta2p1_WPLoose_Gsf
 bool HLT_Ele25_eta2p1_WPLoose_Gsf
 bool HLT_Ele27_eta2p1_WPLoose_Gsf
+bool HLT_Ele28_eta2p1_WPTight_Gsf_HT150
 
 # Lepton HT cross-triggers
 bool HLT_Mu15_IsoVVVL_PFHT350
@@ -735,3 +746,10 @@ bool HLT_Mu37_TkMu27
 #Photon Triggers
 bool HLT_Mu17_Photon30_IsoCaloId
 bool HLT_Photon175
+bool HLT_DoublePhoton70
+bool HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId
+bool HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId_Mass55
+bool HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90
+bool HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95
+
+
