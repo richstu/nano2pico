@@ -32,6 +32,8 @@ def getTag(path):
   tag = tag.split("RunIISummer20UL17NanoAODv9")[0]
   tag = tag.split("RunIISummer20UL18NanoAODv9")[0]
 
+  tag = tag.split("Run3Summer22NanoAODv11")[0]
+
   tag = tag.split("_ext")[0]
   tag = tag.replace("wgt_sums_","")
   tag = tag.strip("_")

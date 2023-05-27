@@ -56,12 +56,20 @@ int main(int argc, char *argv[]){
   string output_path = argv[optind];
   vector<string> input_paths(argv+optind+1, argv+argc);
 
-  int year;
-  if (Contains(input_paths[0], "RunIISummer20")) {
-    year = Contains(input_paths[0], "RunIISummer20UL16") ? 2016 : (Contains(input_paths[0], "RunIISummer20UL17") ? 2017 : 2018);
-  } else {
-    year = Contains(input_paths[0], "RunIISummer16") ? 2016 : (Contains(input_paths[0], "RunIIFall17") ? 2017 : 2018);
-  }
+  int year = 2018;
+  if      (Contains(input_paths[0], "RunIISummer20UL16")) year = 2016;
+  else if (Contains(input_paths[0], "RunIISummer20UL17")) year = 2017;
+  else if (Contains(input_paths[0], "RunIISummer20UL18")) year = 2018;
+  else if (Contains(input_paths[0], "RunIISummer16")) year = 2016;
+  else if (Contains(input_paths[0], "RunIIFall17")) year = 2017;
+  else if (Contains(input_paths[0], "RunIIAutumn18")) year = 2017;
+  else if (Contains(input_paths[0], "Run3Summer22")) year = 2022;
+
+  //if (Contains(input_paths[0], "RunIISummer20")) {
+  //  year = Contains(input_paths[0], "RunIISummer20UL16") ? 2016 : (Contains(input_paths[0], "RunIISummer20UL17") ? 2017 : 2018);
+  //} else {
+  //  year = Contains(input_paths[0], "RunIISummer16") ? 2016 : (Contains(input_paths[0], "RunIIFall17") ? 2017 : 2018);
+  //}
   cout << "Running with settings for year = "<<year<<"."<<endl;
 
   corrections_tree corr("", output_path.c_str());

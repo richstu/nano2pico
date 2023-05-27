@@ -42,6 +42,10 @@ def findBaseSampleNames(folder):
     dataset_tag = dataset_tag.split('__UL2018_MiniAODv2_NanoAODv9-v2__')[0]
     dataset_tag = dataset_tag.split('__UL2018_MiniAODv2_NanoAODv9-v3__')[0]
 
+    # For NanoAODv11
+    dataset_tag = dataset_tag.split('__Run3Summer22NanoAODv11__')[0]
+    dataset_tag = dataset_tag.split('__Run2022')[0]
+
     dataset_tag = dataset_tag.split('_ext')[0]
     dataset_tag = dataset_tag.replace('.root','')
     infiles.add(dataset_tag)

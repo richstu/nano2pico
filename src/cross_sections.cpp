@@ -133,7 +133,7 @@ namespace xsec{
         if(file.Contains("ZH_HToBB_ZToNuNu_M125"))  xsec = 0.883*Htobb*0.2;
         if(file.Contains("WH_HToBB_WToLNu_M125"))   xsec = 1.373*Htobb*(0.1071+0.1063+0.1138);
 
-    } else {
+    } else if (year == 2017 || year == 2018) {
         if(file.Contains("SMS-T1tttt_mGluino-1200_mLSP-800_Tune")) xsec = 0.0985;
         if(file.Contains("SMS-T1tttt_mGluino-2000_mLSP-100_Tune")) xsec = 0.00101;
 
@@ -328,6 +328,8 @@ namespace xsec{
         if(file.Contains("ZH_HToBB_ZToNuNu_M125"))    xsec = 0.883*Htobb*0.2;
         if(file.Contains("WHiggs0PMToBB"))     xsec = 1.373*Htobb*(0.1071+0.1063+0.1138); //using same as 2016
 
+    } else if (year == 2022) {
+        if(file.Contains("DYto2L-2Jets_MLL-50_TuneCP5"))     xsec = 6688.0; // XSDB
     }
 
     if(file.Contains("ttHTobb_M125")) xsec = 0.2934;
