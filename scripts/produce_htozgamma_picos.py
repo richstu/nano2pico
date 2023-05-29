@@ -319,6 +319,10 @@ Pico files: BASE_FOLDERNAME/NANOAOD_VERSION/TAG_NAME/(2016,2017,2018)/(data,mc,s
   #    print('[Error] '+dataset_list_file+' does not exist. Existing.')
   #    sys.exit()
 
+  if not os.path.exists('logs'): 
+    print('Creating logs directory')
+    os.makedirs('logs')
+
   # Check if slim rules exist
   slim_rule_files = [
     'txt/slim_rules/zgmc.txt',
