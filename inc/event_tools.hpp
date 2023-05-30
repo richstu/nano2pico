@@ -11,7 +11,7 @@ public:
   explicit EventTools(const std::string &name, int year);
   ~EventTools();
 
-  enum Dataset {EGamma, SingleElectron, SingleMuon, DoubleEG, DoubleMuon, MET, JetHT};
+  enum Dataset {EGamma, SingleElectron, SingleMuon, DoubleEG, DoubleMuon, MET, JetHT, Muon, JetMET, MuonEG};
 
   void WriteStitch(nano_tree &nano, pico_tree &pico);
   void WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, std::vector<int> sig_jet_nano_idx,
