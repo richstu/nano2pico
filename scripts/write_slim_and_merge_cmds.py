@@ -93,7 +93,7 @@ if __name__ == '__main__':
   nexisting = 0
   for dstag in dataset_tags:
     #if 'TTJets_SingleLeptFromT_' not in dstag: continue
-    in_file_paths = os.path.join(in_dir,'*'+dstag+'*.root')
+    in_file_paths = os.path.join(in_dir,'*'+dstag+'_*.root')
     out_file_name = 'merged_'+dstag+'_'+slim_name+'_'+skim_name+'_nfiles_'+str(len(glob(in_file_paths)))
     out_file_path = os.path.join(out_dir,out_file_name+'.root')
 
