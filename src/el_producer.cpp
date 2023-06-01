@@ -51,13 +51,13 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
           pico.out_el_eminusp().push_back(nano.Electron_eInvMinusPInv()[iel]);
           break;
         case 2022:
-          isSignal = nano.Electron_mvaIso_WP80()[iel];
+          isSignal = nano.Electron_mvaIso_WP90()[iel];
           pico.out_el_idmva().push_back(nano.Electron_mvaIso()[iel]);
           pico.out_el_sip3d().push_back(nano.Electron_sip3d()[iel]);
           pico.out_el_phidx().push_back(nano.Electron_photonIdx()[iel]);
           pico.out_el_id80().push_back(nano.Electron_mvaIso_WP80()[iel]);
           pico.out_el_id90().push_back(nano.Electron_mvaIso_WP90()[iel]);
-          pico.out_el_idLoose().push_back(nano.Electron_mvaIso_WP80()[iel]);
+          pico.out_el_idLoose().push_back(nano.Electron_mvaIso_WP90()[iel]);
           pico.out_el_etPt().push_back(nano.Electron_scEtOverPt()[iel]);
           pico.out_el_eminusp().push_back(nano.Electron_eInvMinusPInv()[iel]);
           break;
