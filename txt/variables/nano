@@ -210,9 +210,11 @@ array<float> Photon_eta
 array<float> Photon_hoe
 array<float> Photon_mass
 array<float> Photon_mvaID
+array<float> Photon_mvaID_Fall17V2
 array<float> Photon_mvaIDV1
 array<float> Photon_pfRelIso03_all
 array<float> Photon_pfRelIso03_all_quadratic
+array<float> Photon_pfRelIso03_all_Fall17V2
 array<float> Photon_pfRelIso03_chg
 array<float> Photon_phi
 array<float> Photon_pt
@@ -230,6 +232,8 @@ array<bool> Photon_isScEtaEB
 array<bool> Photon_isScEtaEE
 array<bool> Photon_mvaID_WP80
 array<bool> Photon_mvaID_WP90
+array<bool> Photon_mvaID_Fall17V2_WP80
+array<bool> Photon_mvaID_Fall17V2_WP90
 array<bool> Photon_pixelSeed
 array<char> Photon_seedGain
 array<int> Photon_genPartIdx

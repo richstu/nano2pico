@@ -36,7 +36,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
     float pt = nano.Photon_pt()[iph];
     float eta = nano.Photon_eta()[iph];
     float phi = nano.Photon_phi()[iph];
-    float mva = nano.Photon_mvaID()[iph];
+    float mva = nano.Photon_mvaID_Fall17V2()[iph];
     bool eVeto = nano.Photon_electronVeto()[iph];
 
     if (pt <= PhotonPtCut) continue;
@@ -93,14 +93,14 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
         pico.out_photon_pt()    .insert(pico.out_photon_pt()    .begin()+shift, pt);
         pico.out_photon_eta()   .insert(pico.out_photon_eta()   .begin()+shift, eta);
         pico.out_photon_phi()   .insert(pico.out_photon_phi()   .begin()+shift, phi);
-        pico.out_photon_reliso().insert(pico.out_photon_reliso().begin()+shift, nano.Photon_pfRelIso03_all_quadratic()[iph]);
+        pico.out_photon_reliso().insert(pico.out_photon_reliso().begin()+shift, nano.Photon_pfRelIso03_all_Fall17V2()[iph]);
         pico.out_photon_r9()    .insert(pico.out_photon_r9()    .begin()+shift, nano.Photon_r9()[iph]);
         pico.out_photon_sieie() .insert(pico.out_photon_sieie() .begin()+shift, nano.Photon_sieie()[iph]);
         pico.out_photon_pterr() .insert(pico.out_photon_pterr() .begin()+shift, nano.Photon_energyErr()[iph]);
         pico.out_photon_hoe()   .insert(pico.out_photon_hoe()   .begin()+shift, nano.Photon_hoe()[iph]);
         pico.out_photon_elveto().insert(pico.out_photon_elveto().begin()+shift, eVeto);
-        pico.out_photon_id()    .insert(pico.out_photon_id()    .begin()+shift, nano.Photon_mvaID_WP90()[iph]);
-        pico.out_photon_id80()  .insert(pico.out_photon_id80()  .begin()+shift, nano.Photon_mvaID_WP80()[iph]);
+        pico.out_photon_id()    .insert(pico.out_photon_id()    .begin()+shift, nano.Photon_mvaID_Fall17V2_WP90()[iph]);
+        pico.out_photon_id80()  .insert(pico.out_photon_id80()  .begin()+shift, nano.Photon_mvaID_Fall17V2_WP80()[iph]);
         pico.out_photon_idmva() .insert(pico.out_photon_idmva() .begin()+shift, mva);
         pico.out_photon_sig()   .insert(pico.out_photon_sig()   .begin()+shift, isSignal);
         pico.out_photon_drmin() .insert(pico.out_photon_drmin() .begin()+shift, minLepDR);
