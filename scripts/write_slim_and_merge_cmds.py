@@ -44,6 +44,7 @@ def findBaseSampleNames(folder):
 
     # For NanoAODv11
     dataset_tag = dataset_tag.split('__Run3Summer22NanoAODv11__')[0]
+    dataset_tag = dataset_tag.split('__Run3Summer22EENanoAODv11__')[0]
     dataset_tag = dataset_tag.split('__Run2022')[0]
 
     dataset_tag = dataset_tag.split('_ext')[0]
