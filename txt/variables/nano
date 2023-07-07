@@ -219,6 +219,7 @@ array<float> Photon_pt
 array<float> Photon_r9
 array<float> Photon_sieie
 array<int> Photon_charge
+array<int> Photon_cutBased
 array<int> Photon_cutBasedBitmap
 array<int> Photon_cutBasedV1Bitmap
 array<int> Photon_electronIdx
