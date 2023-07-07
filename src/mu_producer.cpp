@@ -19,6 +19,8 @@ MuonProducer::~MuonProducer(){
 vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<int> &jet_islep_nano_idx, vector<int> &jet_isvlep_nano_idx, vector<int> &sig_mu_pico_idx, bool isZgamma, bool isFastsim){
   vector<float> Jet_pt, Jet_mass;
   getJetWithJEC(nano, isFastsim, Jet_pt, Jet_mass);
+  vector<int> Muon_fsrPhotonIdx;
+  getMuon_fsrPhotonIdx(nano, year, Muon_fsrPhotonIdx);
 
   vector<int> sig_mu_nano_idx;
   pico.out_nmu() = 0; pico.out_nvmu() = 0;
@@ -40,7 +42,7 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
       pico.out_mu_mediumid().push_back(nano.Muon_mediumId()[imu]);
       pico.out_mu_tightid().push_back(nano.Muon_tightId()[imu]);
       pico.out_mu_highptid().push_back(nano.Muon_highPtId()[imu]);
-      pico.out_mu_fsrphotonid().push_back(nano.Muon_fsrPhotonIdx()[imu]);
+      pico.out_mu_fsrphotonid().push_back(Muon_fsrPhotonIdx[imu]);
     }
     else {
       if (!nano.Muon_mediumId()[imu]) continue;

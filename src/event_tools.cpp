@@ -188,6 +188,8 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
   getMETWithJEC(nano, year, isFastsim, MET_pt, MET_phi, is_preUL);
   vector<float> Jet_pt, Jet_mass;
   getJetWithJEC(nano, isFastsim, Jet_pt, Jet_mass);
+  vector<int> Jet_jetId;
+  getJetId(nano, year, Jet_jetId);
 
   // jet quality filter
   pico.out_pass_jets() = true;
@@ -211,7 +213,7 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
     }
   } else { // Fullsim: require just loosest possible ID for now (for all jets, not just central!)
     for(int ijet(0); ijet<nano.nJet(); ++ijet){
-      if (Jet_pt[ijet] > min_jet_pt && nano.Jet_jetId()[ijet] < 1) 
+      if (Jet_pt[ijet] > min_jet_pt && Jet_jetId[ijet] < 1) 
         pico.out_pass_jets() = false;
     } 
   }

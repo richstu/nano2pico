@@ -8,22 +8,26 @@ class Variable{
 public:
   Variable():
     type_(""),
-    name_(""){
+    name_(""),
+    out_name_(""){
   }
 
   Variable(const std::string &type,
            const std::string &base_type,
-           const std::string &name):
+           const std::string &name,
+           const std::string &out_name):
     type_(type),
     base_type_(base_type),
-    name_(name){
+    name_(name),
+    out_name_(out_name){
   }
 
   bool operator<(const Variable& var) const{
-    return type_<var.type_ || (type_==var.type_ && name_<var.name_);
+    //return type_<var.type_ || (type_==var.type_ && name_<var.name_);
+    return type_<var.type_ || (type_==var.type_ && out_name_<var.out_name_);
   }
 
-  std::string type_, base_type_, name_;
+  std::string type_, base_type_, name_, out_name_;
 };
 
 bool Contains(const std::string &text, const std::string &pattern);

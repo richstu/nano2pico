@@ -322,8 +322,8 @@ vector<float> tks_mt
 vector<bool> tks_tm
 
 ###################   Trigger   ##################
-vector<bool> trig;
-vector<float> trig_prescale;
+vector<bool> trig
+vector<float> trig_prescale
 bool trig_ra4
 bool trig_met
 bool trig_vvvl

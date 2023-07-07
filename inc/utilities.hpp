@@ -95,5 +95,11 @@ void SplitFilePath(const std::string &path, std::string &dir_name, std::string &
 
 void getMETWithJEC(nano_tree & nano, int year, bool isFastsim, float & MET_pt, float & MET_phi, bool is_preUL);
 void getJetWithJEC(nano_tree & nano, bool isFastsim, std::vector<float> & Jet_pt, std::vector<float> & Jet_mass);
+void getJetId(nano_tree & nano, int year, std::vector<int> & Jet_jetId);
+void getPhoton_electronIdx(nano_tree & nano, int year, std::vector<int> & Photon_electronIdx);
+void getMuon_fsrPhotonIdx(nano_tree & nano, int year, std::vector<int> & Muon_fsrPhotonIdx);
+void getElectron_photonIdx(nano_tree & nano, int year, std::vector<int> & Electron_photonIdx);
+void getFsrPhoton_muonIdx(nano_tree & nano, int year, std::vector<int> & FsrPhoton_muonIdx);
+void getPhoton_jetIdx(nano_tree & nano, int year, std::vector<int> & Photon_jetIdx);
 
 #endif

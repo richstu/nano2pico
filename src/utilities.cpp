@@ -229,8 +229,53 @@ void getJetWithJEC(nano_tree & nano, bool isFastsim, vector<float> & Jet_pt, vec
       Jet_pt[ijet] = nano.Jet_pt()[ijet];
       Jet_mass[ijet] = nano.Jet_mass()[ijet];
     }
-  };
+  }
+}
 
+void getJetId(nano_tree & nano, int year, vector<int> & Jet_jetId) {
+  Jet_jetId.resize(nano.nJet());
+  for(int ijet(0); ijet<nano.nJet(); ++ijet){
+    if (year == 2023) Jet_jetId[ijet] = nano.Jet_jetId_char()[ijet];
+    else Jet_jetId[ijet] = nano.Jet_jetId()[ijet];
+  }
+}
 
+void getPhoton_electronIdx(nano_tree & nano, int year, vector<int> & Photon_electronIdx) {
+  Photon_electronIdx.resize(nano.nPhoton());
+  for(int iphoton(0); iphoton<nano.nPhoton(); ++iphoton){
+    if (year == 2023) Photon_electronIdx[iphoton] = nano.Photon_electronIdx_short()[iphoton];
+    else Photon_electronIdx[iphoton] = nano.Photon_electronIdx()[iphoton];
+  }
+}
 
+void getMuon_fsrPhotonIdx(nano_tree & nano, int year, vector<int> & Muon_fsrPhotonIdx) {
+  Muon_fsrPhotonIdx.resize(nano.nMuon());
+  for(int imuon(0); imuon<nano.nMuon(); ++imuon){
+    if (year == 2023) Muon_fsrPhotonIdx[imuon] = nano.Muon_fsrPhotonIdx_short()[imuon];
+    else Muon_fsrPhotonIdx[imuon] = nano.Muon_fsrPhotonIdx()[imuon];
+  }
+}
+
+void getElectron_photonIdx(nano_tree & nano, int year, vector<int> & Electron_photonIdx) {
+  Electron_photonIdx.resize(nano.nElectron());
+  for(int iel(0); iel<nano.nElectron(); ++iel){
+    if (year == 2023) Electron_photonIdx[iel] = nano.Electron_photonIdx_short()[iel];
+    else Electron_photonIdx[iel] = nano.Electron_photonIdx()[iel];
+  }
+}
+
+void getFsrPhoton_muonIdx(nano_tree & nano, int year, vector<int> & FsrPhoton_muonIdx) {
+  FsrPhoton_muonIdx.resize(nano.nFsrPhoton());
+  for(int ipart(0); ipart<nano.nFsrPhoton(); ++ipart){
+    if (year == 2023) FsrPhoton_muonIdx[ipart] = nano.FsrPhoton_muonIdx_short()[ipart];
+    else FsrPhoton_muonIdx[ipart] = nano.FsrPhoton_muonIdx()[ipart];
+  }
+}
+
+void getPhoton_jetIdx(nano_tree & nano, int year, vector<int> & Photon_jetIdx) {
+  Photon_jetIdx.resize(nano.nPhoton());
+  for(int ipart(0); ipart<nano.nPhoton(); ++ipart){
+    if (year == 2023) Photon_jetIdx[ipart] = nano.Photon_jetIdx_short()[ipart];
+    else Photon_jetIdx[ipart] = nano.Photon_jetIdx()[ipart];
+  }
 }

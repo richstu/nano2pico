@@ -3,6 +3,7 @@
 #include <iostream>
 #include <iomanip>
 #include <bitset>
+#include <regex>
 
 #include <getopt.h>
 
@@ -66,34 +67,60 @@ int main(int argc, char *argv[]){
   bool isFastsim = Contains(in_file, "Fast") ? true : false;
   bool isSignal = Contains(in_file, "TChiHH") || Contains(in_file, "T5qqqqZH") ? true : false;
   bool isZgamma = Contains(out_dir, "zgamma");
-  int year;
+  int year = -1;
   int isAPV = false;
   int is_preUL = true;
-  if (Contains(in_file, "RunIISummer20")) { 
-    is_preUL = false;
-    if (Contains(in_file, "RunIISummer20UL16NanoAODAPV")) isAPV = true;
-    if (Contains(in_file, "RunIISummer20UL16")) year = 2016;
-    else if (Contains(in_file, "RunIISummer20UL17")) year = 2017;
-    else year = 2018;
-  } else if (Contains(in_file, "RunIISummer19")) { 
-    is_preUL = false;
-    if (Contains(in_file, "RunIISummer19UL16NanoAODAPV")) isAPV = true;
-    if (Contains(in_file, "RunIISummer19UL16")) year = 2016;
-    else if (Contains(in_file, "RunIISummer19UL17")) year = 2017;
-    else year = 2018;
-  } else if (Contains(in_file, "Run3Summer22")){ //Run 3 MC is UL, right?
-    is_preUL = false;
-    if (Contains(in_file, "Run3_2022")){
-      year = 2022;
-      cout<<"Using 2018 btag wpts by default currently."<<endl;
-    } 
-    else cout<<"Add code for new year!"<<endl;
-  } else {
-    year = Contains(in_file, "RunIISummer16") ? 2016 : (Contains(in_file, "RunIIFall17") ? 2017 : 2018);
+  if (regex_search(in_file, std::regex("RunIISummer\\d\\dUL"))) is_preUL = false;
+  // Find year and isAPV for MC
+  if (!isData) { // MC
+    if (!is_preUL) { // UL
+      if (regex_search(in_file, std::regex("RunIISummer\\d\\dUL16NanoAODAPV"))) isAPV = true;
+      if (regex_search(in_file, std::regex("RunIISummer\\d\\dUL16"))) year = 2016;
+      else if (regex_search(in_file, std::regex("RunIISummer\\d\\dUL17"))) year = 2017;
+      else if (regex_search(in_file, std::regex("RunIISummer\\d\\dUL18"))) year = 2018;
+    } else { // Not UL
+      if (regex_search(in_file, std::regex("RunIISummer16"))) year = 2016;
+      else if (regex_search(in_file, std::regex("RunIIFall17"))) year = 2017;
+      else if (regex_search(in_file, std::regex("RunIIAutumn18"))) year = 2018;
+      else if (regex_search(in_file, std::regex("Run3Summer22"))) year = 2022;
+    }
+  } else { // Data
+    if (Contains(in_file, "Run2016")) year = 2016;
+    else if (Contains(in_file, "Run2017")) year = 2017;
+    else if (Contains(in_file, "Run2018")) year = 2018;
+    else if (Contains(in_file, "Run2022")) year = 2022;
+    else if (Contains(in_file, "Run2023")) year = 2023;
   }
-  if (isData) {
-    year = Contains(in_file, "Run2016") ? 2016 : (Contains(in_file, "Run2017") ? 2017 : (Contains(in_file, "Run2018") ? 2018: 2022));
+  if (year < 0) {
+    cout<<"ERROR: Add code for new year!"<<endl;
+    exit(1);
   }
+
+  //if (Contains(in_file, "RunIISummer20")) { 
+  //  is_preUL = false;
+  //  if (Contains(in_file, "RunIISummer20UL16NanoAODAPV")) isAPV = true;
+  //  if (Contains(in_file, "RunIISummer20UL16")) year = 2016;
+  //  else if (Contains(in_file, "RunIISummer20UL17")) year = 2017;
+  //  else year = 2018;
+  //} else if (Contains(in_file, "RunIISummer19")) { 
+  //  is_preUL = false;
+  //  if (Contains(in_file, "RunIISummer19UL16NanoAODAPV")) isAPV = true;
+  //  if (Contains(in_file, "RunIISummer19UL16")) year = 2016;
+  //  else if (Contains(in_file, "RunIISummer19UL17")) year = 2017;
+  //  else year = 2018;
+  //} else if (Contains(in_file, "Run3Summer22")){
+  //  is_preUL = false;
+  //  if (Contains(in_file, "Run3_2022")){
+  //    year = 2022;
+  //    cout<<"Using 2018 btag wpts by default currently."<<endl;
+  //  } 
+  //  else cout<<"Add code for new year!"<<endl;
+  //} else {
+  //  year = Contains(in_file, "RunIISummer16") ? 2016 : (Contains(in_file, "RunIIFall17") ? 2017 : 2018);
+  //}
+  //if (isData) {
+  //  year = Contains(in_file, "Run2016") ? 2016 : (Contains(in_file, "Run2017") ? 2017 : (Contains(in_file, "Run2018") ? 2018: 2022));
+  //}
 
   vector<vector<int>> VVRunLumi;
   if (isData) {
@@ -112,6 +139,9 @@ int main(int argc, char *argv[]){
         break;
       case 2022:
         if (Contains(in_file, "2022")) VVRunLumi = MakeVRunLumi("golden2022");
+        break;
+      case 2023:
+        if (Contains(in_file, "2023")) VVRunLumi = MakeVRunLumi("golden2023");
         break;
       default:
         cout << "ERROR: no golden cert for given year" << endl;
@@ -135,13 +165,15 @@ int main(int argc, char *argv[]){
     {2016, vector<float>({0.2217, 0.6321, 0.8953})},
     {2017, vector<float>({0.1522, 0.4941, 0.8001})},
     {2018, vector<float>({0.1241, 0.4184, 0.7527})},
-    {2022, vector<float>({0.1241, 0.4184, 0.7527})}
+    {2022, vector<float>({0.1241, 0.4184, 0.7527})},
+    {2023, vector<float>({0.1241, 0.4184, 0.7527})}
   };
   map<int, vector<float>> btag_df_wpts{
     {2016, vector<float>({0.0614, 0.3093, 0.7221})},
     {2017, vector<float>({0.0521, 0.3033, 0.7489})},
     {2018, vector<float>({0.0494, 0.2770, 0.7264})},
-    {2022, vector<float>({0.0494, 0.2770, 0.7264})}
+    {2022, vector<float>({0.0494, 0.2770, 0.7264})},
+    {2023, vector<float>({0.0494, 0.2770, 0.7264})}
   };
 
   // Rochester corrections
@@ -206,7 +238,7 @@ int main(int argc, char *argv[]){
   wgt_sums.out_nent() = nentries;
 
   for(size_t entry(0); entry<nentries; ++entry){
-    if (debug) cout << "GetEntry: " << entry <<" event = "<< endl;
+    if (debug) cout << "GetEntry: " << entry <<" event = "<<pico.out_event()<< endl;
     nano.GetEntry(entry);
     if (entry%2000==0 || entry == nentries-1) {
       cout<<"Processing event: "<<entry<<endl;

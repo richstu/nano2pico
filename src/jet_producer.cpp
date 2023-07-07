@@ -42,6 +42,8 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
   getJetWithJEC(nano, isFastsim, Jet_pt, Jet_mass);
   float MET_pt, MET_phi;
   getMETWithJEC(nano, year, isFastsim, MET_pt, MET_phi, is_preUL);
+  vector<int> Jet_jetId;
+  getJetId(nano, year, Jet_jetId);
   
   // calculate MHT; needed when saving jet info
   TLorentzVector mht_vec;
@@ -85,7 +87,7 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
     bool isphoton = find(jet_isphoton_nano_idx.begin(), jet_isphoton_nano_idx.end(), ijet) != jet_isphoton_nano_idx.end();
     // jetid applied to only full sim and data
     bool pass_jetid = true;
-    if (!isFastsim) if (nano.Jet_jetId()[ijet] <1) pass_jetid = false;
+    if (!isFastsim) if (Jet_jetId[ijet] <1) pass_jetid = false;
 
     bool isgood = !islep && !isphoton && (fabs(nano.Jet_eta()[ijet]) <= max_jet_eta) && pass_jetid;
 
@@ -178,13 +180,14 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
         pico.out_jet_isvlep().push_back(isvlep);
         pico.out_jet_isphoton().push_back(isphoton);
         pico.out_jet_isgood().push_back(isgood);
-        pico.out_jet_id().push_back(nano.Jet_jetId()[ijet]);
+        pico.out_jet_id().push_back(Jet_jetId[ijet]);
         pico.out_jet_mht_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], mht_vec.Phi()));
         pico.out_jet_met_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], MET_phi));
         pico.out_jet_puid().push_back(nano.Jet_puId()[ijet]);
         pico.out_jet_puid_disc().push_back(nano.Jet_puIdDisc()[ijet]);
         break;
       case 2022:
+      case 2023:
         pico.out_jet_pt().push_back(Jet_pt[ijet]);
         pico.out_jet_eta().push_back(nano.Jet_eta()[ijet]);
         pico.out_jet_phi().push_back(nano.Jet_phi()[ijet]);
@@ -199,7 +202,7 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
         pico.out_jet_isvlep().push_back(isvlep);
         pico.out_jet_isphoton().push_back(isphoton);
         pico.out_jet_isgood().push_back(isgood);
-        pico.out_jet_id().push_back(nano.Jet_jetId()[ijet]);
+        pico.out_jet_id().push_back(Jet_jetId[ijet]);
         pico.out_jet_mht_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], mht_vec.Phi()));
         pico.out_jet_met_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], MET_phi));
         //pico.out_jet_puid().push_back(nano.Jet_puId()[ijet]);

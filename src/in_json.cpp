@@ -27,6 +27,8 @@ std::vector< std::vector<int> > MakeVRunLumi(std::string input){
     fullpath = "txt/json/golden_Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt";
   } else if(input == "golden2022") {
     fullpath = "txt/json/Cert_Collisions2022_355100_362760_Golden.json";
+  } else if(input == "golden2023") {
+    fullpath = "txt/json/Cert_Collisions2023_366442_368224_Golden.json";
   } else{
     fullpath = input;
   }

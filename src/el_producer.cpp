@@ -17,6 +17,8 @@ ElectronProducer::~ElectronProducer(){
 vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, vector<int> &jet_islep_nano_idx, vector<int> &jet_isvlep_nano_idx, vector<int> &sig_el_pico_idx, bool isZgamma, bool isFastsim){
   vector<float> Jet_pt, Jet_mass;
   getJetWithJEC(nano, isFastsim, Jet_pt, Jet_mass);
+  vector<int> Electron_photonIdx;
+  getElectron_photonIdx(nano, year, Electron_photonIdx);
 
   vector<int> sig_el_nano_idx;
   pico.out_nel() = 0; pico.out_nvel() = 0;
@@ -43,7 +45,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
           isSignal = nano.Electron_mvaFall17V2Iso_WPL()[iel];
           pico.out_el_idmva().push_back(nano.Electron_mvaFall17V2Iso()[iel]);
           pico.out_el_sip3d().push_back(nano.Electron_sip3d()[iel]);
-          pico.out_el_phidx().push_back(nano.Electron_photonIdx()[iel]);
+          pico.out_el_phidx().push_back(Electron_photonIdx[iel]);
           pico.out_el_id80().push_back(nano.Electron_mvaFall17V2Iso_WP80()[iel]);
           pico.out_el_id90().push_back(nano.Electron_mvaFall17V2Iso_WP90()[iel]);
           pico.out_el_idLoose().push_back(nano.Electron_mvaFall17V2Iso_WPL()[iel]);
@@ -51,10 +53,11 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
           pico.out_el_eminusp().push_back(nano.Electron_eInvMinusPInv()[iel]);
           break;
         case 2022:
+        case 2023:
           isSignal = nano.Electron_mvaIso_WP90()[iel];
           pico.out_el_idmva().push_back(nano.Electron_mvaIso()[iel]);
           pico.out_el_sip3d().push_back(nano.Electron_sip3d()[iel]);
-          pico.out_el_phidx().push_back(nano.Electron_photonIdx()[iel]);
+          pico.out_el_phidx().push_back(Electron_photonIdx[iel]);
           pico.out_el_id80().push_back(nano.Electron_mvaIso_WP80()[iel]);
           pico.out_el_id90().push_back(nano.Electron_mvaIso_WP90()[iel]);
           pico.out_el_idLoose().push_back(nano.Electron_mvaIso_WP90()[iel]);

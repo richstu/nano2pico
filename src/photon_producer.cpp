@@ -18,6 +18,13 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
   vector<int> sig_photon_nano_idx;
   int nphotons(0), ndr(0), shift(0);
 
+  vector<int> Photon_electronIdx;
+  getPhoton_electronIdx(nano, year, Photon_electronIdx);
+  vector<int> FsrPhoton_muonIdx;
+  getFsrPhoton_muonIdx(nano, year, FsrPhoton_muonIdx);
+  vector<int> Photon_jetIdx;
+  getPhoton_jetIdx(nano, year, Photon_jetIdx);
+
   for(int iph(0); iph < nano.nFsrPhoton(); ++iph){
     if (nano.FsrPhoton_pt()[iph] <= FsrPhotonPtCut) continue;
     if (fabs(nano.FsrPhoton_eta()[iph]) > FsrPhotonEtaCut) continue;
@@ -27,7 +34,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
     pico.out_fsrphoton_eta().push_back(nano.FsrPhoton_eta()[iph]);
     pico.out_fsrphoton_phi().push_back(nano.FsrPhoton_phi()[iph]);
     pico.out_fsrphoton_reliso().push_back(nano.FsrPhoton_relIso03()[iph]);
-    pico.out_fsrphoton_muonidx().push_back(nano.FsrPhoton_muonIdx()[iph]);
+    pico.out_fsrphoton_muonidx().push_back(FsrPhoton_muonIdx[iph]);
     pico.out_fsrphoton_droveret2().push_back(nano.FsrPhoton_dROverEt2()[iph]);
     pico.out_nfsrphoton()++;
   }
@@ -87,9 +94,10 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
         pico.out_photon_idmva() .insert(pico.out_photon_idmva() .begin()+shift, mva);
         pico.out_photon_sig()   .insert(pico.out_photon_sig()   .begin()+shift, isSignal);
         pico.out_photon_drmin() .insert(pico.out_photon_drmin() .begin()+shift, minLepDR);
-        pico.out_photon_elidx() .insert(pico.out_photon_elidx() .begin()+shift, nano.Photon_electronIdx()[iph]);
+        pico.out_photon_elidx() .insert(pico.out_photon_elidx() .begin()+shift, Photon_electronIdx[iph]);
         break;
       case 2022:
+      case 2023:
         pico.out_photon_pt()    .insert(pico.out_photon_pt()    .begin()+shift, pt);
         pico.out_photon_eta()   .insert(pico.out_photon_eta()   .begin()+shift, eta);
         pico.out_photon_phi()   .insert(pico.out_photon_phi()   .begin()+shift, phi);
@@ -104,7 +112,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
         pico.out_photon_idmva() .insert(pico.out_photon_idmva() .begin()+shift, mva);
         pico.out_photon_sig()   .insert(pico.out_photon_sig()   .begin()+shift, isSignal);
         pico.out_photon_drmin() .insert(pico.out_photon_drmin() .begin()+shift, minLepDR);
-        pico.out_photon_elidx() .insert(pico.out_photon_elidx() .begin()+shift, nano.Photon_electronIdx()[iph]);
+        pico.out_photon_elidx() .insert(pico.out_photon_elidx() .begin()+shift, Photon_electronIdx[iph]);
         break;
       default:
         std::cout<<"Need code for new year in getZGammaPhBr (in photon_producer.cpp)"<<endl;
@@ -121,8 +129,8 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
       pico.out_nphoton()++;
       sig_photon_nano_idx.push_back(iph);
       // save indices of matching jets
-      if (nano.Photon_jetIdx()[iph]>=0)
-        jet_isphoton_nano_idx.push_back(nano.Photon_jetIdx()[iph]);
+      if (Photon_jetIdx[iph]>=0)
+        jet_isphoton_nano_idx.push_back(Photon_jetIdx[iph]);
       else
         for (int ijet(0); ijet<nano.nJet(); ijet++)
           if (dR(eta, nano.Jet_eta()[ijet], phi, nano.Jet_phi()[ijet])<0.4)
