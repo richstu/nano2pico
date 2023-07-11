@@ -24,6 +24,8 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
   getFsrPhoton_muonIdx(nano, year, FsrPhoton_muonIdx);
   vector<int> Photon_jetIdx;
   getPhoton_jetIdx(nano, year, Photon_jetIdx);
+  vector<int> Photon_cutBased;
+  getPhoton_cutBased(nano, year, Photon_cutBased);
 
   for(int iph(0); iph < nano.nFsrPhoton(); ++iph){
     if (nano.FsrPhoton_pt()[iph] <= FsrPhotonPtCut) continue;
@@ -92,7 +94,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
         pico.out_photon_id()    .insert(pico.out_photon_id()    .begin()+shift, nano.Photon_mvaID_WP90()[iph]);
         pico.out_photon_id80()  .insert(pico.out_photon_id80()  .begin()+shift, nano.Photon_mvaID_WP80()[iph]);
         pico.out_photon_idmva() .insert(pico.out_photon_idmva() .begin()+shift, mva);
-        pico.out_photon_idCutBased() .insert(pico.out_photon_idCutBased() .begin()+shift, nano.Photon_cutBased()[iph]);
+        pico.out_photon_idCutBased() .insert(pico.out_photon_idCutBased() .begin()+shift, Photon_cutBased[iph]);
         pico.out_photon_idCutBasedBitMap() .insert(pico.out_photon_idCutBasedBitMap() .begin()+shift, nano.Photon_vidNestedWPBitmap()[iph]);
         pico.out_photon_sig()   .insert(pico.out_photon_sig()   .begin()+shift, isSignal);
         pico.out_photon_drmin() .insert(pico.out_photon_drmin() .begin()+shift, minLepDR);
@@ -112,7 +114,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
         pico.out_photon_id()    .insert(pico.out_photon_id()    .begin()+shift, nano.Photon_mvaID_WP90()[iph]);
         pico.out_photon_id80()  .insert(pico.out_photon_id80()  .begin()+shift, nano.Photon_mvaID_WP80()[iph]);
         pico.out_photon_idmva() .insert(pico.out_photon_idmva() .begin()+shift, mva);
-        pico.out_photon_idCutBased() .insert(pico.out_photon_idCutBased() .begin()+shift, nano.Photon_cutBased()[iph]);
+        pico.out_photon_idCutBased() .insert(pico.out_photon_idCutBased() .begin()+shift, Photon_cutBased[iph]);
         pico.out_photon_idCutBasedBitMap() .insert(pico.out_photon_idCutBasedBitMap() .begin()+shift, nano.Photon_vidNestedWPBitmap()[iph]);
         pico.out_photon_sig()   .insert(pico.out_photon_sig()   .begin()+shift, isSignal);
         pico.out_photon_drmin() .insert(pico.out_photon_drmin() .begin()+shift, minLepDR);

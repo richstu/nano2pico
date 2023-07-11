@@ -19,24 +19,26 @@ def ensureDir(path):
 def getTag(path):
   tag = path.split("/")[-1]
 
-  tag = tag.split("RunIISummer16NanoAODv5")[0]
-  tag = tag.split("RunIIFall17NanoAODv5")[0]
-  tag = tag.split("RunIIAutumn18NanoAODv5")[0]
+  #tag = tag.split("RunIISummer16NanoAODv5")[0]
+  #tag = tag.split("RunIIFall17NanoAODv5")[0]
+  #tag = tag.split("RunIIAutumn18NanoAODv5")[0]
 
-  tag = tag.split("RunIISummer16NanoAODv7")[0]
-  tag = tag.split("RunIIFall17NanoAODv7")[0]
-  tag = tag.split("RunIIAutumn18NanoAODv7")[0]
+  #tag = tag.split("RunIISummer16NanoAODv7")[0]
+  #tag = tag.split("RunIIFall17NanoAODv7")[0]
+  #tag = tag.split("RunIIAutumn18NanoAODv7")[0]
 
-  tag = tag.split("RunIISummer20UL16NanoAODv9")[0]
-  tag = tag.split("RunIISummer20UL16NanoAODAPVv9")[0]
-  tag = tag.split("RunIISummer20UL17NanoAODv9")[0]
-  tag = tag.split("RunIISummer20UL18NanoAODv9")[0]
+  #tag = tag.split("RunIISummer20UL16NanoAODv9")[0]
+  #tag = tag.split("RunIISummer20UL16NanoAODAPVv9")[0]
+  #tag = tag.split("RunIISummer20UL17NanoAODv9")[0]
+  #tag = tag.split("RunIISummer20UL18NanoAODv9")[0]
 
-  tag = tag.split("Run3Summer22NanoAODv11")[0]
+  #tag = tag.split("Run3Summer22NanoAODv11")[0]
 
-  tag = tag.split("_ext")[0]
-  tag = tag.replace("wgt_sums_","")
-  tag = tag.strip("_")
+  #tag = tag.split("_ext")[0]
+  #tag = tag.replace("wgt_sums_","")
+  #tag = tag.strip("_")
+
+  tag = re.findall('(.*?)__',tag)[0]
   return tag
 
 def mergeCorrections(wgt_dir, corr_dir):

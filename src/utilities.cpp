@@ -279,3 +279,11 @@ void getPhoton_jetIdx(nano_tree & nano, int year, vector<int> & Photon_jetIdx) {
     else Photon_jetIdx[ipart] = nano.Photon_jetIdx()[ipart];
   }
 }
+
+void getPhoton_cutBased(nano_tree & nano, int year, vector<int> & Photon_cutBased) {
+  Photon_cutBased.resize(nano.nPhoton());
+  for(int ipart(0); ipart<nano.nPhoton(); ++ipart){
+    if (year == 2023) Photon_cutBased[ipart] = nano.Photon_cutBased_char()[ipart];
+    else Photon_cutBased[ipart] = nano.Photon_cutBased()[ipart];
+  }
+}

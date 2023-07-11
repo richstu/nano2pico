@@ -225,7 +225,6 @@ def processData(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR
     # signal
     #0
     [notify_script+' "Started process nano '+data_tag+'"',
-    #'./scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/data/ --production '+PRODUCTION_NAME+' --dataset_list txt/datasets/htozgamma_data_infile_list.txt --list_format filename --tag '+data_tag,
     './scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/data/ --production '+PRODUCTION_NAME+' --dataset_list txt/datasets/'+NANOAOD_VERSION+'_htozgamma_'+YEAR+'_data_dataset_paths --data --tag '+data_tag,
     'auto_submit_jobs.py process_nano_cmds_'+data_tag+'.json -c scripts/check_data_process_nano_job.py -f',
     notify_script+' "Finished process nano '+data_tag+'"',
@@ -294,6 +293,7 @@ Pico files: BASE_FOLDERNAME/NANOAOD_VERSION/TAG_NAME/(2016,2017,2018)/(data,mc,s
 ''', formatter_class=argparse.RawTextHelpFormatter)
 
   parser.add_argument('-t','--tag_name', required=True, help='Tag name for production in git')
+  parser.add_argument('-y','--years', required=True, help='Years for production. Example: --years 2016,2016APV,2017,2018')
   parser.add_argument('-n','--nanoaod_version', required=True, help='Nanoaod version for production')
   parser.add_argument('-b','--base_foldername', required=True, help='Base folder for ntuple files. Ex) /net/cms17/cms17r0/pico')
   parser.add_argument('-f', '--fake_run', action="store_true", help='Do not run commands. Only print commands to run.')
@@ -307,17 +307,29 @@ Pico files: BASE_FOLDERNAME/NANOAOD_VERSION/TAG_NAME/(2016,2017,2018)/(data,mc,s
     print('[Error] Could not find base folder: '+args.base_foldername+'. Exiting.')
     sys.exit()
 
+  years = args.years.split(',')
+
+  # Check if dataset_list (nanoaod files to process) exist
+  dataset_list_files = []
+  for year in years:
+    dataset_list_files.append(f'txt/datasets/{args.nanoaod_version}_htozgamma_{year}_mc_dataset_paths')
+    dataset_list_files.append(f'txt/datasets/{args.nanoaod_version}_htozgamma_{year}_data_dataset_paths')
+  for dataset_list_file in dataset_list_files:
+    if not os.path.exists(dataset_list_file): 
+      print('[Error] '+dataset_list_file+' does not exist. Existing.')
+      sys.exit()
+
   ## Check if dataset_list (nanoaod files to process) exist
   #dataset_list_files = [
   #  'txt/datasets/'+args.nanoaod_version+'_htozgamma_2016_mc_dataset_paths',
   #  'txt/datasets/'+args.nanoaod_version+'_htozgamma_2017_mc_dataset_paths',
   #  'txt/datasets/'+args.nanoaod_version+'_htozgamma_2018_mc_dataset_paths',
-  #  'txt/datasets/htozgamma_data_infile_list.txt'
+  #  'txt/datasets/'+args.nanoaod_version+'_htozgamma_2022_mc_dataset_paths',
+  #  'txt/datasets/'+args.nanoaod_version+'_htozgamma_2016_data_dataset_paths',
+  #  'txt/datasets/'+args.nanoaod_version+'_htozgamma_2017_data_dataset_paths',
+  #  'txt/datasets/'+args.nanoaod_version+'_htozgamma_2018_data_dataset_paths',
+  #  'txt/datasets/'+args.nanoaod_version+'_htozgamma_2022_data_dataset_paths',
   #  ]
-  #for dataset_list_file in dataset_list_files:
-  #  if not os.path.exists(dataset_list_file): 
-  #    print('[Error] '+dataset_list_file+' does not exist. Existing.')
-  #    sys.exit()
 
   if not os.path.exists('logs'): 
     print('Creating logs directory')
@@ -386,19 +398,26 @@ Pico files: BASE_FOLDERNAME/NANOAOD_VERSION/TAG_NAME/(2016,2017,2018)/(data,mc,s
   # There is also a memory list of commands from this script. 
   # They are compared and missing steps are ran.
   # Step is the step that is running. Will run the next step.
+  for year in years:
+    FIRST_COMMAND = processMc(YEAR=year, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2016.mc.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2016.mc.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
+
+  for year in years:
+    FIRST_COMMAND = processData(YEAR=year, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2016.data.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2016.data.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
+
   #FIRST_COMMAND = processMc(YEAR=2016, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2016.mc.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2016.mc.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
   #FIRST_COMMAND = processMc(YEAR='2016APV', PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2016APV.mc.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2016APV.mc.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
   #FIRST_COMMAND = processMc(YEAR=2017, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2017.mc.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2017.mc.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
   #FIRST_COMMAND = processMc(YEAR=2018, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2018.mc.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2018.mc.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
-  FIRST_COMMAND = processMc(YEAR='2022', PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2022.mc.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2022.mc.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
-  FIRST_COMMAND = processMc(YEAR='2022EE', PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2022EE.mc.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2022EE.mc.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
+  #FIRST_COMMAND = processMc(YEAR='2022', PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2022.mc.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2022.mc.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
+  #FIRST_COMMAND = processMc(YEAR='2022EE', PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2022EE.mc.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2022EE.mc.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
 
   #FIRST_COMMAND = processData(YEAR=2016, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2016.data.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2016.data.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
   #FIRST_COMMAND = processData(YEAR='2016APV', PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2016APV.data.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2016APV.data.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
   #FIRST_COMMAND = processData(YEAR=2017, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2017.data.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2017.data.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
   #FIRST_COMMAND = processData(YEAR=2018, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2018.data.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2018.data.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
-  FIRST_COMMAND = processData(YEAR=2022, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2022.data.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2022.data.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
-  FIRST_COMMAND = processData(YEAR='2022EE', PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2022EE.data.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2022EE.data.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
+  #FIRST_COMMAND = processData(YEAR=2022, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2022.data.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2022.data.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
+  #FIRST_COMMAND = processData(YEAR='2022EE', PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2022EE.data.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2022EE.data.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
+  #FIRST_COMMAND = processData(YEAR='2023', PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2022EE.data.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2022EE.data.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
 
   # Change permission of directories
   os.system("find "+PICO_DIR+"/"+NANOAOD_VERSION+'/'+PRODUCTION_NAME+" -type d -exec chmod 775 {} \;")

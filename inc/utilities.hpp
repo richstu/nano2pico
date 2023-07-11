@@ -101,5 +101,6 @@ void getMuon_fsrPhotonIdx(nano_tree & nano, int year, std::vector<int> & Muon_fs
 void getElectron_photonIdx(nano_tree & nano, int year, std::vector<int> & Electron_photonIdx);
 void getFsrPhoton_muonIdx(nano_tree & nano, int year, std::vector<int> & FsrPhoton_muonIdx);
 void getPhoton_jetIdx(nano_tree & nano, int year, std::vector<int> & Photon_jetIdx);
+void getPhoton_cutBased(nano_tree & nano, int year, std::vector<int> & Photon_cutBased);
 
 #endif
