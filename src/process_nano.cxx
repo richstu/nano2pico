@@ -25,6 +25,9 @@
 #include "met_producer.hpp"
 #include "hig_producer.hpp"
 #include "zgamma_producer.hpp"
+#include "gammagamma_producer.hpp"
+#include "bb_producer.hpp"
+#include "bbgammagamma_producer.hpp"
 #include "in_json.hpp"
 
 #include "btag_weighter.hpp"
@@ -67,6 +70,7 @@ int main(int argc, char *argv[]){
   bool isFastsim = Contains(in_file, "Fast") ? true : false;
   bool isSignal = Contains(in_file, "TChiHH") || Contains(in_file, "T5qqqqZH") ? true : false;
   bool isZgamma = Contains(out_dir, "zgamma");
+  bool isHiggsino = Contains(out_dir, "higgsino");
   int year = -1;
   int isAPV = false;
   int is_preUL = true;
@@ -194,6 +198,9 @@ int main(int argc, char *argv[]){
   MetProducer met_producer(year, isData, is_preUL);
   HigVarProducer hig_producer(year);
   ZGammaVarProducer zgamma_producer(year);
+  GammaGammaVarProducer gammagamma_producer(year);
+  BBVarProducer bb_producer(year);
+  BBGammaGammaVarProducer bbgammagamma_producer(year);
 
   //Initialize scale factor tools
   std::cout<<"For years past 2018, currently using 2018 weights in Prefire, BTag, Lepton, Photon, and event by default. Remove this message only when this has been fixed."<<endl;
@@ -206,7 +213,7 @@ int main(int argc, char *argv[]){
   BTagWeighter btag_df_weighter(year, isFastsim, true, btag_df_wpts[year]);
   LeptonWeighter lep_weighter(year, isZgamma);
   LeptonWeighter lep_weighter16gh(year, isZgamma, true);
-  PhotonWeighter photon_weighter(year, isZgamma);
+  PhotonWeighter photon_weighter(year, isZgamma || isHiggsino);
   // UL scale factors
   EventWeighter event_weighter(year, isAPV);
   //cout<<"Is APV: "<<isAPV<<endl;
@@ -305,7 +312,7 @@ int main(int argc, char *argv[]){
     }
 
     vector<int> jet_isphoton_nano_idx = vector<int>();
-    if(isZgamma) 
+    if(isZgamma || isHiggsino) 
       vector<int> sig_ph_nano_idx = photon_producer.WritePhotons(nano, pico, jet_isphoton_nano_idx,
                                                                  sig_el_nano_idx, sig_mu_nano_idx);
 
@@ -368,6 +375,10 @@ int main(int argc, char *argv[]){
       zgamma_producer.WriteZGammaVars(nano, pico, sig_jet_nano_idx);
 
   
+    if (isHiggsino) gammagamma_producer.WriteGammaGammaVars(pico);
+    if (isHiggsino) bb_producer.WriteBBVars(pico, /*doDeepFlav*/false);
+    if (isHiggsino) bb_producer.WriteBBVars(pico, /*doDeepFlav*/true);
+    if (isHiggsino) bbgammagamma_producer.WriteBBGammaGammaVars(pico);
 
     //save higgs variables using DeepCSV and DeepFlavor
     hig_producer.WriteHigVars(pico, false, isSignal, sys_higvars);

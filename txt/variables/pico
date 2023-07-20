@@ -71,6 +71,51 @@ vector<float> llphoton_dijet_dphi
 vector<float> llphoton_dijet_balance
 vector<float> llphoton_pTt2
 
+###################   gammagamma   ##################
+int nphotonphoton
+vector<float> photonphoton_pt
+vector<float> photonphoton_eta
+vector<float> photonphoton_phi
+vector<float> photonphoton_m
+vector<float> photonphoton_dr
+vector<float> photonphoton_dphi
+vector<float> photonphoton_deta
+vector<int>   photonphoton_ileadph
+vector<int>   photonphoton_isubph
+
+###################   bb   ##################
+int nbb
+vector<float> bb_pt
+vector<float> bb_eta
+vector<float> bb_phi
+vector<float> bb_m
+vector<float> bb_dr
+vector<float> bb_dphi
+vector<float> bb_deta
+vector<int>   bb_ileadscorejet
+vector<int>   bb_isubscorejet
+int nbb_df
+vector<float> bb_df_pt
+vector<float> bb_df_eta
+vector<float> bb_df_phi
+vector<float> bb_df_m
+vector<float> bb_df_dr
+vector<float> bb_df_dphi
+vector<float> bb_df_deta
+vector<int>   bb_df_ileadscorejet
+vector<int>   bb_df_isubscorejet
+
+###################   bbgammagamma   ##################
+int nbbphotonphoton;
+vector<float> bbphotonphoton_dm;
+vector<float> bbphotonphoton_am;
+vector<float> bbphotonphoton_drmax;
+int nbbphotonphoton_df;
+vector<float> bbphotonphoton_df_dm;
+vector<float> bbphotonphoton_df_am;
+vector<float> bbphotonphoton_df_drmax;
+
+
 ###################   Jets   ##################
 int njet
 int nbl
