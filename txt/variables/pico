@@ -106,14 +106,14 @@ vector<int>   bb_df_ileadscorejet
 vector<int>   bb_df_isubscorejet
 
 ###################   bbgammagamma   ##################
-int nbbphotonphoton;
-vector<float> bbphotonphoton_dm;
-vector<float> bbphotonphoton_am;
-vector<float> bbphotonphoton_drmax;
-int nbbphotonphoton_df;
-vector<float> bbphotonphoton_df_dm;
-vector<float> bbphotonphoton_df_am;
-vector<float> bbphotonphoton_df_drmax;
+int nbbphotonphoton
+vector<float> bbphotonphoton_dm
+vector<float> bbphotonphoton_am
+vector<float> bbphotonphoton_drmax
+int nbbphotonphoton_df
+vector<float> bbphotonphoton_df_dm
+vector<float> bbphotonphoton_df_am
+vector<float> bbphotonphoton_df_drmax
 
 
 ###################   Jets   ##################

@@ -158,6 +158,12 @@ int main(int argc, char *argv[]){
   string out_path;
   out_path = out_dir+"/raw_pico/raw_pico_"+in_file;
 
+  // Find nanoAOD version
+  std::smatch nanoad_version_matches;
+  std::regex_search(in_file, nanoad_version_matches, std::regex("NanoAOD(?:APVv|v)(\\d+p\\d+|\\d+)"));
+  float nanoaod_version = std::stof(std::regex_replace(nanoad_version_matches[1].str(), std::regex("p"), "."));
+  cout<<"Using NanoAOD version: "<<nanoad_version_matches[0]<<endl;
+
   time_t begtime, endtime;
   time(&begtime);
 
@@ -194,7 +200,7 @@ int main(int argc, char *argv[]){
   DileptonProducer dilep_producer(year);
   IsoTrackProducer tk_producer(year);
   PhotonProducer photon_producer(year, isData);
-  JetProducer jet_producer(year, min_jet_pt, max_jet_eta, isData);
+  JetProducer jet_producer(year, nanoaod_version, min_jet_pt, max_jet_eta, isData);
   MetProducer met_producer(year, isData, is_preUL);
   HigVarProducer hig_producer(year);
   ZGammaVarProducer zgamma_producer(year);
@@ -225,7 +231,8 @@ int main(int argc, char *argv[]){
   ISRTools isr_tools(in_path, year);
 
   // Initialize trees
-  nano_tree nano(in_path);
+  nano_tree nano(in_path, nanoaod_version);
+  //nano_tree nano(in_path, 9);
   size_t nentries(nent_test>0 ? nent_test : nano.GetEntries());
   cout << "Nano file: " << in_path << endl;
   cout << "Input number of events: " << nentries << endl;

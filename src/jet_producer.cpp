@@ -11,12 +11,13 @@
 
 using namespace std;
 
-JetProducer::JetProducer(int year_, float min_jet_pt_, float max_jet_eta_, bool isData_, bool verbose_){
+JetProducer::JetProducer(int year_, float nanoaod_version_, float min_jet_pt_, float max_jet_eta_, bool isData_, bool verbose_){
   year = year_;
   isData = isData_;
   verbose = verbose_;
   min_jet_pt = min_jet_pt_;
   max_jet_eta = max_jet_eta_;
+  nanoaod_version = nanoaod_version_;
 }
 
 JetProducer::~JetProducer(){
@@ -291,6 +292,9 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
 
 void JetProducer::WriteFatJets(nano_tree &nano, pico_tree &pico){
   pico.out_nfjet() = 0; 
+  vector<int> FatJet_btagDDBvL;
+  getFatJet_btagDDBvL(nano, nanoaod_version, FatJet_btagDDBvL);
+
   for(int ifjet(0); ifjet<nano.nFatJet(); ++ifjet){
     if (verbose) cout<<"FatJet "<<ifjet<<": pt = "<<setw(10)<<nano.FatJet_pt()[ifjet]
                                        <<" eta = "<<setw(10)<<nano.FatJet_eta()[ifjet]
@@ -304,7 +308,7 @@ void JetProducer::WriteFatJets(nano_tree &nano, pico_tree &pico){
     pico.out_fjet_m().push_back(nano.FatJet_mass()[ifjet]);
     pico.out_fjet_msoftdrop().push_back(nano.FatJet_msoftdrop()[ifjet]);
     // Mass-decorrelated Deep Double B, H->bb vs QCD discriminator, endorsed by BTV
-    pico.out_fjet_deep_md_hbb_btv().push_back(nano.FatJet_btagDDBvL()[ifjet]);
+    pico.out_fjet_deep_md_hbb_btv().push_back(FatJet_btagDDBvL[ifjet]);
     pico.out_fjet_mva_hbb_btv().push_back(nano.FatJet_btagHbb()[ifjet]);
     // Mass-decorrelated DeepAk8, H->bb vs QCD discriminator, endorsed by JME
     pico.out_fjet_deep_md_hbb_jme().push_back(nano.FatJet_deepTagMD_HbbvsQCD()[ifjet]);

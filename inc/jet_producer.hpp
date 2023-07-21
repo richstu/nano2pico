@@ -10,7 +10,7 @@
 class JetProducer{
 public:
 
-  explicit JetProducer(int year, float min_jet_pt, float max_jet_eta, bool isData, bool verbose=false);
+  explicit JetProducer(int year, float nanoaod_version, float min_jet_pt, float max_jet_eta, bool isData, bool verbose=false);
   ~JetProducer();
 
   void SetVerbose(bool verbose_){ verbose = verbose_; };
@@ -31,6 +31,7 @@ public:
                               std::vector<int> &sig_jet_nano_idx, const float &btag_wpt, bool isFastsim);
 private:
   int year;
+  float nanoaod_version;
   bool verbose;
   float min_jet_pt;
   float max_jet_eta;

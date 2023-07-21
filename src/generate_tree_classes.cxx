@@ -171,9 +171,8 @@ vector<Variable> GetVariables(const string &file_name){
     stringToVectorString(line, items, " ");
     name_ = items[1];
     type_ = items[0];
-    string out_name_;
-    if (items.size() == 2) out_name_ = name_;
-    else out_name_ = items[2];
+    float version_ = 0.;
+    if (items.size() !=2) version_ = std::stof(string(items[2]));
 
     // Add size of array to type
     if (line.find("array")!=string::npos) {
@@ -189,7 +188,7 @@ vector<Variable> GetVariables(const string &file_name){
       base_type_ = line.substr(start, split-start);
     }
 
-    vars.push_back(Variable(type_, base_type_,name_,out_name_));
+    vars.push_back(Variable(type_, base_type_,name_,version_));
   }
   infile.close();
 
@@ -256,7 +255,7 @@ void WriteNanoHeader(const vector<Variable> &vars){
 
   file << "class nano_tree{\n";
   file << "public:\n";
-  file << "  nano_tree(TString infile = \"\"); \n\n";
+  file << "  nano_tree(TString infile = \"\", float version = 0.); \n\n";
 
   file << "  long GetEntries() const;\n";
   file << "  void GetEntry(const long entry);\n";
@@ -265,9 +264,9 @@ void WriteNanoHeader(const vector<Variable> &vars){
 
   for(vector<Variable>::const_iterator var = vars.begin(); var != vars.end(); ++var){
     if(Contains(var->type_, "vector") || Contains(var->type_, "array")){
-      file << "  std::vector<" << var->base_type_ << "> &" << var->out_name_ << "();\n";
+      file << "  std::vector<" << var->base_type_ << "> &" << var->get_out_name() << "();\n";
     } else {
-      file << "  " << var->type_ << " &" << var->out_name_ << "();\n";
+      file << "  " << var->type_ << " &" << var->get_out_name() << "();\n";
     }
   }
   file << '\n';
@@ -286,19 +285,20 @@ void WriteNanoHeader(const vector<Variable> &vars){
   file << "  static VectorLoader vl_;\n";
   for(vector<Variable>::const_iterator var = vars.begin(); var != vars.end(); ++var){
     if(Contains(var->type_, "vector")){
-      file << "  std::" << var->type_ << ' ' << var->out_name_ << "_;\n";
-      file << "  std::" << var->type_ << " *p_" << var->out_name_ << "_;\n";
+      file << "  std::" << var->type_ << ' ' << var->get_out_name() << "_;\n";
+      file << "  std::" << var->type_ << " *p_" << var->get_out_name() << "_;\n";
     } else if(Contains(var->type_, "array")){
-      file << "  std::" << var->type_ << " arr_" << var->out_name_ << "_;\n";
-      file << "  std::vector<" << var->base_type_ << "> " << var->out_name_ << "_;\n";
+      file << "  std::" << var->type_ << " arr_" << var->get_out_name() << "_;\n";
+      file << "  std::vector<" << var->base_type_ << "> " << var->get_out_name() << "_;\n";
     } else { 
-      file << "  " << var->type_ << ' ' << var->out_name_ << "_;\n";
+      file << "  " << var->type_ << ' ' << var->get_out_name() << "_;\n";
     }
-    file << "  TBranch *b_" << var->out_name_ << "_;\n";
-    file << "  mutable bool c_" << var->out_name_ << "_;\n";
+    file << "  TBranch *b_" << var->get_out_name() << "_;\n";
+    file << "  mutable bool c_" << var->get_out_name() << "_;\n";
   }
 
   file << "  long entry_;\n";
+  file << "  float version_;\n";
 
   file << "};\n\n";
 
@@ -318,6 +318,7 @@ void WriteNanoSource(const vector<Variable> &vars){
   file << "#include <string>\n";
   file << "#include <iostream>\n";
   file << "#include <vector>\n\n";
+  file << "#include <regex>\n\n";
 
   file << "#include \"TROOT.h\"\n";
   file << "#include \"TTree.h\"\n";
@@ -338,40 +339,42 @@ void WriteNanoSource(const vector<Variable> &vars){
   file << "  }\n";
   file << "}\n\n";
 
-  file << "nano_tree::nano_tree(TString infile):\n";
+  file << "nano_tree::nano_tree(TString infile, float version):\n";
   file << "  bad_val_(-999.),\n";
 
   for(vector<Variable>::const_iterator var = vars.begin(); var != vars.end(); ++var){
     if(Contains(var->type_, "vector")){
-      file << "  " << var->out_name_ << "_(0),\n";
+      file << "  " << var->get_out_name() << "_(0),\n";
     } else if (Contains(var->type_, "array")) {
-      file << "  arr_" << var->out_name_ << "_("<< var->type_ <<"{}),\n";
-      file << "  " << var->out_name_ << "_(0),\n";
+      file << "  arr_" << var->get_out_name() << "_("<< var->type_ <<"{}),\n";
+      file << "  " << var->get_out_name() << "_(0),\n";
     } else if(Contains(var->type_, "tring")){
-      file << "  " << var->out_name_ << "_(\"\"),\n";
+      file << "  " << var->get_out_name() << "_(\"\"),\n";
     } else if(Contains(var->type_, "bool")){
-      file << "  " << var->out_name_ << "_(false),\n";
+      file << "  " << var->get_out_name() << "_(false),\n";
     } else{
-      file << "  " << var->out_name_ << "_(static_cast<" << var->type_ << ">(bad_val_)),\n";
+      file << "  " << var->get_out_name() << "_(static_cast<" << var->type_ << ">(bad_val_)),\n";
     }
     if(Contains(var->type_, "vector")){
-      file << "  p_" << var->out_name_ << "_(&" << var->out_name_ << "_),\n";
+      file << "  p_" << var->get_out_name() << "_(&" << var->get_out_name() << "_),\n";
     }
-    file << "  b_" << var->out_name_ << "_(NULL),\n";
-    file << "  c_" << var->out_name_ << "_(false),\n";
+    file << "  b_" << var->get_out_name() << "_(NULL),\n";
+    file << "  c_" << var->get_out_name() << "_(false),\n";
   }
   file << "  entry_(0){\n";
+
+  file << "  version_ = version;\n";
 
   file << "  intree_ = new TChain(\"Events\");\n";
   file << "  intree_->Add(infile);\n\n";
 
   for(vector<Variable>::const_iterator var = vars.begin(); var != vars.end(); ++var){
     if(Contains(var->type_, "vector")){
-      file << "  intree_->SetBranchAddress(\"" << var->name_ << "\", &p_" << var->out_name_ << "_, &b_" << var->out_name_ << "_);\n";
+      file << "  if (version_+0.01 > "<<var->version_<<") intree_->SetBranchAddress(\"" << var->name_ << "\", &p_" << var->get_out_name() << "_, &b_" << var->get_out_name() << "_);\n";
     } else if (Contains(var->type_, "array")){
-      file << "  intree_->SetBranchAddress(\"" << var->name_ << "\", &arr_" << var->out_name_ << "_[0], &b_" << var->out_name_ << "_);\n";
+      file << "  if (version_+0.01 > "<<var->version_<<") intree_->SetBranchAddress(\"" << var->name_ << "\", &arr_" << var->get_out_name() << "_[0], &b_" << var->get_out_name() << "_);\n";
     } else {
-      file << "  intree_->SetBranchAddress(\"" << var->name_ << "\", &" << var->out_name_ << "_, &b_" << var->out_name_ << "_);\n";
+      file << "  if (version_+0.01 > "<<var->version_<<") intree_->SetBranchAddress(\"" << var->name_ << "\", &" << var->get_out_name() << "_, &b_" << var->get_out_name() << "_);\n";
     }
   }
   file << "}\n\n"; // closing constructor bracket
@@ -394,20 +397,20 @@ void WriteNanoSource(const vector<Variable> &vars){
   // Writing methods called when accessing input tree variable
   for(vector<Variable>::const_iterator var = vars.begin(); var != vars.end(); ++var){
     if (Contains(var->type_, "array")){
-      file << "vector<"<< var->base_type_ << "> & nano_tree::" << var->out_name_ << "(){\n";
+      file << "vector<"<< var->base_type_ << "> & nano_tree::" << var->get_out_name() << "(){\n";
     } else {
-      file << var->type_ << " & nano_tree::" << var->out_name_ << "(){\n";
+      file << var->type_ << " & nano_tree::" << var->get_out_name() << "(){\n";
     }
-    file << "  if(!c_" << var->name_ << "_ && b_" << var->out_name_ <<"_){\n";
+    file << "  if(!c_" << var->name_ << "_ && b_" << var->get_out_name() <<"_){\n";
     if (Contains(var->type_, "array")){
-      file << "    int bytes = b_" << var->out_name_ << "_->GetEntry(entry_);\n";
-      file << "    "<< var->out_name_ <<"_ = vector<"<< var->base_type_ <<">(arr_"<< var->out_name_ <<"_.begin(), arr_"<< var->out_name_ <<"_.begin()+bytes/sizeof(arr_"<< var->out_name_ <<"_[0]));\n";
+      file << "    int bytes = b_" << var->get_out_name() << "_->GetEntry(entry_);\n";
+      file << "    "<< var->get_out_name() <<"_ = vector<"<< var->base_type_ <<">(arr_"<< var->get_out_name() <<"_.begin(), arr_"<< var->get_out_name() <<"_.begin()+bytes/sizeof(arr_"<< var->get_out_name() <<"_[0]));\n";
     } else {
-      file << "    b_" << var->out_name_ << "_->GetEntry(entry_);\n";
+      file << "    b_" << var->get_out_name() << "_->GetEntry(entry_);\n";
     }
-    file << "    c_" << var->out_name_ << "_ = true;\n";
+    file << "    c_" << var->get_out_name() << "_ = true;\n";
     file << "  }\n";
-    file << "  return " << var->out_name_ << "_;\n";
+    file << "  return " << var->get_out_name() << "_;\n";
     file << "}\n\n";
   }
 

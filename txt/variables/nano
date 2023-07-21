@@ -56,7 +56,7 @@ array<int> Electron_cutBased_Fall17_V1
 array<int> Electron_jetIdx
 array<int> Electron_pdgId
 array<int> Electron_photonIdx
-array<short> Electron_photonIdx Electron_photonIdx_short
+array<short> Electron_photonIdx 11.9
 array<int> Electron_tightCharge
 array<int> Electron_vidNestedWPBitmap
 array<int> Electron_vidNestedWPBitmapHEEP
@@ -111,7 +111,7 @@ array<float> Muon_tunepRelPt
 array<float> Muon_mvaLowPt
 array<float> Muon_mvaTTH
 array<int> Muon_fsrPhotonIdx
-array<short> Muon_fsrPhotonIdx Muon_fsrPhotonIdx_short
+array<short> Muon_fsrPhotonIdx 11.9
 array<int> Muon_charge
 array<int> Muon_jetIdx
 array<int> Muon_nStations
@@ -222,13 +222,13 @@ array<float> Photon_r9
 array<float> Photon_sieie
 array<int> Photon_charge
 array<int> Photon_cutBased
-array<char> Photon_cutBased Photon_cutBased_char
+array<char> Photon_cutBased 11.9
 array<int> Photon_cutBasedBitmap
 array<int> Photon_cutBasedV1Bitmap
 array<int> Photon_electronIdx
-array<short> Photon_electronIdx Photon_electronIdx_short
+array<short> Photon_electronIdx 11.9
 array<int> Photon_jetIdx
-array<short> Photon_jetIdx Photon_jetIdx_short
+array<short> Photon_jetIdx 11.9
 array<int> Photon_pdgId
 array<int> Photon_vidNestedWPBitmap
 array<bool> Photon_electronVeto
@@ -248,7 +248,7 @@ int nFsrPhoton
 array<float> FsrPhoton_dROverEt2
 array<float> FsrPhoton_eta
 array<int> FsrPhoton_muonIdx
-array<short> FsrPhoton_muonIdx FsrPhoton_muonIdx_short
+array<short> FsrPhoton_muonIdx 11.9
 array<float> FsrPhoton_phi
 array<float> FsrPhoton_pt
 array<float> FsrPhoton_relIso03
@@ -284,7 +284,7 @@ array<float> Jet_bRegRes
 array<int> Jet_electronIdx1
 array<int> Jet_electronIdx2
 array<int> Jet_jetId
-array<char> Jet_jetId Jet_jetId_char
+array<char> Jet_jetId 11.9
 array<int> Jet_muonIdx1
 array<int> Jet_muonIdx2
 array<int> Jet_nConstituents
@@ -327,6 +327,7 @@ array<float> FatJet_area
 array<float> FatJet_btagCMVA
 array<float> FatJet_btagCSVV2
 array<float> FatJet_btagDDBvL
+array<float> FatJet_btagDDBvLV2
 array<float> FatJet_btagDDCvB
 array<float> FatJet_btagDDCvL
 array<float> FatJet_btagDeepB
