@@ -383,9 +383,16 @@ float w_isr
 float w_btag_dc
 float w_pu
 float w_prefire
-float eff_trig
+float w_trig
 
 ################  Triggers copy straight from Nano, same names   ##################
+
+# Trigger summary branches
+#------------------------------
+bool trig_single_el
+bool trig_double_el
+bool trig_single_mu
+bool trig_double_mu
 
 # Muon triggers
 #------------------------------

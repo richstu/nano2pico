@@ -37,6 +37,7 @@
 #include "event_tools.hpp"
 #include "isr_tools.hpp"
 #include "event_weighter.hpp"
+#include "trigger_weighter.hpp"
 
 using namespace std;
 
@@ -222,6 +223,7 @@ int main(int argc, char *argv[]){
   PhotonWeighter photon_weighter(year, isZgamma || isHiggsino);
   // UL scale factors
   EventWeighter event_weighter(year, isAPV);
+  TriggerWeighter trigger_weighter(year, isAPV);
   //cout<<"Is APV: "<<isAPV<<endl;
 
   // Other tools
@@ -395,7 +397,14 @@ int main(int argc, char *argv[]){
     // N.B. Jets: pico.out_pass_jets() and pico.out_pass_fsjets() filled in jet_producer
     event_tools.WriteDataQualityFilters(nano, pico, sig_jet_nano_idx, min_jet_pt, isData, isFastsim, is_preUL);
 
-    event_tools.WriteTriggerEfficiency(pico);
+    if (isHiggsino) event_tools.WriteTriggerEfficiency(pico);
+    if (isZgamma) {
+      std::vector<float> zgamma_trigsfs = trigger_weighter.GetSF(pico);
+      pico.out_w_trig() = zgamma_trigsfs[0];
+      pico.out_sys_trig().resize(2,0);
+      pico.out_sys_trig()[0] = zgamma_trigsfs[1];
+      pico.out_sys_trig()[1] = zgamma_trigsfs[2];
+    }
 
     // ----------------------------------------------------------------------------------------------
     //              *** Calculating weight branches ***
