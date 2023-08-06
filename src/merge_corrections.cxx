@@ -40,6 +40,7 @@ void FixLumi(corrections_tree &corr, const string &corr_path, int year);
 void FixISR(corrections_tree &corr, const string &corr_path, int year);
 void Normalize(corrections_tree &corr);
 void Fix0L(corrections_tree &corr);
+void FixZvtx(corrections_tree &corr, int year);
 
 void GetOptions(int argc, char *argv[]);
 
@@ -94,6 +95,7 @@ int main(int argc, char *argv[]){
   FixLumi(corr, output_path, year);
   FixISR(corr, output_path, year);
   Fix0L(corr);
+  FixZvtx(corr,year);
 
   Normalize(corr);
 
@@ -114,6 +116,8 @@ void Initialize(corrections_tree &wgt_sums, corrections_tree &corr){
   corr.out_w_isr() = 0.;
   corr.out_w_pu() = 0.;
   corr.out_w_photon() = 0.;
+  corr.out_w_zvtx_pass() = 0.;
+  corr.out_w_zvtx_fail() = 0.;
   // w_prefire should not be normalized!!
 
   corr.out_neff() = 0;
@@ -140,6 +144,7 @@ void AddEntry(corrections_tree &wgt_sums, corrections_tree &corr){
   corr.out_neff() += wgt_sums.neff();
   corr.out_nent() += wgt_sums.nent();
   corr.out_nent_zlep() += wgt_sums.nent_zlep();
+  corr.out_neff_pass_eltrigs() += wgt_sums.neff_pass_eltrigs();
   corr.out_tot_weight_l0() += wgt_sums.tot_weight_l0();
   corr.out_tot_weight_l1() += wgt_sums.tot_weight_l1();
 
@@ -288,6 +293,25 @@ void Fix0L(corrections_tree &corr){
   }
   for(size_t i = 0; i<corr.out_sys_fs_lep().size(); i++){
     corr.out_sys_fs_lep()[i] = corr.out_sys_fs_lep()[i] ? (nent-corr.out_sys_fs_lep()[i])/nent_zlep : 1.;
+  }
+}
+
+/*!\brief calculate additional correction needed for Zvtx issue in 2017, even in 
+  UL, see https://twiki.cern.ch/twiki/bin/view/CMS/EgammaUL2016To2018. 
+  Normalization is performed here
+ */
+void FixZvtx(corrections_tree &corr, int year) {
+  //in apply corrections, this will only be applied to events failing dielectron
+  //triggers
+  if (year != 2017) {
+    corr.out_w_zvtx_pass() = 1.0;
+    corr.out_w_zvtx_fail() = 1.0;
+  }
+  else {
+    float neff_pass = corr.neff_pass_eltrigs();
+    float neff_fail = corr.neff()-corr.neff_pass_eltrigs();
+    corr.out_w_zvtx_pass() = 0.991;
+    corr.out_w_zvtx_fail() = (corr.neff()-neff_pass*0.991)/neff_fail;
   }
 }
 

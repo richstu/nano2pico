@@ -419,6 +419,8 @@ int main(int argc, char *argv[]){
     float w_photon_csev(1.);
     float w_btag_dc(1.);
     float w_pu(1.);
+    float sys_pu_up(1.);
+    float sys_pu_down(1.);
     vector<float> sys_lep(2,1.), sys_fs_lep(2,1.);
     vector<float> sys_photon(2,1.);
 
@@ -442,7 +444,7 @@ int main(int argc, char *argv[]){
         // ElectronISO SF need to be implemented for non-HToZgamma
         event_weighter.MuonIDSF(pico, w_mu_id);
         event_weighter.MuonIsoSF(pico, w_mu_iso);
-        event_weighter.PileupSF(pico, w_pu);
+        event_weighter.PileupSF(pico, w_pu, sys_pu_up, sys_pu_down);
         event_weighter.bTaggingSF(pico, w_btag_dc); // This is implemented wrongly
         pico.out_w_pu()       = w_pu;
         pico.out_w_btag()    = w_btag_dc; 
@@ -454,7 +456,14 @@ int main(int argc, char *argv[]){
         pico.out_w_lep() = w_el_id * w_mu_id * w_mu_iso;
         pico.out_w_fs_lep() = 1.; // Need to be implemented
         pico.out_sys_lep().resize(2,0); pico.out_sys_fs_lep().resize(2,0); // Need to be implemented
-        pico.out_sys_pu().resize(2, 0.); // Need to be implemented
+        pico.out_sys_pu().resize(2, 1.);
+        pico.out_sys_pu()[0] = sys_pu_up;
+        pico.out_sys_pu()[1] = sys_pu_down;
+        pico.out_w_prefire() = nano.L1PreFiringWeight_Nom();
+        pico.out_sys_prefire().resize(2, 1.);
+        //N.B. Up = more prefiring i.e. less events
+        pico.out_sys_prefire()[0] = nano.L1PreFiringWeight_Up()/nano.L1PreFiringWeight_Nom();
+        pico.out_sys_prefire()[1] = nano.L1PreFiringWeight_Dn()/nano.L1PreFiringWeight_Nom();
         event_weighter.PhotonIDSF(pico, w_photon_id);
         event_weighter.PhotonCSEVSF(pico, w_photon_csev);
         pico.out_w_photon() = w_photon_id * w_photon_csev;
@@ -497,6 +506,13 @@ int main(int argc, char *argv[]){
         }
         pico.out_w_pu() = 1.; // To be implemented
         pico.out_sys_pu().resize(2, 0.); // Need to be implemented
+        // N.B. out_w_prefire should not be renormalized because it models an inefficiency, 
+        // i.e. we *should* get less events!
+        float w_prefire=1.;
+        std::vector<float> sys_prefire(2, 1.);
+        prefire_weighter.EventWeight(nano, w_prefire, sys_prefire, isFastsim);
+        pico.out_w_prefire() = w_prefire;
+        pico.out_sys_prefire() = sys_prefire;
       } // Pre-UL
     } // MC
 
@@ -511,13 +527,6 @@ int main(int argc, char *argv[]){
 
     isr_tools.WriteISRWeights(pico);
 
-    // N.B. out_w_prefire should not be renormalized because it models an inefficiency, 
-    // i.e. we SHOULD get less events!
-    float w_prefire=1.;
-    std::vector<float> sys_prefire(2, 1.);
-    prefire_weighter.EventWeight(nano, w_prefire, sys_prefire, isFastsim);
-    pico.out_w_prefire() = w_prefire;
-    pico.out_sys_prefire() = sys_prefire;
 
     // do not include w_prefire, or anything that should not be renormalized! Will be set again in Step 3
     if (isZgamma) {
@@ -552,6 +561,9 @@ int main(int argc, char *argv[]){
           wgt_sums.out_sys_lep()[i] += sys_lep[i];
           wgt_sums.out_sys_fs_lep()[i] += sys_fs_lep[i];
         }
+      }
+      if (pico.trig_single_el() || pico.trig_double_el()) {
+        wgt_sums.out_neff_pass_eltrigs() += nano.Generator_weight()>0 ? 1:-1;
       }
       if(pico.out_nphoton()>0) {
         wgt_sums.out_w_photon() += w_photon;
@@ -593,23 +605,26 @@ int main(int argc, char *argv[]){
 }
 
 void Initialize(corrections_tree &wgt_sums){
-  wgt_sums.out_neff()          = 0;
-  wgt_sums.out_nent_zlep()     = 0;
-  wgt_sums.out_tot_weight_l0() = 0.;
-  wgt_sums.out_tot_weight_l1() = 0.;
+  wgt_sums.out_neff()              = 0;
+  wgt_sums.out_nent_zlep()         = 0;
+  wgt_sums.out_neff_pass_eltrigs() = 0;
+  wgt_sums.out_tot_weight_l0()     = 0.;
+  wgt_sums.out_tot_weight_l1()     = 0.;
 
-  wgt_sums.out_weight()     = 0.;
-  wgt_sums.out_w_lumi()     = 0.;
-  wgt_sums.out_w_lep()      = 0.;
-  wgt_sums.out_w_fs_lep()   = 0.;
-  wgt_sums.out_w_photon()   = 0.;
-  wgt_sums.out_w_btag()     = 0.;
-  wgt_sums.out_w_btag_df()  = 0.;
-  wgt_sums.out_w_bhig()     = 0.;
-  wgt_sums.out_w_bhig_df()  = 0.;
-  wgt_sums.out_w_isr()      = 0.;
-  wgt_sums.out_w_pu()       = 0.;
-  // w_prefire should not be normalized!!
+  wgt_sums.out_weight()      = 0.;
+  wgt_sums.out_w_lumi()      = 0.;
+  wgt_sums.out_w_lep()       = 0.;
+  wgt_sums.out_w_fs_lep()    = 0.;
+  wgt_sums.out_w_photon()    = 0.;
+  wgt_sums.out_w_btag()      = 0.;
+  wgt_sums.out_w_btag_df()   = 0.;
+  wgt_sums.out_w_bhig()      = 0.;
+  wgt_sums.out_w_bhig_df()   = 0.;
+  wgt_sums.out_w_isr()       = 0.;
+  wgt_sums.out_w_pu()        = 0.;
+  wgt_sums.out_w_zvtx_pass() = 0.;
+  wgt_sums.out_w_zvtx_fail() = 0.;
+  // w_prefire should not be normalized
 
   wgt_sums.out_sys_lep().resize(2,0);
   wgt_sums.out_sys_fs_lep().resize(2,0);

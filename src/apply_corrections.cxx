@@ -70,6 +70,10 @@ int main(int argc, char *argv[]){
     pico.out_w_isr()      = pico.w_isr()*corr.w_isr();
     pico.out_w_pu()       = pico.w_pu()*corr.w_pu();
 
+    if (pico.out_trig_single_el() || pico.out_trig_double_el())
+      pico.out_w_trig() = pico.w_trig()*corr.w_zvtx_pass();
+    else
+      pico.out_w_trig() = pico.w_trig()*corr.w_zvtx_fail();
 
     pico.out_w_lumi() = pico.w_lumi()>0 ? 1. : -1.; //get the generator weight sign
     pico.out_w_lumi() *= corr.w_lumi();
@@ -77,6 +81,7 @@ int main(int argc, char *argv[]){
     pico.out_weight() = corr.weight() * pico.out_w_lumi() *
                      pico.out_w_lep() * pico.out_w_fs_lep() * //post-corr values in order for 0l to be correct
                      pico.w_bhig() * pico.w_isr() *pico.w_pu() * pico.w_prefire() * pico.w_photon();
+    //w_trig not currently included in out_weight
 
     pico.out_sys_bchig().resize(2); pico.out_sys_fs_bchig().resize(2);
     pico.out_sys_udsghig().resize(2); pico.out_sys_fs_udsghig().resize(2);

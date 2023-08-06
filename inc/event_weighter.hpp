@@ -25,7 +25,7 @@ public:
 
   void MuonIsoSF(pico_tree &pico, float &w_muon_iso);
 
-  void PileupSF(pico_tree &pico, float &w_pu);
+  void PileupSF(pico_tree &pico, float &w_pu, float &sys_pu_up, float &sys_pu_down);
 
   void bTaggingSF(pico_tree &pico, float &w_btag);
 
