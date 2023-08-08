@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Python script to generate correctionlib style corrections for trigger 
 scale factors from the various formats output by the Egamma and Muon POG
 official tools. 
@@ -60,6 +61,8 @@ if __name__ == '__main__':
   parser.add_argument('-i','--inputfile',help='input filename')
   parser.add_argument('-o','--outputfile',default='corrections',
             help='output filename (no extension)')
+  parser.add_argument('-n','--histname',default='',
+            help='histogram name in root file')
   parser.add_argument('-f','--filetype',help='type of input file')
   args = parser.parse_args()
   
@@ -95,8 +98,8 @@ if __name__ == '__main__':
       data_statunc = float(eg_txt_line[5])
       simu_eff = float(eg_txt_line[6])
       simu_statunc = float(eg_txt_line[7])
-      data_systuncsig = float(eg_txt_line[8])
-      data_systuncbkg = float(eg_txt_line[9])
+      data_systuncsig = abs(float(eg_txt_line[8])-data_eff)
+      data_systuncbkg = abs(float(eg_txt_line[9])-data_eff)
       if len(pt_bins)==0:
         #first entry
         pt_bins.append(pt_lowedge)
@@ -114,13 +117,17 @@ if __name__ == '__main__':
                 math.sqrt(data_statunc**2+data_systuncsig**2+data_systuncbkg**2))
       simu_uncs.append(simu_statunc)
       txt_line += 1
+    #remove directory from name in file
+    clean_name = args.outputfile
+    if '/' in clean_name:
+      clean_name = clean_name[len(clean_name)-(clean_name[::-1]).find('/'):]
     #generate output
     json_dict = {
       'schema_version' : 2,
       'description' : EGAMMA_DESCRIPTION,
       'corrections' : [
         {
-          'name' : args.outputfile,
+          'name' : clean_name,
           'description' : EGAMMA_DESCRIPTION,
           'version' : 1,
           'inputs' : [
@@ -162,7 +169,10 @@ if __name__ == '__main__':
     muon_root_file = ROOT.TFile(args.inputfile,'READ')
     #extract binning and efficiencies from ROOT file
     data_hist_name = args.inputfile[:-5]+'_efficiencyData'
-    simu_hist_name = args.inputfile[:-5]+'_efficiencyData'
+    simu_hist_name = args.inputfile[:-5]+'_efficiencyMC'
+    if args.histname != '':
+      data_hist_name = args.histname+'_efficiencyData'
+      simu_hist_name = args.histname+'_efficiencyMC'
     data_hist = muon_root_file.Get(data_hist_name)
     simu_hist = muon_root_file.Get(simu_hist_name)
     abseta_nbins = data_hist.GetXaxis().GetNbins()
@@ -185,13 +195,17 @@ if __name__ == '__main__':
         data_uncs.append(data_hist.GetBinErrorUp(abseta_bin,pt_bin))
         simu_effs.append(simu_hist.GetBinContent(abseta_bin,pt_bin))
         simu_uncs.append(simu_hist.GetBinErrorUp(abseta_bin,pt_bin))
+    #remove directory from name in file
+    clean_name = args.outputfile
+    if '/' in clean_name:
+      clean_name = clean_name[len(clean_name)-(clean_name[::-1]).find('/'):]
     #generate output
     json_dict = {
       'schema_version' : 2,
       'description' : MUON_DESCRIPTION,
       'corrections' : [
         {
-          'name' : args.outputfile,
+          'name' : clean_name,
           'description' : MUON_DESCRIPTION,
           'version' : 1,
           'inputs' : [

@@ -188,11 +188,25 @@ int main(int argc, char *argv[]){
   };
 
   // Rochester corrections
-  string rocco_file = "data/RoccoR2016.txt";
-  if (year==2017)
-    rocco_file = "data/RoccoR2017.txt";
-  else if (year==2018)
-    rocco_file = "data/RoccoR2018.txt";
+  string rocco_file = "data/zgamma/2018_UL/RoccoR2018UL.txt";
+  if (is_preUL) {
+    if (year==2016)
+      rocco_file = "data/RoccoR2016.txt";
+    else if (year==2017)
+      rocco_file = "data/RoccoR2017.txt";
+    else if (year==2018)
+      rocco_file = "data/RoccoR2018.txt";
+  }
+  else {
+    if (year==2016 && isAPV)
+      rocco_file = "data/zgamma/2016preVFP_UL/RoccoR2016aUL.txt";
+    else if (year==2016 && !isAPV)
+      rocco_file = "data/zgamma/2016postVFP_UL/RoccoR2016bUL.txt";
+    else if (year==2017)
+      rocco_file = "data/zgamma/2017_UL/RoccoR2017UL.txt";
+    else if (year==2018)
+      rocco_file = "data/zgamma/2018_UL/RoccoR2018UL.txt";
+  }
 
   //Initialize object producers
   GenParticleProducer mc_producer(year);
@@ -398,10 +412,10 @@ int main(int argc, char *argv[]){
     event_tools.WriteDataQualityFilters(nano, pico, sig_jet_nano_idx, min_jet_pt, isData, isFastsim, is_preUL);
 
     if (isHiggsino) event_tools.WriteTriggerEfficiency(pico);
-    if (isZgamma) {
+    if (isZgamma && !isData) {
       std::vector<float> zgamma_trigsfs = trigger_weighter.GetSF(pico);
       pico.out_w_trig() = zgamma_trigsfs[0];
-      pico.out_sys_trig().resize(2,0);
+      pico.out_sys_trig().resize(2,0.);
       pico.out_sys_trig()[0] = zgamma_trigsfs[1];
       pico.out_sys_trig()[1] = zgamma_trigsfs[2];
     }
@@ -439,7 +453,7 @@ int main(int argc, char *argv[]){
       pico.out_w_photon() = 1.;
       pico.out_sys_photon().resize(2,0);
     } else { // MC
-      if (!is_preUL) {
+      if ((!is_preUL) || year>=2022) { //UL or run 3
         event_weighter.ElectronIDSF(pico, w_el_id);
         // ElectronISO SF need to be implemented for non-HToZgamma
         event_weighter.MuonIDSF(pico, w_mu_id);
@@ -468,7 +482,7 @@ int main(int argc, char *argv[]){
         event_weighter.PhotonCSEVSF(pico, w_photon_csev);
         pico.out_w_photon() = w_photon_id * w_photon_csev;
         pico.out_sys_photon().resize(2,0); // Need to be implemented
-      } else { // Pre-UL
+      } else { // Pre-UL run 2
         pico.out_w_btag()    = btag_weighter.EventWeight(pico, BTagEntry::OP_MEDIUM, ctr, ctr);; 
         pico.out_w_btag_df() = btag_df_weighter.EventWeight(pico, BTagEntry::OP_MEDIUM, ctr, ctr); 
         pico.out_w_bhig()    = btag_weighter.EventWeight(pico, op_all, ctr, ctr); 
@@ -562,8 +576,11 @@ int main(int argc, char *argv[]){
           wgt_sums.out_sys_fs_lep()[i] += sys_fs_lep[i];
         }
       }
-      if (pico.trig_single_el() || pico.trig_double_el()) {
-        wgt_sums.out_neff_pass_eltrigs() += nano.Generator_weight()>0 ? 1:-1;
+      if (pico.out_nel()>0) {
+        wgt_sums.out_neff_el() += nano.Generator_weight()>0 ? 1:-1;
+        if (pico.out_trig_single_el() || pico.out_trig_double_el()) {
+          wgt_sums.out_neff_pass_eltrigs() += nano.Generator_weight()>0 ? 1:-1;
+        }
       }
       if(pico.out_nphoton()>0) {
         wgt_sums.out_w_photon() += w_photon;
@@ -607,6 +624,7 @@ int main(int argc, char *argv[]){
 void Initialize(corrections_tree &wgt_sums){
   wgt_sums.out_neff()              = 0;
   wgt_sums.out_nent_zlep()         = 0;
+  wgt_sums.out_neff_el()           = 0;
   wgt_sums.out_neff_pass_eltrigs() = 0;
   wgt_sums.out_tot_weight_l0()     = 0.;
   wgt_sums.out_tot_weight_l1()     = 0.;

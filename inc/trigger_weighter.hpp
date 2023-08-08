@@ -50,7 +50,7 @@ private:
       bool pass_diel, bool pass_dimu);
 
   /*!\brief returns probability (efficiency) for event to pass electron OR muon 
-    triggers in the format {value, uncertainty}
+    triggers in the format {nominal value, up variation, down variation}
    
     \param[in] electron_pt list of electron pts
     \param[in] muon_pt list of muon pts
@@ -69,7 +69,8 @@ private:
       bool is_data);
 
   /*!\brief returns probability (efficiency) for event to pass single or dilepton
-    triggers for a particular lepton flavor in the format {value, uncertainty}
+    triggers for a particular lepton flavor in the format 
+    {nominal value, up variation, down variation}
    
     \param[in] lepton_pt list of lepton pts
     \param[in] lepton_eta list of lepton etas
@@ -83,7 +84,7 @@ private:
       bool pass_singlelep, bool pass_dilep, bool is_data, bool is_electron);
 
   /*!\brief returns probability (efficiency) for a lepton to pass a given trigger
-    leg in the format {value, uncertainty}
+    leg in the format {nominal value, up variation, down variation}
    
     \param[in] lepton_pt lepton pt
     \param[in] lepton_eta lepton eta

@@ -37,6 +37,7 @@ vector<float> sys_murf
 # additional variables
 int neff
 int nent
+int neff_el
 int neff_pass_eltrigs
 int nent_zlep
 float tot_weight_l0

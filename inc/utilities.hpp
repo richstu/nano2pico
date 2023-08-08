@@ -46,6 +46,14 @@ public:
   std::string type_, name_;
 };
 
+/*!\brief struct used to sort nano entries
+ */
+struct NanoOrderEntry {
+  int nano_idx;
+  float pt;
+  bool is_sig;
+};
+
 const long double PI = acos(-1.L);
 long double DeltaPhi(long double phi1, long double phi2);
 long double SignedDeltaPhi(long double phi1, long double phi2);

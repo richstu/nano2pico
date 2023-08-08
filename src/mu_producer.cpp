@@ -3,6 +3,8 @@
 
 #include "utilities.hpp"
 
+#include <algorithm>
+
 using namespace std;
 
 MuonProducer::MuonProducer(int year_, bool isData_, std::string rocco_file) :
@@ -16,16 +18,63 @@ MuonProducer::MuonProducer(int year_, bool isData_, std::string rocco_file) :
 MuonProducer::~MuonProducer(){
 }
 
+bool MuonProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma) {
+  float pt = nano.Muon_pt()[nano_idx];
+  float eta = nano.Muon_eta()[nano_idx];
+  if(isZgamma) { // For Zgamma productions
+    if (pt <= ZgMuonPtCut) return false;
+    if (fabs(eta) > MuonEtaCut) return false;
+    if (fabs(nano.Muon_dz()[nano_idx])>1.0)  return false;
+    if (fabs(nano.Muon_dxy()[nano_idx])>0.5) return false; 
+    if ((nano.Muon_looseId()[nano_idx] || (pt > 200 && nano.Muon_highPtId()[nano_idx])) && 
+         nano.Muon_pfRelIso03_all()[nano_idx] < MuonRelIsoCut &&
+         nano.Muon_sip3d()[nano_idx] < 4)
+      return true;
+    return false;
+  }
+  else {
+    if (!nano.Muon_mediumId()[nano_idx]) return false;
+    if (pt <= VetoMuonPtCut) return false;
+    if (fabs(eta) > MuonEtaCut) return false;
+    if (pt > SignalMuonPtCut &&
+      nano.Muon_miniPFRelIso_all()[nano_idx] < MuonMiniIsoCut &&
+      fabs(nano.Muon_dz()[nano_idx])<=0.5 &&
+      fabs(nano.Muon_dxy()[nano_idx])<=0.2)
+      return true;
+    return false;
+  }
+  return false;
+}
+
 vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<int> &jet_islep_nano_idx, vector<int> &jet_isvlep_nano_idx, vector<int> &sig_mu_pico_idx, bool isZgamma, bool isFastsim){
   vector<float> Jet_pt, Jet_mass;
   getJetWithJEC(nano, isFastsim, Jet_pt, Jet_mass);
   vector<int> Muon_fsrPhotonIdx;
   getMuon_fsrPhotonIdx(nano, year, Muon_fsrPhotonIdx);
 
+  //first, determine ordering based on signal and pt
+  std::vector<NanoOrderEntry> nano_entries;
+  for(int imu(0); imu<nano.nMuon(); ++imu){
+    NanoOrderEntry nano_entry;
+    nano_entry.nano_idx = imu;
+    nano_entry.pt = nano.Muon_pt()[imu];
+    nano_entry.is_sig = IsSignal(nano, imu, isZgamma);
+    nano_entries.push_back(nano_entry);
+  }
+  std::sort(nano_entries.begin(),nano_entries.end(), 
+      [](NanoOrderEntry a, NanoOrderEntry b) {
+        if (a.is_sig && !b.is_sig) return true;
+        if (b.is_sig && !a.is_sig) return false;
+        return (a.pt>b.pt);
+      });
+  std::vector<int> ordered_nano_indices;
+  for (NanoOrderEntry nano_entry : nano_entries)
+    ordered_nano_indices.push_back(nano_entry.nano_idx);
+
   vector<int> sig_mu_nano_idx;
   pico.out_nmu() = 0; pico.out_nvmu() = 0;
   int pico_idx = 0;
-  for(int imu(0); imu<nano.nMuon(); ++imu){
+  for(int imu : ordered_nano_indices){
     float pt = nano.Muon_pt()[imu];
     float eta = nano.Muon_eta()[imu];
     bool isSignal = false;
@@ -34,10 +83,7 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
       if (fabs(eta) > MuonEtaCut) continue;
       if (fabs(nano.Muon_dz()[imu])>1.0)  continue;
       if (fabs(nano.Muon_dxy()[imu])>0.5) continue; 
-      if ((nano.Muon_looseId()[imu] || (pt > 200 && nano.Muon_highPtId()[imu])) && 
-           nano.Muon_pfRelIso03_all()[imu] < MuonRelIsoCut &&
-           nano.Muon_sip3d()[imu] < 4)
-        isSignal = true;
+      isSignal = IsSignal(nano, imu, isZgamma);
       pico.out_mu_sip3d().push_back(nano.Muon_sip3d()[imu]);
       pico.out_mu_mediumid().push_back(nano.Muon_mediumId()[imu]);
       pico.out_mu_tightid().push_back(nano.Muon_tightId()[imu]);
@@ -48,11 +94,7 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
       if (!nano.Muon_mediumId()[imu]) continue;
       if (pt <= VetoMuonPtCut) continue;
       if (fabs(eta) > MuonEtaCut) continue;
-      if (pt > SignalMuonPtCut &&
-        nano.Muon_miniPFRelIso_all()[imu] < MuonMiniIsoCut &&
-        fabs(nano.Muon_dz()[imu])<=0.5 &&
-        fabs(nano.Muon_dxy()[imu])<=0.2)
-        isSignal = true;
+      isSignal = IsSignal(nano, imu, isZgamma);
     }
     pico.out_mu_pt().push_back(pt);
     pico.out_mu_ptErr().push_back(nano.Muon_ptErr()[imu]);

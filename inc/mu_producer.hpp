@@ -29,6 +29,8 @@ private:
   bool isData;
   RoccoR rc;
   TRandom3 rng;
+
+  bool IsSignal(nano_tree &nano, int nano_idx, bool isZgamma);
   
 };
 

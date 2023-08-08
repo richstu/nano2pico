@@ -121,6 +121,8 @@ void Initialize(corrections_tree &wgt_sums, corrections_tree &corr){
   // w_prefire should not be normalized!!
 
   corr.out_neff() = 0;
+  corr.out_neff_el() = 0;
+  corr.out_neff_pass_eltrigs() = 0;
   corr.out_nent() = 0;
   corr.out_nent_zlep() = 0;
   corr.out_tot_weight_l0() = 0.;
@@ -145,6 +147,7 @@ void AddEntry(corrections_tree &wgt_sums, corrections_tree &corr){
   corr.out_nent() += wgt_sums.nent();
   corr.out_nent_zlep() += wgt_sums.nent_zlep();
   corr.out_neff_pass_eltrigs() += wgt_sums.neff_pass_eltrigs();
+  corr.out_neff_el() += wgt_sums.neff_el();
   corr.out_tot_weight_l0() += wgt_sums.tot_weight_l0();
   corr.out_tot_weight_l1() += wgt_sums.tot_weight_l1();
 
@@ -308,10 +311,10 @@ void FixZvtx(corrections_tree &corr, int year) {
     corr.out_w_zvtx_fail() = 1.0;
   }
   else {
-    float neff_pass = corr.neff_pass_eltrigs();
-    float neff_fail = corr.neff()-corr.neff_pass_eltrigs();
+    float neff_pass = corr.out_neff_pass_eltrigs();
+    float neff_fail = corr.out_neff_el()-corr.out_neff_pass_eltrigs();
     corr.out_w_zvtx_pass() = 0.991;
-    corr.out_w_zvtx_fail() = (corr.neff()-neff_pass*0.991)/neff_fail;
+    corr.out_w_zvtx_fail() = (corr.out_neff_el()-neff_pass*0.991)/neff_fail;
   }
 }
 
@@ -337,7 +340,6 @@ void Normalize(corrections_tree &corr){
   Normalize(corr.out_sys_udsghig(), nent);
   Normalize(corr.out_sys_fs_bchig(), nent);
   Normalize(corr.out_sys_fs_udsghig(), nent);
-  Normalize(corr.out_sys_pu(), nent);
 
   Normalize(corr.out_sys_murf(), nent);
   // Normalize(corr.out_w_pdf(), nent);
