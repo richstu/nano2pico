@@ -12,6 +12,8 @@ float photon_pt
 float photon_eta
 float photon_phi
 float photon_drmin
+float photon_drmax
+
 #--------------------------------------------------------------------
 # two lepton candidates
 #--------------------------------------------------------------------

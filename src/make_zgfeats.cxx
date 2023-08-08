@@ -101,6 +101,7 @@ int main(int argc, char *argv[]){
         features.out_photon_eta()   = pico.photon_eta()[iph];
         features.out_photon_phi()   = pico.photon_phi()[iph];
         features.out_photon_drmin() = pico.photon_drmin()[iph];
+        features.out_photon_drmax() = pico.photon_drmax()[iph];
         continue;
       }
     //--------------------------------------------------------------

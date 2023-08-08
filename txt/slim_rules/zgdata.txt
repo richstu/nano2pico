@@ -23,6 +23,7 @@ keep ll_*
 keep llphoton_*
 
 keep njet
+keep nbdf*
 keep nlep
 keep nll
 keep nllphoton
