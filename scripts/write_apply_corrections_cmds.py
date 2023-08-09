@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os, argparse
+import re
 from glob import glob
 
 def getTag(path):
@@ -27,6 +28,7 @@ def getTag(path):
   #tag = tag.strip("_")
 
   tag = re.findall('(.*?)__',tag)[0]
+  tag = tag.replace("raw_pico_","")
   return tag
 
 parser = argparse.ArgumentParser(description="Submits batch jobs to apply new SFs and compute sum-of-weights",

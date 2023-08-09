@@ -5,6 +5,7 @@ from __future__ import print_function
 import argparse
 import subprocess
 import os
+import re
 
 def fullPath(path):
   return os.path.realpath(os.path.abspath(os.path.expanduser(path)))
@@ -39,6 +40,7 @@ def getTag(path):
   #tag = tag.strip("_")
 
   tag = re.findall('(.*?)__',tag)[0]
+  tag = tag.replace("wgt_sums_","")
   return tag
 
 def mergeCorrections(wgt_dir, corr_dir):
