@@ -159,10 +159,15 @@ int main(int argc, char *argv[]){
   out_path = out_dir+"/raw_pico/raw_pico_"+in_file;
 
   // Find nanoAOD version
+  float nanoaod_version = -1;
   std::smatch nanoad_version_matches;
-  std::regex_search(in_file, nanoad_version_matches, std::regex("NanoAOD(?:APVv|v)(\\d+p\\d+|\\d+)"));
-  float nanoaod_version = std::stof(std::regex_replace(nanoad_version_matches[1].str(), std::regex("p"), "."));
-  cout<<"Using NanoAOD version: "<<nanoad_version_matches[0]<<endl;
+  bool version_found = std::regex_search(in_file, nanoad_version_matches, std::regex("NanoAOD(?:APVv|v)(\\d+p\\d+|\\d+)"));
+  if (version_found) nanoaod_version = std::stof(std::regex_replace(nanoad_version_matches[1].str(), std::regex("p"), "."));
+  else {
+    bool is_nanoAODv7_found = std::regex_search(in_file, nanoad_version_matches, std::regex("02Apr2020"));
+    if (is_nanoAODv7_found) nanoaod_version = 7;
+  }
+  cout<<"Using NanoAOD version: "<<nanoaod_version<<endl;
 
   time_t begtime, endtime;
   time(&begtime);
