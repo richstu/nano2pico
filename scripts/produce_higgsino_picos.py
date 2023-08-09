@@ -170,7 +170,7 @@ def processMc(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, 
   process_commands = [
     #0
     [notify_script+' "Start process nano '+mc_tag+'"',
-    './scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/mc/ --production '+PRODUCTION_NAME+' --dataset_list txt/datasets/'+NANOAOD_VERSION+'_htozgamma_'+YEAR+'_mc_dataset_paths --tag '+mc_tag,
+    './scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/mc/ --production '+PRODUCTION_NAME+' --dataset_list txt/datasets/'+NANOAOD_VERSION+'_higgsino_'+YEAR+'_mc_dataset_paths --tag '+mc_tag,
     'auto_submit_jobs.py process_nano_cmds_'+mc_tag+'.json -c scripts/check_process_nano_job.py -f',
     notify_script+' "Finished process nano '+mc_tag+'"'], 
     
@@ -186,33 +186,157 @@ def processMc(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, 
     notify_script+' "Finished applied corrections '+mc_tag+'"'],
 
     #3
-    [notify_script+' "Start skim llg '+mc_tag+'"',
-    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/unskimmed/ --skim_name llg --tag '+mc_tag,
-    'auto_submit_jobs.py skim_llg_cmds_'+mc_tag+'.json -c scripts/check_skim.py -f',
-    notify_script+' "Finished skim llg '+mc_tag+'"'],
+    [notify_script+' "Start skim met150 '+mc_tag+'"',
+    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/unskimmed/ --skim_name met150 --tag '+mc_tag,
+    'auto_submit_jobs.py skim_met150_cmds_'+mc_tag+'.json -c scripts/check_skim.py -f',
+    notify_script+' "Finished skim met150 '+mc_tag+'"'],
     
     #4
-    [notify_script+' "Start merge llg '+mc_tag+'"',
-    './scripts/write_slim_and_merge_cmds.py -f --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/skim_llg/ --slim_name zgmc --tag '+mc_tag,
-    'auto_submit_jobs.py '+mc_tag+'_slim_zgmc_llg_cmds.json -f',
-    './scripts/confirm_slim.py '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/skim_llg '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/merged_zgmc_llg',
-    notify_script+' "Finished merge llg '+mc_tag+'"'],
+    [notify_script+' "Start merge met150 '+mc_tag+'"',
+    './scripts/write_slim_and_merge_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/skim_met150/ --slim_name higmc --tag '+mc_tag,
+    'auto_submit_jobs.py '+mc_tag+'_slim_higmc_met150_cmds.json -f',
+    './scripts/confirm_slim.py '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/skim_met150 '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/merged_higmc_met150',
+    notify_script+' "Finished merge met150 '+mc_tag+'"'],
 
     #5
-    [notify_script+' "Start skim ll '+mc_tag+'"',
-    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/unskimmed/ --skim_name ll --tag '+mc_tag,
-    'auto_submit_jobs.py skim_ll_cmds_'+mc_tag+'.json -c scripts/check_skim.py -f',
-    notify_script+' "Finished skim ll '+mc_tag+'"'],
+    [notify_script+' "Start skim preselect '+mc_tag+'"',
+    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/merged_higmc_met150/ --skim_name preselect --tag '+mc_tag,
+    'auto_submit_jobs.py skim_preselect_cmds_'+mc_tag+'.json -c scripts/check_skim.py -f',
+    notify_script+' "Finished skim preselect '+mc_tag+'"'],
     
     #6
-    [notify_script+' "Start merge ll '+mc_tag+'"',
-    './scripts/write_slim_and_merge_cmds.py -f --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/skim_ll/ --slim_name zgmc --tag '+mc_tag,
-    'auto_submit_jobs.py '+mc_tag+'_slim_zgmc_ll_cmds.json -f',
-    './scripts/confirm_slim.py '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/skim_ll '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/merged_zgmc_ll',
-    notify_script+' "Finished merge ll '+mc_tag+'"'],
+    [notify_script+' "Start skim higloose '+mc_tag+'"',
+    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/merged_higmc_met150/ --skim_name higloose --tag '+mc_tag,
+    'auto_submit_jobs.py skim_higloose_cmds_'+mc_tag+'.json -c scripts/check_skim.py -f',
+    notify_script+' "Finished skim higloose '+mc_tag+'"'],
+
+    #7 1l control sample skim
+    [notify_script+' "Start skim higlep1T '+mc_tag+'"',
+    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/unskimmed/ --skim_name higlep1T --tag '+mc_tag,
+    'auto_submit_jobs.py skim_higlep1T_cmds_'+mc_tag+'.json -c scripts/check_skim.py -f',
+    notify_script+' "Finished skim higlep1T '+mc_tag+'"'],
+
+    #8 1l control sample merge
+    [notify_script+' "Start merge higlep1T '+mc_tag+'"',
+    './scripts/write_slim_and_merge_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/skim_higlep1T/ --slim_name higmc --tag '+mc_tag,
+    'auto_submit_jobs.py '+mc_tag+'_slim_higmc_higlep1T_cmds.json -f',
+    './scripts/confirm_slim.py '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/skim_higlep1T '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/merged_higmc_higlep1T',
+    notify_script+' "Finished merge higlep1T '+mc_tag+'"'],
+
+    #9 2l control sample skim
+    [notify_script+' "Start skim higlep2T '+mc_tag+'"',
+    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/unskimmed/ --skim_name higlep2T --tag '+mc_tag,
+    'auto_submit_jobs.py skim_higlep2T_cmds_'+mc_tag+'.json -c scripts/check_skim.py -f',
+    notify_script+' "Finished skim higlep2T '+mc_tag+'"'],
+
+    #10 2l control sample merge
+    [notify_script+' "Start merge higlep2T '+mc_tag+'"',
+    './scripts/write_slim_and_merge_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/skim_higlep2T/ --slim_name higmc --tag '+mc_tag,
+    'auto_submit_jobs.py '+mc_tag+'_slim_higmc_higlep2T_cmds.json -f',
+    './scripts/confirm_slim.py '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/skim_higlep2T '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/merged_higmc_higlep2T',
+    notify_script+' "Finished merge higlep2T '+mc_tag+'"'],
+
+    #11 qcd control sample skim and merge from met150
+    [notify_script+' "Start skim higqcd '+mc_tag+'"',
+    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/merged_higmc_met150/ --skim_name higqcd --tag '+mc_tag,
+    'auto_submit_jobs.py skim_higqcd_cmds_'+mc_tag+'.json -c scripts/check_skim.py -f',
+    notify_script+' "Finished skim higqcd '+mc_tag+'"'],
 
   ]
   return processSteps(process_commands, YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, NANOAOD_VERSION, FIRST_COMMAND, NO_RUN, mc_tag)
+
+def processSignal(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, NANOAOD_VERSION, SIGNAL_FOLDER_NAME, FIRST_COMMAND, notify_script):
+  YEAR = str(YEAR)
+  # Add signal commands
+  sig_tag=PRODUCTION_NAME+'_'+YEAR+'_'+SIGNAL_FOLDER_NAME
+  print("[Info] pico dir: "+PICO_DIR)
+  print("[Info] step file: "+STEP_FILEBASENAME)
+  print("[Info] log file: "+LOG_FILENAME)
+  process_commands = [
+
+    # signal
+    #0
+    [notify_script+' "Started process nano '+sig_tag+'"',
+    './scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/'+SIGNAL_FOLDER_NAME+'/ --production '+PRODUCTION_NAME+' --tag '+sig_tag,
+    'auto_submit_jobs.py process_nano_cmds_'+sig_tag+'.json -c scripts/check_process_nano_job.py -f',
+    notify_script+' "Finished process nano '+sig_tag+'"'],
+    
+    #1
+    [notify_script+' "Started merge corrections '+sig_tag+'"',
+    './scripts/merge_corrections.py --wgt_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/'+SIGNAL_FOLDER_NAME+'/wgt_sums/ --corr_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/'+SIGNAL_FOLDER_NAME+'/corrections/',
+    notify_script+' "Finished merge corrections '+sig_tag+'"'],
+    
+    #2
+    [notify_script+' "Started applied corrections '+sig_tag+'"',
+    './scripts/write_apply_corrections_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/'+SIGNAL_FOLDER_NAME+'/raw_pico/ --tag '+sig_tag,
+    'auto_submit_jobs.py '+sig_tag+'_apply_corr_cmds.json -c scripts/check_apply_corrections_job.py -f',
+    notify_script+' "Finished applied corrections '+sig_tag+'"'],
+    
+    #3
+    [notify_script+' "Started skim met150 '+sig_tag+'"',
+    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/'+SIGNAL_FOLDER_NAME+'/unskimmed/ --skim_name met150 --tag '+sig_tag,
+    'auto_submit_jobs.py skim_met150_cmds_'+sig_tag+'.json -c scripts/check_skim.py -f',
+    notify_script+' "Finished skim met150 '+sig_tag+'"'],
+    
+    #4
+    [notify_script+' "Started merge met150 '+sig_tag+'"',
+    './scripts/write_slim_and_merge_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/'+SIGNAL_FOLDER_NAME+'/skim_met150/ --slim_name higmc --tag '+sig_tag,
+    'auto_submit_jobs.py '+sig_tag+'_slim_higmc_met150_cmds.json -f',
+    './scripts/confirm_slim.py '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/'+SIGNAL_FOLDER_NAME+'/skim_met150 '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/'+SIGNAL_FOLDER_NAME+'/merged_higmc_met150',
+    notify_script+' "Finished merge met150 '+sig_tag+'"'],
+    
+    #5
+    [notify_script+' "Started skim preselect '+sig_tag+'"',
+    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/'+SIGNAL_FOLDER_NAME+'/merged_higmc_met150 --skim_name preselect --tag '+sig_tag,
+    'auto_submit_jobs.py skim_preselect_cmds_'+sig_tag+'.json -c scripts/check_skim.py -f',
+    notify_script+' "Finished skim preselect '+sig_tag+'"'],
+
+    #6
+    [notify_script+' "Started skim higloose '+sig_tag+'"',
+    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/'+SIGNAL_FOLDER_NAME+'/merged_higmc_met150 --skim_name higloose --tag '+sig_tag,
+    'auto_submit_jobs.py skim_higloose_cmds_'+sig_tag+'.json -c scripts/check_skim.py -f',
+    notify_script+' "Finished skim higloose '+sig_tag+'"'],
+
+    #7 1l control sample skim
+    [notify_script+' "Start skim higlep1T '+sig_tag+'"',
+    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/'+SIGNAL_FOLDER_NAME+'/unskimmed/ --skim_name higlep1T --tag '+sig_tag,
+    'auto_submit_jobs.py skim_higlep1T_cmds_'+sig_tag+'.json -c scripts/check_skim.py -f',
+    notify_script+' "Finished skim higlep1T '+sig_tag+'"'],
+
+    #8 1l control sample merge
+    [notify_script+' "Start merge higlep1T '+sig_tag+'"',
+    './scripts/write_slim_and_merge_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/'+SIGNAL_FOLDER_NAME+'/skim_higlep1T/ --slim_name higmc --tag '+sig_tag,
+    'auto_submit_jobs.py '+sig_tag+'_slim_higmc_higlep1T_cmds.json -f',
+    './scripts/confirm_slim.py '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/'+SIGNAL_FOLDER_NAME+'/skim_higlep1T '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/'+SIGNAL_FOLDER_NAME+'/merged_higmc_higlep1T',
+    notify_script+' "Finished merge higlep1T '+sig_tag+'"'],
+
+    #9 2l control sample skim
+    [notify_script+' "Start skim higlep2T '+sig_tag+'"',
+    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/'+SIGNAL_FOLDER_NAME+'/unskimmed/ --skim_name higlep2T --tag '+sig_tag,
+    'auto_submit_jobs.py skim_higlep2T_cmds_'+sig_tag+'.json -c scripts/check_skim.py -f',
+    notify_script+' "Finished skim higlep2T '+sig_tag+'"'],
+
+    #10 2l control sample merge
+    [notify_script+' "Start merge higlep2T '+sig_tag+'"',
+    './scripts/write_slim_and_merge_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/'+SIGNAL_FOLDER_NAME+'/skim_higlep2T/ --slim_name higmc --tag '+sig_tag,
+    'auto_submit_jobs.py '+sig_tag+'_slim_higmc_higlep2T_cmds.json -f',
+    './scripts/confirm_slim.py '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/'+SIGNAL_FOLDER_NAME+'/skim_higlep2T '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/'+SIGNAL_FOLDER_NAME+'/merged_higmc_higlep2T',
+    notify_script+' "Finished merge higlep2T '+sig_tag+'"'],
+
+    #11 qcd control sample skim and merge from met150
+    [notify_script+' "Start skim higqcd '+sig_tag+'"',
+    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/'+SIGNAL_FOLDER_NAME+'/merged_higmc_met150/ --skim_name higqcd --tag '+sig_tag,
+    'auto_submit_jobs.py skim_higqcd_cmds_'+sig_tag+'.json -c scripts/check_skim.py -f',
+    notify_script+' "Finished skim higqcd '+sig_tag+'"'],
+    
+    #12 higsys skim from unksimmed
+    [notify_script+' "Start skim higsys '+sig_tag+'"',
+    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/'+SIGNAL_FOLDER_NAME+'/unskimmed/ --skim_name higsys --tag '+sig_tag,
+    'auto_submit_jobs.py skim_higsys_cmds_'+sig_tag+'.json -c scripts/check_skim.py -f',
+    notify_script+' "Finished skim higsys '+sig_tag+'"'],
+  ]
+
+  return processSteps(process_commands, YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, NANOAOD_VERSION, FIRST_COMMAND, NO_RUN, sig_tag)
 
 def processData(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, NANOAOD_VERSION, FIRST_COMMAND, notify_script):
   YEAR = str(YEAR)
@@ -225,36 +349,67 @@ def processData(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR
     # signal
     #0
     [notify_script+' "Started process nano '+data_tag+'"',
-    './scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/data/ --production '+PRODUCTION_NAME+' --dataset_list txt/datasets/'+NANOAOD_VERSION+'_htozgamma_'+YEAR+'_data_dataset_paths --data --tag '+data_tag,
+    './scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/data/ --production '+PRODUCTION_NAME+' --dataset_list txt/datasets/'+NANOAOD_VERSION+'_higgsino_'+YEAR+'_data_dataset_paths --data --tag '+data_tag,
     'auto_submit_jobs.py process_nano_cmds_'+data_tag+'.json -c scripts/check_data_process_nano_job.py -f',
     notify_script+' "Finished process nano '+data_tag+'"',
     'ln -s '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/raw_pico '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/unskimmed'],
     
     #1
-    [notify_script+' "Started skim llg '+data_tag+'"',
-    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/raw_pico/ --skim_name llg --tag '+data_tag,
-    'auto_submit_jobs.py skim_llg_cmds_'+data_tag+'.json -c scripts/check_skim.py -f',
-    notify_script+' "Finished skim llg '+data_tag+'"'],
+    [notify_script+' "Started skim met150 '+data_tag+'"',
+    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/raw_pico/ --skim_name met150 --tag '+data_tag,
+    'auto_submit_jobs.py skim_met150_cmds_'+data_tag+'.json -c scripts/check_skim.py -f',
+    notify_script+' "Finished skim met150 '+data_tag+'"'],
     
     #2
-    [notify_script+' "Started merge llg '+data_tag+'"',
-    './scripts/write_slim_and_merge_cmds.py -f --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/skim_llg/ --slim_name zgdata --tag '+data_tag,
-    'auto_submit_jobs.py '+data_tag+'_slim_zgdata_llg_cmds.json -c scripts/check_slim_and_merge.py -f',
-    './scripts/confirm_slim.py '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/skim_llg '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/merged_zgdata_llg',
-    notify_script+' "Finished merge llg '+data_tag+'"'],
-
-    #3
-    [notify_script+' "Started skim ll '+data_tag+'"',
-    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/raw_pico/ --skim_name ll --tag '+data_tag,
-    'auto_submit_jobs.py skim_ll_cmds_'+data_tag+'.json -c scripts/check_skim.py -f',
-    notify_script+' "Finished skim ll '+data_tag+'"'],
+    [notify_script+' "Started merge met150 '+data_tag+'"',
+    './scripts/write_slim_and_merge_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/skim_met150/ --slim_name higdata --tag '+data_tag,
+    'auto_submit_jobs.py '+data_tag+'_slim_higdata_met150_cmds.json -f',
+    './scripts/confirm_slim.py '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/skim_met150 '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/merged_higdata_met150',
+    notify_script+' "Finished merge met150 '+data_tag+'"'],
     
+    #3
+    [notify_script+' "Started skim preselect '+data_tag+'"',
+    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/merged_higdata_met150 --skim_name preselect --tag '+data_tag,
+    'auto_submit_jobs.py skim_preselect_cmds_'+data_tag+'.json -c scripts/check_skim.py -f',
+    notify_script+' "Finished skim preselect '+data_tag+'"'],
+
     #4
-    [notify_script+' "Started merge ll '+data_tag+'"',
-    './scripts/write_slim_and_merge_cmds.py -f --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/skim_ll/ --slim_name zgdata --tag '+data_tag,
-    'auto_submit_jobs.py '+data_tag+'_slim_zgdata_ll_cmds.json -c scripts/check_slim_and_merge.py -f',
-    './scripts/confirm_slim.py '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/skim_ll '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/merged_zgdata_ll',
-    notify_script+' "Finished merge ll '+data_tag+'"'],
+    [notify_script+' "Started skim higloose '+data_tag+'"',
+    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/merged_higdata_met150 --skim_name higloose --tag '+data_tag,
+    'auto_submit_jobs.py skim_higloose_cmds_'+data_tag+'.json -c scripts/check_skim.py -f',
+    notify_script+' "Finished skim higloose '+data_tag+'"'],
+
+    #5 1l control sample skim
+    [notify_script+' "Start skim higlep1T '+data_tag+'"',
+    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/raw_pico/ --skim_name higlep1T --tag '+data_tag,
+    'auto_submit_jobs.py skim_higlep1T_cmds_'+data_tag+'.json -c scripts/check_skim.py -f',
+    notify_script+' "Finished skim higlep1T '+data_tag+'"'],
+
+    #6 1l control sample merge
+    [notify_script+' "Start merge higlep1T '+data_tag+'"',
+    './scripts/write_slim_and_merge_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/skim_higlep1T/ --slim_name higdata --tag '+data_tag,
+    'auto_submit_jobs.py '+data_tag+'_slim_higdata_higlep1T_cmds.json -f',
+    './scripts/confirm_slim.py '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/skim_higlep1T '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/merged_higdata_higlep1T',
+    notify_script+' "Finished merge higlep1T '+data_tag+'"'],
+
+    #7 2l control sample skim
+    [notify_script+' "Start skim higlep2T '+data_tag+'"',
+    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/raw_pico/ --skim_name higlep2T --tag '+data_tag,
+    'auto_submit_jobs.py skim_higlep2T_cmds_'+data_tag+'.json -c scripts/check_skim.py -f',
+    notify_script+' "Finished skim higlep2T '+data_tag+'"'],
+
+    #8 2l control sample merge
+    [notify_script+' "Start merge higlep2T '+data_tag+'"',
+    './scripts/write_slim_and_merge_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/skim_higlep2T/ --slim_name higdata --tag '+data_tag,
+    'auto_submit_jobs.py '+data_tag+'_slim_higdata_higlep2T_cmds.json -f',
+    './scripts/confirm_slim.py '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/skim_higlep2T '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/merged_higdata_higlep2T',
+    notify_script+' "Finished merge higlep2T '+data_tag+'"'],
+
+    #9 qcd control sample skim and merge from met150
+    [notify_script+' "Start skim higqcd '+data_tag+'"',
+    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/merged_higdata_met150/ --skim_name higqcd --tag '+data_tag,
+    'auto_submit_jobs.py skim_higqcd_cmds_'+data_tag+'.json -c scripts/check_skim.py -f',
+    notify_script+' "Finished skim higqcd '+data_tag+'"'],
 
   ]
 
@@ -263,7 +418,7 @@ def processData(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR
 if __name__ == '__main__':
 
   parser = argparse.ArgumentParser(description='''\
-Script to produce zgamma piocs from NanoAOD. 
+Script to produce picos from NanoAOD. 
 Requirements
 - A git tag to do production
 - dataset_list files that have NanoAOD names to process. 
@@ -312,8 +467,9 @@ Pico files: BASE_FOLDERNAME/NANOAOD_VERSION/TAG_NAME/(2016,2017,2018)/(data,mc,s
   # Check if dataset_list (nanoaod files to process) exist
   dataset_list_files = []
   for year in years:
-    dataset_list_files.append(f'txt/datasets/{args.nanoaod_version}_htozgamma_{year}_mc_dataset_paths')
-    dataset_list_files.append(f'txt/datasets/{args.nanoaod_version}_htozgamma_{year}_data_dataset_paths')
+    print(args.nanoaod_version, year)
+    dataset_list_files.append(f'txt/datasets/{args.nanoaod_version}_higgsino_{year}_mc_dataset_paths')
+    dataset_list_files.append(f'txt/datasets/{args.nanoaod_version}_higgsino_{year}_data_dataset_paths')
   for dataset_list_file in dataset_list_files:
     if not os.path.exists(dataset_list_file): 
       print('[Error] '+dataset_list_file+' does not exist. Existing.')
@@ -337,29 +493,29 @@ Pico files: BASE_FOLDERNAME/NANOAOD_VERSION/TAG_NAME/(2016,2017,2018)/(data,mc,s
 
   # Check if slim rules exist
   slim_rule_files = [
-    'txt/slim_rules/zgmc.txt',
-    'txt/slim_rules/zgdata.txt',
+    'txt/slim_rules/higmc.txt',
+    'txt/slim_rules/higdata.txt',
     ]
   for slim_rule_file in slim_rule_files:
     if not os.path.exists(slim_rule_file): 
       print('[Error] '+slim_rule_file+' does not exist. Existing.')
       sys.exit()
 
-  # Search if tag exists and is pushed.
-  output, error = runCommand('git tag -l '+args.tag_name)
-  if args.tag_name not in output:
-    print("[Error] tag_name: "+args.tag_name+" does not exist. Exiting.")
-    sys.exit()
-  #output, error = runCommand('git ls-remote origin refs/tags/'+args.tag_name)
+  ## Search if tag exists and is pushed.
+  #output, error = runCommand('git tag -l '+args.tag_name)
   #if args.tag_name not in output:
-  #  print("[Error] tag_name: "+args.tag_name+" does not exist on github. Exiting.")
+  #  print("[Error] tag_name: "+args.tag_name+" does not exist. Exiting.")
   #  sys.exit()
-  
-  # Checkout tag
-  output, error = runCommand('git checkout '+args.tag_name)
-  if 'Aborting' in error:
-    print("[Error] Could not checkout "+args.tag_name+". Exiting.")
-    sys.exit()
+  ##output, error = runCommand('git ls-remote origin refs/tags/'+args.tag_name)
+  ##if args.tag_name not in output:
+  ##  print("[Error] tag_name: "+args.tag_name+" does not exist on github. Exiting.")
+  ##  sys.exit()
+  #
+  ## Checkout tag
+  #output, error = runCommand('git checkout '+args.tag_name)
+  #if 'Aborting' in error:
+  #  print("[Error] Could not checkout "+args.tag_name+". Exiting.")
+  #  sys.exit()
 
   # Do compile after checkout
   if os.system('scons') != 0:
@@ -398,11 +554,11 @@ Pico files: BASE_FOLDERNAME/NANOAOD_VERSION/TAG_NAME/(2016,2017,2018)/(data,mc,s
   # There is also a memory list of commands from this script. 
   # They are compared and missing steps are ran.
   # Step is the step that is running. Will run the next step.
-  for year in years:
-    FIRST_COMMAND = processMc(YEAR=year, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2016.mc.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2016.mc.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
+  #for year in years:
+  #  FIRST_COMMAND = processMc(YEAR=year, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_higgsino_picos.py.'+PRODUCTION_NAME+'.2016.mc.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_higgsino_picos.py.'+PRODUCTION_NAME+'.2016.mc.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
 
   for year in years:
-    FIRST_COMMAND = processData(YEAR=year, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2016.data.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2016.data.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
+    FIRST_COMMAND = processData(YEAR=year, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_higgsino_picos.py.'+PRODUCTION_NAME+'.2016.data.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_higgsino_picos.py.'+PRODUCTION_NAME+'.2016.data.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
 
   #FIRST_COMMAND = processMc(YEAR=2016, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2016.mc.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2016.mc.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
   #FIRST_COMMAND = processMc(YEAR='2016APV', PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2016APV.mc.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2016APV.mc.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
