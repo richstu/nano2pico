@@ -90,7 +90,27 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
     bool pass_jetid = true;
     if (!isFastsim) if (Jet_jetId[ijet] <1) pass_jetid = false;
 
-    bool isgood = !islep && !isphoton && (fabs(nano.Jet_eta()[ijet]) <= max_jet_eta) && pass_jetid;
+    bool isvetojet = false;
+    in_file_jetveto_ = "pathto/jetvetomap.json";
+    cs_jetveto_ = correction::CorrectionSet::from_file(in_file_jetveto_); //double check if this works how you think it does
+
+
+    float veto = 0; 
+    float vetoEE = 0;
+    if (year==2022 && is2022preEE==true){
+      map_jetveto_ = cs_jetveto_->at("Winter22Run3_RunCD_V1");
+      veto = map_jetveto_->evaluate({key_,"jetvetomap", std::abs(nano.Jet_eta().at(ijet),nano.Jet_phi().at(ijet))});
+    } else if (year==2022 && is2022preEE==false){
+      map_jetveto_ = cs_jetveto_->at("Winter22Run3_RunE_V1");
+      veto = map_jetveto_->evaluate({key_,"jetvetomap", std::abs(nano.Jet_eta().at(ijet),nano.Jet_phi().at(ijet))});
+      vetoEE = map_jetveto_->evaluate({key_,"jetvetomap_eep", std::abs(nano.Jet_eta().at(ijet),nano.Jet_phi().at(ijet))});
+    }
+
+    if(veto != 0.0 || vetoEE != 0.0){
+      isvetojet = true;
+    }
+
+    bool isgood = !islep && !isphoton && (fabs(nano.Jet_eta()[ijet]) <= max_jet_eta) && pass_jetid && !isvetojet;
 
     //sys_jetvar convention: [0] JER up, [1] JER down, [2] JEC up, [3] JEC down
     //for now, only save sys_ variables
@@ -161,7 +181,7 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
       }
     }
 
-    if (Jet_pt[ijet] <= min_jet_pt) continue;
+    if (Jet_pt[ijet] <= min_jet_pt || isvetojet) continue;
 
     switch(year) {
       case 2016:
