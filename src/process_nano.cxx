@@ -108,7 +108,7 @@ int main(int argc, char *argv[]){
       }
     } else {
       if (!Contains(in_file, "Summer2022EE")){
-        is2022preEE = true
+        is2022preEE = true;
       }
     }
   }
@@ -218,7 +218,7 @@ int main(int argc, char *argv[]){
   DileptonProducer dilep_producer(year);
   IsoTrackProducer tk_producer(year);
   PhotonProducer photon_producer(year, isData);
-  JetProducer jet_producer(year, nanoaod_version, min_jet_pt, max_jet_eta, isData, is2022preEE);
+  JetProducer jet_producer(year, nanoaod_version, min_jet_pt, max_jet_eta, isData);
   MetProducer met_producer(year, isData, is_preUL);
   HigVarProducer hig_producer(year);
   ZGammaVarProducer zgamma_producer(year);
@@ -446,7 +446,7 @@ int main(int argc, char *argv[]){
       pico.out_w_photon() = 1.;
       pico.out_sys_photon().resize(2,0);
     } else { // MC
-      if (!is_preUL) {
+      if ((!is_preUL) || year>=2022) { //Changed for testing
         event_weighter.ElectronIDSF(pico, w_el_id);
         // ElectronISO SF need to be implemented for non-HToZgamma
         event_weighter.MuonIDSF(pico, w_mu_id);

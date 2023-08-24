@@ -32,6 +32,7 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
                                    bool isFastsim, 
                                    bool isSignal,
                                    bool is_preUL,
+                                   bool is2022preEE,
                                    vector<HiggsConstructionVariables> &sys_higvars){
   vector<int> sig_jet_nano_idx;
   pico.out_njet() = 0; pico.out_ht() = 0; pico.out_ht5() = 0; 
@@ -91,21 +92,28 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
     if (!isFastsim) if (Jet_jetId[ijet] <1) pass_jetid = false;
 
     bool isvetojet = false;
-    in_file_jetveto_ = "pathto/jetvetomap.json";
-    cs_jetveto_ = correction::CorrectionSet::from_file(in_file_jetveto_); //double check if this works how you think it does
-
+    in_file_jetveto_ = "data/zgamma/2022/jetvetomaps.json";
+    cs_jetveto_ = correction::CorrectionSet::from_file(in_file_jetveto_);
 
     float veto = 0; 
     float vetoEE = 0;
-    if (year==2022 && is2022preEE==true){
-      map_jetveto_ = cs_jetveto_->at("Winter22Run3_RunCD_V1");
-      veto = map_jetveto_->evaluate({key_,"jetvetomap", std::abs(nano.Jet_eta().at(ijet),nano.Jet_phi().at(ijet))});
-    } else if (year==2022 && is2022preEE==false){
-      map_jetveto_ = cs_jetveto_->at("Winter22Run3_RunE_V1");
-      veto = map_jetveto_->evaluate({key_,"jetvetomap", std::abs(nano.Jet_eta().at(ijet),nano.Jet_phi().at(ijet))});
-      vetoEE = map_jetveto_->evaluate({key_,"jetvetomap_eep", std::abs(nano.Jet_eta().at(ijet),nano.Jet_phi().at(ijet))});
+    double phicorr;
+    if(nano.Jet_phi().at(ijet)>3.1415926){ //a dumb addition because sometimes jet phi is slightly larger than pi
+      phicorr = 3.1415926;
+    } else if (nano.Jet_phi().at(ijet)<-3.1415926){
+      phicorr = -3.1415926;
+    } else {
+      phicorr = nano.Jet_phi().at(ijet);
     }
 
+    if (year==2022 && is2022preEE==true){
+      map_jetveto_ = cs_jetveto_->at("Winter22Run3_RunCD_V1");
+      veto = map_jetveto_->evaluate({"jetvetomap", nano.Jet_eta().at(ijet),phicorr});
+    } else if (year==2022 && is2022preEE==false){
+      map_jetveto_ = cs_jetveto_->at("Winter22Run3_RunE_V1");
+      veto = map_jetveto_->evaluate({"jetvetomap", nano.Jet_eta().at(ijet),phicorr});
+      vetoEE = map_jetveto_->evaluate({"jetvetomap_eep", nano.Jet_eta().at(ijet),phicorr});
+    }
     if(veto != 0.0 || vetoEE != 0.0){
       isvetojet = true;
     }

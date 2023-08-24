@@ -4,6 +4,7 @@
 #include "hig_producer.hpp"
 #include "nano_tree.hpp"
 #include "pico_tree.hpp"
+#include "correction.hpp"
 
 #include "TLorentzVector.h"
 
@@ -38,6 +39,8 @@ private:
   float max_jet_eta;
   bool isData;
   std::string in_file_jetveto_;
+  std::unique_ptr<correction::CorrectionSet> cs_jetveto_;
+  correction::Correction::Ref map_jetveto_;
 };
 
 #endif
