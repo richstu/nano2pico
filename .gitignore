@@ -1,6 +1,8 @@
 # Generated on compilation
 *_tree.hpp
 *_tree.cpp
+build/*
+kernel/*
 
 # Compiled Object files
 *.slo

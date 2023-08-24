@@ -496,6 +496,53 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
 	pico.out_HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90() = nano.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90();
 	pico.out_HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95() = nano.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95();
 
+  //trigger summary branches for H->Zgamma
+  pico.out_trig_single_el() = false;
+  pico.out_trig_double_el() = false;
+  pico.out_trig_single_mu() = false;
+  pico.out_trig_double_mu() = false;
+  if (year==2016) {
+    pico.out_trig_single_el() = nano.HLT_Ele27_WPTight_Gsf();
+    pico.out_trig_double_el() = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ();
+    pico.out_trig_single_mu() = nano.HLT_IsoMu24() || nano.HLT_IsoTkMu24();
+    pico.out_trig_double_mu() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL() ||
+                              nano.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL() || 
+                              nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ() ||
+                              nano.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ();
+
+  }
+  if (year==2017) {
+    pico.out_trig_single_el() = nano.HLT_Ele32_WPTight_Gsf_L1DoubleEG();
+    pico.out_trig_double_el() = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL();
+    pico.out_trig_single_mu() = nano.HLT_IsoMu27();
+    pico.out_trig_double_mu() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8() || 
+                              nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8();
+  }
+  if (year==2018) {
+    pico.out_trig_single_el() = nano.HLT_Ele32_WPTight_Gsf();
+    pico.out_trig_double_el() = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL();
+    pico.out_trig_single_mu() = nano.HLT_IsoMu24();
+    pico.out_trig_double_mu() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8();
+  }
+  if (year==2022) {
+    //Ele28 was enabled & unprescaled before aug, but then disabled
+    //No official Egamma recommendations yet
+    //others seem the same based on POG presentations
+    pico.out_trig_single_el() = nano.HLT_Ele32_WPTight_Gsf(); 
+    pico.out_trig_double_el() = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL();
+    pico.out_trig_single_mu() = nano.HLT_IsoMu24();
+    pico.out_trig_double_mu() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8();
+  }
+  if (year==2023) {
+    //Ele30 is enabled & unprescaled in some of 2023, but it is unclear from
+    //POG presentations whether it was enabled until the LHC RQX.L8 incident
+    pico.out_trig_single_el() = nano.HLT_Ele32_WPTight_Gsf(); 
+    pico.out_trig_double_el() = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL();
+    pico.out_trig_single_mu() = nano.HLT_IsoMu24();
+    pico.out_trig_double_mu() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8();
+  }
+
+  //overlap removal performed based on trigger decisions
   if (isZgamma) {
     // this assumes that we process all the single and dileptondatasets
     if (dataset==Dataset::DoubleMuon                                                                      && doublemuon_trigs) return true;
@@ -757,7 +804,7 @@ int EventTools::GetEventType(){
 
 void EventTools::WriteTriggerEfficiency(pico_tree &pico) {
   // trigger efficiency and uncertainty - @todo, needs to be updated to full Run 2 trig eff. measurement
-  pico.out_eff_trig() = hig_trig_eff::eff(pico);
+  pico.out_w_trig() = hig_trig_eff::eff(pico);
   float effunc = hig_trig_eff::eff_unc(pico);
   pico.out_sys_trig().resize(2,0);
   pico.out_sys_trig()[0] = 1+effunc;

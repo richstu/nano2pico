@@ -166,9 +166,11 @@ void EventWeighter::MuonIsoSF(pico_tree &pico, float &w_muon_iso){
 }
 
 // Pileup Scale Factors
-void EventWeighter::PileupSF(pico_tree &pico, float &w_pu){
+void EventWeighter::PileupSF(pico_tree &pico, float &w_pu, float &sys_pu_up, float &sys_pu_down){
   auto sf = map_pileup_->evaluate({float(pico.out_npu_tru_mean()), "nominal"});
   w_pu = sf;
+  sys_pu_up = (map_pileup_->evaluate({float(pico.out_npu_tru_mean()), "up"}))/sf;
+  sys_pu_down = (map_pileup_->evaluate({float(pico.out_npu_tru_mean()), "down"}))/sf;
 }
 
 // b-tagging Scale Factors

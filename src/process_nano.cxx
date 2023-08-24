@@ -37,6 +37,7 @@
 #include "event_tools.hpp"
 #include "isr_tools.hpp"
 #include "event_weighter.hpp"
+#include "trigger_weighter.hpp"
 
 using namespace std;
 
@@ -192,11 +193,25 @@ int main(int argc, char *argv[]){
   };
 
   // Rochester corrections
-  string rocco_file = "data/RoccoR2016.txt";
-  if (year==2017)
-    rocco_file = "data/RoccoR2017.txt";
-  else if (year==2018)
-    rocco_file = "data/RoccoR2018.txt";
+  string rocco_file = "data/zgamma/2018_UL/RoccoR2018UL.txt";
+  if (is_preUL) {
+    if (year==2016)
+      rocco_file = "data/RoccoR2016.txt";
+    else if (year==2017)
+      rocco_file = "data/RoccoR2017.txt";
+    else if (year==2018)
+      rocco_file = "data/RoccoR2018.txt";
+  }
+  else {
+    if (year==2016 && isAPV)
+      rocco_file = "data/zgamma/2016preVFP_UL/RoccoR2016aUL.txt";
+    else if (year==2016 && !isAPV)
+      rocco_file = "data/zgamma/2016postVFP_UL/RoccoR2016bUL.txt";
+    else if (year==2017)
+      rocco_file = "data/zgamma/2017_UL/RoccoR2017UL.txt";
+    else if (year==2018)
+      rocco_file = "data/zgamma/2018_UL/RoccoR2018UL.txt";
+  }
 
   //Initialize object producers
   GenParticleProducer mc_producer(year);
@@ -227,6 +242,7 @@ int main(int argc, char *argv[]){
   PhotonWeighter photon_weighter(year, isZgamma || isHiggsino);
   // UL scale factors
   EventWeighter event_weighter(year, isAPV);
+  TriggerWeighter trigger_weighter(year, isAPV);
   //cout<<"Is APV: "<<isAPV<<endl;
 
   // Other tools
@@ -400,7 +416,14 @@ int main(int argc, char *argv[]){
     // N.B. Jets: pico.out_pass_jets() and pico.out_pass_fsjets() filled in jet_producer
     event_tools.WriteDataQualityFilters(nano, pico, sig_jet_nano_idx, min_jet_pt, isData, isFastsim, is_preUL);
 
-    event_tools.WriteTriggerEfficiency(pico);
+    if (isHiggsino) event_tools.WriteTriggerEfficiency(pico);
+    if (isZgamma && !isData) {
+      std::vector<float> zgamma_trigsfs = trigger_weighter.GetSF(pico);
+      pico.out_w_trig() = zgamma_trigsfs[0];
+      pico.out_sys_trig().resize(2,0.);
+      pico.out_sys_trig()[0] = zgamma_trigsfs[1];
+      pico.out_sys_trig()[1] = zgamma_trigsfs[2];
+    }
 
     // ----------------------------------------------------------------------------------------------
     //              *** Calculating weight branches ***
@@ -415,6 +438,8 @@ int main(int argc, char *argv[]){
     float w_photon_csev(1.);
     float w_btag_dc(1.);
     float w_pu(1.);
+    float sys_pu_up(1.);
+    float sys_pu_down(1.);
     vector<float> sys_lep(2,1.), sys_fs_lep(2,1.);
     vector<float> sys_photon(2,1.);
 
@@ -433,12 +458,12 @@ int main(int argc, char *argv[]){
       pico.out_w_photon() = 1.;
       pico.out_sys_photon().resize(2,0);
     } else { // MC
-      if (!is_preUL) {
+      if ((!is_preUL) || year>=2022) { //UL or run 3
         event_weighter.ElectronIDSF(pico, w_el_id);
         // ElectronISO SF need to be implemented for non-HToZgamma
         event_weighter.MuonIDSF(pico, w_mu_id);
         event_weighter.MuonIsoSF(pico, w_mu_iso);
-        event_weighter.PileupSF(pico, w_pu);
+        event_weighter.PileupSF(pico, w_pu, sys_pu_up, sys_pu_down);
         event_weighter.bTaggingSF(pico, w_btag_dc); // This is implemented wrongly
         pico.out_w_pu()       = w_pu;
         pico.out_w_btag()    = w_btag_dc; 
@@ -450,12 +475,19 @@ int main(int argc, char *argv[]){
         pico.out_w_lep() = w_el_id * w_mu_id * w_mu_iso;
         pico.out_w_fs_lep() = 1.; // Need to be implemented
         pico.out_sys_lep().resize(2,0); pico.out_sys_fs_lep().resize(2,0); // Need to be implemented
-        pico.out_sys_pu().resize(2, 0.); // Need to be implemented
+        pico.out_sys_pu().resize(2, 1.);
+        pico.out_sys_pu()[0] = sys_pu_up;
+        pico.out_sys_pu()[1] = sys_pu_down;
+        pico.out_w_prefire() = nano.L1PreFiringWeight_Nom();
+        pico.out_sys_prefire().resize(2, 1.);
+        //N.B. Up = more prefiring i.e. less events
+        pico.out_sys_prefire()[0] = nano.L1PreFiringWeight_Up()/nano.L1PreFiringWeight_Nom();
+        pico.out_sys_prefire()[1] = nano.L1PreFiringWeight_Dn()/nano.L1PreFiringWeight_Nom();
         event_weighter.PhotonIDSF(pico, w_photon_id);
         event_weighter.PhotonCSEVSF(pico, w_photon_csev);
         pico.out_w_photon() = w_photon_id * w_photon_csev;
         pico.out_sys_photon().resize(2,0); // Need to be implemented
-      } else { // Pre-UL
+      } else { // Pre-UL run 2
         pico.out_w_btag()    = btag_weighter.EventWeight(pico, BTagEntry::OP_MEDIUM, ctr, ctr);; 
         pico.out_w_btag_df() = btag_df_weighter.EventWeight(pico, BTagEntry::OP_MEDIUM, ctr, ctr); 
         pico.out_w_bhig()    = btag_weighter.EventWeight(pico, op_all, ctr, ctr); 
@@ -493,6 +525,13 @@ int main(int argc, char *argv[]){
         }
         pico.out_w_pu() = 1.; // To be implemented
         pico.out_sys_pu().resize(2, 0.); // Need to be implemented
+        // N.B. out_w_prefire should not be renormalized because it models an inefficiency, 
+        // i.e. we *should* get less events!
+        float w_prefire=1.;
+        std::vector<float> sys_prefire(2, 1.);
+        prefire_weighter.EventWeight(nano, w_prefire, sys_prefire, isFastsim);
+        pico.out_w_prefire() = w_prefire;
+        pico.out_sys_prefire() = sys_prefire;
       } // Pre-UL
     } // MC
 
@@ -507,13 +546,6 @@ int main(int argc, char *argv[]){
 
     isr_tools.WriteISRWeights(pico);
 
-    // N.B. out_w_prefire should not be renormalized because it models an inefficiency, 
-    // i.e. we SHOULD get less events!
-    float w_prefire=1.;
-    std::vector<float> sys_prefire(2, 1.);
-    prefire_weighter.EventWeight(nano, w_prefire, sys_prefire, isFastsim);
-    pico.out_w_prefire() = w_prefire;
-    pico.out_sys_prefire() = sys_prefire;
 
     // do not include w_prefire, or anything that should not be renormalized! Will be set again in Step 3
     if (isZgamma) {
@@ -547,6 +579,12 @@ int main(int argc, char *argv[]){
         for(size_t i = 0; i<pico.out_sys_lep().size(); ++i){
           wgt_sums.out_sys_lep()[i] += sys_lep[i];
           wgt_sums.out_sys_fs_lep()[i] += sys_fs_lep[i];
+        }
+      }
+      if (pico.out_nel()>0) {
+        wgt_sums.out_neff_el() += nano.Generator_weight()>0 ? 1:-1;
+        if (pico.out_trig_single_el() || pico.out_trig_double_el()) {
+          wgt_sums.out_neff_pass_eltrigs() += nano.Generator_weight()>0 ? 1:-1;
         }
       }
       if(pico.out_nphoton()>0) {
@@ -589,23 +627,27 @@ int main(int argc, char *argv[]){
 }
 
 void Initialize(corrections_tree &wgt_sums){
-  wgt_sums.out_neff()          = 0;
-  wgt_sums.out_nent_zlep()     = 0;
-  wgt_sums.out_tot_weight_l0() = 0.;
-  wgt_sums.out_tot_weight_l1() = 0.;
+  wgt_sums.out_neff()              = 0;
+  wgt_sums.out_nent_zlep()         = 0;
+  wgt_sums.out_neff_el()           = 0;
+  wgt_sums.out_neff_pass_eltrigs() = 0;
+  wgt_sums.out_tot_weight_l0()     = 0.;
+  wgt_sums.out_tot_weight_l1()     = 0.;
 
-  wgt_sums.out_weight()     = 0.;
-  wgt_sums.out_w_lumi()     = 0.;
-  wgt_sums.out_w_lep()      = 0.;
-  wgt_sums.out_w_fs_lep()   = 0.;
-  wgt_sums.out_w_photon()   = 0.;
-  wgt_sums.out_w_btag()     = 0.;
-  wgt_sums.out_w_btag_df()  = 0.;
-  wgt_sums.out_w_bhig()     = 0.;
-  wgt_sums.out_w_bhig_df()  = 0.;
-  wgt_sums.out_w_isr()      = 0.;
-  wgt_sums.out_w_pu()       = 0.;
-  // w_prefire should not be normalized!!
+  wgt_sums.out_weight()      = 0.;
+  wgt_sums.out_w_lumi()      = 0.;
+  wgt_sums.out_w_lep()       = 0.;
+  wgt_sums.out_w_fs_lep()    = 0.;
+  wgt_sums.out_w_photon()    = 0.;
+  wgt_sums.out_w_btag()      = 0.;
+  wgt_sums.out_w_btag_df()   = 0.;
+  wgt_sums.out_w_bhig()      = 0.;
+  wgt_sums.out_w_bhig_df()   = 0.;
+  wgt_sums.out_w_isr()       = 0.;
+  wgt_sums.out_w_pu()        = 0.;
+  wgt_sums.out_w_zvtx_pass() = 0.;
+  wgt_sums.out_w_zvtx_fail() = 0.;
+  // w_prefire should not be normalized
 
   wgt_sums.out_sys_lep().resize(2,0);
   wgt_sums.out_sys_fs_lep().resize(2,0);

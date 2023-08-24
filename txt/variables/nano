@@ -11,6 +11,11 @@ Long64_t event
 float btagWeight_CSVV2
 float btagWeight_DeepCSVB
 
+#the integrated branches incorporate both muon and ECAL prefiring
+float L1PreFiringWeight_Nom
+float L1PreFiringWeight_Up
+float L1PreFiringWeight_Dn
+
 ################ Electrons ################
 
 int nElectron
