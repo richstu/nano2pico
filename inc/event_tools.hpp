@@ -28,10 +28,10 @@ private:
   bool isTTJets_LO_MET;
   bool isTTJets_LO_HT;
   bool isWJets_LO;
-  bool isWWG;
-  bool isWZG;
-  bool isZZG;
   bool isDYJets_LO;
+  bool isWW;
+  bool isWZ;
+  bool isZZ;
   bool isFastSim;
   int dataset;
 };

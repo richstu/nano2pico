@@ -7,8 +7,11 @@ bool stitch
 bool stitch_ht
 bool stitch_htmet
 bool stitch_photon
-bool stitch_dy
 bool old_stitch_dy
+bool is_overlap_old
+bool is_overlap
+bool use_event
+
 
 ####################   Global   ###################
 int npv

@@ -294,7 +294,8 @@ int main(int argc, char *argv[]){
     pico.out_lumiblock() = nano.luminosityBlock();
     pico.out_run()       = nano.run();
     pico.out_type()      = event_type;
-    pico.out_stitch_dy() = true;
+    pico.out_is_overlap_old() = true;
+    pico.out_is_overlap() = true;
     pico.out_old_stitch_dy() = true;
 
     // number of reconstructed primary vertices

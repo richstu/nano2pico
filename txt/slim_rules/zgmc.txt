@@ -5,6 +5,8 @@ keep event
 keep type
 keep stitch*
 keep old_stitch*
+keep is_overlap*
+keep use_event 
 
 keep npv
 
