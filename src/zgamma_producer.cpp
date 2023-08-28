@@ -27,7 +27,11 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
     pico.out_dijet_deta() = fabs(j1.Eta() - j2.Eta());
   }
   pico.out_nllphoton() = 0;
-  if (pico.out_ll_pt().size() == 0 || pico.out_nphoton() == 0) return;
+  int baseBit = 0b0000000000000;//If 0, no selections applied. Placed here to get 0 for cases where no dilep or photon
+  if (pico.out_ll_pt().size() == 0 || pico.out_nphoton() == 0){
+    pico.out_zg_cutBitMap() = baseBit;
+    return;
+  }
   for(size_t ill(0); ill < pico.out_ll_pt().size(); ill++)
     for(size_t igamma(0); igamma < pico.out_photon_pt().size(); igamma++) {
       TLorentzVector dilep, photon, llg;
@@ -195,7 +199,6 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
 
 
   // Bitmap for zgamma cut flow
-  int baseBit = 0b0000000000000;//If 0, no selections applied.
 
   float minlead_epT = 25; //probably store these in zgamma_producer.hpp
   float minsublead_epT = 15;
@@ -247,52 +250,25 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
 
   if (pico.out_nel()>=2 && pico.out_ll_lepid().at(0)==11){
     baseBit += 0b1010000000000; 
-    if(trigs_e == true){
-      baseBit +=0b0001000000000; 
-    }
-    if(trigs_ee == true){
-      baseBit +=0b0000100000000;
-    }
-    if (pico.out_el_pt().at(0)>=minlead_epT){
-      baseBit += 0b0000010000000;
-    }
-    if(pico.out_el_pt().at(1)>=minsublead_epT){
-      baseBit+= 0b0000001000000;
-    }
+    if(trigs_e == true){baseBit +=0b0001000000000;}
+    if(trigs_ee == true){baseBit +=0b0000100000000;}
+    if (pico.out_el_pt().at(0)>=minlead_epT){baseBit += 0b0000010000000;}
+    if(pico.out_el_pt().at(1)>=minsublead_epT){baseBit+= 0b0000001000000;}
   }
   if (pico.out_nmu()>=2 && pico.out_ll_lepid().at(0)==13){
     baseBit += 0b1100000000000;
-    if(trigs_mu ==true){
-      baseBit +=0b0001000000000;
-    }
-    if(trigs_mumu == true){
-      baseBit +=0b0000100000000;
-    }
-    if (pico.out_mu_pt().at(0)>=minlead_mupT){
-      baseBit += 0b0000010000000;
-    }
-    if(pico.out_mu_pt().at(1)>=minsublead_mupT){
-      baseBit+= 0b0000001000000;
-    }
+    if(trigs_mu ==true){baseBit +=0b0001000000000;}
+    if(trigs_mumu == true){baseBit +=0b0000100000000;}
+    if (pico.out_mu_pt().at(0)>=minlead_mupT){baseBit += 0b0000010000000;}
+    if(pico.out_mu_pt().at(1)>=minsublead_mupT){baseBit+= 0b0000001000000;}
   }
-  if (pico.out_nphoton()>=1){
-    baseBit+= 0b0000000100000;
-  }
-  if (pico.out_photon_id80().at(pico.out_llphoton_iph().at(0))){
-    baseBit+= 0b0000000010000;
-  }
-  if (pico.out_ll_m().at(pico.out_llphoton_ill().at(0))>=80 && pico.out_ll_m().at(pico.out_llphoton_ill().at(0))<=100){
-    baseBit+= 0b0000000001000;
-  }
-  if (pico.out_llphoton_m().at(0)>=100 && pico.out_llphoton_m().at(0)<=180){
-    baseBit+= 0b0000000000100;
-  }
-  if(pico.out_photon_pt().at(pico.out_llphoton_iph().at(0))/pico.out_llphoton_m().at(0) >=15/110){
-    baseBit+= 0b0000000000010;
-  }
-  if(pico.out_llphoton_m().at(0)<=122 || pico.out_llphoton_m().at(0)>=128){
-    baseBit+= 0b0000000000001;
-  }
+  if (pico.out_nphoton()>=1){baseBit+= 0b0000000100000;}
+  if (pico.out_photon_id80().at(pico.out_llphoton_iph().at(0))){baseBit+= 0b0000000010000;}
+  if (pico.out_ll_m().at(pico.out_llphoton_ill().at(0))>=80 && pico.out_ll_m().at(pico.out_llphoton_ill().at(0))<=100){baseBit+= 0b0000000001000;}
+  if (pico.out_llphoton_m().at(0)>=100 && pico.out_llphoton_m().at(0)<=180){baseBit+= 0b0000000000100;}
+  if(pico.out_photon_pt().at(pico.out_llphoton_iph().at(0))/pico.out_llphoton_m().at(0) >=15/110){baseBit+= 0b0000000000010;}
+  if(pico.out_llphoton_m().at(0)<=122 || pico.out_llphoton_m().at(0)>=128){baseBit+= 0b0000000000001;}
+
   pico.out_zg_cutBitMap() = baseBit;
 //End Bitmap for zgamma cut flow
 
