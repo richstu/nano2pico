@@ -29,20 +29,26 @@ EventTools::EventTools(const string &name_, int year_):
   if(Contains(name, "WJetsToLNu_Tune")  && Contains(name,"madgraphMLM"))
     isWJets_LO = true;
 
-  if(Contains(name, "WW")) 
-    isWWG = true;
- 
-  if(Contains(name, "WZ")) 
-    isWZG = true;
- 
-  if(Contains(name, "ZZ")) 
-    isZZG = true;
-
   if(Contains(name, "DYJetsToLL_M-50_Tune")  && Contains(name,"madgraphMLM"))
     isDYJets_LO = true;
 
   if(Contains(name, "Fast"))
     isFastSim = true;
+
+
+  //These four variables control the generator settings of the overlap removal variable in MC
+  if(Contains(name, "WW")) 
+    isWW = true;
+ 
+  if(Contains(name, "WZ")) 
+    isWZ = true;
+ 
+  if(Contains(name, "ZZ")) 
+    isZZ = true;
+
+  if(Contains(name, "TTGJets_")) 
+    isTTJets_LO_Incl = true; 
+
 
   if(Contains(name, "EGamma")) // replaced SingleElectron and DoubleEG starting in 2018
     dataset = Dataset::EGamma;
@@ -108,18 +114,27 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
     }
   }
 
-
-
-  double ptmin = 15.0;
-  double etamax = 2.6;
+  //Need to include the new overlap removal by including the newer values for ZGtoLLG_lowMll_lowGPt
+  double ptmin = 9.0;
   double isocone = 0.05;
-  if(isWWG || isZZG){
+  if(isZZ || isTTJets_LO_Incl){
     ptmin = 10.0;
-    etamax= 99.0;
+  }
+  if(isWZ || isWW){
+    ptmin = 20.0;
   }
 
-  if(isWWG){
-    isocone = 0.1;
+
+  double ptmin_old = 15.0;
+  double etamax_old = 2.6;
+  double isocone_old = 0.05;
+  if(isWW || isZZ || isTTJets_LO_Incl){
+    ptmin_old = 10.0;
+    etamax_old= 99.0;
+  }
+
+  if(isWW || isWZ){
+    ptmin_old = 20;
   }
 
   for(int mc_idx(0); mc_idx<nano.nGenPart(); mc_idx++) {
@@ -133,7 +148,7 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
                             nano.GenPart_eta().at(mc_idx), 
                             nano.GenPart_phi().at(mc_idx));
 
-        if( genPhoton.Pt() > ptmin && fabs(genPhoton.Eta())< etamax ){
+        if( genPhoton.Pt() > ptmin){
           //check if another generator particle nearby
           bool found_other_particles = false;
           for (int mc_idx_2 = 0; mc_idx_2 < nano.nGenPart(); mc_idx_2++) {
@@ -151,7 +166,37 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
           }
 
           if(!found_other_particles){
-            pico.out_stitch_dy() = false;
+            pico.out_is_overlap() = false;
+          }       
+
+        }
+    }
+
+
+      if( (mc_statusFlags[0] || mc_statusFlags[8]) ){  // Which are isPrompt or fromHardProcess
+        genPhoton.SetPtEtaPhi(nano.GenPart_pt().at(mc_idx), 
+                            nano.GenPart_eta().at(mc_idx), 
+                            nano.GenPart_phi().at(mc_idx));
+
+        if( genPhoton.Pt() > ptmin_old && fabs(genPhoton.Eta())< etamax_old ){
+          //check if another generator particle nearby
+          bool found_other_particles = false;
+          for (int mc_idx_2 = 0; mc_idx_2 < nano.nGenPart(); mc_idx_2++) {
+            bitset<15> mc_statusFlags2(nano.GenPart_statusFlags().at(mc_idx_2));
+            compPart.SetPtEtaPhi(nano.GenPart_pt().at(mc_idx_2), 
+                                 nano.GenPart_eta().at(mc_idx_2), 
+                                 nano.GenPart_phi().at(mc_idx_2)); 
+            
+
+            //isPrompt and fromHardProcess already applied
+            if ( (compPart.Pt() > 5.0) && (genPhoton.DeltaR(compPart) < isocone_old) && (mc_idx != mc_idx_2) && (mc_statusFlags2[8]) && (nano.GenPart_pdgId().at(mc_idx_2) != 22 )  ) {
+              found_other_particles = true;
+              //Basically saying that a photon is not isolated so this is not SM Zgamma sample!
+            }
+          }
+
+          if(!found_other_particles){
+            pico.out_is_overlap_old() = false;
           }       
 
         }
@@ -171,6 +216,17 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
       }
 
     }
+  }
+
+  //This bit of code uses the overlap removal variable to then select whether an event should be kept or not. 
+  //If the event contains should and does (does not) contain a generator photon then is_overlap_old = false, is_overlap = false, use_event = true (is_overlap_old=true, is_overlap=true, use_event=false)
+  //If the event contains should not and does not (does) contain a generator photon then is_overlap_old = true, is_overlap = false, use_event = true (is_overlap_old=false, is_overlap=true, use_event=false)
+  if( (isTTJets_LO_Incl && Contains(name, "TTGJets") ) || (isWZ && Contains(name, "WZG")) || (isWW && Contains(name, "WWG")) || (isZZ && Contains(name, "ZZG")) || Contains(name,"ZGToLLG") ){
+    pico.out_use_event() = !pico.out_is_overlap();
+  } else if( isTTJets_LO_Incl || isWZ || isWW || isZZ || Contains(name, "DY") ){
+    pico.out_use_event() = pico.out_is_overlap();
+  } else{
+    pico.out_is_overlap() = false; pico.out_use_event() = true;
   }
 
   if(isDYJets_LO  && nano.LHE_HT()>70) 
@@ -496,6 +552,53 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
 	pico.out_HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90() = nano.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90();
 	pico.out_HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95() = nano.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95();
 
+  //trigger summary branches for H->Zgamma
+  pico.out_trig_single_el() = false;
+  pico.out_trig_double_el() = false;
+  pico.out_trig_single_mu() = false;
+  pico.out_trig_double_mu() = false;
+  if (year==2016) {
+    pico.out_trig_single_el() = nano.HLT_Ele27_WPTight_Gsf();
+    pico.out_trig_double_el() = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ();
+    pico.out_trig_single_mu() = nano.HLT_IsoMu24() || nano.HLT_IsoTkMu24();
+    pico.out_trig_double_mu() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL() ||
+                              nano.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL() || 
+                              nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ() ||
+                              nano.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ();
+
+  }
+  if (year==2017) {
+    pico.out_trig_single_el() = nano.HLT_Ele32_WPTight_Gsf_L1DoubleEG();
+    pico.out_trig_double_el() = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL();
+    pico.out_trig_single_mu() = nano.HLT_IsoMu27();
+    pico.out_trig_double_mu() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8() || 
+                              nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8();
+  }
+  if (year==2018) {
+    pico.out_trig_single_el() = nano.HLT_Ele32_WPTight_Gsf();
+    pico.out_trig_double_el() = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL();
+    pico.out_trig_single_mu() = nano.HLT_IsoMu24();
+    pico.out_trig_double_mu() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8();
+  }
+  if (year==2022) {
+    //Ele28 was enabled & unprescaled before aug, but then disabled
+    //No official Egamma recommendations yet
+    //others seem the same based on POG presentations
+    pico.out_trig_single_el() = nano.HLT_Ele32_WPTight_Gsf(); 
+    pico.out_trig_double_el() = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL();
+    pico.out_trig_single_mu() = nano.HLT_IsoMu24();
+    pico.out_trig_double_mu() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8();
+  }
+  if (year==2023) {
+    //Ele30 is enabled & unprescaled in some of 2023, but it is unclear from
+    //POG presentations whether it was enabled until the LHC RQX.L8 incident
+    pico.out_trig_single_el() = nano.HLT_Ele32_WPTight_Gsf(); 
+    pico.out_trig_double_el() = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL();
+    pico.out_trig_single_mu() = nano.HLT_IsoMu24();
+    pico.out_trig_double_mu() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8();
+  }
+
+  //overlap removal performed based on trigger decisions
   if (isZgamma) {
     // this assumes that we process all the single and dileptondatasets
     if (dataset==Dataset::DoubleMuon                                                                      && doublemuon_trigs) return true;
@@ -757,7 +860,7 @@ int EventTools::GetEventType(){
 
 void EventTools::WriteTriggerEfficiency(pico_tree &pico) {
   // trigger efficiency and uncertainty - @todo, needs to be updated to full Run 2 trig eff. measurement
-  pico.out_eff_trig() = hig_trig_eff::eff(pico);
+  pico.out_w_trig() = hig_trig_eff::eff(pico);
   float effunc = hig_trig_eff::eff_unc(pico);
   pico.out_sys_trig().resize(2,0);
   pico.out_sys_trig()[0] = 1+effunc;

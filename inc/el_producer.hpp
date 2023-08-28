@@ -24,6 +24,7 @@ private:
   int year;
   bool isData;
 
+  bool IsSignal(nano_tree& nano, int nano_idx, bool isZgamma);
   bool idElectron_noIso(int bitmap, int level);
   bool EcalDriven(int bitmap);
 
