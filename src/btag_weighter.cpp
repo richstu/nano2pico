@@ -256,13 +256,5 @@ double BTagWeighter::GetMCTagEfficiency(int pdgId, float pT, float eta,
   float eff;
   bin = btag_efficiencies_deep_.at(rdr_idx).FindFixBin(fabs(eta), pT, pdgId);
   eff = btag_efficiencies_deep_.at(rdr_idx).GetBinContent(bin);
-  if(eff == 0){
-    cout<<"hi"<<endl;
-    cout<<rdr_idx<<endl;
-    cout<<eta<<endl;
-    cout<<pT<<endl;
-    cout<<pdgId<<endl;
-    cout<<bin<<endl;
-  }
   return eff;
 }
