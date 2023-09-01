@@ -101,6 +101,19 @@ int main(int argc, char *argv[]){
     exit(1);
   }
 
+  bool is2022preEE = false; //Classify data and MC into pre and post EE for 2022
+  if(year == 2022){ 
+    if(isData){
+      if (Contains(in_file, "2022C") || Contains(in_file, "2022D")){
+        is2022preEE = true;
+      }
+    } else {
+      if (!Contains(in_file, "Summer2022EE")){
+        is2022preEE = true;
+      }
+    }
+  }
+
   //if (Contains(in_file, "RunIISummer20")) { 
   //  is_preUL = false;
   //  if (Contains(in_file, "RunIISummer20UL16NanoAODAPV")) isAPV = true;
@@ -363,7 +376,7 @@ int main(int argc, char *argv[]){
 
     vector<HiggsConstructionVariables> sys_higvars;
     vector<int> sig_jet_nano_idx = jet_producer.WriteJets(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, jet_isphoton_nano_idx,
-                                                          btag_wpts[year], btag_df_wpts[year], isFastsim, isSignal, is_preUL, sys_higvars);
+                                                          btag_wpts[year], btag_df_wpts[year], isFastsim, isSignal, is_preUL, is2022preEE, sys_higvars);
     jet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year][1], isFastsim); // usually w.r.t. medium WP
     if(!isZgamma){
       jet_producer.WriteFatJets(nano, pico); // jet_producer.SetVerbose(nano.nSubJet()>0);

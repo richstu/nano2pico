@@ -32,6 +32,7 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
                                    bool isFastsim, 
                                    bool isSignal,
                                    bool is_preUL,
+                                   bool is2022preEE,
                                    vector<HiggsConstructionVariables> &sys_higvars){
   vector<int> sig_jet_nano_idx;
   pico.out_njet() = 0; pico.out_ht() = 0; pico.out_ht5() = 0; 
@@ -90,7 +91,34 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
     bool pass_jetid = true;
     if (!isFastsim) if (Jet_jetId[ijet] <1) pass_jetid = false;
 
-    bool isgood = !islep && !isphoton && (fabs(nano.Jet_eta()[ijet]) <= max_jet_eta) && pass_jetid;
+    bool isvetojet = false;
+    in_file_jetveto_ = "data/zgamma/2022/jetvetomaps.json";
+    cs_jetveto_ = correction::CorrectionSet::from_file(in_file_jetveto_);
+
+    float veto = 0; 
+    float vetoEE = 0;
+    double phicorr;
+    if(nano.Jet_phi().at(ijet)>3.1415926){ //a dumb addition because sometimes jet phi is slightly larger than pi
+      phicorr = 3.1415926;
+    } else if (nano.Jet_phi().at(ijet)<-3.1415926){
+      phicorr = -3.1415926;
+    } else {
+      phicorr = nano.Jet_phi().at(ijet);
+    }
+
+    if (year==2022 && is2022preEE==true){
+      map_jetveto_ = cs_jetveto_->at("Winter22Run3_RunCD_V1");
+      veto = map_jetveto_->evaluate({"jetvetomap", nano.Jet_eta().at(ijet),phicorr});
+    } else if (year==2022 && is2022preEE==false){
+      map_jetveto_ = cs_jetveto_->at("Winter22Run3_RunE_V1");
+      veto = map_jetveto_->evaluate({"jetvetomap", nano.Jet_eta().at(ijet),phicorr});
+      vetoEE = map_jetveto_->evaluate({"jetvetomap_eep", nano.Jet_eta().at(ijet),phicorr});
+    }
+    if(veto != 0.0 || vetoEE != 0.0){
+      isvetojet = true;
+    }
+
+    bool isgood = !islep && !isphoton && (fabs(nano.Jet_eta()[ijet]) <= max_jet_eta) && pass_jetid && !isvetojet;
 
     //sys_jetvar convention: [0] JER up, [1] JER down, [2] JEC up, [3] JEC down
     //for now, only save sys_ variables
@@ -161,7 +189,7 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
       }
     }
 
-    if (Jet_pt[ijet] <= min_jet_pt) continue;
+    if (Jet_pt[ijet] <= min_jet_pt || isvetojet) continue;
 
     switch(year) {
       case 2016:

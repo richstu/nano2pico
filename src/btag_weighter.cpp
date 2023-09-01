@@ -256,6 +256,5 @@ double BTagWeighter::GetMCTagEfficiency(int pdgId, float pT, float eta,
   float eff;
   bin = btag_efficiencies_deep_.at(rdr_idx).FindFixBin(fabs(eta), pT, pdgId);
   eff = btag_efficiencies_deep_.at(rdr_idx).GetBinContent(bin);
-  
   return eff;
 }
