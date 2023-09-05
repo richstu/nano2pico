@@ -18,6 +18,9 @@ JetProducer::JetProducer(int year_, float nanoaod_version_, float min_jet_pt_, f
   min_jet_pt = min_jet_pt_;
   max_jet_eta = max_jet_eta_;
   nanoaod_version = nanoaod_version_;
+  in_file_jetveto_ = "data/zgamma/2022/jetvetomaps.json";
+  cs_jetveto_ = correction::CorrectionSet::from_file(in_file_jetveto_);
+
 }
 
 JetProducer::~JetProducer(){
@@ -92,8 +95,6 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
     if (!isFastsim) if (Jet_jetId[ijet] <1) pass_jetid = false;
 
     bool isvetojet = false;
-    in_file_jetveto_ = "data/zgamma/2022/jetvetomaps.json";
-    cs_jetveto_ = correction::CorrectionSet::from_file(in_file_jetveto_);
 
     float veto = 0; 
     float vetoEE = 0;
