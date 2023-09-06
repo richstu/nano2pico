@@ -122,17 +122,15 @@ std::vector<float> TriggerWeighter::GetSF(std::vector<float> electron_pt,
 
   //calculate SFs
   float sf = data_prob[0]/mc_prob[0];
-  float sf_up = data_prob[1]/mc_prob[1];
-  float sf_dn = data_prob[2]/mc_prob[2];
+  float sf_up = data_prob[1]/mc_prob[2];
+  float sf_dn = data_prob[2]/mc_prob[1];
 
   //deal with signal leptons with low probabilities
   if (mc_prob[0]==0 || data_prob[0]==0) sf = 1.0;
   if (mc_prob[1]==0 || data_prob[1]==0) sf_up = 1.0;
   if (mc_prob[2]==0 || data_prob[2]==0) sf_dn = 1.0;
-  float w_sys_up = sf_up/sf;
-  float w_sys_dn = sf_dn/sf;
 
-  return {sf, w_sys_up, w_sys_dn};
+  return {sf, sf_up, sf_dn};
 }
 
 

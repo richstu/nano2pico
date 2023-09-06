@@ -37,7 +37,7 @@ int GetHiggsinoMass(const string &path);
 int GetGluinoMass(const string &path);
 int GetSUSYMass(const string & patth, const string & tag);
 void FixLumi(corrections_tree &corr, const string &corr_path, int year);
-void FixISR(corrections_tree &corr, const string &corr_path, int year);
+void FixISR(corrections_tree &corr, const string &corr_path, int year, bool is_zgamma);
 void Normalize(corrections_tree &corr);
 void Fix0L(corrections_tree &corr);
 void FixZvtx(corrections_tree &corr, int year);
@@ -66,6 +66,7 @@ int main(int argc, char *argv[]){
   else if (Contains(input_paths[0], "RunIIAutumn18")) year = 2017;
   else if (Contains(input_paths[0], "Run3Summer22")) year = 2022;
 
+  bool is_zgamma = Contains(output_path, "zgamma");
   //if (Contains(input_paths[0], "RunIISummer20")) {
   //  year = Contains(input_paths[0], "RunIISummer20UL16") ? 2016 : (Contains(input_paths[0], "RunIISummer20UL17") ? 2017 : 2018);
   //} else {
@@ -93,8 +94,9 @@ int main(int argc, char *argv[]){
   }
 
   FixLumi(corr, output_path, year);
-  FixISR(corr, output_path, year);
-  Fix0L(corr);
+  FixISR(corr, output_path, year, is_zgamma);
+  if (!is_zgamma)
+    Fix0L(corr);
   FixZvtx(corr,year);
 
   Normalize(corr);
@@ -107,6 +109,8 @@ int main(int argc, char *argv[]){
 void Initialize(corrections_tree &wgt_sums, corrections_tree &corr){
   corr.out_weight() = 0.;
   corr.out_w_lumi() = 0.;
+  corr.out_w_el() = 0.;
+  corr.out_w_mu() = 0.;
   corr.out_w_lep() = 0.;
   corr.out_w_fs_lep() = 0.;
   corr.out_w_btag() = 0.;
@@ -116,6 +120,7 @@ void Initialize(corrections_tree &wgt_sums, corrections_tree &corr){
   corr.out_w_isr() = 0.;
   corr.out_w_pu() = 0.;
   corr.out_w_photon() = 0.;
+  corr.out_w_trig() = 0.;
   corr.out_w_zvtx_pass() = 0.;
   corr.out_w_zvtx_fail() = 0.;
   // w_prefire should not be normalized!!
@@ -128,12 +133,15 @@ void Initialize(corrections_tree &wgt_sums, corrections_tree &corr){
   corr.out_tot_weight_l0() = 0.;
   corr.out_tot_weight_l1() = 0.;
 
+  CopySize(wgt_sums.sys_el(),                 corr.out_sys_el());
+  CopySize(wgt_sums.sys_mu(),                 corr.out_sys_mu());
   CopySize(wgt_sums.sys_lep(),                corr.out_sys_lep());
   CopySize(wgt_sums.sys_fs_lep(),             corr.out_sys_fs_lep());
   CopySize(wgt_sums.sys_bchig(),              corr.out_sys_bchig());
   CopySize(wgt_sums.sys_udsghig(),            corr.out_sys_udsghig());
   CopySize(wgt_sums.sys_fs_bchig(),           corr.out_sys_fs_bchig());
   CopySize(wgt_sums.sys_fs_udsghig(),         corr.out_sys_fs_udsghig());
+  CopySize(wgt_sums.sys_trig(),               corr.out_sys_trig());
   CopySize(wgt_sums.sys_isr(),                corr.out_sys_isr());
   CopySize(wgt_sums.sys_pu(),                 corr.out_sys_pu());
   CopySize(wgt_sums.sys_murf(),               corr.out_sys_murf());
@@ -152,16 +160,21 @@ void AddEntry(corrections_tree &wgt_sums, corrections_tree &corr){
   corr.out_tot_weight_l1() += wgt_sums.tot_weight_l1();
 
   corr.out_weight()            += wgt_sums.weight();
+  corr.out_w_el()              += wgt_sums.w_el();
+  corr.out_w_mu()              += wgt_sums.w_mu();
   corr.out_w_lep()             += wgt_sums.w_lep();
   corr.out_w_fs_lep()          += wgt_sums.w_fs_lep();
   corr.out_w_bhig()            += wgt_sums.w_bhig();
   corr.out_w_btag()            += wgt_sums.w_btag();
   corr.out_w_bhig_df()         += wgt_sums.w_bhig_df();
   corr.out_w_btag_df()         += wgt_sums.w_btag_df();
+  corr.out_w_trig()            += wgt_sums.w_trig();
   corr.out_w_isr()             += wgt_sums.w_isr();
   corr.out_w_pu()              += wgt_sums.w_pu();
   corr.out_w_photon()          += wgt_sums.w_photon();
 
+  VecAdd(wgt_sums.sys_el(),            corr.out_sys_el());
+  VecAdd(wgt_sums.sys_mu(),            corr.out_sys_mu());
   VecAdd(wgt_sums.sys_lep(),           corr.out_sys_lep());
   VecAdd(wgt_sums.sys_fs_lep(),        corr.out_sys_fs_lep());
   VecAdd(wgt_sums.sys_bchig(),         corr.out_sys_bchig());
@@ -169,6 +182,7 @@ void AddEntry(corrections_tree &wgt_sums, corrections_tree &corr){
   VecAdd(wgt_sums.sys_fs_bchig(),      corr.out_sys_fs_bchig());
   VecAdd(wgt_sums.sys_fs_udsghig(),    corr.out_sys_fs_udsghig());
   VecAdd(wgt_sums.sys_isr(),           corr.out_sys_isr());
+  VecAdd(wgt_sums.sys_trig(),          corr.out_sys_trig());
   VecAdd(wgt_sums.sys_pu(),            corr.out_sys_pu());
   VecAdd(wgt_sums.sys_murf(),          corr.out_sys_murf());
   // VecAdd(wgt_sums.w_pdf(),             corr.out_w_pdf());
@@ -236,7 +250,7 @@ void FixLumi(corrections_tree &corr, const string &corr_path, int year){
   corr.out_w_lumi() = xsec*lumi/corr.out_neff();
 }
 
-void FixISR(corrections_tree &corr, const string &corr_path, int year){
+void FixISR(corrections_tree &corr, const string &corr_path, int year, bool is_zgamma){
   double corr_w_isr(1.);
   vector<double> corr_sys_isr(2,1.);
   double tot_w_isr = corr.out_w_isr();
@@ -275,10 +289,18 @@ void FixISR(corrections_tree &corr, const string &corr_path, int year){
   if (corr.out_w_fs_lep()) w_corr_l0 *= (nent-corr.out_w_fs_lep())/nent_zlep;
   if(nent_zlep==0) w_corr_l0 = 1.;
   // again normalize to total w_isr, not unity
-  if(year==2016) 
-    corr.out_weight() = (tot_w_isr*corr_w_isr)/(corr.out_tot_weight_l0()*w_corr_l0 + corr.out_tot_weight_l1());
-  else
-    corr.out_weight() = nent/(corr.out_tot_weight_l0()*w_corr_l0 + corr.out_tot_weight_l1());
+  if (!is_zgamma) {
+    if(year==2016) 
+      corr.out_weight() = (tot_w_isr*corr_w_isr)/(corr.out_tot_weight_l0()*w_corr_l0 + corr.out_tot_weight_l1());
+    else
+      corr.out_weight() = nent/(corr.out_tot_weight_l0()*w_corr_l0 + corr.out_tot_weight_l1());
+  }
+  else {
+    if(year==2016) 
+      corr.out_weight() = (tot_w_isr*corr_w_isr)/nent;
+    else
+      corr.out_weight() = 1.0;
+  }
 
   //cout<<"tot_w_isr: "<<tot_w_isr<<" corr_w_isr: "<<corr_w_isr<<" nent: "<<corr.out_nent()<<" out_tot_weight_l0: "<<corr.out_tot_weight_l0()<<" w_corr_l0: "<<w_corr_l0<<" out_tot_weight_l1: "<<corr.out_tot_weight_l1()<<" out_weight: "<<corr.out_weight()<<endl;
 }
@@ -325,6 +347,9 @@ void Normalize(corrections_tree &corr){
 
   // total weight fixed in FixISR
   // w_lep fixed in Fix0L
+  
+  Normalize(corr.out_w_el(), nent);
+  Normalize(corr.out_w_mu(), nent);
 
   Normalize(corr.out_w_btag(), nent);
   Normalize(corr.out_w_btag_df(), nent);
@@ -336,10 +361,16 @@ void Normalize(corrections_tree &corr){
 
   Normalize(corr.out_w_photon(), nent);
 
+  Normalize(corr.out_w_trig(), nent);
+
+  Normalize(corr.out_sys_el(), nent);
+  Normalize(corr.out_sys_mu(), nent);
   Normalize(corr.out_sys_bchig(), nent);
   Normalize(corr.out_sys_udsghig(), nent);
   Normalize(corr.out_sys_fs_bchig(), nent);
   Normalize(corr.out_sys_fs_udsghig(), nent);
+  Normalize(corr.out_sys_trig(), nent);
+  Normalize(corr.out_sys_pu(), nent);
 
   Normalize(corr.out_sys_murf(), nent);
   // Normalize(corr.out_w_pdf(), nent);

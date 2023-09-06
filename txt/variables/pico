@@ -369,9 +369,8 @@ int mlsp
 float weight
 float w_lumi
 float w_lep
-float w_el_id
-float w_mu_id
-float w_mu_iso
+float w_el
+float w_mu
 float w_fs_lep
 float w_photon
 float w_photon_id
@@ -551,6 +550,8 @@ bool HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95
 ################  Systematic variations  - to be implemented as needed  ##################
 
 # +/- variations are index 0 and 1
+vector<float> sys_el
+vector<float> sys_mu
 vector<float> sys_lep
 vector<float> sys_fs_lep
 
