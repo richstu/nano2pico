@@ -69,16 +69,19 @@ int main(int argc, char *argv[]){
     pico.out_w_bhig()     = pico.w_bhig()*corr.w_bhig();
     pico.out_w_btag_df()  = pico.w_btag_df()*corr.w_btag_df();
     pico.out_w_bhig_df()  = pico.w_bhig_df()*corr.w_bhig_df();
+    pico.out_w_photon()   = pico.w_photon()*corr.w_photon();
     
     pico.out_w_trig()     = pico.w_trig()*corr.w_trig();
     pico.out_w_isr()      = pico.w_isr()*corr.w_isr();
     pico.out_w_pu()       = pico.w_pu()*corr.w_pu();
 
+    float btag_weight = pico.out_w_bhig();
     if (is_zgamma) {
       pico.out_w_lep() = pico.out_w_el()*pico.out_w_mu();
       pico.out_w_fs_lep() = 1.0;
       pico.out_sys_fs_lep()[0] = 1.0;
       pico.out_sys_fs_lep()[1] = 1.0;
+      btag_weight = pico.out_w_bhig_df();
     }
 
     pico.out_sys_trig().resize(2);
@@ -104,8 +107,8 @@ int main(int argc, char *argv[]){
 
     pico.out_weight() = corr.weight() * pico.out_w_lumi() *
                      pico.out_w_lep() * pico.out_w_fs_lep() * //post-corr values in order for 0l to be correct
-                     pico.w_bhig() * pico.w_trig() * pico.w_isr() * 
-                     pico.w_pu() * pico.w_prefire() * pico.w_photon();
+                     btag_weight * pico.out_w_trig() * pico.out_w_isr() * 
+                     pico.out_w_pu() * pico.w_prefire() * pico.out_w_photon();
 
     pico.out_sys_bchig().resize(2); pico.out_sys_fs_bchig().resize(2);
     pico.out_sys_udsghig().resize(2); pico.out_sys_fs_udsghig().resize(2);

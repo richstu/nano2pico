@@ -13,7 +13,7 @@
 
 class EventWeighter{
 public:
-  EventWeighter(int year, bool preVFP = false);
+  EventWeighter(int year, bool preVFP, const std::vector<float> &btag_wpts);
 
   void ElectronIDSF(pico_tree &pico, float &w_el_id, std::vector<float> &sys_lep);
 
@@ -25,7 +25,8 @@ public:
 
   void PileupSF(pico_tree &pico, float &w_pu, float &sys_pu_up, float &sys_pu_down);
 
-  void bTaggingSF(pico_tree &pico, float &w_btag);
+  void bTaggingSF(pico_tree &pico, float &w_btag, std::vector<float> &sys_bctag, 
+                  std::vector<float> &sys_udsgtag);
 
 private:
   std::string in_file_electron_;
@@ -36,6 +37,7 @@ private:
   std::string in_file_muon_mceff_;
   std::string in_file_pu_;
   std::string in_file_btag_;
+  std::string in_file_btag_mceff_;
   std::string key_;
   std::string puName_;
   std::unique_ptr<correction::CorrectionSet> cs_electron_;
@@ -46,6 +48,7 @@ private:
   std::unique_ptr<correction::CorrectionSet> cs_muon_;
   std::unique_ptr<correction::CorrectionSet> cs_pileup_;
   std::unique_ptr<correction::CorrectionSet> cs_btag_;
+  std::unique_ptr<correction::CorrectionSet> cs_btag_mceff_;
   correction::Correction::Ref map_electron_;
   correction::Correction::Ref map_photon_id_;
   correction::Correction::Ref map_photon_csev_;
@@ -57,6 +60,10 @@ private:
   correction::Correction::Ref map_muon_mceff_;
   correction::Correction::Ref map_pileup_;
   correction::Correction::Ref map_btag_;
+  correction::Correction::Ref map_udsgtag_;
+  float btag_wp_loose_;
+  float btag_wp_medium_;
+  float btag_wp_tight_;
 };
 
 #endif

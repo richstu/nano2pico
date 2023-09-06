@@ -5,13 +5,43 @@ official tools.
 
 Additional functionality to create pretty histograms may eventually also be 
 added
--MO
 """
 
 import argparse
 import json
 import math
 import ROOT
+
+def get_values_from_n2p_hist(file_name, canvas_name, hist_name):
+  """
+  Extracts numerical values from a TH2 stored in a ROOT file in a canvas
+  Returns a tuple of 4 lists of floats (x bins, y bins, values, uncertainties)
+  
+  file_name     string  name of ROOT file to open
+  canvas_name   string  name of canvas in ROOT file
+  hist_name     string  name of histogram in canvas
+  """
+  root_file = ROOT.TFile(file_name,'READ')
+  canvas = root_file.Get(canvas_name)
+  hist = canvas.GetPrimitive(hist_name)
+
+  #process histogram to extract binning and efficiencies
+  x_nbins = hist.GetXaxis().GetNbins()
+  y_nbins = hist.GetYaxis().GetNbins()
+  x_bins = []
+  y_bins = []
+  for i in range(x_nbins+1):
+    x_bins.append(hist.GetXaxis().GetBinUpEdge(i))
+  for i in range(y_nbins+1):
+    y_bins.append(hist.GetYaxis().GetBinUpEdge(i))
+  effs = []
+  uncs = []
+  for y_bin in range(1,y_nbins+1):
+    for x_bin in range(1,x_nbins+1):
+      effs.append(hist.GetBinContent(x_bin,y_bin))
+      uncs.append(hist.GetBinErrorUp(x_bin,y_bin))
+  root_file.Close()
+  return (x_bins, y_bins, effs, uncs)
 
 def make_multibinning_node_absetapt(abseta_bins, pt_bins, content):
   """
@@ -124,7 +154,7 @@ MUON_DESCRIPTION = 'These are muon trigger efficiencies derived using the offici
 ABSETA_INPUT = {'name' : 'abseta', 'type' : 'real', 'description' : 'absolute value of pseudorapidity'}
 ETA_INPUT = {'name' : 'eta', 'type' : 'real', 'description' : 'pseudorapidity'}
 PT_INPUT = {'name' : 'pt', 'type' : 'real', 'description' : 'transverse momentum'}
-SUPPORTED_INPUTS = ['egamma_trigger','egamma_elid','muon_root','muon_pogjson','rootfile_th2']
+SUPPORTED_INPUTS = ['egamma_trigger','egamma_elid','muon_root','muon_pogjson','rootfile_th2','btag_root']
 
 if __name__ == '__main__':
   #set up argparse
@@ -335,6 +365,7 @@ if __name__ == '__main__':
       for x_bin in range(1,x_nbins+1):
         effs.append(hist.GetBinContent(x_bin,y_bin))
         uncs.append(hist.GetBinErrorUp(x_bin,y_bin))
+    root_file.Close()
 
     #generate general json inputs
     #NOTE: this is currently hard-coded for a specific histogram input, 
@@ -350,6 +381,29 @@ if __name__ == '__main__':
             make_multibinning_node(bin_variable_names,[y_bins,x_bins],uncs)])
     correction_list = [write_correction_dict('Electron_WPL_MCeff', input_variables, output_variable, data)]
     write_correctionlib_json(correction_list, args.outputfile)
+
+  #handle general root files
+  elif args.filetype == 'btag_root':
+    #generate general json inputs
+    input_variables = [make_valtype_input(['effmc','systmc']), ETA_INPUT, PT_INPUT]
+    output_variable = {'name' : 'eff', 'type' : 'real', 'description' : 'b-(mis)tagging MC efficiency/uncertainty'}
+    bin_variable_names = ['pt','eta']
+
+    years = ['2016APV','2016','2017','2018']
+    years_out = { '2016APV' : '2016preVFP', '2016' : '2016postVFP', '2017' : '2017' , '2018' : '2018'}
+    flavors = ['b','c','uds']
+    wps = ['loose','medium','tight']
+
+    for year in years:
+      correction_list = []
+      for flavor in flavors:
+        for wp in wps:
+          values = get_values_from_n2p_hist('json_inputs/b_tagging_all_plots/b_tagging_efficiency_'+flavor+'_truth_'+wp+'_'+year+'.root','canv','Tagged')
+          data = make_data_category('ValType',['effmc','systmc'],
+                  [make_multibinning_node(bin_variable_names,[values[1],values[0]],values[2]),
+                  make_multibinning_node(bin_variable_names,[values[1],values[0]],values[3])])
+          correction_list.append(write_correction_dict('Btag_'+flavor+'_WP'+wp+'_MCeff', input_variables, output_variable, data))
+      write_correctionlib_json(correction_list, 'data/zgamma/'+years_out[year]+'_UL/btag_mceff.json')
 
   #muon POG json format
   elif args.filetype == 'muon_pogjson':

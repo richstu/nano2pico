@@ -12,7 +12,7 @@
 
 using namespace std;
 
-EventWeighter::EventWeighter(int year, bool preVFP){
+EventWeighter::EventWeighter(int year, bool preVFP, const vector<float> &btag_wpts){
   if (year==2016 && preVFP) {
     in_file_electron_        = "data/zgamma/2016preVFP_UL/electron_WPL.json";
     in_file_photon_          = "data/zgamma/2016preVFP_UL/photon.json";
@@ -22,6 +22,7 @@ EventWeighter::EventWeighter(int year, bool preVFP){
     in_file_muon_mceff_      = "data/zgamma/2016preVFP_UL/muon_mceff.json";
     in_file_pu_              = "data/zgamma/2016preVFP_UL/puWeights.json";
     in_file_btag_            = "data/zgamma/2016preVFP_UL/btagging.json";
+    in_file_btag_mceff_      = "data/zgamma/2016preVFP_UL/btag_mceff.json";
     key_                     = "2016preVFP";
     puName_                  = "Collisions16_UltraLegacy_goldenJSON";
   } else if (year==2016) {
@@ -33,6 +34,7 @@ EventWeighter::EventWeighter(int year, bool preVFP){
     in_file_muon_mceff_      = "data/zgamma/2016postVFP_UL/muon_mceff.json";
     in_file_pu_              = "data/zgamma/2016postVFP_UL/puWeights.json";
     in_file_btag_            = "data/zgamma/2016postVFP_UL/btagging.json";
+    in_file_btag_mceff_      = "data/zgamma/2016postVFP_UL/btag_mceff.json";
     key_                     = "2016postVFP";
     puName_                  = "Collisions16_UltraLegacy_goldenJSON";
   } else if (year==2017) {
@@ -44,6 +46,7 @@ EventWeighter::EventWeighter(int year, bool preVFP){
     in_file_muon_mceff_      = "data/zgamma/2017_UL/muon_mceff.json";
     in_file_pu_              = "data/zgamma/2017_UL/puWeights.json";
     in_file_btag_            = "data/zgamma/2017_UL/btagging.json";
+    in_file_btag_mceff_      = "data/zgamma/2017_UL/btag_mceff.json";
     key_                     = "2017";
     puName_                  = "Collisions17_UltraLegacy_goldenJSON";
   } else if (year==2018) {
@@ -55,6 +58,7 @@ EventWeighter::EventWeighter(int year, bool preVFP){
     in_file_muon_mceff_      = "data/zgamma/2018_UL/muon_mceff.json";
     in_file_pu_              = "data/zgamma/2018_UL/puWeights.json";
     in_file_btag_            = "data/zgamma/2018_UL/btagging.json";
+    in_file_btag_mceff_      = "data/zgamma/2018_UL/btag_mceff.json";
     key_                     = "2018";
     puName_                  = "Collisions18_UltraLegacy_goldenJSON";
   } else if (year==2022){
@@ -67,6 +71,7 @@ EventWeighter::EventWeighter(int year, bool preVFP){
     in_file_muon_mceff_      = "data/zgamma/2018_UL/muon_mceff.json";
     in_file_pu_              = "data/zgamma/2018_UL/puWeights.json";
     in_file_btag_            = "data/zgamma/2018_UL/btagging.json";
+    in_file_btag_mceff_      = "data/zgamma/2018_UL/btag_mceff.json";
     key_                     = "2018";
     puName_                  = "Collisions18_UltraLegacy_goldenJSON";
   } else if (year==2023){
@@ -79,6 +84,7 @@ EventWeighter::EventWeighter(int year, bool preVFP){
     in_file_muon_mceff_      = "data/zgamma/2018_UL/muon_mceff.json";
     in_file_pu_              = "data/zgamma/2018_UL/puWeights.json";
     in_file_btag_            = "data/zgamma/2018_UL/btagging.json";
+    in_file_btag_mceff_      = "data/zgamma/2018_UL/btag_mceff.json";
     key_                     = "2018";
     puName_                  = "Collisions18_UltraLegacy_goldenJSON";
   } else {
@@ -92,6 +98,7 @@ EventWeighter::EventWeighter(int year, bool preVFP){
   cs_muon_mceff_       = correction::CorrectionSet::from_file(in_file_muon_mceff_);
   cs_pileup_           = correction::CorrectionSet::from_file(in_file_pu_);
   cs_btag_             = correction::CorrectionSet::from_file(in_file_btag_);
+  cs_btag_mceff_       = correction::CorrectionSet::from_file(in_file_btag_mceff_);
   map_electron_        = cs_electron_->at("ElectronWPL");
   map_photon_id_       = cs_photon_->at("UL-Photon-ID-SF");
   map_photon_csev_     = cs_photon_->at("UL-Photon-CSEV-SF");
@@ -101,10 +108,14 @@ EventWeighter::EventWeighter(int year, bool preVFP){
   map_muon_lowpt_reco_ = cs_muon_lowpt_reco_->at("NUM_TrackerMuons_DEN_genTracks");
   map_muon_lowpt_id_   = cs_muon_lowpt_id_->at("NUM_LooseID_DEN_TrackerMuons");
   map_muon_mceff_      = cs_muon_mceff_->at("Muon_LooseID_MCeff");
-  map_btag_            = cs_btag_->at("deepCSV_mujets");
-  // DeepJet can be used instead of DeepCSV
-  // map_btag_           = cs_btag_->at("deepJet_mujets");
+  map_btag_            = cs_btag_->at("deepJet_mujets");
+  map_udsgtag_            = cs_btag_->at("deepJet_incl");
+  // DeepCSV can be used instead of DeepJet
+  // map_btag_           = cs_btag_->at("deepCSV_mujets");
   map_pileup_          = cs_pileup_->at(puName_);
+  btag_wp_loose_       = btag_wpts[0];
+  btag_wp_medium_      = btag_wpts[1];
+  btag_wp_tight_       = btag_wpts[2];
 }
 
 // Electron MVA ID Scale Factors
@@ -287,8 +298,8 @@ void EventWeighter::MuonTotalSF(pico_tree &pico, float &w_muon_tot, std::vector<
       if (mc_eff_up > 1.0) mc_eff_up = 1.0;
       if (mc_eff_dn < 0.0) mc_eff_dn = 0.0;
       float data_eff = sf*mc_eff;
-      float data_eff_up = sf_up*mc_eff_up;
-      float data_eff_dn = sf_dn*mc_eff_dn;
+      float data_eff_up = sf_up*mc_eff;
+      float data_eff_dn = sf_dn*mc_eff;
       //for variations consider "worst case": data overestimated and mc 
       //underestimated or vice-versa
       sf = data_eff/mc_eff;
@@ -321,14 +332,118 @@ void EventWeighter::PileupSF(pico_tree &pico, float &w_pu, float &sys_pu_up, flo
 }
 
 // b-tagging Scale Factors
-void EventWeighter::bTaggingSF(pico_tree &pico, float &w_btag){
-  double sf_tot = 1.0;
-  auto n_jets = pico.out_jet_isgood().size();
-  for(size_t i = 0; i < n_jets; ++i){
-    int hadronFlavour = abs(pico.out_jet_hflavor().at(i));
-    if(pico.out_jet_isgood().at(i) && hadronFlavour==5 && std::abs(pico.out_jet_eta().at(i)) < 2.4){
-      sf_tot *= map_btag_->evaluate({"central", "M", hadronFlavour, std::abs(pico.out_jet_eta().at(i)), pico.out_jet_pt().at(i)}); // M stands for Medium WP
-    }
-  }
-  w_btag = sf_tot;
+void EventWeighter::bTaggingSF(pico_tree &pico, float &w_btag, std::vector<float> &sys_bctag, std::vector<float> &sys_udsgtag){
+  float sf_tot_nm = 1.0;
+  float sf_tot_up_bc = 1.0;
+  float sf_tot_dn_bc = 1.0;
+  float sf_tot_up_udsg = 1.0;
+  float sf_tot_dn_udsg = 1.0;
+  for (unsigned ijet = 0; ijet < pico.out_jet_pt().size(); ijet++) {
+
+    if(pico.out_jet_isgood().at(ijet) && std::abs(pico.out_jet_eta().at(ijet)) < 2.4){
+
+      //get true flavor
+      int jet_flavor = abs(pico.out_jet_hflavor().at(ijet));
+      if (jet_flavor != 5 && jet_flavor != 4) jet_flavor = 0;
+      correction::Correction::Ref *btag_map = &map_btag_;
+      std::string mc_string = "Btag_b_WP";
+      if (jet_flavor == 4) mc_string = "Btag_c_WP";
+      if (jet_flavor == 0) {
+        mc_string = "Btag_uds_WP";
+        btag_map = &map_udsgtag_;
+      }
+
+      //calculate probability to be in exclusive categories (i.e. tight, 
+      // medium-but-not-tight, loose-but-not-medium, not-loose) in data and MC.
+      //This can be done by combining SFs (data/MC) with MC efficiencies
+      //Then use prob(data)/prob(MC) to get final SFs
+      float cat_data_eff(1.0), cat_data_eff_up(1.0), cat_data_eff_dn(1.0);
+      float cat_mc_eff(1.0), cat_mc_eff_up(1.0), cat_mc_eff_dn(1.0);
+      if (pico.out_jet_deepflav().at(ijet) > btag_wp_tight_) { 
+        float t_sf = (*btag_map)->evaluate({"central", "T", jet_flavor, std::abs(pico.out_jet_eta().at(ijet)), pico.out_jet_pt().at(ijet)});
+        float t_sf_up = (*btag_map)->evaluate({"up_correlated", "T", jet_flavor, std::abs(pico.out_jet_eta().at(ijet)), pico.out_jet_pt().at(ijet)});
+        float t_sf_dn = (*btag_map)->evaluate({"down_correlated", "T", jet_flavor, std::abs(pico.out_jet_eta().at(ijet)), pico.out_jet_pt().at(ijet)});
+        float t_mc_eff = cs_btag_mceff_->at((mc_string+"tight_MCeff").c_str())->evaluate({"effmc", pico.out_jet_eta().at(ijet), pico.out_jet_pt().at(ijet)});
+        float t_mc_syst = cs_btag_mceff_->at((mc_string+"tight_MCeff").c_str())->evaluate({"systmc", pico.out_jet_eta().at(ijet), pico.out_jet_pt().at(ijet)});
+        cat_mc_eff = t_mc_eff;
+        cat_mc_eff_up = t_mc_eff+t_mc_syst;
+        cat_mc_eff_dn = t_mc_eff+t_mc_syst;
+        cat_data_eff = t_mc_eff*t_sf;
+        cat_data_eff_up = t_mc_eff*t_sf_up;
+        cat_data_eff_dn = t_mc_eff*t_sf_dn;
+      }
+      else if (pico.out_jet_deepflav().at(ijet) > btag_wp_medium_) {
+        float t_sf = (*btag_map)->evaluate({"central", "T", jet_flavor, std::abs(pico.out_jet_eta().at(ijet)), pico.out_jet_pt().at(ijet)});
+        float t_sf_up = (*btag_map)->evaluate({"up_correlated", "T", jet_flavor, std::abs(pico.out_jet_eta().at(ijet)), pico.out_jet_pt().at(ijet)});
+        float t_sf_dn = (*btag_map)->evaluate({"down_correlated", "T", jet_flavor, std::abs(pico.out_jet_eta().at(ijet)), pico.out_jet_pt().at(ijet)});
+        float t_mc_eff = cs_btag_mceff_->at((mc_string+"tight_MCeff").c_str())->evaluate({"effmc", pico.out_jet_eta().at(ijet), pico.out_jet_pt().at(ijet)});
+        float t_mc_syst = cs_btag_mceff_->at((mc_string+"tight_MCeff").c_str())->evaluate({"systmc", pico.out_jet_eta().at(ijet), pico.out_jet_pt().at(ijet)});
+        float m_sf = (*btag_map)->evaluate({"central", "M", jet_flavor, std::abs(pico.out_jet_eta().at(ijet)), pico.out_jet_pt().at(ijet)});
+        float m_sf_up = (*btag_map)->evaluate({"up_correlated", "M", jet_flavor, std::abs(pico.out_jet_eta().at(ijet)), pico.out_jet_pt().at(ijet)});
+        float m_sf_dn = (*btag_map)->evaluate({"down_correlated", "M", jet_flavor, std::abs(pico.out_jet_eta().at(ijet)), pico.out_jet_pt().at(ijet)});
+        float m_mc_eff = cs_btag_mceff_->at((mc_string+"medium_MCeff").c_str())->evaluate({"effmc", pico.out_jet_eta().at(ijet), pico.out_jet_pt().at(ijet)});
+        float m_mc_syst = cs_btag_mceff_->at((mc_string+"medium_MCeff").c_str())->evaluate({"systmc", pico.out_jet_eta().at(ijet), pico.out_jet_pt().at(ijet)});
+        cat_mc_eff = m_mc_eff-t_mc_eff;
+        cat_mc_eff_up = m_mc_eff+m_mc_syst-t_mc_eff-t_mc_syst;
+        cat_mc_eff_dn = m_mc_eff-m_mc_syst-t_mc_eff+t_mc_syst;
+        cat_data_eff = m_mc_eff*m_sf-t_mc_eff*t_sf;
+        cat_data_eff_up = m_mc_eff*m_sf_up-t_mc_eff*t_sf_up;
+        cat_data_eff_dn = m_mc_eff*m_sf_dn-t_mc_eff*t_sf_dn;
+      }
+      else if (pico.out_jet_deepflav().at(ijet) > btag_wp_loose_) {
+        float m_sf = (*btag_map)->evaluate({"central", "M", jet_flavor, std::abs(pico.out_jet_eta().at(ijet)), pico.out_jet_pt().at(ijet)});
+        float m_sf_up = (*btag_map)->evaluate({"up_correlated", "M", jet_flavor, std::abs(pico.out_jet_eta().at(ijet)), pico.out_jet_pt().at(ijet)});
+        float m_sf_dn = (*btag_map)->evaluate({"down_correlated", "M", jet_flavor, std::abs(pico.out_jet_eta().at(ijet)), pico.out_jet_pt().at(ijet)});
+        float m_mc_eff = cs_btag_mceff_->at((mc_string+"medium_MCeff").c_str())->evaluate({"effmc", pico.out_jet_eta().at(ijet), pico.out_jet_pt().at(ijet)});
+        float m_mc_syst = cs_btag_mceff_->at((mc_string+"medium_MCeff").c_str())->evaluate({"systmc", pico.out_jet_eta().at(ijet), pico.out_jet_pt().at(ijet)});
+        float l_sf = (*btag_map)->evaluate({"central", "L", jet_flavor, std::abs(pico.out_jet_eta().at(ijet)), pico.out_jet_pt().at(ijet)});
+        float l_sf_up = (*btag_map)->evaluate({"up_correlated", "L", jet_flavor, std::abs(pico.out_jet_eta().at(ijet)), pico.out_jet_pt().at(ijet)});
+        float l_sf_dn = (*btag_map)->evaluate({"down_correlated", "L", jet_flavor, std::abs(pico.out_jet_eta().at(ijet)), pico.out_jet_pt().at(ijet)});
+        float l_mc_eff = cs_btag_mceff_->at((mc_string+"loose_MCeff").c_str())->evaluate({"effmc", pico.out_jet_eta().at(ijet), pico.out_jet_pt().at(ijet)});
+        float l_mc_syst = cs_btag_mceff_->at((mc_string+"loose_MCeff").c_str())->evaluate({"systmc", pico.out_jet_eta().at(ijet), pico.out_jet_pt().at(ijet)});
+        cat_mc_eff = l_mc_eff-m_mc_eff;
+        cat_mc_eff_up = l_mc_eff+l_mc_syst-m_mc_eff-m_mc_syst;
+        cat_mc_eff_dn = l_mc_eff-l_mc_syst-m_mc_eff+m_mc_syst;
+        cat_data_eff = l_mc_eff*l_sf-m_mc_eff*m_sf;
+        cat_data_eff_up = l_mc_eff*l_sf_up-m_mc_eff*m_sf_up;
+        cat_data_eff_dn = l_mc_eff*l_sf_dn-m_mc_eff*m_sf_dn;
+      }
+      else {
+        float l_sf = (*btag_map)->evaluate({"central", "L", jet_flavor, std::abs(pico.out_jet_eta().at(ijet)), pico.out_jet_pt().at(ijet)});
+        float l_sf_up = (*btag_map)->evaluate({"up_correlated", "L", jet_flavor, std::abs(pico.out_jet_eta().at(ijet)), pico.out_jet_pt().at(ijet)});
+        float l_sf_dn = (*btag_map)->evaluate({"down_correlated", "L", jet_flavor, std::abs(pico.out_jet_eta().at(ijet)), pico.out_jet_pt().at(ijet)});
+        float l_mc_eff = cs_btag_mceff_->at((mc_string+"loose_MCeff").c_str())->evaluate({"effmc", pico.out_jet_eta().at(ijet), pico.out_jet_pt().at(ijet)});
+        float l_mc_syst = cs_btag_mceff_->at((mc_string+"loose_MCeff").c_str())->evaluate({"systmc", pico.out_jet_eta().at(ijet), pico.out_jet_pt().at(ijet)});
+        cat_mc_eff = 1.0-l_mc_eff;
+        cat_mc_eff_up = 1.0-(l_mc_eff+l_mc_syst);
+        cat_mc_eff_dn = 1.0-(l_mc_eff-l_mc_syst);
+        cat_data_eff = 1.0-l_mc_eff*l_sf;
+        cat_data_eff_up = 1.0-l_mc_eff*l_sf_up;
+        cat_data_eff_dn = 1.0-l_mc_eff*l_sf_dn;
+      }
+
+      //total SF is product of per-jet SFs
+      float sf_nm = cat_data_eff/cat_mc_eff;
+      float sf_up = cat_data_eff_up/cat_mc_eff_dn;
+      float sf_dn = cat_data_eff_dn/cat_mc_eff_up;
+      if (isinf(sf_nm)||isnan(sf_nm)) sf_nm = 1.0;
+      if (isinf(sf_up)||isnan(sf_up)) sf_up = 1.0;
+      if (isinf(sf_dn)||isnan(sf_dn)) sf_dn = 1.0;
+      sf_tot_nm *= cat_data_eff/cat_mc_eff;
+      if (jet_flavor != 0) { //bottom and charm
+        sf_tot_up_bc *= cat_data_eff_up/cat_mc_eff_dn;
+        sf_tot_dn_bc *= cat_data_eff_dn/cat_mc_eff_up;
+      }
+      else { //light flavor
+        sf_tot_up_udsg *= cat_data_eff_up/cat_mc_eff_dn;
+        sf_tot_dn_udsg *= cat_data_eff_dn/cat_mc_eff_up;
+      }
+    } //jet is good
+  } //loop over jets
+
+  w_btag = sf_tot_nm;
+  sys_bctag[0] = sf_tot_up_bc;
+  sys_bctag[1] = sf_tot_dn_bc;
+  sys_udsgtag[0] = sf_tot_up_udsg;
+  sys_udsgtag[1] = sf_tot_dn_udsg;
 }
