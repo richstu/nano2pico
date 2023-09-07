@@ -8,6 +8,7 @@ added
 """
 
 import argparse
+import copy
 import json
 import math
 import ROOT
@@ -154,7 +155,7 @@ MUON_DESCRIPTION = 'These are muon trigger efficiencies derived using the offici
 ABSETA_INPUT = {'name' : 'abseta', 'type' : 'real', 'description' : 'absolute value of pseudorapidity'}
 ETA_INPUT = {'name' : 'eta', 'type' : 'real', 'description' : 'pseudorapidity'}
 PT_INPUT = {'name' : 'pt', 'type' : 'real', 'description' : 'transverse momentum'}
-SUPPORTED_INPUTS = ['egamma_trigger','egamma_elid','muon_root','muon_pogjson','rootfile_th2','btag_root']
+SUPPORTED_INPUTS = ['egamma_trigger','egamma_elid','muon_root','muon_pogjson','rootfile_th2','rootfile_tgae','btag_root']
 
 if __name__ == '__main__':
   #set up argparse
@@ -380,6 +381,42 @@ if __name__ == '__main__':
             [make_multibinning_node(bin_variable_names,[y_bins,x_bins],effs),
             make_multibinning_node(bin_variable_names,[y_bins,x_bins],uncs)])
     correction_list = [write_correction_dict('Electron_WPL_MCeff', input_variables, output_variable, data)]
+    write_correctionlib_json(correction_list, args.outputfile)
+
+  #handle general root files
+  elif args.filetype == 'rootfile_tgae':
+    #get histogram from ROOT file
+    root_file = ROOT.TFile(args.inputfile,'READ')
+    if args.histname == '':
+      raise ValueError('Must supply a histogram name with rootfile')
+    hist = root_file.Get(args.histname)
+
+    #process histogram to extract binning and efficiencies
+    x = ROOT.Double(0)
+    y = ROOT.Double(0)
+    effs = []
+    uncs_up = []
+    uncs_dn = []
+    for i in range(hist.GetN()):
+      hist.GetPoint(i,x,y)
+      uncs_up.append(hist.GetErrorYhigh(i))
+      uncs_dn.append(hist.GetErrorYlow(i))
+      effs.append(copy.deepcopy(y))
+    bin_names = ['EBHighR9','EBLowR9','EEHighR9','EELowR9']
+
+    #generate general json inputs
+    #NOTE: this is currently hard-coded for a specific histogram input, 
+    #haven't got the time to make it general yet
+    input_variables = [make_valtype_input(['effmc','systmc_up','systmc_dn']), make_valtype_input(bin_names,'HasPixBin')]
+    output_variable = {'name' : 'eff', 'type' : 'real', 'description' : 'photon conversion-safe electron veto efficiency/uncertainty'}
+
+    #generate output
+    #NOTE: see above about hardcoded output
+    data = make_data_category('ValType',['effmc','systmc_up','systmc_dn'],
+            [make_data_category('HasPixBin',bin_names,effs),
+             make_data_category('HasPixBin',bin_names,uncs_up),
+             make_data_category('HasPixBin',bin_names,uncs_dn)])
+    correction_list = [write_correction_dict('Photon_CSEV_MCeff', input_variables, output_variable, data)]
     write_correctionlib_json(correction_list, args.outputfile)
 
   #handle general root files

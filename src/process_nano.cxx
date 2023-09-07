@@ -473,24 +473,24 @@ int main(int argc, char *argv[]){
         pico.out_w_btag()    = 1.; 
         pico.out_w_btag_df() = 1.; 
         pico.out_w_bhig()    = 1.; 
-        pico.out_sys_fs_bchig().resize(2,0); pico.out_sys_fs_udsghig().resize(2,0); 
-        pico.out_sys_bchig().resize(2,0); 
+        pico.out_sys_fs_bchig().resize(2,1.); pico.out_sys_fs_udsghig().resize(2,1.); 
+        pico.out_sys_bchig().resize(2,1.); 
         pico.out_sys_bchig()[0] = sys_bctag_df[0];
         pico.out_sys_bchig()[1] = sys_bctag_df[1];
-        pico.out_sys_udsghig().resize(2,0); 
+        pico.out_sys_udsghig().resize(2,1.); 
         pico.out_sys_udsghig()[0] = sys_udsgtag_df[0];
         pico.out_sys_udsghig()[1] = sys_udsgtag_df[1];
         pico.out_w_fs_lep() = 1.;
-        pico.out_sys_el().resize(2,0); 
+        pico.out_sys_el().resize(2,1.); 
         pico.out_sys_el()[0] = sys_el[0]; 
         pico.out_sys_el()[1] = sys_el[1]; 
-        pico.out_sys_mu().resize(2,0); 
+        pico.out_sys_mu().resize(2,1.); 
         pico.out_sys_mu()[0] = sys_mu[0]; 
         pico.out_sys_mu()[1] = sys_mu[1]; 
-        pico.out_sys_lep().resize(2,0); 
+        pico.out_sys_lep().resize(2,1.); 
         pico.out_sys_lep()[0] = sys_el[0]*sys_mu[0]; 
         pico.out_sys_lep()[1] = sys_el[1]*sys_mu[1]; 
-        pico.out_sys_fs_lep().resize(2,0);
+        pico.out_sys_fs_lep().resize(2,1.);
         pico.out_sys_pu().resize(2, 1.);
         pico.out_sys_pu()[0] = sys_pu_up;
         pico.out_sys_pu()[1] = sys_pu_down;
@@ -499,9 +499,11 @@ int main(int argc, char *argv[]){
         pico.out_sys_prefire()[0] = nano.L1PreFiringWeight_Up();
         pico.out_sys_prefire()[1] = nano.L1PreFiringWeight_Dn();
         event_weighter.PhotonIDSF(pico, w_photon_id);
-        event_weighter.PhotonCSEVSF(pico, w_photon_csev);
+        event_weighter.PhotonCSEVSF(pico, w_photon_csev, sys_photon);
         pico.out_w_photon() = w_photon_id * w_photon_csev;
-        pico.out_sys_photon().resize(2,0); // Need to be implemented
+        pico.out_sys_photon().resize(2, 1.); 
+        pico.out_sys_photon()[0] = sys_photon[0];
+        pico.out_sys_photon()[1] = sys_photon[1];
       } else { // Pre-UL run 2
         pico.out_w_btag()    = btag_weighter.EventWeight(pico, BTagEntry::OP_MEDIUM, ctr, ctr);; 
         pico.out_w_btag_df() = btag_df_weighter.EventWeight(pico, BTagEntry::OP_MEDIUM, ctr, ctr); 

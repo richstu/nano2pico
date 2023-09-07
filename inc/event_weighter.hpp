@@ -19,7 +19,7 @@ public:
 
   void PhotonIDSF(pico_tree &pico, float &w_photon_id);
 
-  void PhotonCSEVSF(pico_tree &pico, float &w_photon_csev);
+  void PhotonCSEVSF(pico_tree &pico, float &w_photon_csev, std::vector<float> &sys_photon_csev);
 
   void MuonTotalSF(pico_tree &pico, float &w_muon_tot, std::vector<float> &sys_lep);
 
@@ -31,6 +31,7 @@ public:
 private:
   std::string in_file_electron_;
   std::string in_file_photon_;
+  std::string in_file_photon_mceff_;
   std::string in_file_muon_;
   std::string in_file_muon_lowpt_reco_;
   std::string in_file_muon_lowpt_id_;
@@ -42,6 +43,7 @@ private:
   std::string puName_;
   std::unique_ptr<correction::CorrectionSet> cs_electron_;
   std::unique_ptr<correction::CorrectionSet> cs_photon_;
+  std::unique_ptr<correction::CorrectionSet> cs_photon_mceff_;
   std::unique_ptr<correction::CorrectionSet> cs_muon_lowpt_reco_;
   std::unique_ptr<correction::CorrectionSet> cs_muon_lowpt_id_;
   std::unique_ptr<correction::CorrectionSet> cs_muon_mceff_;
@@ -52,6 +54,7 @@ private:
   correction::Correction::Ref map_electron_;
   correction::Correction::Ref map_photon_id_;
   correction::Correction::Ref map_photon_csev_;
+  correction::Correction::Ref map_photon_csev_mceff_;
   correction::Correction::Ref map_muon_looseid_;
   correction::Correction::Ref map_muon_highptid_;
   correction::Correction::Ref map_muon_iso_;
