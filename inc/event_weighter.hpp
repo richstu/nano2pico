@@ -15,18 +15,17 @@ class EventWeighter{
 public:
   EventWeighter(int year, bool preVFP, const std::vector<float> &btag_wpts);
 
-  void ElectronIDSF(pico_tree &pico, float &w_el_id, std::vector<float> &sys_lep);
+  void ElectronSF(pico_tree &pico);
 
   void PhotonIDSF(pico_tree &pico, float &w_photon_id);
 
   void PhotonCSEVSF(pico_tree &pico, float &w_photon_csev, std::vector<float> &sys_photon_csev);
 
-  void MuonTotalSF(pico_tree &pico, float &w_muon_tot, std::vector<float> &sys_lep);
+  void MuonSF(pico_tree &pico);
 
-  void PileupSF(pico_tree &pico, float &w_pu, float &sys_pu_up, float &sys_pu_down);
+  void PileupSF(pico_tree &pico);
 
-  void bTaggingSF(pico_tree &pico, float &w_btag, std::vector<float> &sys_bctag, 
-                  std::vector<float> &sys_udsgtag);
+  void bTaggingSF(pico_tree &pico);
 
 private:
   std::string in_file_electron_;

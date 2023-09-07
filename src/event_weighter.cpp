@@ -128,7 +128,7 @@ EventWeighter::EventWeighter(int year, bool preVFP, const vector<float> &btag_wp
 
 // Electron MVA ID Scale Factors
 // note: electron prodcer and gen particle producer should already have been run
-void EventWeighter::ElectronIDSF(pico_tree &pico, float &w_el_id, std::vector<float> &sys_lep){
+void EventWeighter::ElectronSF(pico_tree &pico){
   float sf_tot = 1.0;
   float sf_tot_up = 1.0;
   float sf_tot_dn = 1.0;
@@ -188,9 +188,10 @@ void EventWeighter::ElectronIDSF(pico_tree &pico, float &w_el_id, std::vector<fl
       sf_tot_dn *= sf_dn;
     }
   }
-  w_el_id = sf_tot;
-  sys_lep[0] *= sf_tot_up;
-  sys_lep[1] *= sf_tot_dn;
+  pico.out_w_el() = sf_tot;
+  pico.out_sys_el().resize(2,1.); 
+  pico.out_sys_el()[0] = sf_tot_up;
+  pico.out_sys_el()[1] = sf_tot_dn;
 }
 
 // Photon MVA ID Scale Factors
@@ -270,7 +271,7 @@ void EventWeighter::PhotonCSEVSF(pico_tree &pico, float &w_photon_csev, std::vec
 }
 
 // Total Muon Scale Factors
-void EventWeighter::MuonTotalSF(pico_tree &pico, float &w_muon_tot, std::vector<float> &sys_lep){
+void EventWeighter::MuonSF(pico_tree &pico){
   float sf_tot = 1.0;
   float sf_tot_up = 1.0;
   float sf_tot_dn = 1.0;
@@ -362,21 +363,22 @@ void EventWeighter::MuonTotalSF(pico_tree &pico, float &w_muon_tot, std::vector<
       sf_tot_dn *= sf_dn;
     }
   }
-  w_muon_tot = sf_tot;
-  sys_lep[0] *= sf_tot_up;
-  sys_lep[1] *= sf_tot_dn;
+  pico.out_w_mu() = sf_tot;
+  pico.out_sys_mu().resize(2,1.); 
+  pico.out_sys_mu()[0] = sf_tot_up;
+  pico.out_sys_mu()[1] = sf_tot_dn;
 }
 
 // Pileup Scale Factors
-void EventWeighter::PileupSF(pico_tree &pico, float &w_pu, float &sys_pu_up, float &sys_pu_down){
-  auto sf = map_pileup_->evaluate({float(pico.out_npu_tru_mean()), "nominal"});
-  w_pu = sf;
-  sys_pu_up = (map_pileup_->evaluate({float(pico.out_npu_tru_mean()), "up"}));
-  sys_pu_down = (map_pileup_->evaluate({float(pico.out_npu_tru_mean()), "down"}));
+void EventWeighter::PileupSF(pico_tree &pico){
+  pico.out_w_pu() = map_pileup_->evaluate({float(pico.out_npu_tru_mean()), "nominal"});
+  pico.out_sys_pu().resize(2, 1.);
+  pico.out_sys_pu()[0] = (map_pileup_->evaluate({float(pico.out_npu_tru_mean()), "up"}));
+  pico.out_sys_pu()[1] = (map_pileup_->evaluate({float(pico.out_npu_tru_mean()), "down"}));
 }
 
 // b-tagging Scale Factors
-void EventWeighter::bTaggingSF(pico_tree &pico, float &w_btag, std::vector<float> &sys_bctag, std::vector<float> &sys_udsgtag){
+void EventWeighter::bTaggingSF(pico_tree &pico){
   float sf_tot_nm = 1.0;
   float sf_tot_up_bc = 1.0;
   float sf_tot_dn_bc = 1.0;
@@ -485,9 +487,11 @@ void EventWeighter::bTaggingSF(pico_tree &pico, float &w_btag, std::vector<float
     } //jet is good
   } //loop over jets
 
-  w_btag = sf_tot_nm;
-  sys_bctag[0] = sf_tot_up_bc;
-  sys_bctag[1] = sf_tot_dn_bc;
-  sys_udsgtag[0] = sf_tot_up_udsg;
-  sys_udsgtag[1] = sf_tot_dn_udsg;
+  pico.out_w_bhig_df() = sf_tot_nm;
+  pico.out_sys_bchig().resize(2,1.); 
+  pico.out_sys_bchig()[0] = sf_tot_up_bc;
+  pico.out_sys_bchig()[1] = sf_tot_dn_bc;
+  pico.out_sys_udsghig().resize(2,1.); 
+  pico.out_sys_udsghig()[0] = sf_tot_up_udsg;
+  pico.out_sys_udsghig()[1] = sf_tot_dn_udsg;
 }
