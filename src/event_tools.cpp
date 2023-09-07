@@ -370,7 +370,7 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
 bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZgamma){
 
   bool egamma_trigs = nano.HLT_Ele25_WPTight_Gsf() || nano.HLT_Ele27_WPTight_Gsf() || 
-                      nano.HLT_Ele28_WPTight_Gsf() || nano.HLT_Ele32_WPTight_Gsf() ||
+                      nano.HLT_Ele28_WPTight_Gsf() || nano.HLT_Ele30_WPTight_Gsf() || nano.HLT_Ele32_WPTight_Gsf() ||
                       nano.HLT_Ele32_WPTight_Gsf_L1DoubleEG() || nano.HLT_Ele35_WPTight_Gsf() || 
                       nano.HLT_Ele20_WPLoose_Gsf() || nano.HLT_Ele45_WPLoose_Gsf() ||
                       nano.HLT_Ele105_CaloIdVT_GsfTrkIdT() || nano.HLT_Ele115_CaloIdVT_GsfTrkIdT() ||
