@@ -51,6 +51,8 @@ namespace xsec{
         // NLO/NNLO cross-sections to that of an inclusive sample in mcm at lower order (LO/NLO)
 
         if(file.Contains("WJetsToLNu_TuneCUETP8M1")) xsec=61526.7; //NNLO from Lesya's summary table
+        if(file.Contains("WGToLNuG_01J_5f")) xsec= 191.3; //amcatnloFXFX
+
 
         //cross-section per slice changed due to change in genHT definition
         if(file.Contains("WJetsToLNu_HT-70To100_TuneCUETP8M1"))    xsec = 1353.*1.224; //XSDB*XSDB K-factor; 1372.*1.21 in Humboldtv3+earlier
@@ -169,6 +171,7 @@ namespace xsec{
         // k-factors are ratio of https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat13TeV
         // NLO/NNLO cross-sections to that of an inclusive sample in mcm at lower order (LO/NLO)
 
+        if(file.Contains("WGToLNuG_01J_5f")) xsec= 193.2; //amcatnloFXFX
         if(file.Contains("WJetsToLNu_TuneCP5")) xsec=20508.9*3; //NNLO from Lesya's summary table
 
         //cross-section per slice based on inclusive sample, roughly 10% higher than 2016, less in extreme tail
@@ -384,6 +387,13 @@ namespace xsec{
     if(file.Contains("WplusHToWWTo2L2Nu"))       xsec = HToWW * 9 * WToLNu * WToLNu * 0.831;
     if(file.Contains("ZHToWWTo2L2Nu"))           xsec = HToWW * 9 * WToLNu * WToLNu * 0.8839;
     if(file.Contains("ttHToWWTo2L2Nu"))          xsec = HToWW * 9 * WToLNu * WToLNu  * 0.5071;
+
+    if(file.Contains("HWminusJ_HToWWTo2L2Nu_WTo2L_M-125"))      xsec = HToWW * 9 * WToLNu * WToLNu * 0.177;
+    if(file.Contains("HWplusJ_HToWWTo2L2Nu_WTo2L_M-125"))       xsec = HToWW * 9 * WToLNu * WToLNu * 0.282;
+    if(file.Contains("HWplusJ_HToWWTo2L2Nu_WTo2L_M-125") && file.Contains("PSweights"))      xsec = HToWW * 9 * WToLNu * WToLNu * 0.176;
+    if(file.Contains("HZJ_HToWWTo2L2Nu_ZTo2L_M-125"))      xsec = HToWW * ZToLL* 0.08237;
+
+
 
     if(file.Contains("GluGluHToWWTo2L2Nu") && file.Contains("jhugen727"))   xsec = HToWW * 9 * WToLNu * WToLNu * 21.47;
     if(file.Contains("VBFHToWWTo2L2Nu")    && file.Contains("jhugen727"))   xsec = HToWW * 9 * WToLNu * WToLNu * 3.892;
