@@ -14,7 +14,7 @@ BBGammaGammaVarProducer::~BBGammaGammaVarProducer(){
 
 void BBGammaGammaVarProducer::WriteBBGammaGammaVars(pico_tree &pico){
 
-  if (pico.out_nphotonphoton()==0 || pico.out_nbb()==0) return;
+  if (pico.out_nphotonphoton()==0) return;
 
   pico.out_nbbphotonphoton() = 0;
   if (pico.out_nbb()>0) {

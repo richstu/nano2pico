@@ -356,7 +356,7 @@ int main(int argc, char *argv[]){
     vector<int> jet_isphoton_nano_idx = vector<int>();
     if(isZgamma || isHiggsino) 
       vector<int> sig_ph_nano_idx = photon_producer.WritePhotons(nano, pico, jet_isphoton_nano_idx,
-                                                                 sig_el_nano_idx, sig_mu_nano_idx, isHiggsino);
+                                                                 sig_el_nano_idx, sig_mu_nano_idx);
 
     if (isData) pico.out_stitch() = true;
     else event_tools.WriteStitch(nano, pico);
@@ -418,7 +418,8 @@ int main(int argc, char *argv[]){
 
   
     if (isHiggsino) gammagamma_producer.WriteGammaGammaVars(pico);
-    if (isHiggsino) bb_producer.WriteBBVars(pico, false);
+    if (isHiggsino) bb_producer.WriteBBVars(pico, /*doDeepFlav*/false);
+    if (isHiggsino) bb_producer.WriteBBVars(pico, /*doDeepFlav*/true);
     if (isHiggsino) bbgammagamma_producer.WriteBBGammaGammaVars(pico);
 
     //save higgs variables using DeepCSV and DeepFlavor

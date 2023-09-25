@@ -44,7 +44,7 @@ int main(int argc, char *argv[]){
   for(long entry(0); entry<pico.GetEntries(); entry++){
 
     pico.GetEntry(entry);
-    if (entry%10000==0) {
+    if (entry%100000==0) {
       cout<<"Processing event: "<<entry<<endl;
     }
 
