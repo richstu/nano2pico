@@ -12,7 +12,7 @@ PhotonProducer::PhotonProducer(int year_, bool isData_){
 PhotonProducer::~PhotonProducer(){
 }
 
-vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vector<int> &jet_isphoton_nano_idx, vector<int> &sig_el_nano_idx, vector<int> &sig_mu_nano_idx){
+vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vector<int> &jet_isphoton_nano_idx, vector<int> &sig_el_nano_idx, vector<int> &sig_mu_nano_idx, bool isHiggsino){
   pico.out_nphoton() = 0;
   // pico.out_nfsrphoton() = 0;
   vector<int> sig_photon_nano_idx;
@@ -55,19 +55,22 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
     // Find min(dR) between photon and signal lepton
     double minLepDR(999.);
     double maxLepDR(0.);
-    for(size_t iel(0); iel<sig_el_nano_idx.size(); iel++) {
-      double tempDR = dR(eta, nano.Electron_eta()[sig_el_nano_idx.at(iel)],
-                         phi, nano.Electron_phi()[sig_el_nano_idx.at(iel)]);
-      if(tempDR < minLepDR) minLepDR = tempDR;
-      if(tempDR > maxLepDR) maxLepDR = tempDR;
-    }
-    for(size_t imu(0); imu<sig_mu_nano_idx.size(); imu++) {
-      double tempDR = dR(eta, nano.Muon_eta()[sig_mu_nano_idx.at(imu)],
-                         phi, nano.Muon_phi()[sig_mu_nano_idx.at(imu)]);
-      if(tempDR < minLepDR) minLepDR = tempDR;
-      if(tempDR > maxLepDR) maxLepDR = tempDR;
-    }
 
+    if (!isHiggsino){
+      for(size_t iel(0); iel<sig_el_nano_idx.size(); iel++) {
+        double tempDR = dR(eta, nano.Electron_eta()[sig_el_nano_idx.at(iel)],
+                           phi, nano.Electron_phi()[sig_el_nano_idx.at(iel)]);
+        if(tempDR < minLepDR) minLepDR = tempDR;
+        if(tempDR > maxLepDR) maxLepDR = tempDR;
+      }
+      for(size_t imu(0); imu<sig_mu_nano_idx.size(); imu++) {
+        double tempDR = dR(eta, nano.Muon_eta()[sig_mu_nano_idx.at(imu)],
+                           phi, nano.Muon_phi()[sig_mu_nano_idx.at(imu)]);
+        if(tempDR < minLepDR) minLepDR = tempDR;
+        if(tempDR > maxLepDR) maxLepDR = tempDR;
+      }
+    }
+    
     bool isSignal = (((fabs(eta) < 1.4442 && mva > -0.4) ||
                      (fabs(eta) > 1.566 && fabs(eta) < 2.5 && mva > -0.58)) &&
                      eVeto && minLepDR > 0.4 && 
