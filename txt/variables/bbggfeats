@@ -1,0 +1,135 @@
+#--------------------------------------------------------------------
+# Global event variables
+#--------------------------------------------------------------------
+Long64_t event
+int nlep
+int nphoton
+int njet
+#--------------------------------------------------------------------
+# highest photon candidate
+#--------------------------------------------------------------------
+float photon_pt
+float photon_eta
+float photon_phi
+float photon_drmin
+float photon_drmax
+
+#--------------------------------------------------------------------
+# two lepton candidates
+#--------------------------------------------------------------------
+float lep1_pt
+float lep1_eta
+float lep1_phi
+float lep2_pt
+float lep2_eta
+float lep2_phi
+#--------------------------------------------------------------------
+# two leding pt jets (and combination)
+#--------------------------------------------------------------------
+float jet1_pt
+float jet1_eta
+float jet1_phi
+float jet1_m
+float jet2_pt
+float jet2_eta
+float jet2_phi
+float jet2_m
+float dijet_pt
+float dijet_eta
+float dijet_phi
+float dijet_m
+float dijet_dr
+float dijet_dphi
+float dijet_deta
+
+
+Long64_t event
+
+# 5 AK4 jets with pt > 30, eta < 2.4, ordered by deep CSV value
+# phi value set w.r.t. leading pt jet
+#--------------------------------------------------------------------
+vector<float> jet_brank_pt
+vector<float> jet_brank_eta
+vector<float> jet_brank_phi
+vector<float> jet_brank_m
+vector<float> jet_brank_deepcsv
+vector<float> jet_brank_qgl
+
+# masses of all combinations of the above jets
+#--------------------------------------------------------------------
+vector<float> mjj
+vector<float> drjj
+
+# 5 AK4 jets with pt > 300, eta < 2.4, ordered by deep doubleB value
+# phi value set w.r.t. leading pt jet
+#--------------------------------------------------------------------
+vector<float> fjet_brank_pt
+vector<float> fjet_brank_eta
+vector<float> fjet_brank_phi
+vector<float> fjet_brank_m
+vector<float> fjet_brank_ddb
+
+# possible outputs
+#------------------------
+int combo_code
+int mhiggs
+int nbacc
+int nbt
+int nbm
+int nbl
+
+# miscellaneous, for selection or checks
+#-----------------------------------------
+int njet
+float mlsp
+float mprod
+float hig_cand_am
+
+
+
+
+
+
+
+
+
+#--------------------------------------------------------------------
+# H candidate made with two b candidates
+#--------------------------------------------------------------------
+int	  nbb
+float bb_pt
+float bb_eta
+float bb_phi
+float bb_m
+float bb_dr
+float bb_dphi
+float bb_deta
+int   bb_ileadscorejet
+int   bb_isubscorejet
+
+#--------------------------------------------------------------------
+# H candidate made with two photon candidates
+#--------------------------------------------------------------------
+int	  nphotonphoton
+float photonphoton_pt
+float photonphoton_eta
+float photonphoton_phi
+float photonphoton_m
+float photonphoton_dr
+float photonphoton_dphi
+float photonphoton_deta
+int   photonphoton_ileadph
+int   photonphoton_isubph
+
+#--------------------------------------------------------------------
+# bbgg candidate made with two photon candidates
+#--------------------------------------------------------------------
+int	  nbbphotonphoton
+float bbphotonphoton_dm
+float bbphotonphoton_am
+float bbphotonphoton_drmax
+
+
+
+
+

@@ -222,6 +222,10 @@ int main(){
   WriteHeader(zgfeats_vars, "zgfeats");
   WriteSource(zgfeats_vars, "zgfeats");
 
+  vector<Variable> bbggfeats_vars = GetVariables("bbggfeats");  
+  WriteHeader(bbggfeats_vars, "bbggfeats");
+  WriteSource(bbggfeats_vars, "bbggfeats");
+
   vector<Variable> corr_vars = GetVariables("corrections");
   WriteHeader(corr_vars, "corrections");
   WriteSource(corr_vars, "corrections");
