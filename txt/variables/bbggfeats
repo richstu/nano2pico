@@ -1,11 +1,4 @@
 #--------------------------------------------------------------------
-# Global event variables
-#--------------------------------------------------------------------
-Long64_t event
-int nlep
-int nphoton
-int njet
-#--------------------------------------------------------------------
 # highest photon candidate
 #--------------------------------------------------------------------
 float photon_pt
@@ -41,9 +34,6 @@ float dijet_m
 float dijet_dr
 float dijet_dphi
 float dijet_deta
-
-
-Long64_t event
 
 # 5 AK4 jets with pt > 30, eta < 2.4, ordered by deep CSV value
 # phi value set w.r.t. leading pt jet
