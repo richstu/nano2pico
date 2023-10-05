@@ -463,9 +463,9 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
   bool doubleeg_trigs = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ() ||
       nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL() || nano.HLT_DoubleEle25_CaloIdL_MW() ||
       nano.HLT_DoublePhoton70() || nano.HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId() ||
-	    nano.HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId_Mass55() ||
+      nano.HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId_Mass55() ||
       nano.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90() ||
-	    nano.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95();
+      nano.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95();
 
   bool doublemuon_trigs = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL() ||
       nano.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL() || nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ() ||
@@ -492,9 +492,9 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
   // Double and di photon trigger
   pico.out_HLT_DoublePhoton70()                        = nano.HLT_DoublePhoton70();
   pico.out_HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId() = nano.HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId();
-	pico.out_HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId_Mass55() = nano.HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId_Mass55();
-	pico.out_HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90() = nano.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90();
-	pico.out_HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95() = nano.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95();
+  pico.out_HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId_Mass55() = nano.HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId_Mass55();
+  pico.out_HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90() = nano.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90();
+  pico.out_HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95() = nano.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95();
 
   //trigger summary branches for H->Zgamma
   pico.out_trig_single_el() = false;
@@ -506,9 +506,9 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
     pico.out_trig_double_el() = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ();
     pico.out_trig_single_mu() = nano.HLT_IsoMu24() || nano.HLT_IsoTkMu24();
     pico.out_trig_double_mu() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL() ||
-                              nano.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL() || 
-                              nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ() ||
-                              nano.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ();
+                                nano.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL() || 
+                                nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ() ||
+                                nano.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ();
 
   }
   if (year==2017) {
@@ -516,7 +516,7 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
     pico.out_trig_double_el() = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL();
     pico.out_trig_single_mu() = nano.HLT_IsoMu27();
     pico.out_trig_double_mu() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8() || 
-                              nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8();
+                                nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8();
   }
   if (year==2018) {
     pico.out_trig_single_el() = nano.HLT_Ele32_WPTight_Gsf();
