@@ -24,7 +24,7 @@ namespace xsec{
           if(file.Contains("600to800")) xsec = 2.61537118;
 
         }
-        if(file.Contains("TTJets_Tune") && file.Contains("amcatnloFXFX"))  xsec = 750.5;
+        if(file.Contains("TTJets_Tune") && file.Contains("amcatnloFXFX"))  xsec = 833.9;
 
         // The efficiency of the mtt>1000 cut is taken from sigma(mtt>1000)/sigma(inclusive) from mcm
         double mtt_1000_eff=(11.16/670.3);
@@ -350,7 +350,7 @@ namespace xsec{
     if(file.Contains("ZGamma2JToGamma2L2J_EWK"))      xsec = 0.1145; // from XSDB
     //NOT FOUND ON XSDB if(file.Contains("ZG2JtoG2L2J_EWK_MLL-50_MJJ-120_TuneCP5_withDipoleRecoil_13p6TeV"))      xsec = ; // from XSDB
 
-    if(file.Contains("WJetsToLNu"))                    xsec = 66680.0;  // from XSDB
+    if(file.Contains("WJetsToLNu") && !file.Contains("ttWJetsToLNu"))     xsec = 66680.0;  // from XSDB
     if(file.Contains("WtoLNu-2Jets_TuneCP5_13p6TeV"))  xsec = 67710.0;  // from XSDB
 
     if(file.Contains("ZGTo2LG"))                      xsec = 117.864; // 123.8 in XSDB
