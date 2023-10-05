@@ -107,13 +107,15 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
       phicorr = nano.Jet_phi().at(ijet);
     }
 
-    if (year==2022 && is2022preEE==true){
-      map_jetveto_ = cs_jetveto_->at("Winter22Run3_RunCD_V1");
-      veto = map_jetveto_->evaluate({"jetvetomap", nano.Jet_eta().at(ijet),phicorr});
-    } else if (year==2022 && is2022preEE==false){
-      map_jetveto_ = cs_jetveto_->at("Winter22Run3_RunE_V1");
-      veto = map_jetveto_->evaluate({"jetvetomap", nano.Jet_eta().at(ijet),phicorr});
-      vetoEE = map_jetveto_->evaluate({"jetvetomap_eep", nano.Jet_eta().at(ijet),phicorr});
+    if (fabs(nano.Jet_eta()[ijet])<5.191) {
+      if (year==2022 && is2022preEE==true){
+        map_jetveto_ = cs_jetveto_->at("Winter22Run3_RunCD_V1");
+        veto = map_jetveto_->evaluate({"jetvetomap", nano.Jet_eta().at(ijet),phicorr});
+      } else if (year==2022 && is2022preEE==false){
+        map_jetveto_ = cs_jetveto_->at("Winter22Run3_RunE_V1");
+        veto = map_jetveto_->evaluate({"jetvetomap", nano.Jet_eta().at(ijet),phicorr});
+        vetoEE = map_jetveto_->evaluate({"jetvetomap_eep", nano.Jet_eta().at(ijet),phicorr});
+      }
     }
     if(veto != 0.0 || vetoEE != 0.0){
       isvetojet = true;
