@@ -7,8 +7,11 @@ bool stitch
 bool stitch_ht
 bool stitch_htmet
 bool stitch_photon
-bool stitch_dy
 bool old_stitch_dy
+bool is_overlap_old
+bool is_overlap
+bool use_event
+
 
 ####################   Global   ###################
 int npv
@@ -51,6 +54,7 @@ float dijet_dr
 float dijet_dphi
 float dijet_deta
 
+int zg_cutBitMap
 int nllphoton
 vector<float> llphoton_pt
 vector<float> llphoton_eta
@@ -531,6 +535,8 @@ bool HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ
 bool HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ
 bool HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8
 bool HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8
+bool HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL
+bool HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ
 bool HLT_DoubleEle25_CaloIdL_MW
 bool HLT_Mu37_TkMu27
 bool HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL

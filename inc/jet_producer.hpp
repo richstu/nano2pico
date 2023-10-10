@@ -5,6 +5,7 @@
 #include "hig_producer.hpp"
 #include "nano_tree.hpp"
 #include "pico_tree.hpp"
+#include "correction.hpp"
 
 #include "TLorentzVector.h"
 #include "TRandom3.h"
@@ -27,6 +28,7 @@ public:
                              bool isFastsim, 
                              bool isSignal,
                              bool is_preUL,
+                             bool is2022preEE,
                              std::vector<HiggsConstructionVariables> &sys_higvars);
   void WriteFatJets(nano_tree &nano, pico_tree &pico);
   void WriteSubJets(nano_tree &nano, pico_tree &pico);
@@ -48,11 +50,14 @@ private:
   float min_jet_pt;
   float max_jet_eta;
   bool isData;
+  TRandom3 rng_;
   std::unique_ptr<correction::CorrectionSet> cs_jerc_;
   correction::Correction::Ref map_jes_;
   correction::Correction::Ref map_jersf_;
   correction::Correction::Ref map_jermc_;
-  TRandom3 rng_;
+  std::string in_file_jetveto_;
+  std::unique_ptr<correction::CorrectionSet> cs_jetveto_;
+  correction::Correction::Ref map_jetveto_;
 };
 
 #endif

@@ -52,6 +52,8 @@ JetProducer::JetProducer(int year_, float nanoaod_version_, float min_jet_pt_, f
     map_jersf_ = cs_jerc_->at("Summer19UL18_JRV2_MC_ScaleFactor_AK4PFchs");
     map_jermc_ = cs_jerc_->at("Summer19UL18_JRV2_MC_PtResolution_AK4PFchs");
   }
+  in_file_jetveto_ = "data/zgamma/2022/jetvetomaps.json";
+  cs_jetveto_ = correction::CorrectionSet::from_file(in_file_jetveto_);
 }
 
 JetProducer::~JetProducer(){
@@ -106,6 +108,7 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
                                    bool isFastsim, 
                                    bool isSignal,
                                    bool is_preUL,
+                                   bool is2022preEE,
                                    vector<HiggsConstructionVariables> &sys_higvars){
   vector<int> sig_jet_nano_idx;
   pico.out_njet() = 0; pico.out_ht() = 0; pico.out_ht5() = 0; 
@@ -173,7 +176,34 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
     bool pass_jetid = true;
     if (!isFastsim) if (Jet_jetId[ijet] <1) pass_jetid = false;
 
-    bool isgood = !islep && !isphoton && (fabs(nano.Jet_eta()[ijet]) <= max_jet_eta) && pass_jetid;
+    bool isvetojet = false;
+
+    float veto = 0; 
+    float vetoEE = 0;
+    double phicorr;
+    if(nano.Jet_phi().at(ijet)>3.1415926){ //a dumb addition because sometimes jet phi is slightly larger than pi
+      phicorr = 3.1415926;
+    } else if (nano.Jet_phi().at(ijet)<-3.1415926){
+      phicorr = -3.1415926;
+    } else {
+      phicorr = nano.Jet_phi().at(ijet);
+    }
+
+    if (fabs(nano.Jet_eta()[ijet])<5.191) {
+      if (year==2022 && is2022preEE==true){
+        map_jetveto_ = cs_jetveto_->at("Winter22Run3_RunCD_V1");
+        veto = map_jetveto_->evaluate({"jetvetomap", nano.Jet_eta().at(ijet),phicorr});
+      } else if (year==2022 && is2022preEE==false){
+        map_jetveto_ = cs_jetveto_->at("Winter22Run3_RunE_V1");
+        veto = map_jetveto_->evaluate({"jetvetomap", nano.Jet_eta().at(ijet),phicorr});
+        vetoEE = map_jetveto_->evaluate({"jetvetomap_eep", nano.Jet_eta().at(ijet),phicorr});
+      }
+    }
+    if(veto != 0.0 || vetoEE != 0.0){
+      isvetojet = true;
+    }
+
+    bool isgood = !islep && !isphoton && (fabs(nano.Jet_eta()[ijet]) <= max_jet_eta) && pass_jetid && !isvetojet;
 
     //sys_jetvar convention: [0] JER up, [1] JER down, [2] JEC up, [3] JEC down
     //for now, only save sys_ variables
@@ -244,7 +274,7 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
       }
     }
 
-    if (Jet_pt[ijet] <= min_jet_pt) continue;
+    if (Jet_pt[ijet] <= min_jet_pt || isvetojet) continue;
 
     //in progress migrating from NanoAOD tools jes/jer variations to direct correctionlib - MO
     //current idea: save all jets with some variation pt>min_jet_pt, but only isgood if nominal pt>min_jet_pt
