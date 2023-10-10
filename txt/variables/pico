@@ -569,6 +569,16 @@ vector<float> sys_prefire
 
 vector<float> sys_murf
 
+#index matches jet_*
+vector<float> sys_jet_pt_jesup
+vector<float> sys_jet_pt_jesdn
+vector<float> sys_jet_pt_jerup
+vector<float> sys_jet_pt_jerdn
+vector<float> sys_jet_m_jesup
+vector<float> sys_jet_m_jesdn
+vector<float> sys_jet_m_jerup
+vector<float> sys_jet_m_jerdn
+
 # variations have index 0 (JER smearing up), 1 (JER smearing down), 2 (JEC up) and 3 (JEC down)
 vector<float> sys_ht
 vector<int>   sys_njet

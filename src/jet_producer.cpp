@@ -1,7 +1,9 @@
 #include "jet_producer.hpp"
 
 #include <algorithm>
+#include <cmath>
 #include <iomanip> 
+#include <iostream>
 #include <vector>
 
 #include "TLorentzVector.h"
@@ -11,16 +13,88 @@
 
 using namespace std;
 
-JetProducer::JetProducer(int year_, float nanoaod_version_, float min_jet_pt_, float max_jet_eta_, bool isData_, bool verbose_){
+JetProducer::JetProducer(int year_, float nanoaod_version_, float min_jet_pt_, float max_jet_eta_, bool isData_, bool preVFP, bool verbose_){
   year = year_;
   isData = isData_;
   verbose = verbose_;
   min_jet_pt = min_jet_pt_;
   max_jet_eta = max_jet_eta_;
   nanoaod_version = nanoaod_version_;
+  if (year==2016 && preVFP) {
+    cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2016preVFP_UL/jet_jerc_2016apv.json");
+    //despite strange name, this map does have JES variations and should be evaluated w.r.t. corrected jet pt
+    map_jes_ = cs_jerc_->at("Summer19UL16APV_V7_MC_Total_AK4PFchs");
+    map_jersf_ = cs_jerc_->at("Summer19UL16APV_JRV3_MC_ScaleFactor_AK4PFchs");
+    map_jermc_ = cs_jerc_->at("Summer19UL16APV_JRV3_MC_PtResolution_AK4PFchs");
+  }
+  else if (year==2016) {
+    cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2016postVFP_UL/jet_jerc_2016.json");
+    map_jes_ = cs_jerc_->at("Summer19UL16_V7_MC_Total_AK4PFchs");
+    map_jersf_ = cs_jerc_->at("Summer19UL16_JRV3_MC_ScaleFactor_AK4PFchs");
+    map_jermc_ = cs_jerc_->at("Summer19UL16_JRV3_MC_PtResolution_AK4PFchs");
+  }
+  else if (year==2017) {
+    cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2017_UL/jet_jerc_2017.json");
+    map_jes_ = cs_jerc_->at("Summer19UL17_V5_MC_Total_AK4PFchs");
+    map_jersf_ = cs_jerc_->at("Summer19UL17_JRV2_MC_ScaleFactor_AK4PFchs");
+    map_jermc_ = cs_jerc_->at("Summer19UL17_JRV2_MC_PtResolution_AK4PFchs");
+  }
+  else if (year==2018) {
+    cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2018_UL/jet_jerc_2018.json");
+    map_jes_ = cs_jerc_->at("Summer19UL18_V5_MC_Total_AK4PFchs");
+    map_jersf_ = cs_jerc_->at("Summer19UL18_JRV2_MC_ScaleFactor_AK4PFchs");
+    map_jermc_ = cs_jerc_->at("Summer19UL18_JRV2_MC_PtResolution_AK4PFchs");
+  }
+  else {
+    std::cout << "WARNING: No dedicated JES/JER uncertainties, defaulting to 2018" << std::endl;
+    cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2018_UL/jet_jerc_2018.json");
+    map_jes_ = cs_jerc_->at("Summer19UL18_V5_MC_Total_AK4PFchs");
+    map_jersf_ = cs_jerc_->at("Summer19UL18_JRV2_MC_ScaleFactor_AK4PFchs");
+    map_jermc_ = cs_jerc_->at("Summer19UL18_JRV2_MC_PtResolution_AK4PFchs");
+  }
 }
 
 JetProducer::~JetProducer(){
+}
+
+void JetProducer::GetJetWithJEC(nano_tree &nano, vector<float> &Jet_pt, 
+                                vector<float> &Jet_pt_jerUp, vector<float> &Jet_pt_jerDn, 
+                                vector<float> &Jet_mass, vector<float> &Jet_mass_jerUp, 
+                                vector<float> &Jet_mass_jerDn) {
+  //https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution#Smearing_procedures
+  for(int ijet(0); ijet<nano.nJet(); ++ijet) {
+
+    float sigmajer = map_jermc_->evaluate({nano.Jet_eta()[ijet],nano.Jet_pt()[ijet],
+                                           nano.fixedGridRhoFastjetAll()});
+    float sjer_nom = map_jersf_->evaluate({nano.Jet_eta()[ijet],"nom"});
+    float sjer_up = map_jersf_->evaluate({nano.Jet_eta()[ijet],"up"});
+    float sjer_dn = map_jersf_->evaluate({nano.Jet_eta()[ijet],"down"});
+    bool found_genjet = false;
+
+    for (int igen(0); igen<nano.nGenJet(); ++igen) {
+      float dr = dR(nano.Jet_eta()[ijet], nano.GenJet_eta()[igen], nano.Jet_phi()[ijet], nano.GenJet_phi()[ijet]);
+      float dpt = nano.Jet_pt()[ijet]-nano.GenJet_pt()[igen];
+      if (dr < 0.2 && fabs(dpt) < 3.0*sigmajer*nano.Jet_pt()[ijet]) {
+        found_genjet = true;
+        Jet_pt.push_back(nano.Jet_pt()[ijet]*(1.0+(sjer_nom-1.0)*dpt/nano.Jet_pt()[ijet]));
+        Jet_pt_jerUp.push_back(nano.Jet_pt()[ijet]*(1.0+(sjer_up-1.0)*dpt/nano.Jet_pt()[ijet]));
+        Jet_pt_jerDn.push_back(nano.Jet_pt()[ijet]*(1.0+(sjer_dn-1.0)*dpt/nano.Jet_pt()[ijet]));
+        Jet_mass.push_back(nano.Jet_mass()[ijet]*(1.0+(sjer_nom-1.0)*dpt/nano.Jet_pt()[ijet]));
+        Jet_mass_jerUp.push_back(nano.Jet_mass()[ijet]*(1.0+(sjer_up-1.0)*dpt/nano.Jet_pt()[ijet]));
+        Jet_mass_jerDn.push_back(nano.Jet_mass()[ijet]*(1.0+(sjer_dn-1.0)*dpt/nano.Jet_pt()[ijet]));
+        break;
+      }
+    }
+
+    if (!found_genjet) {
+      Jet_pt.push_back(nano.Jet_pt()[ijet]*(1.0+rng_.Gaus(0,sigmajer)*sqrt(std::max(sjer_nom*sjer_nom-1.0,0.0))));
+      Jet_pt_jerUp.push_back(nano.Jet_pt()[ijet]*(1.0+rng_.Gaus(0,sigmajer)*sqrt(std::max(sjer_up*sjer_up-1.0,0.0))));
+      Jet_pt_jerDn.push_back(nano.Jet_pt()[ijet]*(1.0+rng_.Gaus(0,sigmajer)*sqrt(std::max(sjer_dn*sjer_dn-1.0,0.0))));
+      Jet_mass.push_back(nano.Jet_mass()[ijet]*(1.0+rng_.Gaus(0,sigmajer)*sqrt(std::max(sjer_nom*sjer_nom-1.0,0.0))));
+      Jet_mass_jerUp.push_back(nano.Jet_mass()[ijet]*(1.0+rng_.Gaus(0,sigmajer)*sqrt(std::max(sjer_up*sjer_up-1.0,0.0))));
+      Jet_mass_jerDn.push_back(nano.Jet_mass()[ijet]*(1.0+rng_.Gaus(0,sigmajer)*sqrt(std::max(sjer_dn*sjer_dn-1.0,0.0))));
+    }
+  }
 }
 
 vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico, 
@@ -39,8 +113,17 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
   pico.out_nbdfl() = 0; pico.out_nbdfm() = 0; pico.out_nbdft() = 0; 
   pico.out_ngenjet() = 0;
 
-  vector<float> Jet_pt, Jet_mass;
-  getJetWithJEC(nano, isFastsim, Jet_pt, Jet_mass);
+  vector<float> Jet_pt, Jet_mass, Jet_pt_jerUp, Jet_pt_jerDn, Jet_mass_jerUp, Jet_mass_jerDn;
+  if (is_preUL && year <= 2018) {
+    getJetWithJEC(nano, isFastsim, Jet_pt, Jet_mass);
+    Jet_pt_jerUp.resize(Jet_pt.size(),0.0);
+    Jet_pt_jerDn.resize(Jet_pt.size(),0.0);
+    Jet_mass_jerUp.resize(Jet_pt.size(),0.0);
+    Jet_mass_jerDn.resize(Jet_pt.size(),0.0);
+  }
+  else  {
+    GetJetWithJEC(nano, Jet_pt, Jet_pt_jerUp, Jet_pt_jerDn, Jet_mass, Jet_mass_jerUp, Jet_mass_jerDn);
+  }
   float MET_pt, MET_phi;
   getMETWithJEC(nano, year, isFastsim, MET_pt, MET_phi, is_preUL);
   vector<int> Jet_jetId;
@@ -163,6 +246,11 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
 
     if (Jet_pt[ijet] <= min_jet_pt) continue;
 
+    //in progress migrating from NanoAOD tools jes/jer variations to direct correctionlib - MO
+    //current idea: save all jets with some variation pt>min_jet_pt, but only isgood if nominal pt>min_jet_pt
+    //temp: https://cms-talk.web.cern.ch/t/jec-and-jer-corrections-and-uncertainties-with-correctionlib-in-nanoaod/20762
+    float jes_unc = map_jes_->evaluate({nano.Jet_eta()[ijet],nano.Jet_pt()[ijet]});
+
     switch(year) {
       case 2016:
       case 2017:
@@ -186,6 +274,14 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
         pico.out_jet_met_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], MET_phi));
         pico.out_jet_puid().push_back(nano.Jet_puId()[ijet]);
         pico.out_jet_puid_disc().push_back(nano.Jet_puIdDisc()[ijet]);
+        pico.out_sys_jet_pt_jesup().push_back(Jet_pt[ijet]*(1.0+jes_unc));
+        pico.out_sys_jet_pt_jesdn().push_back(Jet_pt[ijet]*(1.0-jes_unc));
+        pico.out_sys_jet_pt_jerup().push_back(Jet_pt_jerUp[ijet]);
+        pico.out_sys_jet_pt_jerdn().push_back(Jet_pt_jerDn[ijet]);
+        pico.out_sys_jet_m_jesup().push_back(Jet_mass[ijet]*(1.0+jes_unc));
+        pico.out_sys_jet_m_jesdn().push_back(Jet_mass[ijet]*(1.0-jes_unc));
+        pico.out_sys_jet_m_jerup().push_back(Jet_mass_jerUp[ijet]);
+        pico.out_sys_jet_m_jerdn().push_back(Jet_mass_jerDn[ijet]);
         break;
       case 2022:
       case 2023:
@@ -208,6 +304,14 @@ vector<int> JetProducer::WriteJets(nano_tree &nano, pico_tree &pico,
         pico.out_jet_met_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], MET_phi));
         //pico.out_jet_puid().push_back(nano.Jet_puId()[ijet]);
         //pico.out_jet_puid_disc().push_back(nano.Jet_puIdDisc()[ijet]);
+        pico.out_sys_jet_pt_jesup().push_back(Jet_pt[ijet]*(1.0+jes_unc));
+        pico.out_sys_jet_pt_jesdn().push_back(Jet_pt[ijet]*(1.0-jes_unc));
+        pico.out_sys_jet_pt_jerup().push_back(Jet_pt_jerUp[ijet]);
+        pico.out_sys_jet_pt_jerdn().push_back(Jet_pt_jerDn[ijet]);
+        pico.out_sys_jet_m_jesup().push_back(Jet_mass[ijet]*(1.0+jes_unc));
+        pico.out_sys_jet_m_jesdn().push_back(Jet_mass[ijet]*(1.0-jes_unc));
+        pico.out_sys_jet_m_jerup().push_back(Jet_mass_jerUp[ijet]);
+        pico.out_sys_jet_m_jerdn().push_back(Jet_mass_jerDn[ijet]);
         break;
       default:
         std::cout<<"Need code for new year in getZGammaJetBr in jet_producer.cpp"<<endl;

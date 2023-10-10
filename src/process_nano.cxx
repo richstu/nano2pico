@@ -220,7 +220,7 @@ int main(int argc, char *argv[]){
   DileptonProducer dilep_producer(year);
   IsoTrackProducer tk_producer(year);
   PhotonProducer photon_producer(year, isData);
-  JetProducer jet_producer(year, nanoaod_version, min_jet_pt, max_jet_eta, isData);
+  JetProducer jet_producer(year, nanoaod_version, min_jet_pt, max_jet_eta, isData, isAPV);
   MetProducer met_producer(year, isData, is_preUL);
   HigVarProducer hig_producer(year);
   ZGammaVarProducer zgamma_producer(year);
