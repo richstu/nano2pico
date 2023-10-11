@@ -585,7 +585,8 @@ vector<float> sys_jet_m_jesdn
 vector<float> sys_jet_m_jerup
 vector<float> sys_jet_m_jerdn
 
-# variations have index 0 (JER smearing up), 1 (JER smearing down), 2 (JEC up) and 3 (JEC down)
+# variations have index 0 (JER smearing up), 1 (JER smearing down), 2 (JES up) and 3 (JES down)
+# for met_phi only: indxes 4 (unclustered up) 5 (unclustered down) 6 (lepton photon up) 7 (lepton photon down)
 vector<float> sys_ht
 vector<int>   sys_njet
 vector<int>   sys_nbl

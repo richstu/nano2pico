@@ -21,8 +21,7 @@
 #include "dilep_producer.hpp"
 #include "tk_producer.hpp"
 #include "photon_producer.hpp"
-#include "jet_producer.hpp"
-#include "met_producer.hpp"
+#include "jetmet_producer.hpp"
 #include "hig_producer.hpp"
 #include "zgamma_producer.hpp"
 #include "gammagamma_producer.hpp"
@@ -233,8 +232,8 @@ int main(int argc, char *argv[]){
   DileptonProducer dilep_producer(year);
   IsoTrackProducer tk_producer(year);
   PhotonProducer photon_producer(year, isData);
-  JetProducer jet_producer(year, nanoaod_version, min_jet_pt, max_jet_eta, isData, isAPV);
-  MetProducer met_producer(year, isData, is_preUL);
+  JetMetProducer jetmet_producer(year, nanoaod_version, min_jet_pt, max_jet_eta, 
+                                 isData, isAPV, is_preUL);
   HigVarProducer hig_producer(year);
   ZGammaVarProducer zgamma_producer(year);
   GammaGammaVarProducer gammagamma_producer(year);
@@ -371,16 +370,16 @@ int main(int argc, char *argv[]){
     isr_tools.WriteISRSystemPt(nano, pico);
 
     if (debug) cout<<"INFO:: Writing jets, MET and ISR vars"<<endl;
-    //jet producer uses sys_met_phi, so met_producer must be called first
-    met_producer.WriteMet(nano, pico, isFastsim, isSignal, is_preUL);
 
     vector<HiggsConstructionVariables> sys_higvars;
-    vector<int> sig_jet_nano_idx = jet_producer.WriteJets(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, jet_isphoton_nano_idx,
-                                                          btag_wpts[year], btag_df_wpts[year], isFastsim, isSignal, is_preUL, is2022preEE, sys_higvars);
-    jet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year][1], isFastsim); // usually w.r.t. medium WP
+    vector<int> sig_jet_nano_idx = jetmet_producer.WriteJetMet(nano, pico, 
+        jet_islep_nano_idx, jet_isvlep_nano_idx, jet_isphoton_nano_idx,
+        btag_wpts[year], btag_df_wpts[year], isFastsim, isSignal, 
+        is2022preEE, sys_higvars);
+    jetmet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year][1], isFastsim); // usually w.r.t. medium WP
     if(!isZgamma){
-      jet_producer.WriteFatJets(nano, pico); // jet_producer.SetVerbose(nano.nSubJet()>0);
-      jet_producer.WriteSubJets(nano, pico);
+      jetmet_producer.WriteFatJets(nano, pico); // jetmet_producer.SetVerbose(nano.nSubJet()>0);
+      jetmet_producer.WriteSubJets(nano, pico);
     }
     isr_tools.WriteISRJetMultiplicity(nano, pico);
 
@@ -427,7 +426,7 @@ int main(int argc, char *argv[]){
     hig_producer.WriteHigVars(pico, true, isSignal, sys_higvars);
 
     if (debug) cout<<"INFO:: Writing filters and triggers"<<endl;
-    // N.B. Jets: pico.out_pass_jets() and pico.out_pass_fsjets() filled in jet_producer
+    // N.B. Jets: pico.out_pass_jets() and pico.out_pass_fsjets() filled in jetmet_producer
     event_tools.WriteDataQualityFilters(nano, pico, sig_jet_nano_idx, min_jet_pt, isData, isFastsim, is_preUL);
 
     if (isHiggsino) event_tools.WriteTriggerEfficiency(pico);
