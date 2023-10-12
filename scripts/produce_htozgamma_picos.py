@@ -14,7 +14,7 @@ def runCommand(command):
   process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
   out, err = process.communicate()
   if err != "": print(err.rstrip())
-  return out.decode().rstrip(),err.decode().rstrip()
+  return str(out).rstrip(),str(err).rstrip()
 
 def output_reader(process, log_file):
   for line in iter(process.stdout.readline, b''):
