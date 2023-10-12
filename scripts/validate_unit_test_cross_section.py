@@ -7,7 +7,7 @@ def load_cross_sections(cross_section_path):
   cross_sections = {}
   with open(cross_section_path) as cross_section_file:
     for line in cross_section_file:
-      path, year, cross_section = re.findall("filepath: (.*) year: (\d*) cross-section: (.*) pb",line)[0]
+      path, year, cross_section = re.findall("filepath: (.*) year: (\d*|\d*APV|\d*EE) cross-section: (.*) pb",line)[0]
       if path in cross_sections: print("[Error] "+path+" is already inside cross_sections")
       cross_sections[path] = [cross_section, year]
   return cross_sections
@@ -29,16 +29,22 @@ if __name__ == "__main__":
   golden_cross_sections = load_cross_sections(golden_cross_section_path)
   validate_cross_sections = load_cross_sections(validate_cross_section_path)
 
+  output_log = open(args.output_filename,'w')
+
   # Compare cross_sections
   is_different = False
   for path in golden_cross_sections:
     golden_cross_section = golden_cross_sections[path][0]
+    if path not in validate_cross_sections:
+      print(path+' missing in validation')
+      output_log.write('missing '+path+' in validation\n')
+      continue
     validate_cross_section = validate_cross_sections[path][0]
     if golden_cross_section != validate_cross_section:
       if is_different == False: 
-        output_log = open(args.output_filename,'w')
         print(golden_cross_section_path+" and "+validate_cross_section_path+" have different cross sections.")
         is_different = True
       print(path+" "+golden_cross_section+" vs "+validate_cross_section+" (pb)")
       output_log.write(path+" "+golden_cross_section+" vs "+validate_cross_section+" (pb)\n")
-  if is_different: output_log.close()
+
+  output_log.close()
