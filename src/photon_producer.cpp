@@ -49,7 +49,6 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
     bool eVeto = nano.Photon_electronVeto()[iph];
 
     if (pt <= PhotonPtCut) continue;
-    if (fabs(eta) > PhotonEtaCut) continue;
     if (!(nano.Photon_isScEtaEB()[iph] || nano.Photon_isScEtaEE()[iph])) continue;
 
     // Find min(dR) between photon and signal lepton
@@ -68,8 +67,8 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
       if(tempDR > maxLepDR) maxLepDR = tempDR;
     }
 
-    bool isSignal = (((fabs(eta) < 1.4442 && mva > -0.4) ||
-                     (fabs(eta) > 1.566 && fabs(eta) < 2.5 && mva > -0.58)) &&
+    bool isSignal = (((nano.Photon_isScEtaEB()[iph] && mva > -0.4) ||
+                     (nano.Photon_isScEtaEE()[iph] && mva > -0.58)) &&
                      eVeto && minLepDR > 0.4 && 
                      pt > SignalPhotonPtCut);
 
@@ -88,7 +87,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
         pico.out_photon_pt()    .insert(pico.out_photon_pt()    .begin()+shift, pt);
         pico.out_photon_eta()   .insert(pico.out_photon_eta()   .begin()+shift, eta);
         pico.out_photon_phi()   .insert(pico.out_photon_phi()   .begin()+shift, phi);
-        pico.out_photon_ecorr()   .insert(pico.out_photon_ecorr()   .begin()+shift, nano.Photon_eCorr()[iph]);
+        pico.out_photon_ecorr() .insert(pico.out_photon_ecorr() .begin()+shift, nano.Photon_eCorr()[iph]);
         pico.out_photon_reliso().insert(pico.out_photon_reliso().begin()+shift, nano.Photon_pfRelIso03_all()[iph]);
         pico.out_photon_r9()    .insert(pico.out_photon_r9()    .begin()+shift, nano.Photon_r9()[iph]);
         pico.out_photon_sieie() .insert(pico.out_photon_sieie() .begin()+shift, nano.Photon_sieie()[iph]);
@@ -98,8 +97,10 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
         pico.out_photon_id()    .insert(pico.out_photon_id()    .begin()+shift, nano.Photon_mvaID_WP90()[iph]);
         pico.out_photon_id80()  .insert(pico.out_photon_id80()  .begin()+shift, nano.Photon_mvaID_WP80()[iph]);
         pico.out_photon_idmva() .insert(pico.out_photon_idmva() .begin()+shift, mva);
-        pico.out_photon_idCutBased() .insert(pico.out_photon_idCutBased() .begin()+shift, Photon_cutBased[iph]);
-        pico.out_photon_idCutBasedBitMap() .insert(pico.out_photon_idCutBasedBitMap() .begin()+shift, nano.Photon_vidNestedWPBitmap()[iph]);
+        pico.out_photon_idCutBased().insert(pico.out_photon_idCutBased().begin()+shift, Photon_cutBased[iph]);
+        pico.out_photon_idCutBasedBitMap().insert(pico.out_photon_idCutBasedBitMap() .begin()+shift, nano.Photon_vidNestedWPBitmap()[iph]);
+        pico.out_photon_isScEtaEB().insert(pico.out_photon_isScEtaEB().begin()+shift, nano.Photon_isScEtaEB()[iph]);
+        pico.out_photon_isScEtaEE().insert(pico.out_photon_isScEtaEE().begin()+shift, nano.Photon_isScEtaEE()[iph]);
         pico.out_photon_sig()   .insert(pico.out_photon_sig()   .begin()+shift, isSignal);
         pico.out_photon_drmin() .insert(pico.out_photon_drmin() .begin()+shift, minLepDR);
         pico.out_photon_drmax() .insert(pico.out_photon_drmax() .begin()+shift, maxLepDR);
@@ -128,8 +129,10 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
         pico.out_photon_id()      .insert(pico.out_photon_id()      .begin()+shift, nano.Photon_mvaID_WP90()[iph]);
         pico.out_photon_id80()    .insert(pico.out_photon_id80()    .begin()+shift, nano.Photon_mvaID_WP80()[iph]);
         pico.out_photon_idmva()   .insert(pico.out_photon_idmva()   .begin()+shift, mva);
-        pico.out_photon_idCutBased() .insert(pico.out_photon_idCutBased() .begin()+shift, Photon_cutBased[iph]);
-        pico.out_photon_idCutBasedBitMap() .insert(pico.out_photon_idCutBasedBitMap() .begin()+shift, nano.Photon_vidNestedWPBitmap()[iph]);
+        pico.out_photon_idCutBased().insert(pico.out_photon_idCutBased() .begin()+shift, Photon_cutBased[iph]);
+        pico.out_photon_idCutBasedBitMap().insert(pico.out_photon_idCutBasedBitMap() .begin()+shift, nano.Photon_vidNestedWPBitmap()[iph]);
+        pico.out_photon_isScEtaEB().insert(pico.out_photon_isScEtaEB().begin()+shift, nano.Photon_isScEtaEB()[iph]);
+        pico.out_photon_isScEtaEE().insert(pico.out_photon_isScEtaEE().begin()+shift, nano.Photon_isScEtaEE()[iph]);
         pico.out_photon_sig()     .insert(pico.out_photon_sig()     .begin()+shift, isSignal);
         pico.out_photon_drmin()   .insert(pico.out_photon_drmin()   .begin()+shift, minLepDR);
         pico.out_photon_drmax()   .insert(pico.out_photon_drmax()   .begin()+shift, maxLepDR);
