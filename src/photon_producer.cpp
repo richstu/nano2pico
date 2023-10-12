@@ -88,6 +88,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
         pico.out_photon_pt()    .insert(pico.out_photon_pt()    .begin()+shift, pt);
         pico.out_photon_eta()   .insert(pico.out_photon_eta()   .begin()+shift, eta);
         pico.out_photon_phi()   .insert(pico.out_photon_phi()   .begin()+shift, phi);
+        pico.out_photon_ecorr()   .insert(pico.out_photon_ecorr()   .begin()+shift, nano.Photon_eCorr()[iph]);
         pico.out_photon_reliso().insert(pico.out_photon_reliso().begin()+shift, nano.Photon_pfRelIso03_all()[iph]);
         pico.out_photon_r9()    .insert(pico.out_photon_r9()    .begin()+shift, nano.Photon_r9()[iph]);
         pico.out_photon_sieie() .insert(pico.out_photon_sieie() .begin()+shift, nano.Photon_sieie()[iph]);
@@ -106,24 +107,33 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
         break;
       case 2022:
       case 2023:
-        pico.out_photon_pt()    .insert(pico.out_photon_pt()    .begin()+shift, pt);
-        pico.out_photon_eta()   .insert(pico.out_photon_eta()   .begin()+shift, eta);
-        pico.out_photon_phi()   .insert(pico.out_photon_phi()   .begin()+shift, phi);
-        pico.out_photon_reliso().insert(pico.out_photon_reliso().begin()+shift, nano.Photon_pfRelIso03_all_quadratic()[iph]);
-        pico.out_photon_r9()    .insert(pico.out_photon_r9()    .begin()+shift, nano.Photon_r9()[iph]);
-        pico.out_photon_sieie() .insert(pico.out_photon_sieie() .begin()+shift, nano.Photon_sieie()[iph]);
-        pico.out_photon_pterr() .insert(pico.out_photon_pterr() .begin()+shift, nano.Photon_energyErr()[iph]);
-        pico.out_photon_hoe()   .insert(pico.out_photon_hoe()   .begin()+shift, nano.Photon_hoe()[iph]);
-        pico.out_photon_elveto().insert(pico.out_photon_elveto().begin()+shift, eVeto);
-        pico.out_photon_id()    .insert(pico.out_photon_id()    .begin()+shift, nano.Photon_mvaID_WP90()[iph]);
-        pico.out_photon_id80()  .insert(pico.out_photon_id80()  .begin()+shift, nano.Photon_mvaID_WP80()[iph]);
-        pico.out_photon_idmva() .insert(pico.out_photon_idmva() .begin()+shift, mva);
+        pico.out_photon_pt()      .insert(pico.out_photon_pt()      .begin()+shift, pt);
+        pico.out_photon_eta()     .insert(pico.out_photon_eta()     .begin()+shift, eta);
+        pico.out_photon_phi()     .insert(pico.out_photon_phi()     .begin()+shift, phi);
+        pico.out_photon_reliso()  .insert(pico.out_photon_reliso()  .begin()+shift, nano.Photon_pfRelIso03_all_quadratic()[iph]);
+        pico.out_photon_phiso()   .insert(pico.out_photon_phiso()   .begin()+shift, nano.Photon_pfPhoIso03()[iph]);
+        pico.out_photon_chiso()   .insert(pico.out_photon_chiso()   .begin()+shift, nano.Photon_pfChargedIsoPFPV()[iph]);
+        pico.out_photon_chiso_worst().insert(pico.out_photon_chiso_worst().begin()+shift,nano.Photon_pfChargedIsoWorstVtx()[iph]);
+        pico.out_photon_r9()      .insert(pico.out_photon_r9()      .begin()+shift, nano.Photon_r9()[iph]);
+        pico.out_photon_s4()      .insert(pico.out_photon_s4()      .begin()+shift, nano.Photon_s4()[iph]);
+        pico.out_photon_sieie()   .insert(pico.out_photon_sieie()   .begin()+shift, nano.Photon_sieie()[iph]);
+        pico.out_photon_sieip()   .insert(pico.out_photon_sieip()   .begin()+shift, nano.Photon_sieip()[iph]);
+        pico.out_photon_etawidth().insert(pico.out_photon_etawidth().begin()+shift, nano.Photon_etaWidth()[iph]);
+        pico.out_photon_phiwidth().insert(pico.out_photon_phiwidth().begin()+shift, nano.Photon_phiWidth()[iph]);
+        pico.out_photon_pterr()   .insert(pico.out_photon_pterr()   .begin()+shift, nano.Photon_energyErr()[iph]);
+        pico.out_photon_hoe()     .insert(pico.out_photon_hoe()     .begin()+shift, nano.Photon_hoe()[iph]);
+        pico.out_photon_esoversc().insert(pico.out_photon_esoversc().begin()+shift, nano.Photon_esEnergyOverRawE()[iph]);
+        pico.out_photon_essigmarr().insert(pico.out_photon_essigmarr().begin()+shift,nano.Photon_esEffSigmaRR()[iph]);
+        pico.out_photon_elveto()  .insert(pico.out_photon_elveto()  .begin()+shift, eVeto);
+        pico.out_photon_id()      .insert(pico.out_photon_id()      .begin()+shift, nano.Photon_mvaID_WP90()[iph]);
+        pico.out_photon_id80()    .insert(pico.out_photon_id80()    .begin()+shift, nano.Photon_mvaID_WP80()[iph]);
+        pico.out_photon_idmva()   .insert(pico.out_photon_idmva()   .begin()+shift, mva);
         pico.out_photon_idCutBased() .insert(pico.out_photon_idCutBased() .begin()+shift, Photon_cutBased[iph]);
         pico.out_photon_idCutBasedBitMap() .insert(pico.out_photon_idCutBasedBitMap() .begin()+shift, nano.Photon_vidNestedWPBitmap()[iph]);
-        pico.out_photon_sig()   .insert(pico.out_photon_sig()   .begin()+shift, isSignal);
-        pico.out_photon_drmin() .insert(pico.out_photon_drmin() .begin()+shift, minLepDR);
-        pico.out_photon_drmax() .insert(pico.out_photon_drmax() .begin()+shift, maxLepDR);
-        pico.out_photon_elidx() .insert(pico.out_photon_elidx() .begin()+shift, Photon_electronIdx[iph]);
+        pico.out_photon_sig()     .insert(pico.out_photon_sig()     .begin()+shift, isSignal);
+        pico.out_photon_drmin()   .insert(pico.out_photon_drmin()   .begin()+shift, minLepDR);
+        pico.out_photon_drmax()   .insert(pico.out_photon_drmax()   .begin()+shift, maxLepDR);
+        pico.out_photon_elidx()   .insert(pico.out_photon_elidx()   .begin()+shift, Photon_electronIdx[iph]);
         break;
       default:
         std::cout<<"Need code for new year in getZGammaPhBr (in photon_producer.cpp)"<<endl;

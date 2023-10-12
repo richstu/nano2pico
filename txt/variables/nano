@@ -215,16 +215,25 @@ array<float> Photon_eCorr
 array<float> Photon_energyErr
 array<float> Photon_eta
 array<float> Photon_hoe
+array<float> Photon_esEffSigmaRR
+array<float> Photon_esEnergyOverRawE
 array<float> Photon_mass
 array<float> Photon_mvaID
 array<float> Photon_mvaIDV1
+array<float> Photon_pfPhoIso03
+array<float> Photon_pfChargedIsoPFPV
+array<float> Photon_pfChargedIsoWorstVtx
 array<float> Photon_pfRelIso03_all
 array<float> Photon_pfRelIso03_all_quadratic
 array<float> Photon_pfRelIso03_chg
 array<float> Photon_phi
 array<float> Photon_pt
 array<float> Photon_r9
+array<float> Photon_s4
 array<float> Photon_sieie
+array<float> Photon_sieip
+array<float> Photon_etaWidth
+array<float> Photon_phiWidth
 array<int> Photon_charge
 array<int> Photon_cutBased
 array<char> Photon_cutBased 11.9

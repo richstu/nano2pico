@@ -319,6 +319,9 @@ int main(int argc, char *argv[]){
       pico.out_npu_tru_mean() = nano.Pileup_nTrueInt();
     }
 
+    //pileup energy density
+    pico.out_rho() = nano.fixedGridRhoFastjetAll();
+
     // ----------------------------------------------------------------------------------------------
     //            *** Writing physics objects ***
     // N.B. Order in which producers are called matters! E.g. jets are not counted if overlapping 

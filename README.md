@@ -234,7 +234,7 @@ The 'out_dir' should contain "zgamma" in the name. This is to ensure that 'isZga
 
 These refer to the branches obtained with `ZGamma = false`, i.e. higgsino production!
 
-:blue_book: Documentation of the Nano variables used as input throughout the code can be found [here](https://cms-nanoaod-integration.web.cern.ch/integration/master-102X/mc102X_doc.html).
+:blue_book: Documentation of the Nano variables used as input throughout the code can be found [here](https://cms-nanoaod-integration.web.cern.ch/autoDoc).
 
 ####   Global
 * `run, lumiblock, event` - as expected

@@ -12,12 +12,12 @@ bool is_overlap_old
 bool is_overlap
 bool use_event
 
-
 ####################   Global   ###################
 int npv
 int npv_good
 int npu_tru
 int npu_tru_mean
+float rho
 float ht
 float ht5
 float mht
@@ -285,13 +285,23 @@ int nphoton
 vector<float> photon_pt
 vector<float> photon_eta
 vector<float> photon_phi
+vector<float> photon_ecorr
 vector<float> photon_reliso
+vector<float> photon_phiso
+vector<float> photon_chiso
+vector<float> photon_chiso_worst
 vector<float> photon_r9
+vector<float> photon_s4
 vector<float> photon_sieie
+vector<float> photon_sieip
+vector<float> photon_etawidth
+vector<float> photon_phiwidth
 vector<float> photon_drmin
 vector<float> photon_drmax
 vector<float> photon_pterr
 vector<float> photon_hoe
+vector<float> photon_esoversc
+vector<float> photon_essigmarr
 vector<float> photon_idmva
 vector<int>   photon_pflavor
 vector<bool>  photon_id
@@ -553,7 +563,7 @@ bool HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90
 bool HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95
 
 
-################  Systematic variations  - to be implemented as needed  ##################
+################  Systematic variations  ##################
 
 # +/- variations are index 0 and 1
 vector<float> sys_el

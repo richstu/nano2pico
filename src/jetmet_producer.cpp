@@ -31,15 +31,15 @@ JetMetProducer::JetMetProducer(int year_, float nanoaod_version_,
     cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2016preVFP_UL/jet_jerc_2016apv.json");
     //despite strange name, this map does have JES variations and should be evaluated w.r.t. corrected jet pt
     map_jes_ = cs_jerc_->at("Summer19UL16APV_V7_MC_Total_AK4PFchs");
-    map_jersf_ = cs_jerc_->at("Summer19UL16APV_JRV3_MC_ScaleFactor_AK4PFchs");
-    map_jermc_ = cs_jerc_->at("Summer19UL16APV_JRV3_MC_PtResolution_AK4PFchs");
+    map_jersf_ = cs_jerc_->at("Summer20UL16APV_JRV3_MC_ScaleFactor_AK4PFchs");
+    map_jermc_ = cs_jerc_->at("Summer20UL16APV_JRV3_MC_PtResolution_AK4PFchs");
     map_jec_ = cs_jerc_->compound().at("Summer19UL16APV_V7_MC_L1L2L3Res_AK4PFchs");
   }
   else if (year==2016) {
     cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2016postVFP_UL/jet_jerc_2016.json");
     map_jes_ = cs_jerc_->at("Summer19UL16_V7_MC_Total_AK4PFchs");
-    map_jersf_ = cs_jerc_->at("Summer19UL16_JRV3_MC_ScaleFactor_AK4PFchs");
-    map_jermc_ = cs_jerc_->at("Summer19UL16_JRV3_MC_PtResolution_AK4PFchs");
+    map_jersf_ = cs_jerc_->at("Summer20UL16_JRV3_MC_ScaleFactor_AK4PFchs");
+    map_jermc_ = cs_jerc_->at("Summer20UL16_JRV3_MC_PtResolution_AK4PFchs");
     map_jec_ = cs_jerc_->compound().at("Summer19UL16_V7_MC_L1L2L3Res_AK4PFchs");
   }
   else if (year==2017) {
@@ -314,6 +314,8 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
   float MET_pt, MET_phi;
   if (isData) {
     WriteMet(nano, pico);
+    Jet_pt = nano.Jet_pt();
+    Jet_mass = nano.Jet_mass();
     jer_nm_factor.resize(Jet_pt.size(),1.0);
     jer_up_factor.resize(Jet_pt.size(),1.0);
     jer_dn_factor.resize(Jet_pt.size(),1.0);
