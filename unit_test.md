@@ -14,6 +14,8 @@ git tag htozgamma_kingscanyon_v0
 git push origin htozgamma_kingscanyon_v0
 
 # Produce
+screen
+source set_env.sh
 ./scripts/produce_htozgamma_picos.py -t htozgamma_kingscanyon_v0 -y 2016APV,2016,2017,2018 -n NanoAODv9 -b /net/cms11/cms11r0/pico --use_telegram
 ./scripts/produce_htozgamma_picos.py -t htozgamma_kingscanyon_v0 -y 2022,2022EE -n NanoAODv11 -b /net/cms11/cms11r0/pico --use_telegram
 ./scripts/produce_htozgamma_picos.py -t htozgamma_kingscanyon_v0 -y 2023 -n NanoAODv11p9 -b /net/cms11/cms11r0/pico --use_telegram

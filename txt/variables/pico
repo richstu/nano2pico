@@ -296,6 +296,8 @@ vector<float> photon_idmva
 vector<int>   photon_pflavor
 vector<bool>  photon_id
 vector<bool>  photon_id80
+vector<bool>  photon_isScEtaEB
+vector<bool>  photon_isScEtaEE
 vector<int>   photon_idCutBased
 vector<int>   photon_idCutBasedBitMap
 vector<bool>  photon_elveto
