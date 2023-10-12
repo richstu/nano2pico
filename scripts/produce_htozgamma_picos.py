@@ -13,8 +13,8 @@ def runCommand(command):
   print("\nRunning command: "+command)
   process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
   out, err = process.communicate()
-  if err != "": print(err.rstrip())
-  return str(out).rstrip(),str(err).rstrip()
+  if err != "": print(err.decode('utf-8').rstrip())
+  return out.decode('utf-8').rstrip(),err.decode('utf-8').rstrip()
 
 def output_reader(process, log_file):
   for line in iter(process.stdout.readline, b''):
