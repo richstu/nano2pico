@@ -19,8 +19,9 @@ git push origin htozgamma_kingscanyon_v0
 ./scripts/produce_htozgamma_picos.py -t htozgamma_kingscanyon_v0 -y 2023 -n NanoAODv11p9 -b /net/cms11/cms11r0/pico --use_telegram
 
 # Modify tag
+git commit
+git push
 git tag -d htozgamma_kingscanyon_v0
 git push origin --delete htozgamma_kingscanyon_v0
-git commit
 git tag htozgamma_kingscanyon_v0
 git push origin htozgamma_kingscanyon_v0
