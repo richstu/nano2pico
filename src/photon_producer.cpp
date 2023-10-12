@@ -49,7 +49,6 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
     bool eVeto = nano.Photon_electronVeto()[iph];
 
     if (pt <= PhotonPtCut) continue;
-    if (fabs(eta) > PhotonEtaCut) continue;
     if (!(nano.Photon_isScEtaEB()[iph] || nano.Photon_isScEtaEE()[iph])) continue;
 
     // Find min(dR) between photon and signal lepton
