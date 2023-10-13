@@ -3,6 +3,7 @@
 import os, argparse
 from glob import glob
 import re
+import sys
 
 def findBaseSampleNames(folder):
   infiles = set() # to remove duplicates
@@ -54,6 +55,8 @@ def findBaseSampleNames(folder):
     #print(re.findall('(.*?)__',dataset_tag)[0])
 
     dataset_tag = re.findall('(.*?)__',dataset_tag)[0]
+    # Fix for strange datasets
+    dataset_tag = dataset_tag.split('_ext1')[0] # pico_llg_ZHToTauTau_M125_CP5_13TeV-powheg-pythia8_ext1.
 
     infiles.add(dataset_tag)
     sortedfiles = list()
@@ -93,6 +96,24 @@ if __name__ == '__main__':
   dataset_tags = findBaseSampleNames(in_dir)
   print('Found {} dataset_tags.\n'.format(len(dataset_tags)))
 
+  # Check if there are no duplicate files during merging dataset tags
+  overlapping_files = False
+  file_dict = {}
+  for dstag in dataset_tags:
+    in_file_paths = os.path.join(in_dir,'*'+dstag+'_*.root')
+    out_file_name = 'merged_'+dstag+'_'+slim_name+'_'+skim_name+'_nfiles_'+str(len(glob(in_file_paths)))
+    out_file_path = os.path.join(out_dir,out_file_name+'.root')
+    for file_path in glob(in_file_paths):
+      if file_path not in file_dict: file_dict[file_path] = dstag
+      else:
+        print(f'[Error] Tag: {dstag}. There was already a tag {file_dict[file_path]} for {file_path}')
+        overlapping_files = True
+
+  if overlapping_files: 
+    print('[Error] There are overlapping files when trying to merge files with a tag')
+    sys.exit()
+
+  # Make command files
   cmdfile_name = 'slim_'+slim_name+'_'+skim_name+'_cmds.py'
   if (args['tag']!=''): cmdfile_name = args['tag']+'_'+cmdfile_name
   cmdfile = open(cmdfile_name,'w')
