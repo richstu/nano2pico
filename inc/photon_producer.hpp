@@ -21,7 +21,11 @@ public:
   const float FsrPhotonIsoCut   = 1.8;
   const float FsrPhotondRCut    = 0.012;
 
-  std::vector<int> WritePhotons(nano_tree &nano, pico_tree &pico, std::vector<int> &jet_isphoton_nano_idx, std::vector<int> &sig_el_nano_idx, std::vector<int> &sig_mu_nano_idx);
+  std::vector<int> WritePhotons(nano_tree &nano, pico_tree &pico, 
+                                std::vector<int> &jet_isphoton_nano_idx, 
+                                std::vector<int> &sig_el_nano_idx, 
+                                std::vector<int> &sig_mu_nano_idx,
+                                std::vector<int> &photon_el_pico_idx);
 
 private:
   int year;

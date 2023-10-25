@@ -12,14 +12,12 @@ PhotonProducer::PhotonProducer(int year_, bool isData_){
 PhotonProducer::~PhotonProducer(){
 }
 
-vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vector<int> &jet_isphoton_nano_idx, vector<int> &sig_el_nano_idx, vector<int> &sig_mu_nano_idx){
+vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vector<int> &jet_isphoton_nano_idx, vector<int> &sig_el_nano_idx, vector<int> &sig_mu_nano_idx, vector<int> &photon_el_pico_idx){
   pico.out_nphoton() = 0;
   // pico.out_nfsrphoton() = 0;
   vector<int> sig_photon_nano_idx;
   int nphotons(0), ndr(0), shift(0);
 
-  vector<int> Photon_electronIdx;
-  getPhoton_electronIdx(nano, year, Photon_electronIdx);
   vector<int> FsrPhoton_muonIdx;
   getFsrPhoton_muonIdx(nano, year, FsrPhoton_muonIdx);
   vector<int> Photon_jetIdx;
@@ -104,7 +102,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
         pico.out_photon_sig()   .insert(pico.out_photon_sig()   .begin()+shift, isSignal);
         pico.out_photon_drmin() .insert(pico.out_photon_drmin() .begin()+shift, minLepDR);
         pico.out_photon_drmax() .insert(pico.out_photon_drmax() .begin()+shift, maxLepDR);
-        pico.out_photon_elidx() .insert(pico.out_photon_elidx() .begin()+shift, Photon_electronIdx[iph]);
+        pico.out_photon_elidx() .insert(pico.out_photon_elidx() .begin()+shift, photon_el_pico_idx[iph]);
         break;
       case 2022:
       case 2023:
@@ -136,7 +134,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
         pico.out_photon_sig()     .insert(pico.out_photon_sig()     .begin()+shift, isSignal);
         pico.out_photon_drmin()   .insert(pico.out_photon_drmin()   .begin()+shift, minLepDR);
         pico.out_photon_drmax()   .insert(pico.out_photon_drmax()   .begin()+shift, maxLepDR);
-        pico.out_photon_elidx()   .insert(pico.out_photon_elidx()   .begin()+shift, Photon_electronIdx[iph]);
+        pico.out_photon_elidx()   .insert(pico.out_photon_elidx()   .begin()+shift, photon_el_pico_idx[iph]);
         break;
       default:
         std::cout<<"Need code for new year in getZGammaPhBr (in photon_producer.cpp)"<<endl;

@@ -333,7 +333,8 @@ int main(int argc, char *argv[]){
     pico.out_nlep() = 0; pico.out_nvlep() = 0; // filled by lepton producers
     vector<int> sig_el_pico_idx = vector<int>();
     vector<int> sig_mu_pico_idx = vector<int>();
-    vector<int> sig_el_nano_idx = el_producer.WriteElectrons(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, sig_el_pico_idx, isZgamma, isFastsim);
+    vector<int> photon_el_pico_idx = vector<int>();
+    vector<int> sig_el_nano_idx = el_producer.WriteElectrons(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, sig_el_pico_idx, photon_el_pico_idx, isZgamma, isFastsim);
     vector<int> sig_mu_nano_idx = mu_producer.WriteMuons(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, sig_mu_pico_idx, isZgamma, isFastsim);
 
     // save a separate vector with just signal leptons ordered by pt
@@ -358,7 +359,8 @@ int main(int argc, char *argv[]){
     vector<int> jet_isphoton_nano_idx = vector<int>();
     if(isZgamma || isHiggsino) 
       vector<int> sig_ph_nano_idx = photon_producer.WritePhotons(nano, pico, jet_isphoton_nano_idx,
-                                                                 sig_el_nano_idx, sig_mu_nano_idx);
+                                                                 sig_el_nano_idx, sig_mu_nano_idx,
+                                                                 photon_el_pico_idx);
 
     if (isData) pico.out_stitch() = true;
     else event_tools.WriteStitch(nano, pico);
