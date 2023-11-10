@@ -211,6 +211,8 @@ array<bool> IsoTrack_isFromLostTrack
 ################ Photons ################
 
 int nPhoton
+array<float> Photon_dEsigmaUp
+array<float> Photon_dEsigmaDown
 array<float> Photon_eCorr
 array<float> Photon_energyErr
 array<float> Photon_eta

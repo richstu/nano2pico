@@ -597,6 +597,12 @@ vector<float> sys_jet_m_jesdn
 vector<float> sys_jet_m_jerup
 vector<float> sys_jet_m_jerdn
 
+#index matches photon_*
+vector<float> sys_photon_pt_scaleup
+vector<float> sys_photon_pt_scaledn
+vector<float> sys_photon_pt_resup
+vector<float> sys_photon_pt_resdn
+
 # variations have index 0 (JER smearing up), 1 (JER smearing down), 2 (JES up) and 3 (JES down)
 # for met_phi only: indxes 4 (unclustered up) 5 (unclustered down) 6 (lepton photon up) 7 (lepton photon down)
 vector<float> sys_ht

@@ -1,12 +1,41 @@
 #include "photon_producer.hpp"
 
+#include <iostream>
+#include <string>
+#include <vector>
+
+#include "correction.hpp"
 #include "utilities.hpp"
 
 using namespace std;
 
-PhotonProducer::PhotonProducer(int year_, bool isData_){
+PhotonProducer::PhotonProducer(int year_, bool isData_, bool preVFP){
   year = year_;
   isData = isData_;
+  if (year==2016 && preVFP) {
+    cs_scale_syst_ = correction::CorrectionSet::from_file(
+        "data/zgamma/2016preVFP_UL/EGM_ScaleUnc.json");
+    str_scale_syst_ = "2016preVFP";
+  }
+  else if (year==2016) {
+    cs_scale_syst_ = correction::CorrectionSet::from_file(
+        "data/zgamma/2016postVFP_UL/EGM_ScaleUnc.json");
+    str_scale_syst_ = "2016postVFP";
+  }
+  else if (year==2017) {
+    cs_scale_syst_ = correction::CorrectionSet::from_file(
+        "data/zgamma/2017_UL/EGM_ScaleUnc.json");
+    str_scale_syst_ = "2017";
+  }
+  else if (year==2018) {
+    cs_scale_syst_ = correction::CorrectionSet::from_file(
+        "data/zgamma/2018_UL/EGM_ScaleUnc.json");
+    str_scale_syst_ = "2018";
+  }
+  else {
+    std::cout << "WARNING: No dedicated EGM scale/smearing JSONs, defaulting to 2018" << std::endl;
+  }
+  map_scale_syst_ = cs_scale_syst_->at("UL-EGM_ScaleUnc");
 }
 
 PhotonProducer::~PhotonProducer(){
@@ -77,6 +106,15 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
     }
     else
       shift = nphotons;
+
+    float scale_syst_up = 1.0;
+    float scale_syst_dn = 1.0;
+    if (year <= 2018) {
+      scale_syst_up = map_scale_syst_->evaluate({str_scale_syst_,"scaleup",eta,
+          nano.Photon_seedGain()[iph]});
+      scale_syst_dn = map_scale_syst_->evaluate({str_scale_syst_,"scaledown",eta,
+          nano.Photon_seedGain()[iph]});
+    }
     
     switch(year) {
       case 2016:
@@ -103,7 +141,12 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
         pico.out_photon_drmin() .insert(pico.out_photon_drmin() .begin()+shift, minLepDR);
         pico.out_photon_drmax() .insert(pico.out_photon_drmax() .begin()+shift, maxLepDR);
         pico.out_photon_elidx() .insert(pico.out_photon_elidx() .begin()+shift, photon_el_pico_idx[iph]);
+        pico.out_sys_photon_pt_resup().insert(pico.out_sys_photon_pt_resup().begin()+shift, pt/nano.Photon_eCorr()[iph]*(1.0+nano.Photon_dEsigmaUp()[iph]));
+        pico.out_sys_photon_pt_resdn().insert(pico.out_sys_photon_pt_resdn().begin()+shift, pt/nano.Photon_eCorr()[iph]*(1.0+nano.Photon_dEsigmaDown()[iph]));
+        pico.out_sys_photon_pt_scaleup().insert(pico.out_sys_photon_pt_scaleup().begin()+shift, pt*scale_syst_up);
+        pico.out_sys_photon_pt_scaledn().insert(pico.out_sys_photon_pt_scaledn().begin()+shift, pt*scale_syst_dn);
         break;
+        //TODO: add adaptations for custom NanoAOD production
       case 2022:
       case 2023:
         pico.out_photon_pt()      .insert(pico.out_photon_pt()      .begin()+shift, pt);
@@ -136,6 +179,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
         pico.out_photon_drmax()   .insert(pico.out_photon_drmax()   .begin()+shift, maxLepDR);
         pico.out_photon_elidx()   .insert(pico.out_photon_elidx()   .begin()+shift, photon_el_pico_idx[iph]);
         break;
+        //TODO: add correctionlib-based scale/smearing corrections for run 3 (not available yet?)
       default:
         std::cout<<"Need code for new year in getZGammaPhBr (in photon_producer.cpp)"<<endl;
         exit(1);

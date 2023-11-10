@@ -231,7 +231,7 @@ int main(int argc, char *argv[]){
   MuonProducer mu_producer(year, isData, rocco_file);
   DileptonProducer dilep_producer(year);
   IsoTrackProducer tk_producer(year);
-  PhotonProducer photon_producer(year, isData);
+  PhotonProducer photon_producer(year, isData, isAPV);
   JetMetProducer jetmet_producer(year, nanoaod_version, min_jet_pt, max_jet_eta, 
                                  isData, isAPV, is_preUL);
   HigVarProducer hig_producer(year);

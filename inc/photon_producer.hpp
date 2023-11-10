@@ -1,13 +1,17 @@
 #ifndef H_PHOTON_PRODUCER
 #define H_PHOTON_PRODUCER
 
+#include <string>
+#include <vector>
+
+#include "correction.hpp"
 #include "nano_tree.hpp"
 #include "pico_tree.hpp"
 
 class PhotonProducer{
 public:
 
-  explicit PhotonProducer(int year, bool isData);
+  explicit PhotonProducer(int year, bool isData, bool preVFP);
   ~PhotonProducer();
 
   // check what these should be in a relevant AN
@@ -32,6 +36,9 @@ private:
   bool isData;
 
   bool idPhoton(int bitmap, int level);
+  std::unique_ptr<correction::CorrectionSet> cs_scale_syst_;
+  correction::Correction::Ref map_scale_syst_;
+  std::string str_scale_syst_;
 };
 
 #endif
