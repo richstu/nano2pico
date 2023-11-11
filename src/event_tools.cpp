@@ -6,19 +6,24 @@
 
 using namespace std;
 
-EventTools::EventTools(const string &name_, int year_):
+EventTools::EventTools(const string &name_, int year_, bool isData_):
   name(name_),
   year(year_),
   isTTJets_LO_Incl(false),
   isTTJets_LO_MET(false),
   isTTJets_LO_HT(false),
+  isTTJets_NLO(false),
   isWJets_LO(false),
   isDYJets_LO(false),
   isFastSim(false),
+  isData(isData_),
   dataset(-1){
 
   if(Contains(name, "TTJets_") && Contains(name, "genMET-") && Contains(name, "madgraphMLM")) 
     isTTJets_LO_MET = true;
+
+  if(Contains(name, "TTTo2L2Nu")) 
+    isTTJets_NLO = true;
 
   if(Contains(name, "TTJets_") && !Contains(name, "TTJets_HT") && !Contains(name, "genMET-") &&Contains(name, "madgraphMLM")) 
     isTTJets_LO_Incl = true;
@@ -76,7 +81,16 @@ EventTools::~EventTools(){
 }
 
 void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
-  pico.out_stitch_photon() = pico.out_stitch_htmet() = pico.out_stitch() = pico.out_stitch_ht() = true;
+  pico.out_stitch_photon() = true;
+  pico.out_stitch_htmet() = true;
+  pico.out_stitch() = true;
+  pico.out_stitch_ht() = true;
+  pico.out_is_overlap_old() = true;
+  pico.out_is_overlap() = true; //true = NOT an overlapping event
+  pico.out_old_stitch_dy() = true;
+
+  if (isData) return;
+
   if(isTTJets_LO_Incl && !isFastSim) {
     if (nano.LHE_HTIncoming()>600) 
       pico.out_stitch_htmet() = pico.out_stitch_ht() = false;
@@ -166,11 +180,11 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
           }
 
           if(!found_other_particles){
-            pico.out_is_overlap() = false;
+            pico.out_is_overlap() = false; //false = IS an overlapping event
           }       
 
         }
-    }
+      }
 
 
       if( (mc_statusFlags[0] || mc_statusFlags[8]) ){  // Which are isPrompt or fromHardProcess
@@ -200,9 +214,9 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
           }       
 
         }
-    }
+      }
 
-    if( (mc_statusFlags[0] || mc_statusFlags[8]) && nano.GenPart_status().at(mc_idx) == 1 ){  // Which are isPrompt or fromHardProcess and stable
+      if( (mc_statusFlags[0] || mc_statusFlags[8]) && nano.GenPart_status().at(mc_idx) == 1 ){  // Which are isPrompt or fromHardProcess and stable
         for(size_t reco_idx(0); reco_idx < pico.out_photon_pt().size(); reco_idx++){
           if(pico.out_photon_sig()[reco_idx]){
              compPart.SetPtEtaPhi(pico.out_photon_pt().at(reco_idx), 
@@ -215,15 +229,15 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
         }
       }
 
-    }
-  }
+    } //GenPart_pdgId==22
+  } //loop over GenParts
 
   //This bit of code uses the overlap removal variable to then select whether an event should be kept or not. 
   //If the event contains should and does (does not) contain a generator photon then is_overlap_old = false, is_overlap = false, use_event = true (is_overlap_old=true, is_overlap=true, use_event=false)
   //If the event contains should not and does not (does) contain a generator photon then is_overlap_old = true, is_overlap = false, use_event = true (is_overlap_old=false, is_overlap=true, use_event=false)
   if( (isTTJets_LO_Incl && Contains(name, "TTGJets") ) || (isWZ && Contains(name, "WZG")) || (isWW && Contains(name, "WWG")) || (isZZ && Contains(name, "ZZG")) || Contains(name,"ZGToLLG") ){
     pico.out_use_event() = !pico.out_is_overlap();
-  } else if( isTTJets_LO_Incl || isWZ || isWW || isZZ || Contains(name, "DY") ){
+  } else if( isTTJets_LO_Incl || isTTJets_NLO || isWZ || isWW || isZZ || Contains(name, "DY") ){
     pico.out_use_event() = pico.out_is_overlap();
   } else{
     pico.out_is_overlap() = false; pico.out_use_event() = true;
@@ -239,7 +253,7 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
 
 
 void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vector<int> sig_jet_nano_idx,
-                                         float min_jet_pt, bool isData, bool isFastsim, bool is_preUL){
+                                         float min_jet_pt, bool isFastsim, bool is_preUL){
   float MET_pt, MET_phi;
   getMETWithJEC(nano, year, isFastsim, MET_pt, MET_phi, is_preUL);
   vector<float> Jet_pt, Jet_mass;
@@ -647,7 +661,7 @@ int EventTools::GetEventType(){
       if(bin > 99) bin = 0;//Sanity check
     }
   }else if((Contains(name, "TTJets") || Contains(name, "TT_") || Contains(name,"TTTo2L2Nu")) && !Contains(name, "TTTT_")){ sample = 1;
-    if(Contains(name, "TTJets_Tune")){ category = 0; bin = 0;
+    if(Contains(name, "TTJets_Tune") && !Contains(name,"amcatnlo")){ category = 0; bin = 0;
     }else if(Contains(name, "SingleLept")){ category = 1; bin = 0;
       if(Contains(name, "genMET-150")) bin = 1;
     }else if(Contains(name, "DiLept")){ category = 2; bin = 0;
@@ -660,7 +674,9 @@ int EventTools::GetEventType(){
       }
     }else if(Contains(name, "TT_")){ category = 4; bin = 0;
     }else if(Contains(name, "TTJets_Mtt")){ category = 5; bin = 0;
-    }else if(Contains(name, "TTTo2L2Nu")){ category = 6; bin = 0;
+    }else if(Contains(name, "TTTo2L2Nu") || Contains(name,"TTto2L2Nu")){ category = 6; bin = 0;
+    }else if(Contains(name, "TTJets_Tune") && Contains(name,"amcatnlo")){ category = 7; bin = 0;
+    }else if(Contains(name, "TTtoLNu2Q")){ category = 8; bin = 0;
     }
   }else if(Contains(name, "WJets") && !Contains(name, "TTWJets") && !Contains(name,"ttWJets")){ sample = 2;
     if(Contains(name, "WJetsToLNu_Tune")){ category = 0; bin = 0;
@@ -678,13 +694,19 @@ int EventTools::GetEventType(){
     }else if(Contains(name, "WJetsToQQ_HT")){ category = 2;
       if(Contains(name, "HT-600ToInf")){ bin = 0;
       }
+    }else if(Contains(name, "WtoLNu-2Jets")){ category = 3; bin = 0;
     }
-  }else if(Contains(name, "ST_")){ sample = 3;
+  }else if(Contains(name, "ST_") || Contains(name,"TWminusto") || Contains(name,"TbarWplusto")){ sample = 3;
     if(Contains(name, "ST_s-channel")){ category = 0; bin = 0;
     }else if(Contains(name, "ST_t-channel_top")){ category = 1; bin = 0;
     }else if(Contains(name, "ST_t-channel_antitop")){ category = 2; bin = 0;
     }else if(Contains(name, "ST_tW_top")){ category = 3; bin = 0;
     }else if(Contains(name, "ST_tW_antitop")){ category = 4; bin = 0;
+    }else if(Contains(name, "ST_tWA")){ category = 5; bin = 0;
+    }else if(Contains(name, "TWminusto2L2Nu")){ category = 6; bin = 0;
+    }else if(Contains(name, "TWminustoLNu2Q")){ category = 7; bin = 0;
+    }else if(Contains(name, "TbarWplusto2L2Nu")){ category = 8; bin = 0;
+    }else if(Contains(name, "TbarWplustoLNu2Q")){ category = 9; bin = 0;
     }
   }else if(Contains(name, "TTWJets") || Contains(name,"ttW")){ sample = 4;
     if(Contains(name, "TTWJetsToLNu")){ category = 0; bin = 0;
@@ -697,7 +719,7 @@ int EventTools::GetEventType(){
     }else if(Contains(name, "TTZToQQ")){ category = 1; bin = 0;
     }else if(Contains(name, "ttZJets_Tune")){ category = 2; bin = 0;
     }
-  }else if(Contains(name, "DYJetsToLL")){ sample = 6;
+  }else if(Contains(name, "DYJetsToLL") || Contains(name,"DYto2L")){ sample = 6;
     if(Contains(name, "DYJetsToLL_M-50_Tune") && Contains(name, "madgraphMLM")){ category = 0; bin = 0;
     }else if(Contains(name, "DYJetsToLL_M-50_HT")){ category = 1;
       if(Contains(name, "HT-70to100")){ bin = 0;
@@ -718,8 +740,8 @@ int EventTools::GetEventType(){
       }else if(Contains(name, "Pt-400To650")){ bin = 4;
       }else if(Contains(name, "Pt-650ToInf")){ bin = 5;
       }
+    } else if(Contains(name, "DYto2L-2Jets_MLL-50")){ category = 3; bin = 0;
     }
-
   }else if(Contains(name, "QCD")){ sample = 7;
     if(Contains(name, "QCD_HT")){ category = 0;
       if(Contains(name, "HT50to100")){ bin = 0;
@@ -752,7 +774,7 @@ int EventTools::GetEventType(){
       }else if(Contains(name, "3200toInf")){ bin = 16;
       }
     }
-  }else if(Contains(name, "ZJets")){ sample = 8;
+  }else if(Contains(name, "ZJets") && !Contains(name,"WZ")){ sample = 8;
     if(Contains(name, "ZJetsToNuNu")){ category = 0;
       if(Contains(name, "HT-70To100")){ bin = 0;
       }else if(Contains(name, "HT-100To200")){ bin = 1;
@@ -768,8 +790,13 @@ int EventTools::GetEventType(){
       if(Contains(name, "HT600toInf")){ bin = 0;
       }
     }
-  }else if(Contains(name, "ttHJet") && !Contains(name,"HToZG")){ sample = 9;
-    if(Contains(name, "ttHJetTobb")){ category = 0; bin = 0;
+  }else if(Contains(name, "ttH") && !Contains(name,"HToZG")){ sample = 9;
+    if(Contains(name, "ttHJetToGG")){       category = 0; bin = 0;
+    }else if(Contains(name, "HToZZ")){      category = 1; bin = 0;
+    }else if(Contains(name, "HToWW")){      category = 2; bin = 0;
+    }else if(Contains(name, "HToTauTau")){  category = 3; bin = 0;
+    }else if(Contains(name, "ttHJetTobb")){ category = 4; bin = 0; //previously category 0
+    }else if(Contains(name, "HToMuMu")){    category = 5; bin = 0;
     }
   }else if(Contains(name, "TTGJets")){ sample = 10;
     if(Contains(name, "TTGJets_Tune")){ category = 0; bin = 0;
@@ -777,11 +804,21 @@ int EventTools::GetEventType(){
   }else if(Contains(name, "TTTT")){ sample = 11;
     if(Contains(name, "TTTT_Tune")){ category = 0; bin = 0;
     }
-  }else if(Contains(name, "WH_") && !Contains(name,"TChiWH")){ sample = 12;
-    if(Contains(name, "WH_HToBB_WToLNu")){ category = 0; bin = 0;
+  }else if((Contains(name, "WH_") || Contains(name,"WplusH") || Contains(name,"WminusH") ) && !Contains(name,"TChiWH") && !Contains(name,"HToZG")){ sample = 12;
+    if(Contains(name, "HToGG")){           category = 0; bin = 0;
+    }else if(Contains(name, "HToZZ")){     category = 1; bin = 0;
+    }else if(Contains(name, "HToWW")){     category = 2; bin = 0;
+    }else if(Contains(name, "HToTauTau")){ category = 3; bin = 0;
+    }else if(Contains(name, "HToBB")){     category = 4; bin = 0; //previously category 0
+    }else if(Contains(name, "HToMuMu")){   category = 5; bin = 0;
     }
   }else if(Contains(name, "ZH") && !Contains(name,"HToZG") && !Contains(name, "T5qqqqZH")){ sample = 13;
-    if(Contains(name, "ZH_HToBB_ZToNuNu")){ category = 0; bin = 0;
+    if(Contains(name, "HToGG")){           category = 0; bin = 0;
+    }else if(Contains(name, "HToZZ")){     category = 1; bin = 0;
+    }else if(Contains(name, "HToWW")){     category = 2; bin = 0;
+    }else if(Contains(name, "HToTauTau")){ category = 3; bin = 0;
+    }else if(Contains(name, "HToBB")){     category = 4; bin = 0; //previously category 0
+    }else if(Contains(name, "HToMuMu")){   category = 5; bin = 0;
     }
   }else if(Contains(name, "WW") && !Contains(name,"WWG") && !Contains(name,"WWW") && !Contains(name,"WWZ") && !Contains(name,"HToWW") && !Contains(name,"TChiHH")){ sample = 14;
     if(Contains(name, "WWToLNuQQ")){ category = 0; bin = 0;
@@ -798,20 +835,31 @@ int EventTools::GetEventType(){
   }else if(Contains(name, "ZZ") && !Contains(name,"ZZG") && !Contains(name,"ZZZ") && !Contains(name,"HToZZ") && !Contains(name,"TChiHH")){ sample = 16;
     if(Contains(name, "ZZ_Tune")){ category = 0; bin = 0;
     }
-  }else if(Contains(name, "ZGTo")) { sample = 17; bin = 0;
-    if(Contains(name,"ZGTo2LG_Tune")) category = 0;
-    else if(Contains(name,"ZGToLLG_01J")) category = 1;
+  }else if((Contains(name, "ZGTo") || Contains(name,"DYG")) && !Contains(name,"ZZG")) { sample = 17; bin = 0;
+    if(Contains(name,"ZGTo2LG_Tune")){ category = 0;
+    }else if(Contains(name,"ZGToLLG_01J") && !Contains(name,"lowGPt")){ category = 1;
+    }else if(Contains(name,"ZGToLLG_01J") && Contains(name,"lowGPt")){ category = 2;
+    }else if(Contains(name,"DYGto2LG")) { category = 3;
+      if(Contains(name,"PTG-10to50")){         bin = 0;
+      }else if(Contains(name,"PTG-50to100")){  bin = 1;
+      }else if(Contains(name,"PTG-100to200")){ bin = 2;
+      }else if(Contains(name,"PTG-200")){      bin = 3;
+      }
+    }
   }else if(Contains(name, "TGJets")) { sample = 18; bin = 0;
     if(Contains(name, "TGJets_Tune")) category = 0;
-  }else if(Contains(name, "LLAJJ")) { sample = 19; bin = 0;
-    if(Contains(name,"EWK_MLL-50")) category = 0;
+  }else if(Contains(name, "LLAJJ") || Contains(name,"ZGamma2JToGamma2L2J") || Contains(name,"ZG2JtoG2L2J")) { sample = 19; bin = 0;
+    if(Contains(name,"EWK_MLL-50")){ category = 0;
+    }else if(Contains(name, "ZGamma2JToGamma2L2J") || Contains(name,"ZG2JtoG2L2J")){ category = 1;
+    }
   }else if(Contains(name, "EWKZ2Jets")){ sample = 20; category = 0; bin = 0;
   }else if(Contains(name, "WWG")){ sample = 21; category = 0; bin = 0;
   }else if(Contains(name, "WZG")){ sample = 22; category = 0; bin = 0;
   }else if(Contains(name, "ZZG")){ sample = 23; category = 0; bin = 0;
   }else if(Contains(name, "WWW")){ sample = 24;
-    if(Contains(name, "WWW_4F_Tune")){ category = 0; bin = 0;
-    }else if(Contains(name, "WWW_4F_DileptonFilter")){ category = 1; bin = 0;
+    if(Contains(name, "WWW_4F_Tune") && !Contains(name,"madspin")){ category = 0; bin = 0;
+    }else if(Contains(name, "WWW_4F_DiLeptonFilter")){ category = 1; bin = 0;
+    }else if(Contains(name, "WWW_4F_Tune") && Contains(name,"madspin")){ category = 2; bin = 0;
     }
   }else if(Contains(name, "WWZ")){ sample = 25;
     if(Contains(name, "WWZ_4F_Tune")){ category = 0; bin = 0;
@@ -825,7 +873,17 @@ int EventTools::GetEventType(){
     }else if(Contains(name, "HToWW")){     category = 2; bin = 0;
     }else if(Contains(name, "HToTauTau")){ category = 3; bin = 0;
     }else if(Contains(name, "HToBB")){     category = 4; bin = 0;
+    }else if(Contains(name, "HToMuMu")){   category = 5; bin = 0;
     }
+  }else if(Contains(name, "VBFH") && !Contains(name,"HToZG")){ sample = 29;
+    if(Contains(name, "HToGG")){           category = 0; bin = 0;
+    }else if(Contains(name, "HToZZ")){     category = 1; bin = 0;
+    }else if(Contains(name, "HToWW")){     category = 2; bin = 0;
+    }else if(Contains(name, "HToTauTau")){ category = 3; bin = 0;
+    }else if(Contains(name, "HToBB")){     category = 4; bin = 0;
+    }else if(Contains(name, "HToMuMu")){   category = 5; bin = 0;
+    }
+  }else if(Contains(name, "WGTo") || !Contains(name,"WWG")){ sample = 30; category = 0; bin = 0;
   }else if(Contains(name, "T1tttt")){ sample = 100; category = 0; bin = 0;
   }else if(Contains(name, "T2tt")){   sample = 101; category = 0; bin = 0;
   }else if(Contains(name, "T1bbbb")){ sample = 102; category = 0; bin = 0;

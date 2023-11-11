@@ -258,7 +258,7 @@ int main(int argc, char *argv[]){
   //cout<<"Is APV: "<<isAPV<<endl;
 
   // Other tools
-  EventTools event_tools(in_path, year);
+  EventTools event_tools(in_path, year, isData);
   int event_type = event_tools.GetEventType();
 
   ISRTools isr_tools(in_path, year);
@@ -306,9 +306,6 @@ int main(int argc, char *argv[]){
     pico.out_lumiblock() = nano.luminosityBlock();
     pico.out_run()       = nano.run();
     pico.out_type()      = event_type;
-    pico.out_is_overlap_old() = true;
-    pico.out_is_overlap() = true;
-    pico.out_old_stitch_dy() = true;
 
     // number of reconstructed primary vertices
     pico.out_npv() = nano.PV_npvs();
@@ -362,8 +359,7 @@ int main(int argc, char *argv[]){
                                                                  sig_el_nano_idx, sig_mu_nano_idx,
                                                                  photon_el_pico_idx);
 
-    if (isData) pico.out_stitch() = true;
-    else event_tools.WriteStitch(nano, pico);
+    event_tools.WriteStitch(nano, pico);
  
     tk_producer.WriteIsoTracks(nano, pico, sig_el_nano_idx, sig_mu_nano_idx, isFastsim, is_preUL);
 
@@ -432,7 +428,7 @@ int main(int argc, char *argv[]){
 
     if (debug) cout<<"INFO:: Writing filters and triggers"<<endl;
     // N.B. Jets: pico.out_pass_jets() and pico.out_pass_fsjets() filled in jetmet_producer
-    event_tools.WriteDataQualityFilters(nano, pico, sig_jet_nano_idx, min_jet_pt, isData, isFastsim, is_preUL);
+    event_tools.WriteDataQualityFilters(nano, pico, sig_jet_nano_idx, min_jet_pt, isFastsim, is_preUL);
 
     if (isHiggsino) event_tools.WriteTriggerEfficiency(pico);
     if (isZgamma && !isData) {
