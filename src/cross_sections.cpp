@@ -449,7 +449,7 @@ namespace xsec{
     if(file.Contains("ttHToZG_ZToLL"))              xsec = HToZG * 0.5071 * ZToLL ;
 
 
-    double H120ToZG = 0.00110; double H130ToZG = 0.01941;
+    double H120ToZG = 0.00110; double H130ToZG = 0.001941;
     if(file.Contains("GluGluHToZG_ZToLL_M-120"))    xsec = H120ToZG * ZToLL * 52.22;
     if(file.Contains("VBFHToZG_ZToLL_M-120"))       xsec = H120ToZG * ZToLL * 3.935 ;
     if(file.Contains("WplusH_HToZG_WToAll_M-120"))  xsec = H120ToZG * 0.9558 ; // WplusH, WminusH, ZH, ttH samples do not require decay of Z to leptons

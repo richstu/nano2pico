@@ -334,34 +334,57 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
   }
 
   // filters directly from Nano
-  pico.out_pass_hbhe() = nano.Flag_HBHENoiseFilter();
-  pico.out_pass_hbheiso() = nano.Flag_HBHENoiseIsoFilter();
   pico.out_pass_goodv() = nano.Flag_goodVertices();
   pico.out_pass_cschalo_tight() = nano.Flag_globalSuperTightHalo2016Filter();
-  pico.out_pass_eebadsc() = nano.Flag_eeBadScFilter();
+  pico.out_pass_hbhe() = nano.Flag_HBHENoiseFilter();
+  pico.out_pass_hbheiso() = nano.Flag_HBHENoiseIsoFilter();
   pico.out_pass_ecaldeadcell() = nano.Flag_EcalDeadCellTriggerPrimitiveFilter();
+  pico.out_pass_badpfmu() = nano.Flag_BadPFMuonFilter();
+  if (!is_preUL) {
+    pico.out_pass_badpfmudz() = nano.Flag_BadPFMuonDzFilter();
+    pico.out_pass_hfnoisyhits() = nano.Flag_hfNoisyHitsFilter();
+  }
+  pico.out_pass_eebadsc() = nano.Flag_eeBadScFilter();
   if (year==2016) {
     pico.out_pass_badcalib() = true;
   } else {
-    pico.out_pass_badcalib() = nano.Flag_ecalBadCalibFilterV2();
+    if (is_preUL) {
+      pico.out_pass_badcalib() = nano.Flag_ecalBadCalibFilterV2();
+    } else {
+      pico.out_pass_badcalib() = nano.Flag_ecalBadCalibFilter();
+    }
   }
   pico.out_pass_badchhad() = nano.Flag_BadChargedCandidateFilter();
-  pico.out_pass_badpfmu() = nano.Flag_BadPFMuonFilter();
   pico.out_pass_mubadtrk() = nano.Flag_muonBadTrackFilter();
 
-  // Combined pass variable, as recommended here:
-  // https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2#Analysis_Recommendations_for_ana
-  pico.out_pass() = pico.out_pass_muon_jet() && pico.out_pass_badpfmu() && 
-                    pico.out_met()/pico.out_met_calo()<5 &&
-                    pico.out_pass_goodv() &&
-                    pico.out_pass_hbhe() && pico.out_pass_hbheiso() && 
-                    pico.out_pass_ecaldeadcell() && pico.out_pass_badcalib() &&
-                    pico.out_pass_jets();
+  if (!is_preUL) { //H->Zy/UL
+    //combine pass variable currently consists of recommended JME POG filters
+    //as well as optional hfnoisyhits filter
+    //https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2 UL section
+    pico.out_pass() = pico.out_pass_goodv() && pico.out_pass_cschalo_tight() &&
+                      pico.out_pass_hbhe() && pico.out_pass_hbheiso() &&
+                      pico.out_pass_ecaldeadcell() && pico.out_pass_badpfmu() &&
+                      pico.out_pass_badpfmudz() && pico.out_pass_hfnoisyhits() && 
+                      pico.out_pass_eebadsc() && pico.out_pass_badcalib();
+    //muon_jet, met/met_calo, met/mht, low_neutral_jet - possibly useful RA2b filters to study
+    //htratio_dphi_tight, ecalnoisejet - RA2b filters that may be superseded by hfnoisyhits
+    //HEM to study
+  }
+  else { //HH+MET Run 2/pre-UL
+    // Combined pass variable, as recommended here:
+    // https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2#Analysis_Recommendations_for_ana
+    pico.out_pass() = pico.out_pass_muon_jet() && pico.out_pass_badpfmu() && 
+                      pico.out_met()/pico.out_met_calo()<5 &&
+                      pico.out_pass_goodv() &&
+                      pico.out_pass_hbhe() && pico.out_pass_hbheiso() && 
+                      pico.out_pass_ecaldeadcell() && pico.out_pass_badcalib() &&
+                      pico.out_pass_jets();
 
-  if (!isFastsim) {
-    pico.out_pass() = pico.out_pass() && pico.out_pass_cschalo_tight();
-    if (isData) 
-      pico.out_pass() = pico.out_pass() && pico.out_pass_eebadsc();
+    if (!isFastsim) {
+      pico.out_pass() = pico.out_pass() && pico.out_pass_cschalo_tight();
+      if (isData) 
+        pico.out_pass() = pico.out_pass() && pico.out_pass_eebadsc();
+    }
   }
   
   // Combined pass RA2b-like variable
@@ -595,10 +618,9 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
     pico.out_trig_double_mu() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8();
   }
   if (year==2022) {
-    //Ele28 was enabled & unprescaled before aug, but then disabled
     //No official Egamma recommendations yet
     //others seem the same based on POG presentations
-    pico.out_trig_single_el() = nano.HLT_Ele32_WPTight_Gsf(); 
+    pico.out_trig_single_el() = nano.HLT_Ele32_WPTight_Gsf() || nano.HLT_Ele30_WPTight_Gsf(); 
     pico.out_trig_double_el() = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL();
     pico.out_trig_single_mu() = nano.HLT_IsoMu24();
     pico.out_trig_double_mu() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8();
@@ -606,7 +628,7 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
   if (year==2023) {
     //Ele30 is enabled & unprescaled in some of 2023, but it is unclear from
     //POG presentations whether it was enabled until the LHC RQX.L8 incident
-    pico.out_trig_single_el() = nano.HLT_Ele32_WPTight_Gsf(); 
+    pico.out_trig_single_el() = nano.HLT_Ele32_WPTight_Gsf() || nano.HLT_Ele30_WPTight_Gsf(); 
     pico.out_trig_double_el() = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL();
     pico.out_trig_single_mu() = nano.HLT_IsoMu24();
     pico.out_trig_double_mu() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8();

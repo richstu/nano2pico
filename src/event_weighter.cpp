@@ -215,15 +215,15 @@ void EventWeighter::PhotonCSEVSF(pico_tree &pico, float &w_photon_csev, std::vec
   for(size_t iph = 0; iph < pico.out_photon_pt().size(); ++iph){
     //apply to truth photons passing ID
     float pt = pico.out_photon_pt().at(iph);
-    float abseta = fabs(pico.out_photon_eta().at(iph));
-    bool mva = pico.out_photon_id80().at(iph);
+    float mva = pico.out_photon_idmva().at(iph);
+    bool pass_mva = ((pico.out_photon_isScEtaEB().at(iph) && mva>-0.4) ||
+                     (pico.out_photon_isScEtaEE().at(iph) && mva>-0.58));
     float drmin = pico.out_photon_drmin().at(iph);
     bool eveto = pico.out_photon_elveto().at(iph);
-    if (pt < 15 || abseta > 2.5 || (abseta > 1.4442 && abseta < 1.566) || 
-        !mva || drmin < 0.4) continue;
+    if (pt < 15 || !pass_mva || drmin < 0.4) continue;
     if (pico.out_photon_pflavor().at(iph) != 1) continue;
     //find category
-    if (abseta < 1.5){
+    if (pico.out_photon_isScEtaEB().at(iph)) {
       if (fabs(pico.out_photon_r9().at(iph)) > 0.94) {
         category = "EBHighR9";
       } else {

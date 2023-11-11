@@ -212,7 +212,7 @@ int nvlep
 vector<float> lep_pt
 vector<float> lep_eta
 vector<float> lep_phi
-vector<int> lep_pdgid
+vector<int>   lep_pdgid
 
 int nmu
 int nvmu
@@ -229,7 +229,7 @@ vector<float> mu_sip3d
 vector<bool>  mu_id
 vector<bool>  mu_mediumid
 vector<bool>  mu_tightid
-vector<int>  mu_highptid
+vector<int>   mu_highptid
 vector<bool>  mu_sig
 vector<int>   mu_charge
 vector<int>   mu_pflavor
@@ -348,6 +348,8 @@ bool pass_cschalo_tight
 bool pass_eebadsc
 bool pass_ecaldeadcell
 bool pass_badpfmu
+bool pass_badpfmudz
+bool pass_hfnoisyhits
 bool pass_mubadtrk
 bool pass_badchhad
 bool pass_muon_jet

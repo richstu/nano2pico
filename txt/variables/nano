@@ -598,6 +598,7 @@ bool Flag_CSCTightHalo2015Filter
 bool Flag_globalTightHalo2016Filter
 bool Flag_globalSuperTightHalo2016Filter
 bool Flag_HcalStripHaloFilter
+bool Flag_hfNoisyHitsFilter
 bool Flag_hcalLaserEventFilter
 bool Flag_EcalDeadCellTriggerPrimitiveFilter
 bool Flag_EcalDeadCellBoundaryEnergyFilter
@@ -611,6 +612,7 @@ bool Flag_chargedHadronTrackResolutionFilter
 bool Flag_muonBadTrackFilter
 bool Flag_BadChargedCandidateFilter
 bool Flag_BadPFMuonFilter
+bool Flag_BadPFMuonDzFilter
 bool Flag_BadChargedCandidateSummer16Filter
 bool Flag_BadPFMuonSummer16Filter
 bool Flag_trkPOG_manystripclus53X
