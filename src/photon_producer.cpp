@@ -33,6 +33,9 @@ PhotonProducer::PhotonProducer(int year_, bool isData_, bool preVFP){
     str_scale_syst_ = "2018";
   }
   else {
+    cs_scale_syst_ = correction::CorrectionSet::from_file(
+        "data/zgamma/2018_UL/EGM_ScaleUnc.json");
+    str_scale_syst_ = "2018";
     std::cout << "WARNING: No dedicated EGM scale/smearing JSONs, defaulting to 2018" << std::endl;
   }
   map_scale_syst_ = cs_scale_syst_->at("UL-EGM_ScaleUnc");
