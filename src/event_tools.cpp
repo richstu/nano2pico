@@ -15,6 +15,11 @@ EventTools::EventTools(const string &name_, int year_, bool isData_):
   isTTJets_NLO(false),
   isWJets_LO(false),
   isDYJets_LO(false),
+  isEWKZ(false),
+  isWJ(false),
+  isWW(false),
+  isWZ(false),
+  isZZ(false),
   isFastSim(false),
   isData(isData_),
   dataset(-1){
@@ -42,13 +47,19 @@ EventTools::EventTools(const string &name_, int year_, bool isData_):
 
 
   //These four variables control the generator settings of the overlap removal variable in MC
-  if(Contains(name, "WW")) 
+  if(Contains(name, "WJetsToLNu") || Contains(name,"WGToLNuG_01J"))
+    isWJ = true;
+
+  if(Contains(name,"EWKZ2Jets") || Contains(name, "ZGamma2JToGamma2L2J_EWK"))
+    isEWKZ = true;
+
+  if(Contains(name, "WW") && !(Contains(name,"WWZ") || Contains(name,"WWW")) )
     isWW = true;
  
-  if(Contains(name, "WZ")) 
+  if(Contains(name, "WZ") && !(Contains(name,"WWZ") || Contains(name,"WZZ"))) 
     isWZ = true;
  
-  if(Contains(name, "ZZ")) 
+  if(Contains(name, "ZZ") && !(Contains(name,"WZZ") || Contains(name,"ZZZ"))) 
     isZZ = true;
 
   if(Contains(name, "TTGJets_")) 
@@ -86,7 +97,7 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
   pico.out_stitch() = true;
   pico.out_stitch_ht() = true;
   pico.out_is_overlap_old() = true;
-  pico.out_is_overlap() = true; //true = NOT an overlapping event
+  pico.out_is_overlap() = false; //true==overlapping event
   pico.out_old_stitch_dy() = true;
 
   if (isData) return;
@@ -131,11 +142,14 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
   //Need to include the new overlap removal by including the newer values for ZGtoLLG_lowMll_lowGPt
   double ptmin = 9.0;
   double isocone = 0.05;
-  if(isZZ || isTTJets_LO_Incl){
+  if(isZZ || isTTJets_LO_Incl || isEWKZ){
     ptmin = 10.0;
   }
   if(isWZ || isWW){
     ptmin = 20.0;
+  }
+  if(isWJ){
+    ptmin = 15.0;
   }
 
 
@@ -180,7 +194,7 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
           }
 
           if(!found_other_particles){
-            pico.out_is_overlap() = false; //false = IS an overlapping event
+            pico.out_is_overlap() = true; //true = IS an overlapping event
           }       
 
         }
@@ -235,10 +249,11 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
   //This bit of code uses the overlap removal variable to then select whether an event should be kept or not. 
   //If the event contains should and does (does not) contain a generator photon then is_overlap_old = false, is_overlap = false, use_event = true (is_overlap_old=true, is_overlap=true, use_event=false)
   //If the event contains should not and does not (does) contain a generator photon then is_overlap_old = true, is_overlap = false, use_event = true (is_overlap_old=false, is_overlap=true, use_event=false)
-  if( (isTTJets_LO_Incl && Contains(name, "TTGJets") ) || (isWZ && Contains(name, "WZG")) || (isWW && Contains(name, "WWG")) || (isZZ && Contains(name, "ZZG")) || Contains(name,"ZGToLLG") ){
-    pico.out_use_event() = !pico.out_is_overlap();
-  } else if( isTTJets_LO_Incl || isTTJets_NLO || isWZ || isWW || isZZ || Contains(name, "DY") ){
+  if( (isTTJets_LO_Incl && Contains(name, "TTGJets") ) || (isWZ && Contains(name, "WZG")) || (isWW && Contains(name, "WWG")) || (isZZ && Contains(name, "ZZG")) || Contains(name,"ZGToLLG")
+      || (isWJ && Contains(name,"WGToLNuG_01J")) || (isEWKZ && Contains(name,"ZGamma2JToGamma2L2J_EWK")) ){
     pico.out_use_event() = pico.out_is_overlap();
+  } else if( isTTJets_LO_Incl || isTTJets_NLO || isWZ || isWW || isZZ || isWJ || isEWKZ || Contains(name, "DY") ){
+    pico.out_use_event() = !pico.out_is_overlap();
   } else{
     pico.out_is_overlap() = false; pico.out_use_event() = true;
   }

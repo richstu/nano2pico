@@ -30,6 +30,8 @@ private:
   bool isTTJets_NLO;
   bool isWJets_LO;
   bool isDYJets_LO;
+  bool isEWKZ;
+  bool isWJ;
   bool isWW;
   bool isWZ;
   bool isZZ;
