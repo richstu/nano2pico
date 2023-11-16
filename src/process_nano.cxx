@@ -180,6 +180,7 @@ int main(int argc, char *argv[]){
     bool is_nanoAODv7_found = std::regex_search(in_file, nanoad_version_matches, std::regex("02Apr2020"));
     if (is_nanoAODv7_found) nanoaod_version = 7;
   }
+  if (Contains(in_dir, "NanoAODv9UCSB")) nanoaod_version = 9.5;
   cout<<"Using NanoAOD version: "<<nanoaod_version<<endl;
 
   time_t begtime, endtime;
@@ -231,7 +232,7 @@ int main(int argc, char *argv[]){
   MuonProducer mu_producer(year, isData, rocco_file);
   DileptonProducer dilep_producer(year);
   IsoTrackProducer tk_producer(year);
-  PhotonProducer photon_producer(year, isData, isAPV);
+  PhotonProducer photon_producer(year, isData, isAPV, nanoaod_version);
   JetMetProducer jetmet_producer(year, nanoaod_version, min_jet_pt, max_jet_eta, 
                                  isData, isAPV, is_preUL);
   HigVarProducer hig_producer(year);
@@ -317,7 +318,8 @@ int main(int argc, char *argv[]){
     }
 
     //pileup energy density
-    pico.out_rho() = nano.fixedGridRhoFastjetAll();
+    if (nanoaod_version >= 11 || nanoaod_version == 9.5)
+      pico.out_rho() = nano.fixedGridRhoAll();
 
     // ----------------------------------------------------------------------------------------------
     //            *** Writing physics objects ***

@@ -1,10 +1,12 @@
 # nano2pico
 
-Utility package for converting CMS NanoAOD to analysis-ready ntuples called "pico".
+Utility package for converting CMS NanoAOD to analysis-ready ntuples called "pico". These have been used in the HH+MET and H to Zgamma analyses.
 
-## Environment setting
+## Installation, environment, and compilation
 
-Use one of the servers supporting CMSSW, e.g. cms1,cms3,cms4,cms5...
+If you are not on one of the UCSB servers, prerequisites that must be installed include CERN ROOT and optionally Scons for building nano2pico. Assuming your ROOT environment is active, you can build nano2pico after cloning this repository by running `scons` if you have Scons installed, or by running `compile.sh` otherwise.
+
+If you are using one of the UCSB servers that supports CMSSW (e.g. cms1,cms3,cms4,cms5...), you can use the following commands to install nano2pico and set up the environment:
 
 ~~~~bash
 # Setup git version for SL6.5
@@ -16,6 +18,8 @@ git clone --recurse-submodules git@github.com:richstu/nano2pico.git
 source set_env.sh
 ~~~~
 
+You can then compile via `scons` or `compile.sh`.
+
 ## Productions
 
 Variables stored in the pico can be seen in [variables/pico](variables/pico). For an overview of the available branches, see the dedicated section at the bottom of this README.
@@ -26,19 +30,17 @@ To see the sizes and number of files in all available productions do:
   ./scripts/count_root_files.py -f /net/cms29/cms29r0/pico/NanoAODv5/
 ~~~~
 
-## What is nano2pico?
+## How does nano2pico work?
 
 This package is used to do the Nano -> pico conversion in three steps in order to allow parallelizing the production at the sub-dataset level:
-  1. All variables and event weights (except normalization) are calculated using [src/process_nano.cxx](src/process_nano.cxx). This step also keeps a tally of the weights for all events in the file being run over as input to the next step.
+
+  1. All variables and event weights (except normalization) are calculated using [src/process_nano.cxx](src/process_nano.cxx). For Monte Carlo events, this step also keeps a tally of the weights for all events in the file being run over as input to the next step. For data events, only this step is needed.
   2. The sums of weights from step 1 are further aggregate to get the total per dataset. A correction is then calculated to ensure that the weights do not change the total expected number of events for the dataset. This is done in [src/merge_corrections.cxx](src/merge_corrections.cxx). The luminosity normalization weight `w_lumi` to be applied to get the yield in 1fb-1 is also calculated for each dataset in this step.
   3. The `raw_pico` files from step 1 are corrected by the per-dataset correction factors derived in step 2 and written to the `unskimmed` folder.
 
 At this point, various skims can be made as defined in [scripts/skim_file.py](scripts/skim_file.py).
 
-## Trigger info
-
-Spreadsheets describing the final trigger menus from each year from a post on the [Trigger HN](https://hypernews.cern.ch/HyperNews/CMS/get/trigger-prim-datasets/52/1/2.html): [2016](https://docs.google.com/spreadsheets/d/1bII_92pCrgk20A9FMIIHsOsYYj3f-lLjsoRkP_ZNQW4/edit?usp=sharing), [2017](https://docs.google.com/spreadsheets/d/1SqSKATiHcZdSB-t7rMb0SRSUL4Ot1jr2TExjnMrDUpA/edit?usp=sharing), [2018](https://docs.google.com/spreadsheets/d/1D_og1_J6Hp4uALUg-R4Hkq3CF0VN6IK5komHPHv5R-o/edit?usp=sharing).
-
+*Note:* The input path in which the input NanoAOD files are stored as well as the output path are analyzed to determine the behavior of nano2pico. To run with settings for the Higgs to Z gamma analysis, the 'out_dir' should contian "zgamma" in its name. To run on custom NanoAODv9 files, the input directory must contain "NanoAODv9UCSB" in its name.
 
 ## Interactive test usage
 
@@ -78,6 +80,10 @@ Step 3. Make subdirectory `unskimmed in `out`. Using the pico file from step 1 a
 ~~~~
 
 ## Batch system usage
+
+nano2pico supports batch system usage to process many datasets in parallel. Currently, this system is only configured for use at UCSB, and must be modified if nano2pico is being run on another system.
+
+While previous versions of nano2pico used the custom UCSB batch system, the current version now uses HTCondor. For this reason, jobs must be run on the cms11 server. To get permission to run jobs on HTCondor, please contact Jaebak.
 
 ### Step 0. Setup environment
 
@@ -190,7 +196,7 @@ Here the slim name must correspond to a txt file in the slim_rules folder, so in
 
 Similarly to above, one can optionally use `--overwrite` or `--tag`.
 
-### Step 6. Prior to DNN training: Prepare tree with DNN inputs
+### Step 6. Prior to DNN training: Prepare tree with DNN inputs (deprecated)
 
 For the higgsino analysis, one can prepare a tree with all the necessary DNN inputs for either training or inference using the executable `make_higfeats.exe`, and in the batch system, e.g.:
 
@@ -203,7 +209,7 @@ For the higgsino analysis, one can prepare a tree with all the necessary DNN inp
 
 As usual, the tag is optional and only relevant for the filename of the resulting cmd file.
 
-### Step 7. After DNN evaluation: Merge pico with DNN output
+### Step 7. After DNN evaluation: Merge pico with DNN output (deprecated)
 
 After training the DNN and evaluating its output for all samples of interest using the `diboson_ml` package, one can update the corresponding pico trees to add a new branch containing the DNN output. This relies on having the events in the same order, so one has to update the pico ntuples used as input to higfeats! Given it is rather quick, it's done interactively.
 
@@ -217,7 +223,7 @@ cp -r /net/cms29/cms29r0/pico/NanoAODv5/higgsino_eldorado/2016/mc/merged_higmc_h
      --dnnout_dir /net/cms29/cms29r0/pico/NanoAODv5/higgsino_eldorado/2016/mc/dnnout_higloose/
 ~~~~
 
-## Calculating b-tagging efficiencies
+## Calculating b-tagging efficiencies (deprecated)
 
 Use `parameterize_efficiency.cxx`, giving the directory with all the MC files and the year as arguments. Below is an example run for 2016 MC.
 
@@ -225,42 +231,29 @@ Use `parameterize_efficiency.cxx`, giving the directory with all the MC files an
 ./compile.sh && ./run/parameterize_efficiency.exe -i /mnt/hadoop/jbkim/2019_09_30/2016/mc/ -y 2016
 ~~~~
 
-## Pico production for ZGamma
-
-The 'out_dir' should contain "zgamma" in the name. This is to ensure that 'isZgamma' signal can asserted and ensures the appropriate variables are correctly stored in the picos. For customization See line 98 of process_nano.cxx.
-
-
 ## Description of pico branches
 
-These refer to the branches obtained with `ZGamma = false`, i.e. higgsino production!
+This section describes the event content (branches) of pico n-tuples.
 
 :blue_book: Documentation of the Nano variables used as input throughout the code can be found [here](https://cms-nanoaod-integration.web.cern.ch/autoDoc).
 
 ####   Global
+
+Filled by various files including [event_tools](src/event_tools.cpp), [jetmet_producer](src/jetmet_producer.cpp), and [process_nano](src/process_nano.cxx):
 * `run, lumiblock, event` - as expected
-* `type` - integer encoding the physics process, see [here](https://github.com/richstu/nano2pico/blob/5e62c553fb306f6c1f27bccafee037fb939c0f75/src/event_tools.cpp#L124).
-* `stitch` - include this variable in order to run on an inclusive sample together with an overlapping slice in a different dataset, e.g. stitch = false for events with GenMET > 150 in the inclusive TTJets sample, in order to remove them when using the inclusive sample together with the deidicated *genMET-150* samples, see [here](https://github.com/richstu/nano2pico/blob/f4b99417bd65c134796b703552522a7de5429f19/src/event_tools.cpp#L31-L45).
-* `npv` - number of reconstructed PV
-* `ht` - sum of pt of jets not associated with a lepton, including jets with |eta|<2.4
-* `ht5` - sum of pt of jets not associated with a lepton, including jets with |eta|<5
-* `met, met_phi, met_calo, met_tru, met_tru_phi` - as expected
+* `type` - integer encoding the physics process, see `src/event_tools.cpp`.
+* `stitch, stitch_*` - include `stitch` in order to run on an inclusive sample together with an overlapping slice in a different dataset, e.g. stitch = false for events with GenMET > 150 in the inclusive TTJets sample, in order to remove them when using the inclusive sample together with the deidicated *genMET-150* samples, see [here](https://github.com/richstu/nano2pico/blob/f4b99417bd65c134796b703552522a7de5429f19/src/event_tools.cpp#L31-L45). The full stitch variable is determined by the `stich_*` pieces.
+* `is_overlap, use_event` - overlap removal similar to stitch, but as implemented for the H to Z gamma analysis. Mostly deals with overlap between inclusive samples (ex. Z to ll) and those with photons generated at matrix level. `use_event` will be true for events in one overlapping sample, but not the other
+* `npv, npv_good` - number of (good) reconstructed PVs
+* `rho` - pileup energy density calculated from all PF candidates without foreground removal
+* `ht, ht5` - sum of pt of jets not associated with a lepton, including jets with |eta|<2.4 (|eta|<5)
+* `mht, mht_phi` - negative vector sums of jets not associated with a lepton
+* `met, met_phi, met_calo` - PF/calorimeter missing transverse momentum, as expected
 * `mt` - transverse mass, only calculated for nlep==1
-* `mt_tru` - transverse mass at truth level, only calculated for ntrulep==1
-
-####   Higgsino variables
-Using the 4-jet with highest DeepCSV, calculate the higgsino variables for the three possible pairings. The 0th index stores the pairing with smalled Delta m
-* `hig_cand_dm` - Mass difference between the two Higgs candidates
-* `hig_cand_am` - Average mass between the two Higgs candidates
-* `hig_cand_drmax` - Max opening angle between the two b jets out of the two Higgs candidates.
-
-Same variables using the 4-jet with highest DeepFlavour discriminant value are stored in:
-* `hig_df_cand_*` 
-
-* `low_dphi` - require dPhi(jet, MET) be less than 0.5 for jets 1,2 and less than 0.3 for jets 3,4
 
 ####   Jets
 
-Filled in `jet_producer`:
+Filled in `jetmet_producer`:
 * `nbl, nbm, nbt` - number of loose, medium and tight tagged jets according to DeepCSV tagger
 * `nbdfl, nbdfm, nbdft` - number of loose, medium and tight tagged jets according to DeepFlavour tagger
 * `njet` - number of jets that pass the pt and eta cuts and do not overlap with a _signal_ lepton
@@ -273,10 +266,14 @@ Filled in `jet_producer`:
   * `fjet_deep_md_hbb_btv` - Mass-decorrelated Deep Double B, H->bb vs QCD discriminator, endorsed by BTV
   * `fjet_deep_md_hbb_jme` - Mass-decorrelated DeepAk8, H->bb vs QCD discriminator, endorsed by JME
 
+* `nsubfjet` - number of AK8 jet subjets
+* `subfjet_*` - AK8 jet subjet variables
+
 #### Leptons 
 
 * `nlep = nel + nmu`
 * `nvlep = nvel + nvmu`
+* `lep_*` - signal leptons (electron and muon) variables
 
 Calculated in [mu_producer](src/mu_producer.cpp):
 * `nmu` - number of muons satisfying all signal muon requirements for resolved Higgsino analysis
@@ -288,14 +285,14 @@ Calculated in [el_producer](src/el_producer.cpp):
 * `nvel` - number of electrons satisfying all veto electron requirements for resolved Higgsino analysis
 * `el_*` - variables of interest for all electrons satisfying the veto id, eta and pt requirements, but no isolation 
 
-Calculated in [dilep_producer](src/dilep_producer.cpp):
-* `elel_*, mumu_*` - variables relating to the dilepton system (all combinations stored if more than 2 leptons)
-
 #### Photons 
 
-These are not really used in Higgsino, but just in case...Calculated in [photon_producer](src/photon_producer.cpp):
+Calculated in [photon_producer](src/photon_producer.cpp):
 * `nphoton` - number of signal photons
 * `photon_*` - photon variables
+
+* `nfsrphoton` - number of FSR photons
+* `fsrphoton_*` - FSR photon variables
 
 #### Tracks 
 
@@ -303,54 +300,114 @@ Calculated in [tk_producer](src/tk_producer.cpp):
 * `ntk` - number of tracks passing criteria for resolved Higgsino analysis
 * `tk_*` - track variables
 
+####   Higgsino (HH->4b+MET) candidates
+Using the 4-jet with highest DeepCSV, calculate the higgsino variables for the three possible pairings. The 0th index stores the pairing with smalled Delta m
+* `hig_cand_dm` - Mass difference between the two Higgs candidates
+* `hig_cand_am` - Average mass between the two Higgs candidates
+* `hig_cand_drmax` - Max opening angle between the two b jets out of the two Higgs candidates.
+
+Same variables using the 4-jet with highest DeepFlavour discriminant value are stored in:
+* `hig_df_cand_*` 
+
+* `low_dphi_*` - require dPhi(jet, MET) be less than 0.5 for jets 1,2 and less than 0.3 for jets 3,4
+
+#### Higgs to Z gamma-related variables
+
+Calculated in [dilep_producer](src/dilep_producer.cpp) and [zgamma_producer](src/zgamma_producer.cpp).
+
+* `dijet_*` - variables for pairs of two highest pT signal jets
+* `zg_cutBitMap` - stores whether events pass a particular version of the H to Z gamma baseline selection
+* `nllphoton` - number of Higgs to Z gamma candidates
+* `llphoton_*` - Higgs candidate variables
+
+#### Higgsino (HH->bbgammagamma+MET) candidates
+
+* `nphotonphoton` -  number of diphoton Higgs candidates
+* `photonphoton_*` - diphoton Higgs candidate variables
+* `nbb` -  number of b bbar Higgs candidates using deepCSV
+* `bb_*` - b bbar Higgs candidate variables
+* `nbb_df` -  number of b bbar Higgs candidates using deep flavor
+* `bb_df_*` - b bbar Higgs candidate variables
+* `nbbphotonphoton` - number of bb gammagamma Higgs candidate pairs using deepCSV
+* `bbphotonphoton_*` - bb gammagamma Higgs candidate pair variables
+* `nbbphotonphoton_df` - number of bb gammagamma Higgs candidate pairs using deep flavor
+* `bbphotonphoton_df_*` - bb gammagamma Higgs candidate pair variables
+
 #### Quality 
 
 * `pass_*` - recommended MET filters
 * `pass_jets` - set to false if any of the jets fails loose ID
-* `pass` - combination of all required filters and `pass_jets`
+* `pass` - logical AND of recommended and optional filters (currently not including RA2b for UL)
 
 #### Truth 
 
 * `mc_*` - information for a set of the generator particles in the hard process
 * `ntrumu,ntruel,ntrutauh,ntrutaul` - # of true leptons of particular type, where tauh is hadronically decaying taus and taul is leptonically decaying taus
 * `ntrulep = ntrumu + ntruel + ntrutaul` 
+* `isr_tru_*` - MC truth, hadronic recoil, used for ISR reweighting used by the SUS PAG for weak production
 * `mprod, mlsp` - higgsino and lsp mass, with lsp mass always equal to one for the higgsino model
+* `npu_tru, npu_tru_mean` - true number of pileup vertices
+* `mt_tru` - transverse mass at truth level, only calculated for ntrulep==1
+* `met_tru, met_tru_phi` - true missing transverse momentum
+* `ht_isr_me` - scalar sum of parton pT at matrix element level
+* `ngenjet` - number of truth jets
+* `genjet_*` - truth jet variables
 
 ####   ISR
 
 * `nisr` - number of ISR jets according to matching to truth, used for ISR reweighting used by the SUS PAG for strong production
-* `isr_tru_*` - MC truth, hadronic recoil, used for ISR reweighting used by the SUS PAG for weak production
 
 * `jetsys_*` - hadronic recoil, i.e. vector sum of all jets, used in V+jets ISR studies
 * `jetsys_nob_*` - hadronic recoil, i.e. vector sum of all jets that are not b-tagged, used in 2L tt+jets ISR studies
 
 #### Weights 
 
-Calculated in [process_nano](src/process_nano.cxx) and then re-normalized in subsequent production steps:
-* `weight` - product of all the individual weights below
+Previously calculated in many dedicated files, but for UL, now calculated in [event_weighter](src/event_weighter.cpp) and [trigger_weighter](src/trigger_weighter.cpp) and then re-normalized in subsequent production steps:
+* `weight` - product of some of the individual weights below
 * `w_lumi` - weight to be applied to get the expected yield in 1 fb-1. 
-* `w_lep` - product of fullsim lepton SFs for leptons with > 20 GeV
-* `w_fs_lep` - product of fastsim lepton SFs for leptons with > 20 GeV
-* `w_btag` - product of fullsim and fastsim b-tag SFs if counting _medium tags only_, DeepCSV tagger
-* `w_btag_df` - product of fullsim and fastsim b-tag SFs if counting _medium tags only_, DeepFlavour tagger
-* `w_bhig` - product of fullsim and fastsim b-tag SFs accounting for _all three WPs_ for the DeepCSV tagger
-* `w_bhig_df` - product of fullsim and fastsim b-tag SFs accounting for _all three WPs_ for the DeepFlavour tagger
+* `w_lep` - weights to correct lepton ID efficiency, product of `w_el` and `w_mu`
+* `w_el` - weights to correct electron ID efficiency
+* `w_mu` - weights to correct muon ID efficiency
+* `w_fs_lep` - weights to correct FastSim lepton ID efficiency
+* `w_photon` - weights to correct photon ID and electron veto efficiency _currently not correct_
+* `w_photon_id` - weights to correct photon ID efficiency _currently not correct_
+* `w_photon_csev` - weights to correct photon electron-veto efficiency
+* `w_btag` - weight to correct _medium WP only_ of deepCSV b-jet ID efficiency
+* `w_btag_df` - weight to correct _medium WP only_ of deepFlavor b-jet ID efficiency
+* `w_bhig` - weight to correct _all WPs_ of deepCSV b-jet ID efficiency
+* `w_bhig_df` - weight to correct _all WPs_ of deepFlavor b-jet ID efficiency. This should be used as the primary b-tag weight
 * `w_isr` - 1., except for TTJets 2016 and signal, SUSY ISR reweighting
-* `w_pu` - currently just set 1.
-* `w_prefire` - currently just set 1.
+* `w_pu` - weight to correct pileup distribution
+* `w_prefire` - weight to correct for inefficiency caused by run 2 trigger prefiring
+* `w_trig` - weight to correct for trigger efficiency
 
-#### Other
+#### Trigger
 
+The final trigger menus from each year from a post on the [Trigger HN](https://hypernews.cern.ch/HyperNews/CMS/get/trigger-prim-datasets/52/1/2.html): [2016](https://docs.google.com/spreadsheets/d/1bII_92pCrgk20A9FMIIHsOsYYj3f-lLjsoRkP_ZNQW4/edit?usp=sharing), [2017](https://docs.google.com/spreadsheets/d/1SqSKATiHcZdSB-t7rMb0SRSUL4Ot1jr2TExjnMrDUpA/edit?usp=sharing), [2018](https://docs.google.com/spreadsheets/d/1D_og1_J6Hp4uALUg-R4Hkq3CF0VN6IK5komHPHv5R-o/edit?usp=sharing). Trigger menus for run 3: [2022?](https://docs.google.com/spreadsheets/d/1ThboqmcVpMGdK8uGi2PZu4zllzMwU88nCD9t_ZhO_d0/edit#gid=0), [2023](https://docs.google.com/spreadsheets/d/1yaj9Za8pcXknuO25O5Jpa565FiC425g4g6ACqI32gkU/edit#gid=1253663040).
+
+Calcalated in [event_tools](src/event_tools.cpp).
+* `trig_single_el, trig_double_el, trig_single_mu, trig_double_mu` - flag indicating events passed the lowest unprescaled single/double electron/muon trigger for the particular data taking era considered
 * `HLT_*` - trigger decisions
-* `sys_*` - systematic variations of weights up=0, down=1
 
-* `sys_njet` - analysis variable systematic variations 0=JER up, 1=JER down, 2=JEC up, 3=JEC down
-* `sys_nb*` - analysis variable systematic variations 0=JER up, 1=JER down, 2=JEC up, 3=JEC down
-* `sys_met` - analysis variable systematic variations 0=JER up, 1=JER down, 2=JEC up, 3=JEC down
-* `sys_met_phi` - analysis variable systematic variations 0=JER up, 1=JER down, 2=JEC up, 3=JEC down
-* `sys_hig_cand_*` - analysis variable systematic variations 0=JER up, 1=JER down, 2=JEC up, 3=JEC down
-* `sys_low_dphi_met` - analysis variable systematic variations 0=JER up, 1=JER down, 2=JEC up, 3=JEC down
-* `sys_ht` - analysis variable systematic variations 0=JER up, 1=JER down, 2=JEC up, 3=JEC down
+#### Systematic uncertainties
+
+* `sys_*` - systematic variations of weights up=0, down=1
+* `sys_bchig, sys_udsghig, sys_fs_bchig, sys_fs_udsghig` - variations in (FastSim) b-tagging weights, split by heavy flavor (b/c) and light flavor (u/d/s/g) jets
+* `sys_murf` - variations in renormalization and factorization scales
+
+* `sys_jet_*` - systematic variations in jet pt/mass 
+* `sys_photon_*` - systematic variations in photon pt
+
+For the following uncertainties the indices correspond to 0=JER up, 1=JER down, 2=JES up, 3=JES down.
+* `sys_njet` - `njet` as jet systematics are varied
+* `sys_nb*` - `nb*` as jet systematics are varied
+* `sys_hig_cand_*` - `hig_cand_*` as jet systematics are varied
+* `sys_low_dphi_met` - `low_dphi_met` as jet systematics are varied
+* `sys_ht` - `ht` as jet systematics are varied
+
+For the following uncertainties the indices correspond to 0=JER up, 1=JER down, 2=JES up, 3=JES down, 4=unclustered energy up, 5=unclustered energy down, 6=lepton/photon up, 7=lepton/photon down
+* `sys_met` - `met` as jet systematics are varied
+* `sys_met_phi` - `met_phi` as jet systematics are varied
 
 ## Spliting Higgsino signal
 

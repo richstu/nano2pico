@@ -27,7 +27,6 @@ private:
   bool isTTJets_LO_Incl;
   bool isTTJets_LO_MET;
   bool isTTJets_LO_HT;
-  bool isTTJets_NLO;
   bool isWJets_LO;
   bool isDYJets_LO;
   bool isWW;

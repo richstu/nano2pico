@@ -215,6 +215,7 @@ array<float> Photon_dEsigmaUp
 array<float> Photon_dEsigmaDown
 array<float> Photon_eCorr
 array<float> Photon_energyErr
+array<float> Photon_energyRaw
 array<float> Photon_eta
 array<float> Photon_hoe
 array<float> Photon_esEffSigmaRR
@@ -628,6 +629,7 @@ int Pileup_nPU
 int Pileup_sumEOOT
 int Pileup_sumLOOT
 
+float fixedGridRhoAll
 float fixedGridRhoFastjetAll
 float fixedGridRhoFastjetCentral
 float fixedGridRhoFastjetCentralCalo

@@ -299,6 +299,8 @@ vector<float> photon_phiwidth
 vector<float> photon_drmin
 vector<float> photon_drmax
 vector<float> photon_pterr
+vector<float> photon_energy_raw
+vector<float> photon_origin_eta
 vector<float> photon_hoe
 vector<float> photon_esoversc
 vector<float> photon_essigmarr

@@ -365,10 +365,10 @@ namespace xsec{
     if(file.Contains("ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV")) xsec = 32.45; // from XSDB
 
     if(file.Contains("LLAJJ"))                      xsec = 0.1084;  // from XSDB
-    if(file.Contains("WZ_Tune"))                    xsec = 51.11;   // https://arxiv.org/pdf/1604.08576.pdf 
-    if(file.Contains("WW_Tune"))                    xsec = 118.7;   // https://arxiv.org/pdf/1408.5243.pdf
-    if(file.Contains("WWG_Tune"))                   xsec = 0.2147;  // from XSDB AS A NOTE: WWG is WWG --> LNu 2J
-    if(file.Contains("WZG_Tune"))                   xsec = 0.04345; // from XSDB
+    if(file.Contains("WZ_Tune"))                    xsec = 27.6;    // from XSDB
+    if(file.Contains("WW_Tune"))                    xsec = 75.8;    // from XSDB
+    if(file.Contains("WWG_Tune"))                   xsec = 0.2147;  // from XSDB Note: One W forced to l nu. Also possible bug for lvlv
+    if(file.Contains("WZG_Tune"))                   xsec = 0.04345; // from XSDB Note: W forced to l nu
     if(file.Contains("ZZGTo4L_Tune"))               xsec = 0.02202; // from XSDB
 
     // From https://arxiv.org/pdf/2006.11191.pdf Using Measured XSec for WWW,WWZ, and WZZ. For ZZZ used SM prediction

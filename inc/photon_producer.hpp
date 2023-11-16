@@ -11,7 +11,7 @@
 class PhotonProducer{
 public:
 
-  explicit PhotonProducer(int year, bool isData, bool preVFP);
+  explicit PhotonProducer(int year, bool isData, bool preVFP, float nanoaod_version);
   ~PhotonProducer();
 
   // check what these should be in a relevant AN
@@ -34,6 +34,7 @@ public:
 private:
   int year;
   bool isData;
+  float nanoaod_version;
 
   bool idPhoton(int bitmap, int level);
   std::unique_ptr<correction::CorrectionSet> cs_scale_syst_;

@@ -418,11 +418,12 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
       isvetojet = true;
     }
 
+    //don't include pt in isgood until later in order to save systematics
     bool isgood = !islep && !isphoton && (fabs(nano.Jet_eta()[ijet]) <= max_jet_eta) && pass_jetid && !isvetojet;
 
     //sys_jetvar convention: [0] JER up, [1] JER down, [2] JEC up, [3] JEC down
     //for now, only save sys_ variables
-    if (isSignal) {
+    if (isSignal && is_preUL) {
       if (nano.Jet_pt_jerUp()[ijet] > min_jet_pt) {
         if (isgood) {
           pico.out_sys_njet()[0]++;
@@ -494,6 +495,19 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
         (Jet_pt[ijet]*jer_up_factor[ijet]/jer_nm_factor[ijet]) <= min_jet_pt &&
         (Jet_pt[ijet]*jer_dn_factor[ijet]/jer_nm_factor[ijet]) <= min_jet_pt &&
         (Jet_pt[ijet]*jes_up_factor[ijet]) <= min_jet_pt) continue;
+
+    if (!is_preUL && isgood) {
+      if ((Jet_pt[ijet]*jer_up_factor[ijet]/jer_nm_factor[ijet]) > min_jet_pt)
+        pico.out_sys_njet()[0]++;
+      if ((Jet_pt[ijet]*jer_dn_factor[ijet]/jer_nm_factor[ijet]) > min_jet_pt)
+        pico.out_sys_njet()[1]++;
+      if ((Jet_pt[ijet]*jes_up_factor[ijet]) > min_jet_pt)
+        pico.out_sys_njet()[2]++;
+      if ((Jet_pt[ijet]*jes_dn_factor[ijet]) > min_jet_pt)
+        pico.out_sys_njet()[3]++;
+    }
+
+    //after this point isgood means with nominal (smeared) pt
     isgood = isgood && (Jet_pt[ijet] >= min_jet_pt);
 
     switch(year) {

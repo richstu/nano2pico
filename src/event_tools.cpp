@@ -12,7 +12,6 @@ EventTools::EventTools(const string &name_, int year_, bool isData_):
   isTTJets_LO_Incl(false),
   isTTJets_LO_MET(false),
   isTTJets_LO_HT(false),
-  isTTJets_NLO(false),
   isWJets_LO(false),
   isDYJets_LO(false),
   isFastSim(false),
@@ -21,9 +20,6 @@ EventTools::EventTools(const string &name_, int year_, bool isData_):
 
   if(Contains(name, "TTJets_") && Contains(name, "genMET-") && Contains(name, "madgraphMLM")) 
     isTTJets_LO_MET = true;
-
-  if(Contains(name, "TTTo2L2Nu")) 
-    isTTJets_NLO = true;
 
   if(Contains(name, "TTJets_") && !Contains(name, "TTJets_HT") && !Contains(name, "genMET-") &&Contains(name, "madgraphMLM")) 
     isTTJets_LO_Incl = true;
@@ -42,18 +38,15 @@ EventTools::EventTools(const string &name_, int year_, bool isData_):
 
 
   //These four variables control the generator settings of the overlap removal variable in MC
-  if(Contains(name, "WW")) 
-    isWW = true;
- 
-  if(Contains(name, "WZ")) 
-    isWZ = true;
- 
-  if(Contains(name, "ZZ")) 
-    isZZ = true;
 
-  if(Contains(name, "TTGJets_")) 
-    isTTJets_LO_Incl = true; 
+  if(Contains(name, "WW") && !Contains(name,"WWW") && !Contains(name,"WWZ") && !Contains(name,"HToWW") && !Contains(name,"TChiHH"))
+    isWW = true; //WW or WWG
 
+  if(Contains(name, "WZ") && !Contains(name,"WWZ") && !Contains(name,"WZZ") && !Contains(name,"TChiHH"))
+    isWZ = true; //WZ or WZG
+
+  if(Contains(name, "ZZ") && !Contains(name,"ZZZ") && !Contains(name,"HToZZ") && !Contains(name,"TChiHH"))
+    isZZ = true; //ZZ or ZZG
 
   if(Contains(name, "EGamma")) // replaced SingleElectron and DoubleEG starting in 2018
     dataset = Dataset::EGamma;
@@ -131,18 +124,17 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
   //Need to include the new overlap removal by including the newer values for ZGtoLLG_lowMll_lowGPt
   double ptmin = 9.0;
   double isocone = 0.05;
-  if(isZZ || isTTJets_LO_Incl){
+  if(isZZ || isTTJets_LO_Incl || Contains(name,"TTGJets")){
     ptmin = 10.0;
   }
   if(isWZ || isWW){
     ptmin = 20.0;
   }
 
-
   double ptmin_old = 15.0;
   double etamax_old = 2.6;
   double isocone_old = 0.05;
-  if(isWW || isZZ || isTTJets_LO_Incl){
+  if(isWW || isZZ || isTTJets_LO_Incl || Contains(name,"TTGJets")){
     ptmin_old = 10.0;
     etamax_old= 99.0;
   }
@@ -151,9 +143,30 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
     ptmin_old = 20;
   }
 
+  bool found_hadronic_w = false;
+  bool found_higgs = false;
+  int ntrulep = 0; //includes taus, unlike pico branch
+
   for(int mc_idx(0); mc_idx<nano.nGenPart(); mc_idx++) {
 
     bitset<15> mc_statusFlags(nano.GenPart_statusFlags().at(mc_idx));
+
+    //check if event has a hadronic w decay
+    int mom_id = -1;
+    int mc_id = nano.GenPart_pdgId().at(mc_idx);
+    if (nano.GenPart_genPartIdxMother().at(mc_idx) != -1)
+      mom_id = nano.GenPart_pdgId().at(nano.GenPart_genPartIdxMother().at(mc_idx));
+    if (abs(mom_id)==24 && abs(mc_id)>=1 && abs(mc_id)<=4)
+      found_hadronic_w = true;
+
+    //check if event has Higgs
+    if (mc_id==25)
+      found_higgs = true;
+
+    //calcaulate number of leptons in event - require is FirstCopy and not isDirectPromptTauDecayProduct
+    if ((abs(mc_id)==11 || abs(mc_id)==13 || abs(mc_id)==15) && !mc_statusFlags[5] && mc_statusFlags[12])
+      ntrulep++;
+
     if( nano.GenPart_pdgId().at(mc_idx) == 22 ){ // photons 
       TVector3 compPart,genPhoton;
 
@@ -235,13 +248,20 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
   //This bit of code uses the overlap removal variable to then select whether an event should be kept or not. 
   //If the event contains should and does (does not) contain a generator photon then is_overlap_old = false, is_overlap = false, use_event = true (is_overlap_old=true, is_overlap=true, use_event=false)
   //If the event contains should not and does not (does) contain a generator photon then is_overlap_old = true, is_overlap = false, use_event = true (is_overlap_old=false, is_overlap=true, use_event=false)
-  if( (isTTJets_LO_Incl && Contains(name, "TTGJets") ) || (isWZ && Contains(name, "WZG")) || (isWW && Contains(name, "WWG")) || (isZZ && Contains(name, "ZZG")) || Contains(name,"ZGToLLG") ){
+  if( Contains(name,"ZZG") && found_higgs ){ //remove Higgs decays from ZZG sample
+    pico.out_is_overlap() = true; pico.out_use_event() = false;
+  } else if( (Contains(name, "TTGJets") ) || (isWZ && Contains(name, "WZG")) || (isZZ && Contains(name, "ZZG")) || Contains(name,"ZGToLLG") ){
     pico.out_use_event() = !pico.out_is_overlap();
-  } else if( isTTJets_LO_Incl || isTTJets_NLO || isWZ || isWW || isZZ || Contains(name, "DY") ){
+  } else if( isTTJets_LO_Incl || Contains(name, "TTTo2L2Nu") || Contains(name, "DY") ){
+    pico.out_use_event() = pico.out_is_overlap();
+  } else if( isWZ && !found_hadronic_w ){ //WZG only generated with W->lnu
+    pico.out_use_event() = pico.out_is_overlap();
+  } else if( isZZ && ntrulep==4 ){ //ZZ only generated with ZZ->4l
     pico.out_use_event() = pico.out_is_overlap();
   } else{
     pico.out_is_overlap() = false; pico.out_use_event() = true;
   }
+  //Note: removed overlap removal for WW and WWG since WWG sample may have bug
 
   if(isDYJets_LO  && nano.LHE_HT()>70) 
     pico.out_stitch_htmet() = pico.out_stitch_ht() = pico.out_stitch() = false;

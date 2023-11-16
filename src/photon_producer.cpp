@@ -1,5 +1,6 @@
 #include "photon_producer.hpp"
 
+#include <cmath>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -9,9 +10,10 @@
 
 using namespace std;
 
-PhotonProducer::PhotonProducer(int year_, bool isData_, bool preVFP){
+PhotonProducer::PhotonProducer(int year_, bool isData_, bool preVFP, float nanoaod_version_){
   year = year_;
   isData = isData_;
+  nanoaod_version = nanoaod_version_;
   if (year==2016 && preVFP) {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
         "data/zgamma/2016preVFP_UL/EGM_ScaleUnc.json");
@@ -118,6 +120,31 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
       scale_syst_dn = map_scale_syst_->evaluate({str_scale_syst_,"scaledown",eta,
           nano.Photon_seedGain()[iph]});
     }
+
+    float origin_eta = 0.0;
+    if (nano.Photon_isScEtaEB()[iph]) {
+      float pv_tan_theta_over_2 = exp(-1.0*eta);
+      float pv_tan_theta = 2.0*pv_tan_theta_over_2/(1.0-pv_tan_theta_over_2*pv_tan_theta_over_2);
+      float photon_unit_x = cos(nano.Photon_phi()[iph]);
+      float photon_unit_y = sin(nano.Photon_phi()[iph]);
+      float pv_ecal_dr = 130.0 - (nano.PV_x()*photon_unit_x+nano.PV_y()*photon_unit_y);
+      float pv_ecal_dz = pv_ecal_dr/pv_tan_theta;
+      float origin_theta = atan(130.0/(nano.PV_z()+pv_ecal_dz));
+      if (origin_theta < 0) origin_theta += M_PI;
+      origin_eta = -1.0*log(tan(origin_theta/2.0));
+    }
+    else { //if (nano.Photon_isScEtaEE()[iph]) {
+      float pv_tan_theta_over_2 = exp(-1.0*eta);
+      float pv_tan_theta = 2.0*pv_tan_theta_over_2/(1.0-pv_tan_theta_over_2*pv_tan_theta_over_2);
+      float photon_unit_x = cos(nano.Photon_phi()[iph]);
+      float photon_unit_y = sin(nano.Photon_phi()[iph]);
+      float pv_ecal_dz = 310.0-nano.PV_z(); //+ endcap
+      if (eta < 0) pv_ecal_dz = 310.0+nano.PV_z(); //- endcap
+      float pv_ecal_dr = pv_ecal_dz*pv_tan_theta;
+      float origin_theta = atan(((photon_unit_x*nano.PV_x()+photon_unit_y*nano.PV_y())+pv_ecal_dr)/310.0);
+      if (origin_theta < 0) origin_theta += M_PI;
+      origin_eta = -1.0*log(tan(origin_theta/2.0));
+    }
     
     switch(year) {
       case 2016:
@@ -138,6 +165,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
         pico.out_photon_idmva() .insert(pico.out_photon_idmva() .begin()+shift, mva);
         pico.out_photon_idCutBased().insert(pico.out_photon_idCutBased().begin()+shift, Photon_cutBased[iph]);
         pico.out_photon_idCutBasedBitMap().insert(pico.out_photon_idCutBasedBitMap() .begin()+shift, nano.Photon_vidNestedWPBitmap()[iph]);
+        pico.out_photon_origin_eta().insert(pico.out_photon_origin_eta().begin()+shift, origin_eta);
         pico.out_photon_isScEtaEB().insert(pico.out_photon_isScEtaEB().begin()+shift, nano.Photon_isScEtaEB()[iph]);
         pico.out_photon_isScEtaEE().insert(pico.out_photon_isScEtaEE().begin()+shift, nano.Photon_isScEtaEE()[iph]);
         pico.out_photon_sig()   .insert(pico.out_photon_sig()   .begin()+shift, isSignal);
@@ -149,7 +177,6 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
         pico.out_sys_photon_pt_scaleup().insert(pico.out_sys_photon_pt_scaleup().begin()+shift, pt*scale_syst_up);
         pico.out_sys_photon_pt_scaledn().insert(pico.out_sys_photon_pt_scaledn().begin()+shift, pt*scale_syst_dn);
         break;
-        //TODO: add adaptations for custom NanoAOD production
       case 2022:
       case 2023:
         pico.out_photon_pt()      .insert(pico.out_photon_pt()      .begin()+shift, pt);
@@ -167,6 +194,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
         pico.out_photon_phiwidth().insert(pico.out_photon_phiwidth().begin()+shift, nano.Photon_phiWidth()[iph]);
         pico.out_photon_pterr()   .insert(pico.out_photon_pterr()   .begin()+shift, nano.Photon_energyErr()[iph]);
         pico.out_photon_hoe()     .insert(pico.out_photon_hoe()     .begin()+shift, nano.Photon_hoe()[iph]);
+        pico.out_photon_energy_raw().insert(pico.out_photon_energy_raw().begin()+shift, nano.Photon_energyRaw()[iph]);
         pico.out_photon_esoversc().insert(pico.out_photon_esoversc().begin()+shift, nano.Photon_esEnergyOverRawE()[iph]);
         pico.out_photon_essigmarr().insert(pico.out_photon_essigmarr().begin()+shift,nano.Photon_esEffSigmaRR()[iph]);
         pico.out_photon_elveto()  .insert(pico.out_photon_elveto()  .begin()+shift, eVeto);
@@ -175,6 +203,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
         pico.out_photon_idmva()   .insert(pico.out_photon_idmva()   .begin()+shift, mva);
         pico.out_photon_idCutBased().insert(pico.out_photon_idCutBased() .begin()+shift, Photon_cutBased[iph]);
         pico.out_photon_idCutBasedBitMap().insert(pico.out_photon_idCutBasedBitMap() .begin()+shift, nano.Photon_vidNestedWPBitmap()[iph]);
+        pico.out_photon_origin_eta().insert(pico.out_photon_origin_eta().begin()+shift, origin_eta);
         pico.out_photon_isScEtaEB().insert(pico.out_photon_isScEtaEB().begin()+shift, nano.Photon_isScEtaEB()[iph]);
         pico.out_photon_isScEtaEE().insert(pico.out_photon_isScEtaEE().begin()+shift, nano.Photon_isScEtaEE()[iph]);
         pico.out_photon_sig()     .insert(pico.out_photon_sig()     .begin()+shift, isSignal);
@@ -188,6 +217,18 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
         exit(1);
     }
 
+    if (year <= 2018 && nanoaod_version == 9.5) { //custom NanoAOD production
+      pico.out_photon_phiso()   .insert(pico.out_photon_phiso()   .begin()+shift, nano.Photon_pfPhoIso03()[iph]);
+      pico.out_photon_chiso()   .insert(pico.out_photon_chiso()   .begin()+shift, nano.Photon_pfChargedIsoPFPV()[iph]);
+      pico.out_photon_chiso_worst().insert(pico.out_photon_chiso_worst().begin()+shift,nano.Photon_pfChargedIsoWorstVtx()[iph]);
+      pico.out_photon_s4()      .insert(pico.out_photon_s4()      .begin()+shift, nano.Photon_s4()[iph]);
+      pico.out_photon_sieip()   .insert(pico.out_photon_sieip()   .begin()+shift, nano.Photon_sieip()[iph]);
+      pico.out_photon_etawidth().insert(pico.out_photon_etawidth().begin()+shift, nano.Photon_etaWidth()[iph]);
+      pico.out_photon_phiwidth().insert(pico.out_photon_phiwidth().begin()+shift, nano.Photon_phiWidth()[iph]);
+      pico.out_photon_energy_raw().insert(pico.out_photon_energy_raw().begin()+shift, nano.Photon_energyRaw()[iph]);
+      pico.out_photon_esoversc().insert(pico.out_photon_esoversc().begin()+shift, nano.Photon_esEnergyOverRawE()[iph]);
+      pico.out_photon_essigmarr().insert(pico.out_photon_essigmarr().begin()+shift,nano.Photon_esEffSigmaRR()[iph]);
+    }
 
     nphotons++;
     if (!isData)
