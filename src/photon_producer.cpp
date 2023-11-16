@@ -219,7 +219,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
 
     if (year <= 2018 && nanoaod_version == 9.5) { //custom NanoAOD production
       pico.out_photon_phiso()   .insert(pico.out_photon_phiso()   .begin()+shift, nano.Photon_pfPhoIso03()[iph]);
-      pico.out_photon_chiso()   .insert(pico.out_photon_chiso()   .begin()+shift, nano.Photon_pfChargedIsoPFPV()[iph]);
+      pico.out_photon_chiso()   .insert(pico.out_photon_chiso()   .begin()+shift, nano.Photon_pfChargedIso()[iph]); //note different name from NanoAODv12
       pico.out_photon_chiso_worst().insert(pico.out_photon_chiso_worst().begin()+shift,nano.Photon_pfChargedIsoWorstVtx()[iph]);
       pico.out_photon_s4()      .insert(pico.out_photon_s4()      .begin()+shift, nano.Photon_s4()[iph]);
       pico.out_photon_sieip()   .insert(pico.out_photon_sieip()   .begin()+shift, nano.Photon_sieip()[iph]);

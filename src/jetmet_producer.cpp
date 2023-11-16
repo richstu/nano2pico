@@ -159,8 +159,8 @@ void JetMetProducer::GetJetUncertainties(nano_tree &nano, pico_tree &pico,
 
       if (!found_genjet) {
         indiv_jer_nm = 1.0+rng_.Gaus(0,sigmajer)*sqrt(std::max(sjer_nom*sjer_nom-1.0,0.0));
-        indiv_jer_nm = 1.0+rng_.Gaus(0,sigmajer)*sqrt(std::max(sjer_up*sjer_up-1.0,0.0));
-        indiv_jer_nm = 1.0+rng_.Gaus(0,sigmajer)*sqrt(std::max(sjer_dn*sjer_dn-1.0,0.0));
+        indiv_jer_up = 1.0+rng_.Gaus(0,sigmajer)*sqrt(std::max(sjer_up*sjer_up-1.0,0.0));
+        indiv_jer_dn = 1.0+rng_.Gaus(0,sigmajer)*sqrt(std::max(sjer_dn*sjer_dn-1.0,0.0));
       }
 
       //Following NanoAOD-tools, JES uncertainties are evaluated post-smearing
@@ -361,7 +361,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
 
   vector<vector<float>> sys_jet_met_dphi;
 
-  if (isSignal) {
+  if (is_preUL && isSignal) {
     pico.out_sys_njet().resize(4,0);
     pico.out_sys_nbl().resize(4,0);
     pico.out_sys_nbm().resize(4,0);
@@ -370,6 +370,10 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
     sys_jet_met_dphi.resize(4,vector<float>({}));
     sys_higvars.resize(4, HiggsConstructionVariables());
     pico.out_sys_low_dphi_met().resize(4,false);
+  }
+  else if (!is_preUL) {
+    pico.out_sys_njet().resize(4,0);
+    //TODO add variations for deepflavor b-tagging
   }
 
   // saving jet info on all jets passing pt cut, including endcap

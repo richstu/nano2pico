@@ -224,6 +224,7 @@ array<float> Photon_mass
 array<float> Photon_mvaID
 array<float> Photon_mvaIDV1
 array<float> Photon_pfPhoIso03
+array<float> Photon_pfChargedIso
 array<float> Photon_pfChargedIsoPFPV
 array<float> Photon_pfChargedIsoWorstVtx
 array<float> Photon_pfRelIso03_all
