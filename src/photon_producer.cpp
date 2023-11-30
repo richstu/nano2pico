@@ -53,11 +53,11 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
   int nphotons(0), ndr(0), shift(0);
 
   vector<int> FsrPhoton_muonIdx;
-  getFsrPhoton_muonIdx(nano, year, FsrPhoton_muonIdx);
+  getFsrPhoton_muonIdx(nano, nanoaod_version, FsrPhoton_muonIdx);
   vector<int> Photon_jetIdx;
-  getPhoton_jetIdx(nano, year, Photon_jetIdx);
+  getPhoton_jetIdx(nano, nanoaod_version, Photon_jetIdx);
   vector<int> Photon_cutBased;
-  getPhoton_cutBased(nano, year, Photon_cutBased);
+  getPhoton_cutBased(nano, nanoaod_version, Photon_cutBased);
 
   for(int iph(0); iph < nano.nFsrPhoton(); ++iph){
     if (nano.FsrPhoton_pt()[iph] <= FsrPhotonPtCut) continue;
@@ -219,7 +219,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
         exit(1);
     }
 
-    if (year <= 2018 && nanoaod_version == 9.5) { //custom NanoAOD production
+    if (nanoaod_version > 9.49 && nanoaod_version < 9.51) { //custom NanoAOD production
       pico.out_photon_phiso()   .insert(pico.out_photon_phiso()   .begin()+shift, nano.Photon_pfPhoIso03()[iph]);
       pico.out_photon_chiso()   .insert(pico.out_photon_chiso()   .begin()+shift, nano.Photon_pfChargedIso()[iph]); //note different name from NanoAODv12
       pico.out_photon_chiso_worst().insert(pico.out_photon_chiso_worst().begin()+shift,nano.Photon_pfChargedIsoWorstVtx()[iph]);

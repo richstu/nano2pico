@@ -8,7 +8,7 @@
 class EventTools{
 public:
 
-  explicit EventTools(const std::string &name, int year, bool isData);
+  explicit EventTools(const std::string &name, int year, bool isData, float nanoaod_version);
   ~EventTools();
 
   enum Dataset {EGamma, SingleElectron, SingleMuon, DoubleEG, DoubleMuon, MET, JetHT, Muon, JetMET, MuonEG};
@@ -36,6 +36,7 @@ private:
   bool isZZ;
   bool isFastSim;
   bool isData;
+  float nanoaod_version;
   int dataset;
 };
 

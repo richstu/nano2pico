@@ -145,6 +145,7 @@ void Initialize(corrections_tree &wgt_sums, corrections_tree &corr){
   CopySize(wgt_sums.sys_isr(),                corr.out_sys_isr());
   CopySize(wgt_sums.sys_pu(),                 corr.out_sys_pu());
   CopySize(wgt_sums.sys_murf(),               corr.out_sys_murf());
+  CopySize(wgt_sums.sys_ps(),                 corr.out_sys_ps());
   // CopySize(wgt_sums.w_pdf(),                  corr.out_w_pdf());
   // CopySize(wgt_sums.sys_pdf(),                corr.out_sys_pdf());
 }
@@ -185,6 +186,7 @@ void AddEntry(corrections_tree &wgt_sums, corrections_tree &corr){
   VecAdd(wgt_sums.sys_trig(),          corr.out_sys_trig());
   VecAdd(wgt_sums.sys_pu(),            corr.out_sys_pu());
   VecAdd(wgt_sums.sys_murf(),          corr.out_sys_murf());
+  VecAdd(wgt_sums.sys_ps(),            corr.out_sys_ps());
   // VecAdd(wgt_sums.w_pdf(),             corr.out_w_pdf());
   // VecAdd(wgt_sums.sys_pdf(),           corr.out_sys_pdf());
 }
@@ -373,6 +375,7 @@ void Normalize(corrections_tree &corr){
   Normalize(corr.out_sys_pu(), nent);
 
   Normalize(corr.out_sys_murf(), nent);
+  Normalize(corr.out_sys_ps(), nent);
   // Normalize(corr.out_w_pdf(), nent);
   // Normalize(corr.out_sys_pdf(), nent);
 }

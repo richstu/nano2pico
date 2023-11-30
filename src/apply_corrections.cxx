@@ -132,11 +132,19 @@ int main(int argc, char *argv[]){
       }
     }
     pico.out_sys_murf().resize(9);
-    for (unsigned i(0); i<9; i++) {        
+    for (unsigned i(0); i<pico.out_sys_murf().size(); i++) {        
       if (pico.sys_murf().size() != 0) {
         pico.out_sys_murf()[i]      = pico.sys_murf()[i]*corr.sys_murf()[i];
       } else {
         pico.out_sys_murf()[i]      = 1.0;
+      }
+    }
+    pico.out_sys_ps().resize(4);
+    for (unsigned i(0); i<pico.out_sys_ps().size(); i++) {        
+      if (pico.sys_ps().size() != 0) {
+        pico.out_sys_ps()[i]      = pico.sys_ps()[i]*corr.sys_ps()[i];
+      } else {
+        pico.out_sys_ps()[i]      = 1.0;
       }
     }
 

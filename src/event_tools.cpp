@@ -6,7 +6,7 @@
 
 using namespace std;
 
-EventTools::EventTools(const string &name_, int year_, bool isData_):
+EventTools::EventTools(const string &name_, int year_, bool isData_, float nanoaod_version_):
   name(name_),
   year(year_),
   isTTJets_LO_Incl(false),
@@ -21,6 +21,7 @@ EventTools::EventTools(const string &name_, int year_, bool isData_):
   isZZ(false),
   isFastSim(false),
   isData(isData_),
+  nanoaod_version(nanoaod_version_),
   dataset(-1){
 
   if(Contains(name, "TTJets_") && Contains(name, "genMET-") && Contains(name, "madgraphMLM")) 
@@ -296,7 +297,7 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
   vector<float> Jet_pt, Jet_mass;
   getJetWithJEC(nano, isFastsim, Jet_pt, Jet_mass);
   vector<int> Jet_jetId;
-  getJetId(nano, year, Jet_jetId);
+  getJetId(nano, nanoaod_version, Jet_jetId);
 
   // jet quality filter
   pico.out_pass_jets() = true;
@@ -377,7 +378,7 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
   pico.out_pass_hbheiso() = nano.Flag_HBHENoiseIsoFilter();
   pico.out_pass_ecaldeadcell() = nano.Flag_EcalDeadCellTriggerPrimitiveFilter();
   pico.out_pass_badpfmu() = nano.Flag_BadPFMuonFilter();
-  if (!is_preUL) {
+  if (nanoaod_version+0.01 > 9) {
     pico.out_pass_badpfmudz() = nano.Flag_BadPFMuonDzFilter();
     pico.out_pass_hfnoisyhits() = nano.Flag_hfNoisyHitsFilter();
   }
@@ -385,7 +386,7 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
   if (year==2016) {
     pico.out_pass_badcalib() = true;
   } else {
-    if (is_preUL) {
+    if (nanoaod_version+0.01 < 9) {
       pico.out_pass_badcalib() = nano.Flag_ecalBadCalibFilterV2();
     } else {
       pico.out_pass_badcalib() = nano.Flag_ecalBadCalibFilter();
@@ -394,7 +395,7 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
   pico.out_pass_badchhad() = nano.Flag_BadChargedCandidateFilter();
   pico.out_pass_mubadtrk() = nano.Flag_muonBadTrackFilter();
 
-  if (!is_preUL) { //H->Zy/UL
+  if (nanoaod_version+0.01 > 9) { //H->Zy/UL
     //combine pass variable currently consists of recommended JME POG filters
     //as well as optional hfnoisyhits filter
     //https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2 UL section

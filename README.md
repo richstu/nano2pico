@@ -393,7 +393,8 @@ Calcalated in [event_tools](src/event_tools.cpp).
 
 * `sys_*` - systematic variations of weights up=0, down=1
 * `sys_bchig, sys_udsghig, sys_fs_bchig, sys_fs_udsghig` - variations in (FastSim) b-tagging weights, split by heavy flavor (b/c) and light flavor (u/d/s/g) jets
-* `sys_murf` - variations in renormalization and factorization scales
+* `sys_murf` - variations in renormalization and factorization scales, see nano documentation for indexing
+* `sys_ps` - variations in parton shower, see nano documentation for indexing
 
 * `sys_jet_*` - systematic variations in jet pt/mass 
 * `sys_photon_*` - systematic variations in photon pt

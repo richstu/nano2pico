@@ -232,15 +232,15 @@ void getJetWithJEC(nano_tree & nano, bool isFastsim, vector<float> & Jet_pt, vec
   }
 }
 
-void getJetId(nano_tree & nano, int year, vector<int> & Jet_jetId) {
+void getJetId(nano_tree & nano, float nanoaod_version, vector<int> & Jet_jetId) {
   Jet_jetId.resize(nano.nJet());
   for(int ijet(0); ijet<nano.nJet(); ++ijet){
-    if (year == 2023) Jet_jetId[ijet] = nano.Jet_jetId_11p9()[ijet];
+    if (nanoaod_version+0.01 > 11.9) Jet_jetId[ijet] = nano.Jet_jetId_11p9()[ijet];
     else Jet_jetId[ijet] = nano.Jet_jetId()[ijet];
   }
 }
 
-void getFatJet_btagDDBvL(nano_tree & nano, float nanoaod_version, vector<int> & FatJet_btagDDBvL) {
+void getFatJet_btagDDBvL(nano_tree & nano, float nanoaod_version, vector<float> & FatJet_btagDDBvL) {
   FatJet_btagDDBvL.resize(nano.nFatJet());
   for(int ijet(0); ijet<nano.nFatJet(); ++ijet){
     if (nanoaod_version+0.01 < 9) FatJet_btagDDBvL[ijet] = nano.FatJet_btagDDBvL()[ijet];
@@ -248,23 +248,67 @@ void getFatJet_btagDDBvL(nano_tree & nano, float nanoaod_version, vector<int> & 
   }
 }
 
-void getPhoton_electronIdx(nano_tree & nano, int year, vector<int> & Photon_electronIdx) {
+void getFatJet_particleNetWithMass_WvsQCD(nano_tree & nano, float nanoaod_version, 
+                                          vector<float> & FatJet_particleNetWithMass_WvsQCD) {
+  FatJet_particleNetWithMass_WvsQCD.resize(nano.nFatJet());
+  for(int ijet(0); ijet<nano.nFatJet(); ++ijet){
+    if (nanoaod_version+0.01 < 11.9) 
+      FatJet_particleNetWithMass_WvsQCD[ijet] = nano.FatJet_particleNet_WvsQCD()[ijet];
+    else 
+      FatJet_particleNetWithMass_WvsQCD[ijet] = nano.FatJet_particleNetWithMass_WvsQCD()[ijet];
+  }
+}
+
+void getFatJet_particleNetWithMass_ZvsQCD(nano_tree & nano, float nanoaod_version, 
+                                          vector<float> & FatJet_particleNetWithMass_ZvsQCD) {
+  FatJet_particleNetWithMass_ZvsQCD.resize(nano.nFatJet());
+  for(int ijet(0); ijet<nano.nFatJet(); ++ijet){
+    if (nanoaod_version+0.01 < 11.9) 
+      FatJet_particleNetWithMass_ZvsQCD[ijet] = nano.FatJet_particleNet_ZvsQCD()[ijet];
+    else 
+      FatJet_particleNetWithMass_ZvsQCD[ijet] = nano.FatJet_particleNetWithMass_ZvsQCD()[ijet];
+  }
+}
+
+void getFatJet_particleNetWithMass_TvsQCD(nano_tree & nano, float nanoaod_version, 
+                                          vector<float> & FatJet_particleNetWithMass_TvsQCD) {
+  FatJet_particleNetWithMass_TvsQCD.resize(nano.nFatJet());
+  for(int ijet(0); ijet<nano.nFatJet(); ++ijet){
+    if (nanoaod_version+0.01 < 11.9) 
+      FatJet_particleNetWithMass_TvsQCD[ijet] = nano.FatJet_particleNet_TvsQCD()[ijet];
+    else 
+      FatJet_particleNetWithMass_TvsQCD[ijet] = nano.FatJet_particleNetWithMass_TvsQCD()[ijet];
+  }
+}
+
+void getFatJet_particleNet_mass(nano_tree & nano, float nanoaod_version, 
+                                          vector<float> & FatJet_particleNet_mass) {
+  FatJet_particleNet_mass.resize(nano.nFatJet());
+  for(int ijet(0); ijet<nano.nFatJet(); ++ijet){
+    if (nanoaod_version+0.01 < 11.9) 
+      FatJet_particleNet_mass[ijet] = nano.FatJet_particleNet_mass()[ijet];
+    else 
+      FatJet_particleNet_mass[ijet] = nano.FatJet_particleNet_massCorr()[ijet];
+  }
+}
+
+void getPhoton_electronIdx(nano_tree & nano, float nanoaod_version, vector<int> & Photon_electronIdx) {
   Photon_electronIdx.resize(nano.nPhoton());
   for(int iphoton(0); iphoton<nano.nPhoton(); ++iphoton){
-    if (year == 2023) Photon_electronIdx[iphoton] = nano.Photon_electronIdx_11p9()[iphoton];
+    if (nanoaod_version+0.01 > 11.9) Photon_electronIdx[iphoton] = nano.Photon_electronIdx_11p9()[iphoton];
     else Photon_electronIdx[iphoton] = nano.Photon_electronIdx()[iphoton];
   }
 }
 
-void getMuon_fsrPhotonIdx(nano_tree & nano, int year, vector<int> & Muon_fsrPhotonIdx) {
+void getMuon_fsrPhotonIdx(nano_tree & nano, float nanoaod_version, vector<int> & Muon_fsrPhotonIdx) {
   Muon_fsrPhotonIdx.resize(nano.nMuon());
   for(int imuon(0); imuon<nano.nMuon(); ++imuon){
-    if (year == 2023) Muon_fsrPhotonIdx[imuon] = nano.Muon_fsrPhotonIdx_11p9()[imuon];
+    if (nanoaod_version+0.01 > 11.9) Muon_fsrPhotonIdx[imuon] = nano.Muon_fsrPhotonIdx_11p9()[imuon];
     else Muon_fsrPhotonIdx[imuon] = nano.Muon_fsrPhotonIdx()[imuon];
   }
 }
 
-void getElectron_photonIdx(nano_tree & nano, int year, vector<int> & Electron_photonIdx) {
+void getElectron_photonIdx(nano_tree & nano, float nanoaod_version, vector<int> & Electron_photonIdx) {
   Electron_photonIdx.resize(nano.nElectron());
   //cout<<"nElectron: "<<nano.nElectron()<<endl;
   //cout<<"  "<<nano.Electron_photonIdx()[0]<<endl;
@@ -273,31 +317,47 @@ void getElectron_photonIdx(nano_tree & nano, int year, vector<int> & Electron_ph
   //cout<<"  "<<nano.Photon_cutBased()[0]<<endl;
   //cout<<"  "<<nano.Photon_cutBased_char()[0]<<endl;
   for(int iel(0); iel<nano.nElectron(); ++iel){
-    if (year == 2023) Electron_photonIdx[iel] = nano.Electron_photonIdx_11p9()[iel];
+    if (nanoaod_version+0.01 > 11.9) Electron_photonIdx[iel] = nano.Electron_photonIdx_11p9()[iel];
     else Electron_photonIdx[iel] = nano.Electron_photonIdx()[iel];
   }
 }
 
-void getFsrPhoton_muonIdx(nano_tree & nano, int year, vector<int> & FsrPhoton_muonIdx) {
+void getFsrPhoton_muonIdx(nano_tree & nano, float nanoaod_version, vector<int> & FsrPhoton_muonIdx) {
   FsrPhoton_muonIdx.resize(nano.nFsrPhoton());
   for(int ipart(0); ipart<nano.nFsrPhoton(); ++ipart){
-    if (year == 2023) FsrPhoton_muonIdx[ipart] = nano.FsrPhoton_muonIdx_11p9()[ipart];
+    if (nanoaod_version+0.01 > 11.9) FsrPhoton_muonIdx[ipart] = nano.FsrPhoton_muonIdx_11p9()[ipart];
     else FsrPhoton_muonIdx[ipart] = nano.FsrPhoton_muonIdx()[ipart];
   }
 }
 
-void getPhoton_jetIdx(nano_tree & nano, int year, vector<int> & Photon_jetIdx) {
+void getPhoton_jetIdx(nano_tree & nano, float nanoaod_version, vector<int> & Photon_jetIdx) {
   Photon_jetIdx.resize(nano.nPhoton());
   for(int ipart(0); ipart<nano.nPhoton(); ++ipart){
-    if (year == 2023) Photon_jetIdx[ipart] = nano.Photon_jetIdx_11p9()[ipart];
+    if (nanoaod_version+0.01 > 11.9) Photon_jetIdx[ipart] = nano.Photon_jetIdx_11p9()[ipart];
     else Photon_jetIdx[ipart] = nano.Photon_jetIdx()[ipart];
   }
 }
 
-void getPhoton_cutBased(nano_tree & nano, int year, vector<int> & Photon_cutBased) {
+void getPhoton_cutBased(nano_tree & nano, float nanoaod_version, vector<int> & Photon_cutBased) {
   Photon_cutBased.resize(nano.nPhoton());
   for(int ipart(0); ipart<nano.nPhoton(); ++ipart){
-    if (year == 2023) Photon_cutBased[ipart] = nano.Photon_cutBased_11p9()[ipart];
+    if (nanoaod_version+0.01 > 11.9) Photon_cutBased[ipart] = nano.Photon_cutBased_11p9()[ipart];
     else Photon_cutBased[ipart] = nano.Photon_cutBased()[ipart];
+  }
+}
+
+void getFatJet_subJetIdx1(nano_tree & nano, float nanoaod_version, vector<int> & FatJet_subJetIdx1) {
+  FatJet_subJetIdx1.resize(nano.nFatJet());
+  for(int ipart(0); ipart<nano.nFatJet(); ++ipart){
+    if (nanoaod_version+0.01 > 11.9) FatJet_subJetIdx1[ipart] = nano.FatJet_subJetIdx1_11p9()[ipart];
+    else FatJet_subJetIdx1[ipart] = nano.FatJet_subJetIdx1()[ipart];
+  }
+}
+
+void getFatJet_subJetIdx2(nano_tree & nano, float nanoaod_version, vector<int> & FatJet_subJetIdx2) {
+  FatJet_subJetIdx2.resize(nano.nFatJet());
+  for(int ipart(0); ipart<nano.nFatJet(); ++ipart){
+    if (nanoaod_version+0.01 > 11.9) FatJet_subJetIdx2[ipart] = nano.FatJet_subJetIdx2_11p9()[ipart];
+    else FatJet_subJetIdx2[ipart] = nano.FatJet_subJetIdx2()[ipart];
   }
 }

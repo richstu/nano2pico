@@ -229,8 +229,8 @@ int main(int argc, char *argv[]){
 
   //Initialize object producers
   GenParticleProducer mc_producer(year);
-  ElectronProducer el_producer(year, isData, isAPV);
-  MuonProducer mu_producer(year, isData, rocco_file);
+  ElectronProducer el_producer(year, isData, isAPV, nanoaod_version);
+  MuonProducer mu_producer(year, isData, nanoaod_version, rocco_file);
   DileptonProducer dilep_producer(year);
   IsoTrackProducer tk_producer(year);
   PhotonProducer photon_producer(year, isData, isAPV, nanoaod_version);
@@ -260,7 +260,7 @@ int main(int argc, char *argv[]){
   //cout<<"Is APV: "<<isAPV<<endl;
 
   // Other tools
-  EventTools event_tools(in_path, year, isData);
+  EventTools event_tools(in_path, year, isData, nanoaod_version);
   int event_type = event_tools.GetEventType();
 
   ISRTools isr_tools(in_path, year);
@@ -381,10 +381,8 @@ int main(int argc, char *argv[]){
         btag_wpts[year], btag_df_wpts[year], isFastsim, isSignal, 
         is2022preEE, sys_higvars);
     jetmet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year][1], isFastsim); // usually w.r.t. medium WP
-    if(!isZgamma){
-      jetmet_producer.WriteFatJets(nano, pico); // jetmet_producer.SetVerbose(nano.nSubJet()>0);
-      jetmet_producer.WriteSubJets(nano, pico);
-    }
+    jetmet_producer.WriteFatJets(nano, pico); // jetmet_producer.SetVerbose(nano.nSubJet()>0);
+    jetmet_producer.WriteSubJets(nano, pico);
     isr_tools.WriteISRJetMultiplicity(nano, pico);
 
     // calculate mT only for single lepton events
@@ -551,8 +549,11 @@ int main(int argc, char *argv[]){
     else
       pico.out_w_lumi() = 1.;
 
-    //copy LHE scale variation weights
-    pico.out_sys_murf() = nano.LHEScaleWeight();
+    //copy LHE scale variation weights and PS weights
+    if (!isData) {
+      pico.out_sys_murf() = nano.LHEScaleWeight();
+      pico.out_sys_ps() = nano.PSWeight();
+    }
 
     isr_tools.WriteISRWeights(pico);
 
@@ -620,7 +621,10 @@ int main(int argc, char *argv[]){
         wgt_sums.out_sys_pu()[i]         += pico.out_sys_pu()[i];
       }
       for(size_t i = 0; i<pico.out_sys_murf().size(); ++i){ 
-        wgt_sums.out_sys_murf()[i]         += pico.out_sys_murf()[i];
+        wgt_sums.out_sys_murf()[i] += pico.out_sys_murf()[i];
+      }
+      for(size_t i = 0; i<pico.out_sys_ps().size(); ++i){ 
+        wgt_sums.out_sys_ps()[i] += pico.out_sys_ps()[i];
       }
     }
 
@@ -676,6 +680,7 @@ void Initialize(corrections_tree &wgt_sums){
   wgt_sums.out_sys_pu().resize(2,0);
   wgt_sums.out_sys_trig().resize(2,0);
   wgt_sums.out_sys_murf().resize(9,0);
+  wgt_sums.out_sys_ps().resize(4,0);
 }
 
 void GetOptions(int argc, char *argv[]){

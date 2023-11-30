@@ -36,6 +36,7 @@ vector<float> sys_trig
 vector<float> sys_isr
 vector<float> sys_pu
 vector<float> sys_murf
+vector<float> sys_ps
 
 # vector<float> w_pdf
 # vector<float> sys_pdf

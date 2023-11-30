@@ -11,7 +11,7 @@
 class ElectronProducer{
 public:
 
-  explicit ElectronProducer(int year, bool isData, bool preVFP);
+  explicit ElectronProducer(int year, bool isData, bool preVFP, float nanoaod_version);
   ~ElectronProducer();
 
   const float SignalElectronPtCut  = 20.0;
@@ -34,6 +34,7 @@ private:
   std::unique_ptr<correction::CorrectionSet> cs_scale_syst_;
   correction::Correction::Ref map_scale_syst_;
   std::string str_scale_syst_;
+  float nanoaod_version;
 
   bool IsSignal(nano_tree& nano, int nano_idx, bool isZgamma);
   bool idElectron_noIso(int bitmap, int level);

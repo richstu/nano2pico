@@ -10,7 +10,7 @@
 
 using namespace std;
 
-ElectronProducer::ElectronProducer(int year_, bool isData_, bool preVFP){
+ElectronProducer::ElectronProducer(int year_, bool isData_, bool preVFP, float nanoaod_version_){
   year = year_;
   isData = isData_;
   if (year==2016 && preVFP) {
@@ -40,6 +40,7 @@ ElectronProducer::ElectronProducer(int year_, bool isData_, bool preVFP){
     std::cout << "WARNING: No dedicated EGM scale/smearing JSONs, defaulting to 2018" << std::endl;
   }
   map_scale_syst_ = cs_scale_syst_->at("UL-EGM_ScaleUnc");
+  nanoaod_version = nanoaod_version_;
 }
 
 ElectronProducer::~ElectronProducer(){
@@ -87,9 +88,9 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
   vector<float> Jet_pt, Jet_mass;
   getJetWithJEC(nano, isFastsim, Jet_pt, Jet_mass);
   vector<int> Electron_photonIdx;
-  getElectron_photonIdx(nano, year, Electron_photonIdx);
+  getElectron_photonIdx(nano, nanoaod_version, Electron_photonIdx);
   vector<int> Photon_electronIdx;
-  getPhoton_electronIdx(nano, year, Photon_electronIdx);
+  getPhoton_electronIdx(nano, nanoaod_version, Photon_electronIdx);
 
   for (int iph(0); iph<nano.nPhoton(); ++iph)
     photon_el_pico_idx.push_back(-1);

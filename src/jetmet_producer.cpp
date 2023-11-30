@@ -325,7 +325,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
     jes_up_factor.resize(Jet_pt.size(),1.0);
     jes_dn_factor.resize(Jet_pt.size(),1.0);
   }
-  else if (is_preUL && year <= 2018) {
+  else if ((nanoaod_version+0.01) < 9) {
     getJetWithJEC(nano, isFastsim, Jet_pt, Jet_mass);
     getMETWithJEC(nano, year, isFastsim, MET_pt, MET_phi, is_preUL);
     jer_nm_factor.resize(Jet_pt.size(),1.0);
@@ -347,7 +347,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
     }
   }
   vector<int> Jet_jetId;
-  getJetId(nano, year, Jet_jetId);
+  getJetId(nano, nanoaod_version, Jet_jetId);
   
   // calculate MHT; needed when saving jet info
   TLorentzVector mht_vec;
@@ -363,17 +363,19 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
 
   vector<vector<float>> sys_jet_met_dphi;
 
-  if (is_preUL && isSignal) {
-    pico.out_sys_njet().resize(4,0);
-    pico.out_sys_nbl().resize(4,0);
-    pico.out_sys_nbm().resize(4,0);
-    pico.out_sys_nbt().resize(4,0);
-    pico.out_sys_ht().resize(4,0.0);
-    sys_jet_met_dphi.resize(4,vector<float>({}));
-    sys_higvars.resize(4, HiggsConstructionVariables());
-    pico.out_sys_low_dphi_met().resize(4,false);
+  if ((nanoaod_version+0.01) < 9) {
+    if (isSignal) {
+      pico.out_sys_njet().resize(4,0);
+      pico.out_sys_nbl().resize(4,0);
+      pico.out_sys_nbm().resize(4,0);
+      pico.out_sys_nbt().resize(4,0);
+      pico.out_sys_ht().resize(4,0.0);
+      sys_jet_met_dphi.resize(4,vector<float>({}));
+      sys_higvars.resize(4, HiggsConstructionVariables());
+      pico.out_sys_low_dphi_met().resize(4,false);
+    }
   }
-  else if (!is_preUL) {
+  else if (!isData) { 
     pico.out_sys_njet().resize(4,0);
     //TODO add variations for deepflavor b-tagging
   }
@@ -429,7 +431,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
 
     //sys_jetvar convention: [0] JER up, [1] JER down, [2] JEC up, [3] JEC down
     //for now, only save sys_ variables
-    if (isSignal && is_preUL) {
+    if (isSignal && (nanoaod_version+0.01)<9) {
       if (nano.Jet_pt_jerUp()[ijet] > min_jet_pt) {
         if (isgood) {
           pico.out_sys_njet()[0]++;
@@ -502,7 +504,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
         (Jet_pt[ijet]*jer_dn_factor[ijet]/jer_nm_factor[ijet]) <= min_jet_pt &&
         (Jet_pt[ijet]*jes_up_factor[ijet]) <= min_jet_pt) continue;
 
-    if (!is_preUL && isgood) {
+    if (!isData && (nanoaod_version+0.01)>9 && isgood) {
       if ((Jet_pt[ijet]*jer_up_factor[ijet]/jer_nm_factor[ijet]) > min_jet_pt)
         pico.out_sys_njet()[0]++;
       if ((Jet_pt[ijet]*jer_dn_factor[ijet]/jer_nm_factor[ijet]) > min_jet_pt)
@@ -660,8 +662,16 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
 
 void JetMetProducer::WriteFatJets(nano_tree &nano, pico_tree &pico){
   pico.out_nfjet() = 0; 
-  vector<int> FatJet_btagDDBvL;
+  vector<float> FatJet_btagDDBvL;
+  vector<float> FatJet_particleNetWithMass_WvsQCD;
+  vector<float> FatJet_particleNetWithMass_ZvsQCD;
+  vector<float> FatJet_particleNetWithMass_TvsQCD;
+  vector<float> FatJet_particleNet_mass;
+  vector<int> FatJet_subJetIdx1;
+  vector<int> FatJet_subJetIdx2;
   getFatJet_btagDDBvL(nano, nanoaod_version, FatJet_btagDDBvL);
+  getFatJet_subJetIdx1(nano, nanoaod_version, FatJet_subJetIdx1);
+  getFatJet_subJetIdx2(nano, nanoaod_version, FatJet_subJetIdx2);
 
   for(int ifjet(0); ifjet<nano.nFatJet(); ++ifjet){
     if (verbose) cout<<"FatJet "<<ifjet<<": pt = "<<setw(10)<<nano.FatJet_pt()[ifjet]
@@ -678,13 +688,24 @@ void JetMetProducer::WriteFatJets(nano_tree &nano, pico_tree &pico){
     // Mass-decorrelated Deep Double B, H->bb vs QCD discriminator, endorsed by BTV
     pico.out_fjet_deep_md_hbb_btv().push_back(FatJet_btagDDBvL[ifjet]);
     pico.out_fjet_mva_hbb_btv().push_back(nano.FatJet_btagHbb()[ifjet]);
-    // Mass-decorrelated DeepAk8, H->bb vs QCD discriminator, endorsed by JME
-    pico.out_fjet_deep_md_hbb_jme().push_back(nano.FatJet_deepTagMD_HbbvsQCD()[ifjet]);
-    pico.out_fjet_deep_md_tvsqcd().push_back(nano.FatJet_deepTagMD_TvsQCD()[ifjet]);
-    pico.out_fjet_deep_tvsqcd().push_back(nano.FatJet_deepTag_TvsQCD()[ifjet]);
-
-    pico.out_fjet_subjet_idx1().push_back(nano.FatJet_subJetIdx1()[ifjet]);
-    pico.out_fjet_subjet_idx2().push_back(nano.FatJet_subJetIdx2()[ifjet]);
+    if (nanoaod_version+0.01 < 11.9) {
+      // Mass-decorrelated DeepAK8, H->bb vs QCD discriminator, endorsed by JME
+      pico.out_fjet_deep_md_hbb_jme().push_back(nano.FatJet_deepTagMD_HbbvsQCD()[ifjet]);
+      pico.out_fjet_deep_md_tvsqcd().push_back(nano.FatJet_deepTagMD_TvsQCD()[ifjet]);
+      pico.out_fjet_deep_tvsqcd().push_back(nano.FatJet_deepTag_TvsQCD()[ifjet]);
+    }
+    if (nanoaod_version+0.01 > 9) {
+      getFatJet_particleNetWithMass_WvsQCD(nano, nanoaod_version, FatJet_particleNetWithMass_WvsQCD);
+      getFatJet_particleNetWithMass_ZvsQCD(nano, nanoaod_version, FatJet_particleNetWithMass_ZvsQCD);
+      getFatJet_particleNetWithMass_TvsQCD(nano, nanoaod_version, FatJet_particleNetWithMass_TvsQCD);
+      getFatJet_particleNet_mass(nano, nanoaod_version, FatJet_particleNet_mass);
+      pico.out_fjet_pnet_wtag().push_back(FatJet_particleNetWithMass_WvsQCD[ifjet]);
+      pico.out_fjet_pnet_ztag().push_back(FatJet_particleNetWithMass_ZvsQCD[ifjet]);
+      pico.out_fjet_pnet_ttag().push_back(FatJet_particleNetWithMass_TvsQCD[ifjet]);
+      pico.out_fjet_pnet_m().push_back(FatJet_particleNet_mass[ifjet]);
+    }
+    pico.out_fjet_subjet_idx1().push_back(FatJet_subJetIdx1[ifjet]);
+    pico.out_fjet_subjet_idx2().push_back(FatJet_subJetIdx2[ifjet]);
 
     for(unsigned ijet(0); ijet<pico.out_jet_pt().size(); ++ijet){
       if (dR(pico.out_jet_eta()[ijet], nano.FatJet_eta()[ifjet], pico.out_jet_phi()[ijet], nano.FatJet_phi()[ifjet])<0.8)

@@ -177,6 +177,10 @@ vector<float> fjet_mva_hbb_btv
 vector<float> fjet_deep_md_hbb_jme
 vector<float> fjet_deep_md_tvsqcd
 vector<float> fjet_deep_tvsqcd
+vector<float> fjet_pnet_wtag
+vector<float> fjet_pnet_ztag
+vector<float> fjet_pnet_ttag
+vector<float> fjet_pnet_m
 vector<int>   fjet_subjet_idx1
 vector<int>   fjet_subjet_idx2
 
@@ -590,7 +594,11 @@ vector<float> sys_isr
 vector<float> sys_pu
 vector<float> sys_prefire
 
+#variations have index: 0 (MUF=0.5 MUR=0.5), 1 (MUF=1 MUR=0.5), 2 (MUF=2 MUR=0.5), 3 (MUF=0.5 MUR=1), 4 (MUF=2 MUR=1), 5 (MUF=0.5 MUR=2), 6 (MUF=1 MUR=2), 7 (MUF=2 MUR=2)
 vector<float> sys_murf
+
+#variations have index: 0 (ISR=2 FSR=1), 1 (ISR=1 FSR=2), 2 (ISR=0.5 FSR=1), 2(ISR=1 FSR=0.5)
+vector<float> sys_ps
 
 #index matches jet_*
 vector<float> sys_jet_pt_jesup
