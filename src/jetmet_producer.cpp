@@ -27,7 +27,7 @@ JetMetProducer::JetMetProducer(int year_, float nanoaod_version_,
   min_jet_pt = min_jet_pt_;
   max_jet_eta = max_jet_eta_;
   nanoaod_version = nanoaod_version_;
-  rng_ = TRandom3(0);
+  rng_ = TRandom3(4357);
   if (year==2016 && preVFP) {
     cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2016preVFP_UL/jet_jerc_2016apv.json");
     //despite strange name, this map does have JES variations and should be evaluated w.r.t. corrected jet pt
@@ -315,6 +315,8 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
   float MET_pt, MET_phi;
   if (isData) {
     WriteMet(nano, pico);
+    MET_pt = pico.out_met();
+    MET_phi = pico.out_met_phi();
     Jet_pt = nano.Jet_pt();
     Jet_mass = nano.Jet_mass();
     jer_nm_factor.resize(Jet_pt.size(),1.0);

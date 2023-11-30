@@ -28,6 +28,7 @@ def getTag(path):
   #tag = tag.strip("_")
 
   tag = re.findall('(.*?)__',tag)[0]
+  tag = tag.split("_ext")[0]
   tag = tag.replace("raw_pico_","")
   return tag
 

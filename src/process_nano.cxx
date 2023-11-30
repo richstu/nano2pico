@@ -75,6 +75,7 @@ int main(int argc, char *argv[]){
   int isAPV = false;
   int is_preUL = true;
   if (regex_search(in_file, std::regex("RunIISummer\\d\\dUL"))) is_preUL = false;
+  if (regex_search(in_file, std::regex("UL201\\d"))) is_preUL = false;
   // Find year and isAPV for MC
   if (!isData) { // MC
     if (!is_preUL) { // UL
@@ -228,7 +229,7 @@ int main(int argc, char *argv[]){
 
   //Initialize object producers
   GenParticleProducer mc_producer(year);
-  ElectronProducer el_producer(year, isData);
+  ElectronProducer el_producer(year, isData, isAPV);
   MuonProducer mu_producer(year, isData, rocco_file);
   DileptonProducer dilep_producer(year);
   IsoTrackProducer tk_producer(year);
@@ -465,6 +466,7 @@ int main(int argc, char *argv[]){
       pico.out_w_pu() = 1.;
       pico.out_sys_pu().resize(2, 0);
       pico.out_w_photon() = 1.;
+      pico.out_w_trig() = 1.;
       pico.out_sys_photon().resize(2,0);
     } else { // MC
       if ((!is_preUL) || year>=2022) { //UL or run 3

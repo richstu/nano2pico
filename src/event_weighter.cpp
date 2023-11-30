@@ -475,14 +475,18 @@ void EventWeighter::bTaggingSF(pico_tree &pico){
       if (isinf(sf_nm)||isnan(sf_nm)) sf_nm = 1.0;
       if (isinf(sf_up)||isnan(sf_up)) sf_up = 1.0;
       if (isinf(sf_dn)||isnan(sf_dn)) sf_dn = 1.0;
-      sf_tot_nm *= cat_data_eff/cat_mc_eff;
+      sf_tot_nm *= sf_nm;
       if (jet_flavor != 0) { //bottom and charm
-        sf_tot_up_bc *= cat_data_eff_up/cat_mc_eff_dn;
-        sf_tot_dn_bc *= cat_data_eff_dn/cat_mc_eff_up;
+        sf_tot_up_bc *= sf_up;
+        sf_tot_dn_bc *= sf_dn;
+        sf_tot_up_udsg *= sf_nm;
+        sf_tot_dn_udsg *= sf_nm;
       }
       else { //light flavor
-        sf_tot_up_udsg *= cat_data_eff_up/cat_mc_eff_dn;
-        sf_tot_dn_udsg *= cat_data_eff_dn/cat_mc_eff_up;
+        sf_tot_up_bc *= sf_nm;
+        sf_tot_dn_bc *= sf_nm;
+        sf_tot_up_udsg *= sf_up;
+        sf_tot_dn_udsg *= sf_dn;
       }
     } //jet is good
   } //loop over jets

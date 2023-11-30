@@ -69,7 +69,7 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
       TLorentzVector l1err, l2err, pherr;
       double ptl1err, ptl2err, ptpherr;
       double dml1, dml2, dmph;
-      ptpherr = pico.out_photon_pterr()[igamma] * photon.Pt() / photon.P();
+      ptpherr = pico.out_photon_energyErr()[igamma] * photon.Pt() / photon.P();
       pherr.SetPtEtaPhiM(pico.out_photon_pt()[igamma] + ptpherr,
                          pico.out_photon_eta()[igamma], pico.out_photon_phi()[igamma], 0);
       if(pico.out_ll_lepid()[ill] == 11) {

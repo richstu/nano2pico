@@ -25,6 +25,7 @@ keep mu_*
 keep dijet_*
 keep ll_*
 keep llphoton_*
+keep met
 keep met_*
 
 keep njet

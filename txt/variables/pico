@@ -298,7 +298,7 @@ vector<float> photon_etawidth
 vector<float> photon_phiwidth
 vector<float> photon_drmin
 vector<float> photon_drmax
-vector<float> photon_pterr
+vector<float> photon_energyErr
 vector<float> photon_energy_raw
 vector<float> photon_origin_eta
 vector<float> photon_hoe
@@ -315,6 +315,7 @@ vector<int>   photon_idCutBasedBitMap
 vector<bool>  photon_elveto
 vector<bool>  photon_sig
 vector<int>   photon_elidx
+vector<bool>  photon_pixelseed
 vector<float> photon_jet_mindr
 vector<float> photon_zeppenfeld
 
@@ -600,6 +601,12 @@ vector<float> sys_jet_m_jesup
 vector<float> sys_jet_m_jesdn
 vector<float> sys_jet_m_jerup
 vector<float> sys_jet_m_jerdn
+
+#index matches electron_*
+vector<float> sys_el_pt_scaleup
+vector<float> sys_el_pt_scaledn
+vector<float> sys_el_pt_resup
+vector<float> sys_el_pt_resdn
 
 #index matches photon_*
 vector<float> sys_photon_pt_scaleup

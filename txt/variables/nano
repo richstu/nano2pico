@@ -21,6 +21,8 @@ float L1PreFiringWeight_Dn
 int nElectron
 # delta eta (SC,ele) with sign
 array<float> Electron_deltaEtaSC
+array<float> Electron_dEsigmaUp
+array<float> Electron_dEsigmaDown
 array<float> Electron_dr03EcalRecHitSumEt
 array<float> Electron_dr03HcalDepth1TowerSumEt
 array<float> Electron_dr03TkSumPt

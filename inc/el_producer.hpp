@@ -1,14 +1,17 @@
 #ifndef H_EL_PRODUCER
 #define H_EL_PRODUCER
 
+#include <string>
+#include <memory>
 
+#include "correction.hpp"
 #include "nano_tree.hpp"
 #include "pico_tree.hpp"
 
 class ElectronProducer{
 public:
 
-  explicit ElectronProducer(int year, bool isData);
+  explicit ElectronProducer(int year, bool isData, bool preVFP);
   ~ElectronProducer();
 
   const float SignalElectronPtCut  = 20.0;
@@ -28,11 +31,13 @@ public:
 private:
   int year;
   bool isData;
+  std::unique_ptr<correction::CorrectionSet> cs_scale_syst_;
+  correction::Correction::Ref map_scale_syst_;
+  std::string str_scale_syst_;
 
   bool IsSignal(nano_tree& nano, int nano_idx, bool isZgamma);
   bool idElectron_noIso(int bitmap, int level);
   bool EcalDriven(int bitmap);
-
 };
 
 #endif

@@ -157,7 +157,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
         pico.out_photon_reliso().insert(pico.out_photon_reliso().begin()+shift, nano.Photon_pfRelIso03_all()[iph]);
         pico.out_photon_r9()    .insert(pico.out_photon_r9()    .begin()+shift, nano.Photon_r9()[iph]);
         pico.out_photon_sieie() .insert(pico.out_photon_sieie() .begin()+shift, nano.Photon_sieie()[iph]);
-        pico.out_photon_pterr() .insert(pico.out_photon_pterr() .begin()+shift, nano.Photon_energyErr()[iph]);
+        pico.out_photon_energyErr().insert(pico.out_photon_energyErr() .begin()+shift, nano.Photon_energyErr()[iph]);
         pico.out_photon_hoe()   .insert(pico.out_photon_hoe()   .begin()+shift, nano.Photon_hoe()[iph]);
         pico.out_photon_elveto().insert(pico.out_photon_elveto().begin()+shift, eVeto);
         pico.out_photon_id()    .insert(pico.out_photon_id()    .begin()+shift, nano.Photon_mvaID_WP90()[iph]);
@@ -172,8 +172,9 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
         pico.out_photon_drmin() .insert(pico.out_photon_drmin() .begin()+shift, minLepDR);
         pico.out_photon_drmax() .insert(pico.out_photon_drmax() .begin()+shift, maxLepDR);
         pico.out_photon_elidx() .insert(pico.out_photon_elidx() .begin()+shift, photon_el_pico_idx[iph]);
-        pico.out_sys_photon_pt_resup().insert(pico.out_sys_photon_pt_resup().begin()+shift, pt/nano.Photon_eCorr()[iph]*(1.0+nano.Photon_dEsigmaUp()[iph]));
-        pico.out_sys_photon_pt_resdn().insert(pico.out_sys_photon_pt_resdn().begin()+shift, pt/nano.Photon_eCorr()[iph]*(1.0+nano.Photon_dEsigmaDown()[iph]));
+        pico.out_photon_pixelseed().insert(pico.out_photon_pixelseed().begin()+shift,nano.Photon_pixelSeed()[iph]);
+        pico.out_sys_photon_pt_resup().insert(pico.out_sys_photon_pt_resup().begin()+shift, pt*(1.0+nano.Photon_dEsigmaUp()[iph]));
+        pico.out_sys_photon_pt_resdn().insert(pico.out_sys_photon_pt_resdn().begin()+shift, pt*(1.0+nano.Photon_dEsigmaDown()[iph]));
         pico.out_sys_photon_pt_scaleup().insert(pico.out_sys_photon_pt_scaleup().begin()+shift, pt*scale_syst_up);
         pico.out_sys_photon_pt_scaledn().insert(pico.out_sys_photon_pt_scaledn().begin()+shift, pt*scale_syst_dn);
         break;
@@ -192,7 +193,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
         pico.out_photon_sieip()   .insert(pico.out_photon_sieip()   .begin()+shift, nano.Photon_sieip()[iph]);
         pico.out_photon_etawidth().insert(pico.out_photon_etawidth().begin()+shift, nano.Photon_etaWidth()[iph]);
         pico.out_photon_phiwidth().insert(pico.out_photon_phiwidth().begin()+shift, nano.Photon_phiWidth()[iph]);
-        pico.out_photon_pterr()   .insert(pico.out_photon_pterr()   .begin()+shift, nano.Photon_energyErr()[iph]);
+        pico.out_photon_energyErr().insert(pico.out_photon_energyErr() .begin()+shift, nano.Photon_energyErr()[iph]);
         pico.out_photon_hoe()     .insert(pico.out_photon_hoe()     .begin()+shift, nano.Photon_hoe()[iph]);
         pico.out_photon_energy_raw().insert(pico.out_photon_energy_raw().begin()+shift, nano.Photon_energyRaw()[iph]);
         pico.out_photon_esoversc().insert(pico.out_photon_esoversc().begin()+shift, nano.Photon_esEnergyOverRawE()[iph]);
@@ -210,6 +211,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
         pico.out_photon_drmin()   .insert(pico.out_photon_drmin()   .begin()+shift, minLepDR);
         pico.out_photon_drmax()   .insert(pico.out_photon_drmax()   .begin()+shift, maxLepDR);
         pico.out_photon_elidx()   .insert(pico.out_photon_elidx()   .begin()+shift, photon_el_pico_idx[iph]);
+        pico.out_photon_pixelseed().insert(pico.out_photon_pixelseed().begin()+shift,nano.Photon_pixelSeed()[iph]);
         break;
         //TODO: add correctionlib-based scale/smearing corrections for run 3 (not available yet?)
       default:

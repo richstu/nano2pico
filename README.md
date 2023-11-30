@@ -397,6 +397,7 @@ Calcalated in [event_tools](src/event_tools.cpp).
 
 * `sys_jet_*` - systematic variations in jet pt/mass 
 * `sys_photon_*` - systematic variations in photon pt
+* `sys_el_*` - systematic variations in electron pt
 
 For the following uncertainties the indices correspond to 0=JER up, 1=JER down, 2=JES up, 3=JES down.
 * `sys_njet` - `njet` as jet systematics are varied
