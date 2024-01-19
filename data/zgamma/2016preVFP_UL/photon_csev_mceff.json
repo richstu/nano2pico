@@ -1,0 +1,109 @@
+{
+  "corrections": [
+    {
+      "inputs": [
+        {
+          "type": "string", 
+          "name": "ValType", 
+          "description": "effmc/systmc_up/systmc_dn"
+        }, 
+        {
+          "type": "string", 
+          "name": "HasPixBin", 
+          "description": "EBHighR9/EBLowR9/EEHighR9/EELowR9"
+        }
+      ], 
+      "name": "Photon_CSEV_MCeff", 
+      "version": 1, 
+      "output": {
+        "type": "real", 
+        "name": "eff", 
+        "description": "photon conversion-safe electron veto efficiency/uncertainty"
+      }, 
+      "data": {
+        "content": [
+          {
+            "value": {
+              "content": [
+                {
+                  "value": 0.9930572276455656, 
+                  "key": "EBHighR9"
+                }, 
+                {
+                  "value": 0.9714746412348616, 
+                  "key": "EBLowR9"
+                }, 
+                {
+                  "value": 0.9652652484281949, 
+                  "key": "EEHighR9"
+                }, 
+                {
+                  "value": 0.9182148154182556, 
+                  "key": "EELowR9"
+                }
+              ], 
+              "input": "HasPixBin", 
+              "nodetype": "category"
+            }, 
+            "key": "effmc"
+          }, 
+          {
+            "value": {
+              "content": [
+                {
+                  "value": 2.2949899762481074e-05, 
+                  "key": "EBHighR9"
+                }, 
+                {
+                  "value": 6.209536233725554e-05, 
+                  "key": "EBLowR9"
+                }, 
+                {
+                  "value": 6.816201912052122e-05, 
+                  "key": "EEHighR9"
+                }, 
+                {
+                  "value": 0.00015583561837062554, 
+                  "key": "EELowR9"
+                }
+              ], 
+              "input": "HasPixBin", 
+              "nodetype": "category"
+            }, 
+            "key": "systmc_up"
+          }, 
+          {
+            "value": {
+              "content": [
+                {
+                  "value": 2.3025354335515225e-05, 
+                  "key": "EBHighR9"
+                }, 
+                {
+                  "value": 6.222669551836368e-05, 
+                  "key": "EBLowR9"
+                }, 
+                {
+                  "value": 6.829107726913364e-05, 
+                  "key": "EEHighR9"
+                }, 
+                {
+                  "value": 0.00015610629232565287, 
+                  "key": "EELowR9"
+                }
+              ], 
+              "input": "HasPixBin", 
+              "nodetype": "category"
+            }, 
+            "key": "systmc_dn"
+          }
+        ], 
+        "input": "ValType", 
+        "nodetype": "category"
+      }, 
+      "description": "Photon_CSEV_MCeff"
+    }
+  ], 
+  "description": "", 
+  "schema_version": 2
+}

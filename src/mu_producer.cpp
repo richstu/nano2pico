@@ -7,11 +7,12 @@
 
 using namespace std;
 
-MuonProducer::MuonProducer(int year_, bool isData_, std::string rocco_file) :
+MuonProducer::MuonProducer(int year_, bool isData_, float nanoaod_version_, std::string rocco_file) :
   year(year_),
   isData(isData_),
   rc(rocco_file),
-  rng(4357) {
+  rng(4357),
+  nanoaod_version(nanoaod_version_){
     (void) year;
 }
 
@@ -50,7 +51,7 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
   vector<float> Jet_pt, Jet_mass;
   getJetWithJEC(nano, isFastsim, Jet_pt, Jet_mass);
   vector<int> Muon_fsrPhotonIdx;
-  getMuon_fsrPhotonIdx(nano, year, Muon_fsrPhotonIdx);
+  getMuon_fsrPhotonIdx(nano, nanoaod_version, Muon_fsrPhotonIdx);
 
   //first, determine ordering based on signal and pt
   std::vector<NanoOrderEntry> nano_entries;

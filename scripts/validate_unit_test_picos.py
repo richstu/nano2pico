@@ -92,7 +92,7 @@ if __name__ == "__main__":
     if 'mkdir' in process[0]: continue
     command = process[0]
     golden_execution_time = process[2]
-    validate_execution_time = -1
+    validate_execution_time = '-1'
     for validate_process in validate_process_information:
       # Ignore input directory
       if strip_input(validate_process[0]) == strip_input(command): 

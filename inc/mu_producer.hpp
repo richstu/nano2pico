@@ -12,7 +12,7 @@
 class MuonProducer{
 public:
 
-  explicit MuonProducer(int year, bool isData, std::string rocco_file);
+  explicit MuonProducer(int year, bool isData, float nanoaod_version, std::string rocco_file);
   ~MuonProducer();
 
   const float SignalMuonPtCut  = 20.0;
@@ -29,6 +29,7 @@ private:
   bool isData;
   RoccoR rc;
   TRandom3 rng;
+  float nanoaod_version;
 
   bool IsSignal(nano_tree &nano, int nano_idx, bool isZgamma);
   

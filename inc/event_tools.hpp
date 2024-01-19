@@ -8,14 +8,14 @@
 class EventTools{
 public:
 
-  explicit EventTools(const std::string &name, int year);
+  explicit EventTools(const std::string &name, int year, bool isData, float nanoaod_version);
   ~EventTools();
 
   enum Dataset {EGamma, SingleElectron, SingleMuon, DoubleEG, DoubleMuon, MET, JetHT, Muon, JetMET, MuonEG};
 
   void WriteStitch(nano_tree &nano, pico_tree &pico);
   void WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, std::vector<int> sig_jet_nano_idx,
-                               float min_jet_pt, bool isData, bool isFastsim, bool is_preUL);
+                               float min_jet_pt, bool isFastsim, bool is_preUL);
   bool SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZgamma);
   void WriteTriggerEfficiency(pico_tree &pico);
   int GetEventType();
@@ -29,10 +29,14 @@ private:
   bool isTTJets_LO_HT;
   bool isWJets_LO;
   bool isDYJets_LO;
+  bool isEWKZ;
+  bool isWJ;
   bool isWW;
   bool isWZ;
   bool isZZ;
   bool isFastSim;
+  bool isData;
+  float nanoaod_version;
   int dataset;
 };
 

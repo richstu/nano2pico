@@ -1,0 +1,339 @@
+{
+    "schema_version": 2,
+    "description": "These are the photon ID, Pixel veto and CSEV Scale Factors (nominal, up or down) for 2016preVFP Ultra Legacy dataset. Each kind of scale factors, depend on the chosen working point, some other quantities. More information is below! Please keep in the mind that if your analysis is sensitive to high pT photons (>500 GeV), please refer https://twiki.cern.ch/twiki/bin/view/CMS/EGMPhotonIDHighPtPhotons",
+    "corrections": [
+        {
+            "name": "UL-EGM_ScaleUnc",
+            "description": "These are the Scale unc (up or down) for 2016preVFP Ultra Legacy dataset.",
+            "version": 2,
+            "inputs": [
+                {
+                    "name": "year",
+                    "type": "string",
+                    "description": "year/scenario: example 2016preVFP, 2017 etc"
+                },
+                {
+                    "name": "ValType",
+                    "type": "string",
+                    "description": "ssup/ssdown "
+                },
+                {
+                    "name": "eta",
+                    "type": "real"
+                },
+                {
+                    "name": "gain",
+                    "type": "int"
+                }
+            ],
+            "output": {
+                "name": "unc",
+                "type": "real",
+                "description": "value of unc (up or down)"
+            },
+            "data": {
+                "nodetype": "category",
+                "input": "year",
+                "content": [
+                    {
+                        "key": "2016preVFP",
+                        "value": {
+                            "nodetype": "category",
+                            "input": "ValType",
+                            "content": [
+                                {
+                                    "key": "scaleup",
+                                    "value": {
+                                        "nodetype": "category",
+                                        "input": "gain",
+                                        "content": [
+                                            {
+                                                "key": 12,
+                                                "value": {
+                                                    "nodetype": "multibinning",
+                                                    "inputs": [
+                                                        "eta"
+                                                    ],
+                                                    "edges": [
+                                                        [
+                                                            -Infinity,
+                                                            -1.442,
+                                                            -1.0,
+                                                            0.0,
+                                                            1.0,
+                                                            1.442,
+                                                            Infinity
+                                                        ]
+                                                    ],
+                                                    "content": [
+                                                        1.0015,
+                                                        1.00075,
+                                                        1.0005,
+                                                        1.0005,
+                                                        1.00075,
+                                                        1.0015
+                                                    ],
+                                                    "flow": "error"
+                                                }
+                                            },
+                                            {
+                                                "key": 6,
+                                                "value": {
+                                                    "nodetype": "multibinning",
+                                                    "inputs": [
+                                                        "eta"
+                                                    ],
+                                                    "edges": [
+                                                        [
+                                                            -Infinity,
+                                                            -1.442,
+                                                            -1.0,
+                                                            0.0,
+                                                            1.0,
+                                                            1.442,
+                                                            Infinity
+                                                        ]
+                                                    ],
+                                                    "content": [
+                                                        1.01,
+                                                        1.005,
+                                                        1.005,
+                                                        1.005,
+                                                        1.005,
+                                                        1.01
+                                                    ],
+                                                    "flow": "error"
+                                                }
+                                            },
+                                            {
+                                                "key": 1,
+                                                "value": {
+                                                    "nodetype": "multibinning",
+                                                    "inputs": [
+                                                        "eta"
+                                                    ],
+                                                    "edges": [
+                                                        [
+                                                            -Infinity,
+                                                            -1.442,
+                                                            -1.0,
+                                                            0.0,
+                                                            1.0,
+                                                            1.442,
+                                                            Infinity
+                                                        ]
+                                                    ],
+                                                    "content": [
+                                                        1.03,
+                                                        1.02,
+                                                        1.02,
+                                                        1.02,
+                                                        1.02,
+                                                        1.03
+                                                    ],
+                                                    "flow": "error"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "key": "scaledown",
+                                    "value": {
+                                        "nodetype": "category",
+                                        "input": "gain",
+                                        "content": [
+                                            {
+                                                "key": 12,
+                                                "value": {
+                                                    "nodetype": "multibinning",
+                                                    "inputs": [
+                                                        "eta"
+                                                    ],
+                                                    "edges": [
+                                                        [
+                                                            -Infinity,
+                                                            -1.442,
+                                                            -1.0,
+                                                            0.0,
+                                                            1.0,
+                                                            1.442,
+                                                            Infinity
+                                                        ]
+                                                    ],
+                                                    "content": [
+                                                        0.9985,
+                                                        0.99925,
+                                                        0.9995,
+                                                        0.9995,
+                                                        0.99925,
+                                                        0.9985
+                                                    ],
+                                                    "flow": "error"
+                                                }
+                                            },
+                                            {
+                                                "key": 6,
+                                                "value": {
+                                                    "nodetype": "multibinning",
+                                                    "inputs": [
+                                                        "eta"
+                                                    ],
+                                                    "edges": [
+                                                        [
+                                                            -Infinity,
+                                                            -1.442,
+                                                            -1.0,
+                                                            0.0,
+                                                            1.0,
+                                                            1.442,
+                                                            Infinity
+                                                        ]
+                                                    ],
+                                                    "content": [
+                                                        0.99,
+                                                        0.995,
+                                                        0.995,
+                                                        0.995,
+                                                        0.995,
+                                                        0.99
+                                                    ],
+                                                    "flow": "error"
+                                                }
+                                            },
+                                            {
+                                                "key": 1,
+                                                "value": {
+                                                    "nodetype": "multibinning",
+                                                    "inputs": [
+                                                        "eta"
+                                                    ],
+                                                    "edges": [
+                                                        [
+                                                            -Infinity,
+                                                            -1.442,
+                                                            -1.0,
+                                                            0.0,
+                                                            1.0,
+                                                            1.442,
+                                                            Infinity
+                                                        ]
+                                                    ],
+                                                    "content": [
+                                                        0.97,
+                                                        0.98,
+                                                        0.98,
+                                                        0.98,
+                                                        0.98,
+                                                        0.97
+                                                    ],
+                                                    "flow": "error"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "key": "scaleunc",
+                                    "value": {
+                                        "nodetype": "category",
+                                        "input": "gain",
+                                        "content": [
+                                            {
+                                                "key": 12,
+                                                "value": {
+                                                    "nodetype": "multibinning",
+                                                    "inputs": [
+                                                        "eta"
+                                                    ],
+                                                    "edges": [
+                                                        [
+                                                            -Infinity,
+                                                            -1.442,
+                                                            -1.0,
+                                                            0.0,
+                                                            1.0,
+                                                            1.442,
+                                                            Infinity
+                                                        ]
+                                                    ],
+                                                    "content": [
+                                                        0.0015,
+                                                        0.00075,
+                                                        0.0005,
+                                                        0.0005,
+                                                        0.00075,
+                                                        0.0015
+                                                    ],
+                                                    "flow": "error"
+                                                }
+                                            },
+                                            {
+                                                "key": 6,
+                                                "value": {
+                                                    "nodetype": "multibinning",
+                                                    "inputs": [
+                                                        "eta"
+                                                    ],
+                                                    "edges": [
+                                                        [
+                                                            -Infinity,
+                                                            -1.442,
+                                                            -1.0,
+                                                            0.0,
+                                                            1.0,
+                                                            1.442,
+                                                            Infinity
+                                                        ]
+                                                    ],
+                                                    "content": [
+                                                        0.01,
+                                                        0.005,
+                                                        0.005,
+                                                        0.005,
+                                                        0.005,
+                                                        0.01
+                                                    ],
+                                                    "flow": "error"
+                                                }
+                                            },
+                                            {
+                                                "key": 1,
+                                                "value": {
+                                                    "nodetype": "multibinning",
+                                                    "inputs": [
+                                                        "eta"
+                                                    ],
+                                                    "edges": [
+                                                        [
+                                                            -Infinity,
+                                                            -1.442,
+                                                            -1.0,
+                                                            0.0,
+                                                            1.0,
+                                                            1.442,
+                                                            Infinity
+                                                        ]
+                                                    ],
+                                                    "content": [
+                                                        0.03,
+                                                        0.02,
+                                                        0.02,
+                                                        0.02,
+                                                        0.02,
+                                                        0.03
+                                                    ],
+                                                    "flow": "error"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}

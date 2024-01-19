@@ -144,7 +144,7 @@ namespace xsec{
         //  Cross-section taken from https://twiki.cern.ch/twiki/bin/view/LHCPhysics/TtbarNNLO
         // Alternative option: https://twiki.cern.ch/twiki/bin/view/Sandbox/FullNNLOcrossSections#Top_cross_section_for_13_TeV
         if(file.Contains("TTJets_Tune") || file.Contains("TT_"))  xsec = 815.96;
-        if(file.Contains("TTJets_Tune") && file.Contains("amcatnloFXFX"))  xsec = 734.5;
+        if(file.Contains("TTJets_Tune") && file.Contains("amcatnloFXFX"))  xsec = 833.9;
 
         if(file.Contains("TTJets_DiLept") || file.Contains("TTTo2L2Nu")) xsec = 831.8*0.105; //source: PDG XS*BR http://pdg.lbl.gov/2019/reviews/rpp2018-rev-top-quark.pdf ; 85.66 in Humboldtv3+earlier
         if(file.Contains("TTJets_SingleLept")) xsec = 831.8*0.219; //source: PDG XS*BR http://pdg.lbl.gov/2019/reviews/rpp2018-rev-top-quark.pdf ; 178.7 in Humboldtv3+earlier
@@ -358,17 +358,17 @@ namespace xsec{
     if(file.Contains("ZGToLLG_01J_5f_lowMLL_lowGPt")) xsec = 172.4; // Other sample name
 
 
-    if(file.Contains("TTJets_Tune") && file.Contains("madgraphMLM"))  xsec = 471.7;
+    if(file.Contains("TTJets_Tune") && file.Contains("madgraphMLM"))  xsec = 833.9;
     if(file.Contains("TGJets") && !file.Contains("TTGJets")) xsec = 2.967;
     if(file.Contains("ST_s-channel_4f_leptonDecays_TuneCP5_13TeV")) xsec = 3.549; // from XSDB
     if(file.Contains("ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV")) xsec = 32.51; // from XSDB
     if(file.Contains("ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV")) xsec = 32.45; // from XSDB
 
     if(file.Contains("LLAJJ"))                      xsec = 0.1084;  // from XSDB
-    if(file.Contains("WZ_Tune"))                    xsec = 51.11;   // https://arxiv.org/pdf/1604.08576.pdf 
-    if(file.Contains("WW_Tune"))                    xsec = 118.7;   // https://arxiv.org/pdf/1408.5243.pdf
-    if(file.Contains("WWG_Tune"))                   xsec = 0.2147;  // from XSDB AS A NOTE: WWG is WWG --> LNu 2J
-    if(file.Contains("WZG_Tune"))                   xsec = 0.04345; // from XSDB
+    if(file.Contains("WZ_Tune"))                    xsec = 27.6;    // from XSDB
+    if(file.Contains("WW_Tune"))                    xsec = 75.8;    // from XSDB
+    if(file.Contains("WWG_Tune"))                   xsec = 0.2147;  // from XSDB Note: One W forced to l nu. Also possible bug for lvlv
+    if(file.Contains("WZG_Tune"))                   xsec = 0.04345; // from XSDB Note: W forced to l nu
     if(file.Contains("ZZGTo4L_Tune"))               xsec = 0.02202; // from XSDB
 
     // From https://arxiv.org/pdf/2006.11191.pdf Using Measured XSec for WWW,WWZ, and WZZ. For ZZZ used SM prediction
@@ -449,7 +449,7 @@ namespace xsec{
     if(file.Contains("ttHToZG_ZToLL"))              xsec = HToZG * 0.5071 * ZToLL ;
 
 
-    double H120ToZG = 0.00110; double H130ToZG = 0.01941;
+    double H120ToZG = 0.00110; double H130ToZG = 0.001941;
     if(file.Contains("GluGluHToZG_ZToLL_M-120"))    xsec = H120ToZG * ZToLL * 52.22;
     if(file.Contains("VBFHToZG_ZToLL_M-120"))       xsec = H120ToZG * ZToLL * 3.935 ;
     if(file.Contains("WplusH_HToZG_WToAll_M-120"))  xsec = H120ToZG * 0.9558 ; // WplusH, WminusH, ZH, ttH samples do not require decay of Z to leptons
@@ -463,6 +463,20 @@ namespace xsec{
     if(file.Contains("WminusH_HToZG_WToAll_M-130")) xsec = H130ToZG * 0.4676 ; // New samples are requested with this decay incorporated
     if(file.Contains("ZH_HToZG_ZToAll_M-130"))      xsec = H130ToZG * 0.7899 ; // Add ZToLL when updated samples are available
     if(file.Contains("ttHToZG_M130"))               xsec = H130ToZG * 0.4539 ;
+
+    // With cmssw GenXSecAnalyzer (pb)
+    if(file.Contains("ST_tWAto2L2Nu_5f_TuneCP5_13TeV-madgraph-pythia8")) xsec = 0.1523;
+    if(file.Contains("TTtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8")) xsec = 762.1;
+    if(file.Contains("TWminusto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8")) xsec = 35.99;
+    if(file.Contains("TWminustoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8")) xsec = 35.99;
+    if(file.Contains("TbarWplusto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8")) xsec = 36.05;
+    if(file.Contains("TbarWplustoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8")) xsec = 36.05;
+    if(file.Contains("ZG2JtoG2L2J_EWK_MLL-50_MJJ-120_TuneCP5_withDipoleRecoil_13p6TeV_madgraph-pythia8")) xsec = 0.1142;
+    if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-10to50_TuneCP5_13p6TeV_amcatnloFXFX-pythia8")) xsec = 124.4;
+    if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-50to100_TuneCP5_13p6TeV_amcatnloFXFX-pythia8")) xsec = 2.092;
+    if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-100to200_TuneCP5_13p6TeV_amcatnloFXFX-pythia8")) xsec = 0.3477;
+    if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-200_TuneCP5_13p6TeV_amcatnloFXFX-pythia8")) xsec = 0.04752;
+
 
 
 

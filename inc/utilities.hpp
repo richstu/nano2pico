@@ -103,13 +103,19 @@ void SplitFilePath(const std::string &path, std::string &dir_name, std::string &
 
 void getMETWithJEC(nano_tree & nano, int year, bool isFastsim, float & MET_pt, float & MET_phi, bool is_preUL);
 void getJetWithJEC(nano_tree & nano, bool isFastsim, std::vector<float> & Jet_pt, std::vector<float> & Jet_mass);
-void getJetId(nano_tree & nano, int year, std::vector<int> & Jet_jetId);
-void getFatJet_btagDDBvL(nano_tree & nano, float nanoaod_version, std::vector<int> & FatJet_btagDDBvL);
-void getPhoton_electronIdx(nano_tree & nano, int year, std::vector<int> & Photon_electronIdx);
-void getMuon_fsrPhotonIdx(nano_tree & nano, int year, std::vector<int> & Muon_fsrPhotonIdx);
-void getElectron_photonIdx(nano_tree & nano, int year, std::vector<int> & Electron_photonIdx);
-void getFsrPhoton_muonIdx(nano_tree & nano, int year, std::vector<int> & FsrPhoton_muonIdx);
-void getPhoton_jetIdx(nano_tree & nano, int year, std::vector<int> & Photon_jetIdx);
-void getPhoton_cutBased(nano_tree & nano, int year, std::vector<int> & Photon_cutBased);
+void getJetId(nano_tree & nano, float nanoaod_version, std::vector<int> & Jet_jetId);
+void getFatJet_btagDDBvL(nano_tree & nano, float nanoaod_version, std::vector<float> & FatJet_btagDDBvL);
+void getFatJet_particleNetWithMass_WvsQCD(nano_tree & nano, float nanoaod_version, std::vector<float> & FatJet_particleNetWithMass_WvsQCD);
+void getFatJet_particleNetWithMass_ZvsQCD(nano_tree & nano, float nanoaod_version, std::vector<float> & FatJet_particleNetWithMass_ZvsQCD);
+void getFatJet_particleNetWithMass_TvsQCD(nano_tree & nano, float nanoaod_version, std::vector<float> & FatJet_particleNetWithMass_TvsQCD);
+void getFatJet_particleNet_mass(nano_tree & nano, float nanoaod_version, std::vector<float> & FatJet_particleNet_mass);
+void getPhoton_electronIdx(nano_tree & nano, float nanoaod_version, std::vector<int> & Photon_electronIdx);
+void getMuon_fsrPhotonIdx(nano_tree & nano, float nanoaod_version, std::vector<int> & Muon_fsrPhotonIdx);
+void getElectron_photonIdx(nano_tree & nano, float nanoaod_version, std::vector<int> & Electron_photonIdx);
+void getFsrPhoton_muonIdx(nano_tree & nano, float nanoaod_version, std::vector<int> & FsrPhoton_muonIdx);
+void getPhoton_jetIdx(nano_tree & nano, float nanoaod_version, std::vector<int> & Photon_jetIdx);
+void getPhoton_cutBased(nano_tree & nano, float nanoaod_version, std::vector<int> & Photon_cutBased);
+void getFatJet_subJetIdx1(nano_tree & nano, float nanoaod_version, std::vector<int> & FatJet_subJetIdx1);
+void getFatJet_subJetIdx2(nano_tree & nano, float nanoaod_version, std::vector<int> & FatJet_subJetIdx2);
 
 #endif

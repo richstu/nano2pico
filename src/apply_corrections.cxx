@@ -32,6 +32,8 @@ int main(int argc, char *argv[]){
   string out_file = CopyReplaceAll(in_dir, "/raw_pico/","/unskimmed/") + CopyReplaceAll(in_file, "raw_","");
   corr_file = CopyReplaceAll(in_dir, "/raw_pico/","/corrections/")+corr_file;
 
+  bool is_zgamma = Contains(in_dir, "zgamma");
+
   cout<<"Corrections file: "<<corr_file<<endl;
   corrections_tree corr(corr_file);
   if (corr.GetEntries()!=1) {
@@ -61,20 +63,43 @@ int main(int argc, char *argv[]){
       pico.out_sys_fs_lep()    = pico.sys_fs_lep();
     }
 
-
+    pico.out_w_el()       = pico.w_el()*corr.w_el();
+    pico.out_w_mu()       = pico.w_mu()*corr.w_mu();
     pico.out_w_btag()     = pico.w_btag()*corr.w_btag();
     pico.out_w_bhig()     = pico.w_bhig()*corr.w_bhig();
     pico.out_w_btag_df()  = pico.w_btag_df()*corr.w_btag_df();
     pico.out_w_bhig_df()  = pico.w_bhig_df()*corr.w_bhig_df();
+    pico.out_w_photon()   = pico.w_photon()*corr.w_photon();
     
+    pico.out_w_trig()     = pico.w_trig()*corr.w_trig();
     pico.out_w_isr()      = pico.w_isr()*corr.w_isr();
     pico.out_w_pu()       = pico.w_pu()*corr.w_pu();
 
+    float btag_weight = pico.out_w_bhig();
+    if (is_zgamma) {
+      pico.out_w_lep() = pico.out_w_el()*pico.out_w_mu();
+      pico.out_w_fs_lep() = 1.0;
+      pico.out_sys_fs_lep()[0] = 1.0;
+      pico.out_sys_fs_lep()[1] = 1.0;
+      btag_weight = pico.out_w_bhig_df();
+    }
+
+    pico.out_sys_trig().resize(2);
     if (pico.nel()>0) {
-      if (pico.trig_single_el() || pico.trig_double_el())
-        pico.out_w_trig() = pico.w_trig()*corr.w_zvtx_pass();
-      else
-        pico.out_w_trig() = pico.w_trig()*corr.w_zvtx_fail();
+      if (pico.trig_single_el() || pico.trig_double_el()) {
+        pico.out_w_trig() = pico.out_w_trig()*corr.w_zvtx_pass();
+        pico.out_sys_trig()[0] = pico.sys_trig()[0]*corr.sys_trig()[0]*corr.w_zvtx_pass();
+        pico.out_sys_trig()[1] = pico.sys_trig()[1]*corr.sys_trig()[1]*corr.w_zvtx_pass();
+      }
+      else {
+        pico.out_w_trig() = pico.out_w_trig()*corr.w_zvtx_fail();
+        pico.out_sys_trig()[0] = pico.sys_trig()[0]*corr.sys_trig()[0]*corr.w_zvtx_fail();
+        pico.out_sys_trig()[1] = pico.sys_trig()[1]*corr.sys_trig()[1]*corr.w_zvtx_fail();
+      }
+    }
+    else {
+      pico.out_sys_trig()[0] = pico.sys_trig()[0]*corr.sys_trig()[0];
+      pico.out_sys_trig()[1] = pico.sys_trig()[1]*corr.sys_trig()[1];
     }
 
     pico.out_w_lumi() = pico.w_lumi()>0 ? 1. : -1.; //get the generator weight sign
@@ -82,27 +107,44 @@ int main(int argc, char *argv[]){
 
     pico.out_weight() = corr.weight() * pico.out_w_lumi() *
                      pico.out_w_lep() * pico.out_w_fs_lep() * //post-corr values in order for 0l to be correct
-                     pico.w_bhig() * pico.w_isr() *pico.w_pu() * pico.w_prefire() * pico.w_photon();
-    //w_trig not currently included in out_weight
+                     btag_weight * pico.out_w_trig() * pico.out_w_isr() * 
+                     pico.out_w_pu() * pico.w_prefire() * pico.out_w_photon();
 
     pico.out_sys_bchig().resize(2); pico.out_sys_fs_bchig().resize(2);
     pico.out_sys_udsghig().resize(2); pico.out_sys_fs_udsghig().resize(2);
-    pico.out_sys_isr().resize(2);
+    pico.out_sys_isr().resize(2); pico.out_sys_pu().resize(2);
+    pico.out_sys_el().resize(2); pico.out_sys_mu().resize(2);
     for (unsigned i(0); i<2; i++) {        
+      pico.out_sys_el()[i]         = pico.sys_el()[i]*corr.sys_el()[i];
+      pico.out_sys_mu()[i]         = pico.sys_mu()[i]*corr.sys_mu()[i];
       pico.out_sys_bchig()[i]      = pico.sys_bchig()[i]*corr.sys_bchig()[i];
       pico.out_sys_udsghig()[i]    = pico.sys_udsghig()[i]*corr.sys_udsghig()[i];
       pico.out_sys_fs_bchig()[i]   = pico.sys_fs_bchig()[i]*corr.sys_fs_bchig()[i];
       pico.out_sys_fs_udsghig()[i] = pico.sys_fs_udsghig()[i]*corr.sys_fs_udsghig()[i];
 
+      pico.out_sys_pu()[i]         = pico.sys_pu()[i]*corr.sys_pu()[i];
       pico.out_sys_isr()[i]        = pico.sys_isr()[i]*corr.sys_isr()[i];
 
     } 
+    if (is_zgamma) {
+      for (unsigned i(0); i<2; i++) {        
+        pico.out_sys_lep()[i] = pico.out_sys_el()[i]*pico.out_sys_mu()[i];
+      }
+    }
     pico.out_sys_murf().resize(9);
-    for (unsigned i(0); i<9; i++) {        
+    for (unsigned i(0); i<pico.out_sys_murf().size(); i++) {        
       if (pico.sys_murf().size() != 0) {
         pico.out_sys_murf()[i]      = pico.sys_murf()[i]*corr.sys_murf()[i];
       } else {
         pico.out_sys_murf()[i]      = 1.0;
+      }
+    }
+    pico.out_sys_ps().resize(4);
+    for (unsigned i(0); i<pico.out_sys_ps().size(); i++) {        
+      if (pico.sys_ps().size() != 0) {
+        pico.out_sys_ps()[i]      = pico.sys_ps()[i]*corr.sys_ps()[i];
+      } else {
+        pico.out_sys_ps()[i]      = 1.0;
       }
     }
 

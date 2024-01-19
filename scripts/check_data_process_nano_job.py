@@ -2,6 +2,7 @@
 # The ./jobscript_check.py should return 'success' or 'fail' or 'to_submit' or 'submitted' for a job_log_string
 # The input is given as sys.argv[1] = queue_system.compress_string(job_log_string) sys.argv[2] = queue_system.compress_string(job_argument_string)
 import sys
+import time
 import queue_system
 from ROOT import TChain
 
@@ -25,24 +26,32 @@ outfile.Add(outfile_path);
 #out_nent = outfile.GetEntries()
 
 isFail = False
-if outfile.GetNbranches() == 0:
-  print('[For queue_system] fail: output ({}) has no branches.'.format(outfile_path))
-  isFail = True
-
-for line in job_log_string.split('\n'):
-  if 'Error in <TTree::SetBranchStatus>: unknown branch' in line:
-    continue
-  if 'error' in line.lower():
-    print('[For queue_system] fail: Error in job_log')
+for iTrial in range(5):
+  if outfile.GetNbranches() == 0:
+    if iTrial <= 3: 
+      time.sleep(5)
+      continue
+    print('[For queue_system] fail: output ({}) has no branches.'.format(outfile_path))
     isFail = True
-
-if 'segmentation fault' in job_log_string.lower():
-  print('[For queue_system] fail: Segmentation fault in job_log')
-  isFail = True
-
-if 'segmentation violation' in job_log_string.lower():
-  print('[For queue_system] fail: Segmentation violation in job_log')
-  isFail = True
+    break
+  
+  for line in job_log_string.split('\n'):
+    if 'Error in <TTree::SetBranchStatus>: unknown branch' in line:
+      continue
+    if 'error' in line.lower():
+      print('[For queue_system] fail: Error in job_log')
+      isFail = True
+      break
+  
+  if 'segmentation fault' in job_log_string.lower():
+    print('[For queue_system] fail: Segmentation fault in job_log')
+    isFail = True
+    break
+  
+  if 'segmentation violation' in job_log_string.lower():
+    print('[For queue_system] fail: Segmentation violation in job_log')
+    isFail = True
+    break
 
 if not isFail:
   print('[For queue_system] success')

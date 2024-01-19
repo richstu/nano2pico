@@ -12,12 +12,12 @@ bool is_overlap_old
 bool is_overlap
 bool use_event
 
-
 ####################   Global   ###################
 int npv
 int npv_good
 int npu_tru
 int npu_tru_mean
+float rho
 float ht
 float ht5
 float mht
@@ -177,6 +177,10 @@ vector<float> fjet_mva_hbb_btv
 vector<float> fjet_deep_md_hbb_jme
 vector<float> fjet_deep_md_tvsqcd
 vector<float> fjet_deep_tvsqcd
+vector<float> fjet_pnet_wtag
+vector<float> fjet_pnet_ztag
+vector<float> fjet_pnet_ttag
+vector<float> fjet_pnet_m
 vector<int>   fjet_subjet_idx1
 vector<int>   fjet_subjet_idx2
 
@@ -212,7 +216,7 @@ int nvlep
 vector<float> lep_pt
 vector<float> lep_eta
 vector<float> lep_phi
-vector<int> lep_pdgid
+vector<int>   lep_pdgid
 
 int nmu
 int nvmu
@@ -229,7 +233,7 @@ vector<float> mu_sip3d
 vector<bool>  mu_id
 vector<bool>  mu_mediumid
 vector<bool>  mu_tightid
-vector<int>  mu_highptid
+vector<int>   mu_highptid
 vector<bool>  mu_sig
 vector<int>   mu_charge
 vector<int>   mu_pflavor
@@ -285,22 +289,37 @@ int nphoton
 vector<float> photon_pt
 vector<float> photon_eta
 vector<float> photon_phi
+vector<float> photon_ecorr
 vector<float> photon_reliso
+vector<float> photon_phiso
+vector<float> photon_chiso
+vector<float> photon_chiso_worst
 vector<float> photon_r9
+vector<float> photon_s4
 vector<float> photon_sieie
+vector<float> photon_sieip
+vector<float> photon_etawidth
+vector<float> photon_phiwidth
 vector<float> photon_drmin
 vector<float> photon_drmax
-vector<float> photon_pterr
+vector<float> photon_energyErr
+vector<float> photon_energy_raw
+vector<float> photon_origin_eta
 vector<float> photon_hoe
+vector<float> photon_esoversc
+vector<float> photon_essigmarr
 vector<float> photon_idmva
 vector<int>   photon_pflavor
 vector<bool>  photon_id
 vector<bool>  photon_id80
+vector<bool>  photon_isScEtaEB
+vector<bool>  photon_isScEtaEE
 vector<int>   photon_idCutBased
 vector<int>   photon_idCutBasedBitMap
 vector<bool>  photon_elveto
 vector<bool>  photon_sig
 vector<int>   photon_elidx
+vector<bool>  photon_pixelseed
 vector<float> photon_jet_mindr
 vector<float> photon_zeppenfeld
 
@@ -336,6 +355,8 @@ bool pass_cschalo_tight
 bool pass_eebadsc
 bool pass_ecaldeadcell
 bool pass_badpfmu
+bool pass_badpfmudz
+bool pass_hfnoisyhits
 bool pass_mubadtrk
 bool pass_badchhad
 bool pass_muon_jet
@@ -373,9 +394,8 @@ int mlsp
 float weight
 float w_lumi
 float w_lep
-float w_el_id
-float w_mu_id
-float w_mu_iso
+float w_el
+float w_mu
 float w_fs_lep
 float w_photon
 float w_photon_id
@@ -554,9 +574,11 @@ bool HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90
 bool HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95
 
 
-################  Systematic variations  - to be implemented as needed  ##################
+################  Systematic variations  ##################
 
 # +/- variations are index 0 and 1
+vector<float> sys_el
+vector<float> sys_mu
 vector<float> sys_lep
 vector<float> sys_fs_lep
 
@@ -572,9 +594,36 @@ vector<float> sys_isr
 vector<float> sys_pu
 vector<float> sys_prefire
 
+#variations have index: 0 (MUF=0.5 MUR=0.5), 1 (MUF=1 MUR=0.5), 2 (MUF=2 MUR=0.5), 3 (MUF=0.5 MUR=1), 4 (MUF=2 MUR=1), 5 (MUF=0.5 MUR=2), 6 (MUF=1 MUR=2), 7 (MUF=2 MUR=2)
 vector<float> sys_murf
 
-# variations have index 0 (JER smearing up), 1 (JER smearing down), 2 (JEC up) and 3 (JEC down)
+#variations have index: 0 (ISR=2 FSR=1), 1 (ISR=1 FSR=2), 2 (ISR=0.5 FSR=1), 2(ISR=1 FSR=0.5)
+vector<float> sys_ps
+
+#index matches jet_*
+vector<float> sys_jet_pt_jesup
+vector<float> sys_jet_pt_jesdn
+vector<float> sys_jet_pt_jerup
+vector<float> sys_jet_pt_jerdn
+vector<float> sys_jet_m_jesup
+vector<float> sys_jet_m_jesdn
+vector<float> sys_jet_m_jerup
+vector<float> sys_jet_m_jerdn
+
+#index matches electron_*
+vector<float> sys_el_pt_scaleup
+vector<float> sys_el_pt_scaledn
+vector<float> sys_el_pt_resup
+vector<float> sys_el_pt_resdn
+
+#index matches photon_*
+vector<float> sys_photon_pt_scaleup
+vector<float> sys_photon_pt_scaledn
+vector<float> sys_photon_pt_resup
+vector<float> sys_photon_pt_resdn
+
+# variations have index 0 (JER smearing up), 1 (JER smearing down), 2 (JES up) and 3 (JES down)
+# for met_phi only: indxes 4 (unclustered up) 5 (unclustered down) 6 (lepton photon up) 7 (lepton photon down)
 vector<float> sys_ht
 vector<int>   sys_njet
 vector<int>   sys_nbl

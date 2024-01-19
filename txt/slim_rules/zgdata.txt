@@ -5,6 +5,7 @@ keep event
 keep type
 
 keep npv
+keep rho
 
 keep jet_*
 drop jet_deep*
@@ -15,12 +16,15 @@ drop *hig*
 drop jet_hflavor
 drop jet_pflavor
 
+keep fsrphoton_*
 keep photon_*
 keep el_*
 keep mu_*
 keep dijet_*
 keep ll_*
 keep llphoton_*
+keep met
+keep met_*
 
 keep njet
 keep nbdf*
@@ -29,6 +33,7 @@ keep nll
 keep nllphoton
 keep nmu
 keep nel
+keep nfsrphoton
 keep nphoton
 
 keep pass*
@@ -36,3 +41,4 @@ keep pass*
 keep weight
 
 keep HLT*
+keep trig_*

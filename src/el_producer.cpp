@@ -1,15 +1,46 @@
 #include "el_producer.hpp"
 
+#include "correction.hpp"
 #include "utilities.hpp"
 
-#include<algorithm>
-#include<iomanip>
+#include <algorithm>
+#include <iomanip>
+#include <memory>
+#include <string>
 
 using namespace std;
 
-ElectronProducer::ElectronProducer(int year_, bool isData_){
-    year = year_;
-    isData = isData_;
+ElectronProducer::ElectronProducer(int year_, bool isData_, bool preVFP, float nanoaod_version_){
+  year = year_;
+  isData = isData_;
+  if (year==2016 && preVFP) {
+    cs_scale_syst_ = correction::CorrectionSet::from_file(
+        "data/zgamma/2016preVFP_UL/EGM_ScaleUnc.json");
+    str_scale_syst_ = "2016preVFP";
+  }
+  else if (year==2016) {
+    cs_scale_syst_ = correction::CorrectionSet::from_file(
+        "data/zgamma/2016postVFP_UL/EGM_ScaleUnc.json");
+    str_scale_syst_ = "2016postVFP";
+  }
+  else if (year==2017) {
+    cs_scale_syst_ = correction::CorrectionSet::from_file(
+        "data/zgamma/2017_UL/EGM_ScaleUnc.json");
+    str_scale_syst_ = "2017";
+  }
+  else if (year==2018) {
+    cs_scale_syst_ = correction::CorrectionSet::from_file(
+        "data/zgamma/2018_UL/EGM_ScaleUnc.json");
+    str_scale_syst_ = "2018";
+  }
+  else {
+    cs_scale_syst_ = correction::CorrectionSet::from_file(
+        "data/zgamma/2018_UL/EGM_ScaleUnc.json");
+    str_scale_syst_ = "2018";
+    std::cout << "WARNING: No dedicated EGM scale/smearing JSONs, defaulting to 2018" << std::endl;
+  }
+  map_scale_syst_ = cs_scale_syst_->at("UL-EGM_ScaleUnc");
+  nanoaod_version = nanoaod_version_;
 }
 
 ElectronProducer::~ElectronProducer(){
@@ -53,11 +84,16 @@ bool ElectronProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma) {
   return false;
 }
 
-vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, vector<int> &jet_islep_nano_idx, vector<int> &jet_isvlep_nano_idx, vector<int> &sig_el_pico_idx, bool isZgamma, bool isFastsim){
+vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, vector<int> &jet_islep_nano_idx, vector<int> &jet_isvlep_nano_idx, vector<int> &sig_el_pico_idx, vector<int> &photon_el_pico_idx, bool isZgamma, bool isFastsim){
   vector<float> Jet_pt, Jet_mass;
   getJetWithJEC(nano, isFastsim, Jet_pt, Jet_mass);
   vector<int> Electron_photonIdx;
-  getElectron_photonIdx(nano, year, Electron_photonIdx);
+  getElectron_photonIdx(nano, nanoaod_version, Electron_photonIdx);
+  vector<int> Photon_electronIdx;
+  getPhoton_electronIdx(nano, nanoaod_version, Photon_electronIdx);
+
+  for (int iph(0); iph<nano.nPhoton(); ++iph)
+    photon_el_pico_idx.push_back(-1);
 
   //first, determine ordering based on signal and pt
   std::vector<NanoOrderEntry> nano_entries;
@@ -98,6 +134,15 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
       if (fabs(dz) > 1.0)  continue;
       if (fabs(dxy) > 0.5) continue; 
       isSignal = IsSignal(nano, iel, isZgamma);
+      float scale_syst_up = 1.0;
+      float scale_syst_dn = 1.0;
+      if (year <= 2018) {
+        scale_syst_up = map_scale_syst_->evaluate({str_scale_syst_,"scaleup",etasc,
+            nano.Electron_seedGain()[iel]});
+        scale_syst_dn = map_scale_syst_->evaluate({str_scale_syst_,"scaledown",etasc,
+            nano.Electron_seedGain()[iel]});
+      }
+
       switch(year) {
         case 2016:
         case 2017:
@@ -110,6 +155,10 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
           pico.out_el_idLoose().push_back(nano.Electron_mvaFall17V2Iso_WPL()[iel]);
           pico.out_el_etPt().push_back(nano.Electron_scEtOverPt()[iel]);
           pico.out_el_eminusp().push_back(nano.Electron_eInvMinusPInv()[iel]);
+          pico.out_sys_el_pt_resup().push_back(pt*(1.0+nano.Electron_dEsigmaUp()[iel]));
+          pico.out_sys_el_pt_resdn().push_back(pt*(1.0+nano.Electron_dEsigmaDown()[iel]));
+          pico.out_sys_el_pt_scaleup().push_back(pt*scale_syst_up);
+          pico.out_sys_el_pt_scaledn().push_back(pt*scale_syst_dn);
           break;
         case 2022:
         case 2023:
@@ -170,6 +219,11 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
             fabs(Jet_pt[ijet] - nano.Electron_pt()[iel])/nano.Electron_pt()[iel] < 1)
           jet_isvlep_nano_idx.push_back(ijet);
       }
+    }
+
+    for (int iph(0); iph<nano.nPhoton(); ++iph) {
+      if (Photon_electronIdx[iph]==iel)
+        photon_el_pico_idx[iph] = pico.out_el_pt().size()-1;
     }
 
     if (isSignal) {

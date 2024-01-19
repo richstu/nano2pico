@@ -21,6 +21,8 @@ float L1PreFiringWeight_Dn
 int nElectron
 # delta eta (SC,ele) with sign
 array<float> Electron_deltaEtaSC
+array<float> Electron_dEsigmaUp
+array<float> Electron_dEsigmaDown
 array<float> Electron_dr03EcalRecHitSumEt
 array<float> Electron_dr03HcalDepth1TowerSumEt
 array<float> Electron_dr03TkSumPt
@@ -211,20 +213,33 @@ array<bool> IsoTrack_isFromLostTrack
 ################ Photons ################
 
 int nPhoton
+array<float> Photon_dEsigmaUp
+array<float> Photon_dEsigmaDown
 array<float> Photon_eCorr
 array<float> Photon_energyErr
+array<float> Photon_energyRaw
 array<float> Photon_eta
 array<float> Photon_hoe
+array<float> Photon_esEffSigmaRR
+array<float> Photon_esEnergyOverRawE
 array<float> Photon_mass
 array<float> Photon_mvaID
 array<float> Photon_mvaIDV1
+array<float> Photon_pfPhoIso03
+array<float> Photon_pfChargedIso
+array<float> Photon_pfChargedIsoPFPV
+array<float> Photon_pfChargedIsoWorstVtx
 array<float> Photon_pfRelIso03_all
 array<float> Photon_pfRelIso03_all_quadratic
 array<float> Photon_pfRelIso03_chg
 array<float> Photon_phi
 array<float> Photon_pt
 array<float> Photon_r9
+array<float> Photon_s4
 array<float> Photon_sieie
+array<float> Photon_sieip
+array<float> Photon_etaWidth
+array<float> Photon_phiWidth
 array<int> Photon_charge
 array<int> Photon_cutBased
 array<char> Photon_cutBased 11.9
@@ -358,6 +373,14 @@ array<float> FatJet_mass
 array<float> FatJet_msoftdrop
 array<float> FatJet_n2b1
 array<float> FatJet_n3b1
+array<float> FatJet_particleNetWithMass_TvsQCD
+array<float> FatJet_particleNetWithMass_WvsQCD
+array<float> FatJet_particleNetWithMass_ZvsQCD
+array<float> FatJet_particleNet_TvsQCD
+array<float> FatJet_particleNet_WvsQCD
+array<float> FatJet_particleNet_ZvsQCD
+array<float> FatJet_particleNet_mass
+array<float> FatJet_particleNet_massCorr
 array<float> FatJet_phi
 array<float> FatJet_pt
 array<float> FatJet_rawFactor
@@ -367,7 +390,9 @@ array<float> FatJet_tau3
 array<float> FatJet_tau4
 array<int> FatJet_jetId
 array<int> FatJet_subJetIdx1
+array<short> FatJet_subJetIdx1 11.9
 array<int> FatJet_subJetIdx2
+array<short> FatJet_subJetIdx2 11.9
 
 int nSubJet
 array<float> SubJet_btagCMVA
@@ -587,6 +612,7 @@ bool Flag_CSCTightHalo2015Filter
 bool Flag_globalTightHalo2016Filter
 bool Flag_globalSuperTightHalo2016Filter
 bool Flag_HcalStripHaloFilter
+bool Flag_hfNoisyHitsFilter
 bool Flag_hcalLaserEventFilter
 bool Flag_EcalDeadCellTriggerPrimitiveFilter
 bool Flag_EcalDeadCellBoundaryEnergyFilter
@@ -600,6 +626,7 @@ bool Flag_chargedHadronTrackResolutionFilter
 bool Flag_muonBadTrackFilter
 bool Flag_BadChargedCandidateFilter
 bool Flag_BadPFMuonFilter
+bool Flag_BadPFMuonDzFilter
 bool Flag_BadChargedCandidateSummer16Filter
 bool Flag_BadPFMuonSummer16Filter
 bool Flag_trkPOG_manystripclus53X
@@ -615,6 +642,7 @@ int Pileup_nPU
 int Pileup_sumEOOT
 int Pileup_sumLOOT
 
+float fixedGridRhoAll
 float fixedGridRhoFastjetAll
 float fixedGridRhoFastjetCentral
 float fixedGridRhoFastjetCentralCalo

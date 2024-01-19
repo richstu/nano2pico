@@ -49,7 +49,7 @@ if args['dataset_list']!='':
         if ds[0]!="/": # in case of empty lines or comments
           continue
         tmp_ = ds.split("/")
-        wanted_file_substr.append(re.sub(r'(NanoAODv\d+|NanoAODAPVv\d+)-', r'\1__',tmp_[1]+'__'+tmp_[2]))
+        wanted_file_substr.append(re.sub(r'(NanoAODv\d+|NanoAODAPVv\d+|NanoAODv9UCSB1|NanoAODAPVv9UCSB1)-', r'\1__',tmp_[1]+'__'+tmp_[2]))
     for istr in wanted_file_substr:
       for ifile in all_file_paths:
         if (istr in ifile):
