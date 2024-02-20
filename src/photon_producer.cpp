@@ -58,21 +58,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
   getPhoton_jetIdx(nano, nanoaod_version, Photon_jetIdx);
   vector<int> Photon_cutBased;
   getPhoton_cutBased(nano, nanoaod_version, Photon_cutBased);
-
-  for(int iph(0); iph < nano.nFsrPhoton(); ++iph){
-    if (nano.FsrPhoton_pt()[iph] <= FsrPhotonPtCut) continue;
-    if (fabs(nano.FsrPhoton_eta()[iph]) > FsrPhotonEtaCut) continue;
-    if (nano.FsrPhoton_relIso03()[iph] > FsrPhotonIsoCut) continue;
-    if (nano.FsrPhoton_dROverEt2()[iph] > FsrPhotondRCut) continue;
-    pico.out_fsrphoton_pt().push_back(nano.FsrPhoton_pt()[iph]);
-    pico.out_fsrphoton_eta().push_back(nano.FsrPhoton_eta()[iph]);
-    pico.out_fsrphoton_phi().push_back(nano.FsrPhoton_phi()[iph]);
-    pico.out_fsrphoton_reliso().push_back(nano.FsrPhoton_relIso03()[iph]);
-    pico.out_fsrphoton_muonidx().push_back(FsrPhoton_muonIdx[iph]);
-    pico.out_fsrphoton_droveret2().push_back(nano.FsrPhoton_dROverEt2()[iph]);
-    pico.out_nfsrphoton()++;
-  }
-
+ 
   for(int iph(0); iph<nano.nPhoton(); ++iph){
     float pt = nano.Photon_pt()[iph];
     float eta = nano.Photon_eta()[iph];
@@ -249,6 +235,29 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
             jet_isphoton_nano_idx.push_back(ijet);
     }
   }
+
+  //Saves indices for FSR photons
+  pico.out_nfsrphoton() = 0;
+  for(int iph(0); iph < nano.nFsrPhoton(); ++iph){
+    //These set of selections require the photon be close to the corresponding muon and relatively soft
+    if (nano.FsrPhoton_pt()[iph] <= FsrPhotonPtCut) continue;
+    if (fabs(nano.FsrPhoton_eta()[iph]) > FsrPhotonEtaCut) continue;
+    if (nano.FsrPhoton_relIso03()[iph] > FsrPhotonIsoCut) continue;
+    if (nano.FsrPhoton_dROverEt2()[iph] > FsrPhotondRCut) continue;
+
+    //Check for separation between fsrphoton and first photon candidate
+    if ( dR(pico.out_photon_eta()[0],nano.FsrPhoton_eta()[iph],pico.out_photon_phi()[0],nano.FsrPhoton_phi()[iph]) < FsrSeparationReq) continue;
+    
+    //Add the values to the pico trees
+    pico.out_fsrphoton_pt().push_back(nano.FsrPhoton_pt()[iph]);
+    pico.out_fsrphoton_eta().push_back(nano.FsrPhoton_eta()[iph]);
+    pico.out_fsrphoton_phi().push_back(nano.FsrPhoton_phi()[iph]);
+    pico.out_fsrphoton_reliso().push_back(nano.FsrPhoton_relIso03()[iph]);
+    pico.out_fsrphoton_muonidx().push_back(FsrPhoton_muonIdx[iph]);
+    pico.out_fsrphoton_droveret2().push_back(nano.FsrPhoton_dROverEt2()[iph]);
+    pico.out_nfsrphoton()++;
+  } 
+
   return sig_photon_nano_idx;
 }
 

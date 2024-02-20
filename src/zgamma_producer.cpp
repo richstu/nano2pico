@@ -32,6 +32,7 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
     pico.out_zg_cutBitMap() = baseBit;
     return;
   }
+
   for(size_t ill(0); ill < pico.out_ll_pt().size(); ill++)
     for(size_t igamma(0); igamma < pico.out_photon_pt().size(); igamma++) {
       TLorentzVector dilep, photon, llg;

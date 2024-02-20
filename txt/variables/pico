@@ -284,6 +284,14 @@ vector<int>   ll_i1
 vector<int>   ll_i2
 vector<int>   ll_charge
 
+vector<float> ll_refit_pt
+vector<float> ll_refit_eta
+vector<float> ll_refit_phi
+vector<float> ll_refit_m
+vector<float> ll_refit_l1_pt
+vector<float> ll_refit_l2_pt
+
+
 ##################   Photons   ###################
 int nphoton
 vector<float> photon_pt

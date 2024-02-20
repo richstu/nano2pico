@@ -1,6 +1,6 @@
 #include "dilep_producer.hpp"
-
 #include "utilities.hpp"
+#include "KinZfitter.hpp"
 
 #include "TLorentzVector.h"
 
@@ -8,9 +8,12 @@ using namespace std;
 
 DileptonProducer::DileptonProducer(int year_){
     year = year_;
+    kinZfitter = new KinZfitter();
+
 }
 
 DileptonProducer::~DileptonProducer(){
+    kinZfitter = new KinZfitter();
 }
 
 void DileptonProducer::WriteDileptons(pico_tree &pico, 
@@ -22,6 +25,14 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
   TLorentzVector l1err, l2err;
   double ptl1err, ptl2err;
   double dml1, dml2;
+  int idx_fsr1, idx_fsr2;
+  //KinZfitter::KinZfitter kinZfitter= KinZfitter();
+  //KinZfitter *kinZfitter = new KinZfitter();
+
+  std::map<unsigned int, TLorentzVector> leptons_map;
+  std::map<unsigned int, double> leptons_pterr_map;
+  std::map<unsigned int, TLorentzVector> fsrphotons_map;
+  TLorentzVector fsrphoton1, fsrphoton2;
 
   if (pico.out_nmu()>=2)
     for(size_t i(0); i < sig_mu_pico_idx.size(); i++) 
@@ -29,6 +40,8 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
         int imu1 = sig_mu_pico_idx.at(i);
         int imu2 = sig_mu_pico_idx.at(j);
         TLorentzVector mu1, mu2, dimu;
+        fsrphoton1 = TLorentzVector(0,0,0,0); 
+        fsrphoton2 = TLorentzVector(0,0,0,0);
 
         mu1.SetPtEtaPhiM(pico.out_mu_pt()[imu1], pico.out_mu_eta()[imu1],
                          pico.out_mu_phi()[imu1], 0.10566);
@@ -52,6 +65,39 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
         dml1 = (l1err + mu2).M() - dimu.M();
         dml2 = (mu1 + l2err).M() - dimu.M();
 
+        leptons_map[0] = mu1;
+        leptons_map[1] = mu2;
+        leptons_pterr_map[0] = ptl1err;
+        leptons_pterr_map[1] = ptl2err;
+       
+        //Loops through FSRphotons to find which leptons are associated with to be used for constrained fit
+        idx_fsr1 = -1; idx_fsr2 = -1;
+        for(size_t idx_fsr = 0; idx_fsr < static_cast<unsigned int>(pico.out_nfsrphoton()); idx_fsr++){
+            if(pico.out_fsrphoton_muonidx()[idx_fsr]==imu1){
+              if(idx_fsr1 != -1 && (pico.out_fsrphoton_droveret2()[idx_fsr1] <  pico.out_fsrphoton_droveret2()[idx_fsr])){ continue;}
+              idx_fsr1 = idx_fsr; continue;
+            }
+            if(pico.out_fsrphoton_muonidx()[idx_fsr]==imu2){
+              if(idx_fsr2 != -1 && (pico.out_fsrphoton_droveret2()[idx_fsr2] <  pico.out_fsrphoton_droveret2()[idx_fsr])){ continue;}
+              idx_fsr2 = idx_fsr; continue;
+            }
+        }
+        fsrphotons_map.clear();
+        if(idx_fsr1!=-1){
+          fsrphoton1.SetPtEtaPhiM( pico.out_fsrphoton_pt()[idx_fsr1],pico.out_fsrphoton_eta()[idx_fsr1],pico.out_fsrphoton_phi()[idx_fsr1],0 );
+          fsrphotons_map[0] = fsrphoton1;
+        }
+        if(idx_fsr2!=-1){
+          fsrphoton2.SetPtEtaPhiM( pico.out_fsrphoton_pt()[idx_fsr2],pico.out_fsrphoton_eta()[idx_fsr2],pico.out_fsrphoton_phi()[idx_fsr2],0 ); 
+          fsrphotons_map[1] = fsrphoton2;     
+        }
+
+        //Code Executing the kinematic refit
+        kinZfitter->Setup(leptons_map, fsrphotons_map, leptons_pterr_map);
+        kinZfitter->KinRefitZ1();
+        std::vector<TLorentzVector> refit_leptons = kinZfitter->GetRefitP4s();
+        TLorentzVector ll_refit = refit_leptons[0] + refit_leptons[1];
+
         pico.out_nll()++;
         pico.out_ll_pt()   .insert(pico.out_ll_pt()   .begin()+shift, dimu.Pt());
         pico.out_ll_eta()  .insert(pico.out_ll_eta()  .begin()+shift, dimu.Eta());
@@ -66,8 +112,18 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
         pico.out_ll_l1_masserr() .insert(pico.out_ll_l1_masserr() .begin()+shift, dml1);
         pico.out_ll_l2_masserr() .insert(pico.out_ll_l2_masserr() .begin()+shift, dml2);
         pico.out_ll_charge()     .insert(pico.out_ll_charge()     .begin()+shift, pico.out_mu_charge()[imu1]+pico.out_mu_charge()[imu2]);
+
+        //Assigns the refit lepton/dilepton quantities
+        pico.out_ll_refit_pt()   .insert(pico.out_ll_refit_pt()   .begin()+shift, ll_refit.Pt());
+        pico.out_ll_refit_eta()  .insert(pico.out_ll_refit_eta()  .begin()+shift, ll_refit.Eta());
+        pico.out_ll_refit_phi()  .insert(pico.out_ll_refit_phi()  .begin()+shift, ll_refit.Phi());
+        pico.out_ll_refit_m()    .insert(pico.out_ll_refit_m()    .begin()+shift, ll_refit.M());
+        pico.out_ll_refit_l1_pt().insert(pico.out_ll_refit_l1_pt().begin()+shift, refit_leptons[0].Pt());
+        pico.out_ll_refit_l2_pt().insert(pico.out_ll_refit_l2_pt().begin()+shift, refit_leptons[1].Pt());
+
         nll++;
       }
+  fsrphotons_map.clear();
   if (pico.out_nel()>=2)
     for(size_t i(0); i < sig_el_pico_idx.size(); i++) 
       for(size_t j(i+1); j < sig_el_pico_idx.size(); j++) {
@@ -80,11 +136,12 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
         el2.SetPtEtaPhiM(pico.out_el_pt()[iel2], pico.out_el_eta()[iel2],
                          pico.out_el_phi()[iel2],0.000511);
         diel = el1 + el2;
-        // Dilepton closest to Z mass gets put at the front
-        if(abs(diel.M() - zmass) < mindm) {
+        // Dilepton closest to Z mass (not overlapping with leading signal photon) gets put at the front
+        bool ph_el_overlap = (pico.out_nphoton() > 0 && (static_cast<int>(i)==pico.out_photon_elidx()[0] || static_cast<int>(j)==pico.out_photon_elidx()[0])) || (pico.out_nphoton()==0); //checks for overlap
+        if(abs(diel.M() - zmass) < mindm && ph_el_overlap) {
           mindm = abs(diel.M() - zmass);
           shift = 0;
-        }
+        } 
         else
           shift = nll;
 
@@ -96,6 +153,18 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
                            pico.out_el_eta()[iel2], pico.out_el_phi()[iel2], 0.0005);
         dml1 = (l1err + el2).M() - diel.M();
         dml2 = (el1 + l2err).M() - diel.M();
+
+
+        leptons_map[0] = el1;
+        leptons_map[1] = el2;
+        leptons_pterr_map[0] = ptl1err;
+        leptons_pterr_map[1] = ptl2err;
+
+        //Code executing kinematic refit
+        kinZfitter->Setup(leptons_map, fsrphotons_map, leptons_pterr_map);
+        kinZfitter->KinRefitZ1();
+        std::vector<TLorentzVector> refit_leptons = kinZfitter->GetRefitP4s();
+        TLorentzVector ll_refit = refit_leptons[0] + refit_leptons[1];
 
         pico.out_nll()++;
         pico.out_ll_pt()   .insert(pico.out_ll_pt()   .begin()+shift, diel.Pt());
@@ -111,7 +180,18 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
         pico.out_ll_l1_masserr() .insert(pico.out_ll_l1_masserr() .begin()+shift, dml1);
         pico.out_ll_l2_masserr() .insert(pico.out_ll_l2_masserr() .begin()+shift, dml2);
         pico.out_ll_charge()     .insert(pico.out_ll_charge()     .begin()+shift, pico.out_el_charge()[iel1]+pico.out_el_charge()[iel2]);
+
+        //Assigns the refit lepton/dilepton quantities
+        pico.out_ll_refit_pt()   .insert(pico.out_ll_refit_pt()   .begin()+shift, ll_refit.Pt());
+        pico.out_ll_refit_eta()  .insert(pico.out_ll_refit_eta()  .begin()+shift, ll_refit.Eta());
+        pico.out_ll_refit_phi()  .insert(pico.out_ll_refit_phi()  .begin()+shift, ll_refit.Phi());
+        pico.out_ll_refit_m()    .insert(pico.out_ll_refit_m()    .begin()+shift, ll_refit.M());
+        pico.out_ll_refit_l1_pt().insert(pico.out_ll_refit_l1_pt().begin()+shift, refit_leptons[0].Pt());
+        pico.out_ll_refit_l2_pt().insert(pico.out_ll_refit_l2_pt().begin()+shift, refit_leptons[1].Pt());
+
         nll++;
       }
+
+  //delete kinZfitter;
   return;
 }
