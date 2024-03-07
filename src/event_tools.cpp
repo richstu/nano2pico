@@ -93,7 +93,10 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
   pico.out_is_overlap() = false; 
   pico.out_old_stitch_dy() = true;
 
-  if (isData) return;
+  if (isData){
+    pico.out_is_overlap() = false; pico.out_use_event() = true; 
+    return;
+  }
 
   if(isTTJets_LO_Incl && !isFastSim) {
     if (nano.LHE_HTIncoming()>600) 
@@ -276,7 +279,7 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
     pico.out_use_event() = !pico.out_is_overlap();
   } else if( isZZ && ntrulep==4 ){ //ZZ only generated with ZZ->4l
     pico.out_use_event() = !pico.out_is_overlap();
-  } else{
+  } else {
     pico.out_is_overlap() = false; pico.out_use_event() = true;
   }
   //Note: removed overlap removal for WW and WWG since WWG sample may have bug

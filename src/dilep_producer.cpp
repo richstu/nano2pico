@@ -10,10 +10,17 @@ DileptonProducer::DileptonProducer(int year_){
     year = year_;
     kinZfitter = new KinZfitter();
 
+  //This variable is to debug how often the kinematic refitting code is used
+    cnt_refit = 0;
+
 }
 
 DileptonProducer::~DileptonProducer(){
     kinZfitter = new KinZfitter();
+
+  //This variable is to debug how often the kinematic refitting code is used
+    cnt_refit = 0;
+
 }
 
 void DileptonProducer::WriteDileptons(pico_tree &pico, 
@@ -28,11 +35,15 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
   int idx_fsr1, idx_fsr2;
   //KinZfitter::KinZfitter kinZfitter= KinZfitter();
   //KinZfitter *kinZfitter = new KinZfitter();
-
+  TLorentzVector ll_refit(0,0,0,0);
+  std::vector<TLorentzVector> refit_leptons{ll_refit,ll_refit};
   std::map<unsigned int, TLorentzVector> leptons_map;
   std::map<unsigned int, double> leptons_pterr_map;
   std::map<unsigned int, TLorentzVector> fsrphotons_map;
   TLorentzVector fsrphoton1, fsrphoton2;
+  int status, covmatstatus = -5;
+  float minnll = -5;
+
 
   if (pico.out_nmu()>=2)
     for(size_t i(0); i < sig_mu_pico_idx.size(); i++) 
@@ -83,20 +94,33 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
             }
         }
         fsrphotons_map.clear();
+        int fsr_cnt = 0;
         if(idx_fsr1!=-1){
           fsrphoton1.SetPtEtaPhiM( pico.out_fsrphoton_pt()[idx_fsr1],pico.out_fsrphoton_eta()[idx_fsr1],pico.out_fsrphoton_phi()[idx_fsr1],0 );
-          fsrphotons_map[0] = fsrphoton1;
+          fsrphotons_map[fsr_cnt] = fsrphoton1;
+          fsr_cnt++;
         }
         if(idx_fsr2!=-1){
           fsrphoton2.SetPtEtaPhiM( pico.out_fsrphoton_pt()[idx_fsr2],pico.out_fsrphoton_eta()[idx_fsr2],pico.out_fsrphoton_phi()[idx_fsr2],0 ); 
-          fsrphotons_map[1] = fsrphoton2;     
+          fsrphotons_map[fsr_cnt] = fsrphoton2;     
         }
 
         //Code Executing the kinematic refit
-        kinZfitter->Setup(leptons_map, fsrphotons_map, leptons_pterr_map);
-        kinZfitter->KinRefitZ1();
-        std::vector<TLorentzVector> refit_leptons = kinZfitter->GetRefitP4s();
-        TLorentzVector ll_refit = refit_leptons[0] + refit_leptons[1];
+        if(pico.out_nphoton() > 0){
+          kinZfitter->Setup(leptons_map, fsrphotons_map, leptons_pterr_map);
+          kinZfitter->KinRefitZ1();
+          refit_leptons = kinZfitter->GetRefitP4s();
+          ll_refit     = refit_leptons[0] + refit_leptons[1];
+          status       = kinZfitter -> GetStatus();
+          covmatstatus = kinZfitter -> GetCovMatStatus();
+          minnll       = kinZfitter -> GetMinNll();
+
+          //debug statement
+          cnt_refit++; std::cout << cnt_refit << std::endl;
+        } else {
+        
+          ll_refit = TLorentzVector(0,0,0,0);
+        }
 
         pico.out_nll()++;
         pico.out_ll_pt()   .insert(pico.out_ll_pt()   .begin()+shift, dimu.Pt());
@@ -120,6 +144,10 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
         pico.out_ll_refit_m()    .insert(pico.out_ll_refit_m()    .begin()+shift, ll_refit.M());
         pico.out_ll_refit_l1_pt().insert(pico.out_ll_refit_l1_pt().begin()+shift, refit_leptons[0].Pt());
         pico.out_ll_refit_l2_pt().insert(pico.out_ll_refit_l2_pt().begin()+shift, refit_leptons[1].Pt());
+
+        pico.out_ll_refit_status()   .insert(pico.out_ll_refit_status()   .begin()+shift, status);
+        pico.out_ll_refit_covmat_status()   .insert(pico.out_ll_refit_covmat_status()   .begin()+shift, covmatstatus);
+        pico.out_ll_refit_minnll()   .insert(pico.out_ll_refit_minnll()   .begin()+shift, minnll);
 
         nll++;
       }
@@ -161,10 +189,22 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
         leptons_pterr_map[1] = ptl2err;
 
         //Code executing kinematic refit
-        kinZfitter->Setup(leptons_map, fsrphotons_map, leptons_pterr_map);
-        kinZfitter->KinRefitZ1();
-        std::vector<TLorentzVector> refit_leptons = kinZfitter->GetRefitP4s();
-        TLorentzVector ll_refit = refit_leptons[0] + refit_leptons[1];
+        if(pico.out_nphoton() > 0){
+          kinZfitter->Setup(leptons_map, fsrphotons_map, leptons_pterr_map);
+          kinZfitter->KinRefitZ1();
+          refit_leptons = kinZfitter->GetRefitP4s();
+          ll_refit = refit_leptons[0] + refit_leptons[1];
+          status       = kinZfitter -> GetStatus();
+          covmatstatus = kinZfitter -> GetCovMatStatus();
+          minnll       = kinZfitter -> GetMinNll();
+
+          //debug statement
+          cnt_refit++; std::cout << cnt_refit << std::endl;
+
+        } else {
+        
+          ll_refit = TLorentzVector(0,0,0,0);
+        }
 
         pico.out_nll()++;
         pico.out_ll_pt()   .insert(pico.out_ll_pt()   .begin()+shift, diel.Pt());
@@ -188,6 +228,10 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
         pico.out_ll_refit_m()    .insert(pico.out_ll_refit_m()    .begin()+shift, ll_refit.M());
         pico.out_ll_refit_l1_pt().insert(pico.out_ll_refit_l1_pt().begin()+shift, refit_leptons[0].Pt());
         pico.out_ll_refit_l2_pt().insert(pico.out_ll_refit_l2_pt().begin()+shift, refit_leptons[1].Pt());
+
+        pico.out_ll_refit_status()   .insert(pico.out_ll_refit_status()   .begin()+shift, status);
+        pico.out_ll_refit_covmat_status()   .insert(pico.out_ll_refit_covmat_status()   .begin()+shift, covmatstatus);
+        pico.out_ll_refit_minnll()   .insert(pico.out_ll_refit_minnll()   .begin()+shift, minnll);
 
         nll++;
       }

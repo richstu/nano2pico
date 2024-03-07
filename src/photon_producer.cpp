@@ -85,12 +85,11 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
       if(tempDR > maxLepDR) maxLepDR = tempDR;
     }
 
-    bool isSignal = (((nano.Photon_isScEtaEB()[iph] && mva > -0.4) ||
-                     (nano.Photon_isScEtaEE()[iph] && mva > -0.58)) &&
-                     eVeto && minLepDR > 0.4 && 
+    bool isSignal = (nano.Photon_mvaID_WP80()[iph] &&
+                     eVeto && minLepDR > 0.3 && 
                      pt > SignalPhotonPtCut);
 
-    // Photons passing the Run 2 selections are placed at the front
+    // Photons passing the object selections are placed at the front
     if(isSignal) {
       shift = ndr;
       ndr++;

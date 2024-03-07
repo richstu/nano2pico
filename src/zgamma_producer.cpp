@@ -35,11 +35,15 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
 
   for(size_t ill(0); ill < pico.out_ll_pt().size(); ill++)
     for(size_t igamma(0); igamma < pico.out_photon_pt().size(); igamma++) {
-      TLorentzVector dilep, photon, llg;
+      TLorentzVector dilep, dilep_refit, photon, llg, llg_refit;
       dilep.SetPtEtaPhiM(pico.out_ll_pt()[ill], pico.out_ll_eta()[ill],
                          pico.out_ll_phi()[ill],pico.out_ll_m()[ill]);
+      dilep_refit.SetPtEtaPhiM(pico.out_ll_refit_pt()[ill], pico.out_ll_refit_eta()[ill],
+                               pico.out_ll_refit_phi()[ill],pico.out_ll_refit_m()[ill]);
+
       photon.SetPtEtaPhiM(pico.out_photon_pt()[igamma], pico.out_photon_eta()[igamma], pico.out_photon_phi()[igamma], 0);
       llg = dilep + photon;
+      llg_refit = dilep_refit + photon; 
       pico.out_nllphoton()++;
       pico.out_llphoton_pt().push_back(llg.Pt());
       pico.out_llphoton_eta().push_back(llg.Eta());
@@ -48,6 +52,15 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
       pico.out_llphoton_dr().push_back(dilep.DeltaR(photon));
       pico.out_llphoton_dphi().push_back(dilep.DeltaPhi(photon));
       pico.out_llphoton_deta().push_back(fabs(dilep.Eta() - photon.Eta()));
+
+      pico.out_llphoton_refit_pt().push_back(llg_refit.Pt());
+      pico.out_llphoton_refit_eta().push_back(llg_refit.Eta());
+      pico.out_llphoton_refit_phi().push_back(llg_refit.Phi());
+      pico.out_llphoton_refit_m().push_back(llg_refit.M());
+      pico.out_llphoton_refit_dr().push_back(dilep_refit.DeltaR(photon));
+      pico.out_llphoton_refit_dphi().push_back(dilep_refit.DeltaPhi(photon));
+      pico.out_llphoton_refit_deta().push_back(fabs(dilep_refit.Eta() - photon.Eta()));
+
       pico.out_llphoton_iph().push_back(igamma);
       pico.out_llphoton_ill().push_back(ill);
       if(sig_jet_nano_idx.size() > 1) {
