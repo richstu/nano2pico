@@ -173,7 +173,7 @@ void KinZfitter::Setup(std::map<unsigned int, TLorentzVector> selectedLeptons, s
   pTerrsZ1REFIT_.clear();
   pTerrsZ1phREFIT_.clear();
 
-  //gErrorIgnoreLevel = kWarning;
+  gErrorIgnoreLevel = kWarning;
   RooMsgService::instance().setStreamStatus(1,false);
   initZs(selectedLeptons, selectedFsrPhotons, errorLeptons);
   if(debug_){ cout << "Setup complete" << endl;} 
@@ -201,7 +201,6 @@ void KinZfitter::initZs(std::map<unsigned int, TLorentzVector> selectedLeptons, 
 
   if(debug_) cout<<"init fsr photons"<<endl;
 
-//  if(idsZ1_[0]==13){
     TLorentzVector p4;
     for(unsigned int ifsr = 0; ifsr < selectedFsrPhotons.size(); ifsr++)
       {
@@ -212,7 +211,7 @@ void KinZfitter::initZs(std::map<unsigned int, TLorentzVector> selectedLeptons, 
 
         double pTerr = 0;
 
-        pTerr = pterr(p4); //,isData_);
+        pTerr = pterr(p4);
 
         if(debug_) cout<<" pt err is "<<pTerr<<endl;
         if(debug_) cout<<"for fsr Z1 photon"<<endl;
@@ -243,12 +242,9 @@ void KinZfitter::SetZ1Result(double l1, double l2, double lph1, double lph2) {
 
   p4sZ1REFIT_.push_back(Z1_1_True); p4sZ1REFIT_.push_back(Z1_2_True);
 
-//  if(idsZ1_[0]==13){
   TLorentzVector Z1ph;
   TLorentzVector Z1phTrue(0,0,0,0);
   for(unsigned int ifsr1 = 0; ifsr1<p4sZ1ph_.size(); ifsr1++) {
-//    if(idsZ1_[0]==11){break;}//Added Line for Z to ee events
-
     Z1ph = p4sZ1ph_[ifsr1];
 
     double l = 1.0;
@@ -258,10 +254,8 @@ void KinZfitter::SetZ1Result(double l1, double l2, double lph1, double lph2) {
     Z1phTrue.SetPtEtaPhiM(l*Z1ph.Pt(),Z1ph.Eta(),Z1ph.Phi(),Z1ph.M());
 
     p4sZ1phREFIT_.push_back(Z1phTrue);
-
   }
 
-//  }
   if(debug_) cout<<"end set Z1 result"<<endl;
 
 }
@@ -293,12 +287,10 @@ double KinZfitter::GetMZ1Err()
   pTErrs.push_back(pTerrsZ1_[0]);
   pTErrs.push_back(pTerrsZ1_[1]);
 
-//  if(idsZ1_[0]==13){
     for(unsigned int ifsr1 = 0; ifsr1<p4sZ1ph_.size(); ifsr1++) {
       p4s.push_back(p4sZ1ph_[ifsr1]);
       pTErrs.push_back(pTerrsZ1ph_[ifsr1]);
     }
-//  }
   return masserror(p4s,pTErrs);
 
 }
@@ -360,12 +352,32 @@ void KinZfitter::KinRefitZ1()
 
 }
 
+int KinZfitter::GetStatus()
+{
+  return status_;
+}
+
+int KinZfitter::GetCovMatStatus()
+{
+  return covmat_status_;
+}
+
+float KinZfitter::GetMinNll()
+{
+  return minnll_;
+}
 
 int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double & lph2)
 {
 
   l1= 1.0; l2 = 1.0;
   lph1 = 1.0; lph2 = 1.0;
+
+  //Declaring start time to help time which part of the refit is the longest
+  //clock_t time_start; time_start = static_cast<float>(clock())/CLOCKS_PER_SEC;
+  //This code is used to time the refit
+  //cout << static_cast<float>(clock())/CLOCKS_PER_SEC - time_start<< endl;
+
 
   if(debug_) cout<<"start Z1 refit"<<endl;
 
@@ -403,8 +415,8 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
     Z1_ph2 = p4sZ1ph_[1]; pTerrZ1_ph2 = pTerrsZ1ph_[1];
     RECOpTph2 = Z1_ph2.Pt();
   }
-  double RECOpTph1min = max(2.0, RECOpTph1-3*pTerrZ1_ph1);
-  double RECOpTph2min = max(2.0, RECOpTph2-3*pTerrZ1_ph2);
+  double RECOpTph1min = max(0.0, RECOpTph1-3*pTerrZ1_ph1);
+  double RECOpTph2min = max(0.0, RECOpTph2-3*pTerrZ1_ph2);
   double RECOpTph1max = RECOpTph1 < 2 ? RECOpTph1min : RECOpTph1+3*pTerrZ1_ph1;
   double RECOpTph2max = RECOpTph2 < 2 ? RECOpTph2min : RECOpTph2+3*pTerrZ1_ph2;
 
@@ -417,8 +429,8 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
   RooRealVar* pT1RECO = new RooRealVar("pT1RECO", "pT1RECO", RECOpT1, 5, 500);
   RooRealVar* pT2RECO = new RooRealVar("pT2RECO", "pT2RECO", RECOpT2, 5, 500);
 
-  double RECOpT1min = max(5.0, RECOpT1-2*pTerrZ1_1);
-  double RECOpT2min = max(5.0, RECOpT2-2*pTerrZ1_2);
+  double RECOpT1min = max(5.0, RECOpT1-3*pTerrZ1_1);
+  double RECOpT2min = max(5.0, RECOpT2-3*pTerrZ1_2);
 
   // observables pT1,2,ph1,ph2
   RooRealVar* pT1 = new RooRealVar("pT1", "pT1FIT", RECOpT1, RECOpT1min, RECOpT1+3*pTerrZ1_1 );
@@ -447,6 +459,8 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
 
   /////
 
+  //This code is used to time the refit
+  //cout << "After variable def: " << static_cast<float>(clock())/CLOCKS_PER_SEC - time_start<< endl;
 
   double Vthetaph1, Vphiph1, Vthetaph2, Vphiph2;
   Vthetaph1 = (Z1_ph1).Theta(); Vthetaph2 = (Z1_ph2).Theta();
@@ -515,6 +529,10 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
   // 4-vector DOT metric 1 -1 -1 -1
   RooFormulaVar ph1Dph2("ph1Dph2", "@0*@1-@2", RooArgList(Eph1, Eph2, *ph1v3Dph2));
 
+  //This code is used to time the refit
+  //cout << "After dot products: " << static_cast<float>(clock())/CLOCKS_PER_SEC - time_start<< endl;
+
+
   // mZ1
   RooFormulaVar* mZ1;
   if(p4sZ1ph_.size()==0){
@@ -527,7 +545,7 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
 			    RooArgList(p1D2, p1Dph1, p2Dph1, p1Dph2, p2Dph2, ph1Dph2, *m1, *m2));
   }
 
-  //If mll is outside the bounds return mll without a fit
+  //If mll is outside the bounds of the fit return mll without a fit
   if(mZ1 -> getVal() < 60 || mZ1 -> getVal() > 120){return mZ1 -> getVal();}
 
 
@@ -574,6 +592,8 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
   RooRealVar BWGamma("BWGamma", "", BWgamma_);
   RooRealVar meanGauss("meanGauss", "", sigmaValG_);
 
+  //This code is used to time the refit
+  //cout << "Before model creation: " << static_cast<float>(clock())/CLOCKS_PER_SEC - time_start<< endl;
 
 
   if(threegauss_==true){
@@ -597,6 +617,7 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
 
 
   } else {
+
   VoiToFit = new RooVoigtian("VoiToFit","Voigtian Fit to m_{ll}", *mZ1, BWMean, BWGamma, meanGauss);
   VoiPDF = new RooAddPdf("VoiShape","",*VoiToFit);
   
@@ -614,6 +635,11 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
 
   }
 
+
+  //This code is used to time the refit
+  //cout << "After Model creation: " << static_cast<float>(clock())/CLOCKS_PER_SEC - time_start<< endl;
+
+
   // observable set
   RooArgSet *rastmp;
   if(p4sZ1ph_.size()==0){
@@ -624,8 +650,6 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
     rastmp = new RooArgSet(*pT1RECO, *pT2RECO, *pTph1RECO, *pTph2RECO);
   }
 
-
-
   RooDataSet* pTs = new RooDataSet("pTs", "pTs", *rastmp);
   pTs->add(*rastmp);
 
@@ -633,8 +657,19 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
   //nll = model->createNLL(*pTs);
   //RooMinuit(*nll).migrad();
 
-  RooFitResult* r = model->fitTo(*pTs, RooFit::Save(), RooFit::PrintLevel(-1));
+  //This code is used to time the refit
+  //cout << "Before fit: " << static_cast<float>(clock())/CLOCKS_PER_SEC - time_start<< endl;
+
+
+  RooFitResult* r = model->fitTo(*pTs, RooFit::Save(), RooFit::PrintLevel(-1));//,RooFit::Timer(true));
   const TMatrixDSym& covMatrix = r->covarianceMatrix();
+  status_ = r->status();
+  covmat_status_ = r->covQual();
+  minnll_ = r -> minNll();
+
+  //This code is used to time the refit
+  //cout << "After fit: " << static_cast<float>(clock())/CLOCKS_PER_SEC - time_start<< endl;
+
 
   const RooArgList& finalPars = r->floatParsFinal();
   for (int i=0 ; i<finalPars.getSize(); i++) {
@@ -681,6 +716,10 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
 
   }
 
+  //This code is used to time the refit
+  //cout << "Before delete statements: " << static_cast<float>(clock())/CLOCKS_PER_SEC - time_start<< endl;
+
+
  // delete pT1; delete pT2;delete pTph1; delete pTph2;
  //delete pT1RECO; delete pT2RECO; delete pTph1RECO; delete pTph2RECO;  delete m1; delete m2; delete theta1; 
  // delete p1v3D2; delete p1v3Dph1; delete p2v3Dph2; delete p2v3Dph2; delete ph1v3Dph2; delete mZ1;
@@ -700,6 +739,10 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
   delete theta1; delete phi1; delete theta2; delete phi2;
   delete m1; delete m2; delete pTph1RECO; delete pTph2RECO;
   delete pT1; delete pT2;  delete pT1RECO; delete pT2RECO;
+
+  //This code is used to time the refit
+  //cout << "After delete statements: " << static_cast<float>(clock())/CLOCKS_PER_SEC - time_start<< endl;
+
 
   if(debug_) cout<<"end Z1 refit"<<endl;
 

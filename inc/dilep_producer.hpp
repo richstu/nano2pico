@@ -15,10 +15,10 @@ public:
 
 private:
   int year;
-  KinZfitter *kinZfitter;
+  //KinZfitter *kinZfitter;
 
   //Below value is used for debug purposes
-  int cnt_refit;
+  //int cnt_refit;
 };
 
 #endif

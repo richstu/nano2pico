@@ -75,13 +75,22 @@ vector<float> llphoton_dijet_dphi
 vector<float> llphoton_dijet_balance
 vector<float> llphoton_pTt2
 
-vector<float> llphoton_refit_pt
-vector<float> llphoton_refit_eta
-vector<float> llphoton_refit_phi
-vector<float> llphoton_refit_m
-vector<float> llphoton_refit_dphi
-vector<float> llphoton_refit_deta
-vector<float> llphoton_refit_dr
+#vector<float> llphoton_refit_pt
+#vector<float> llphoton_refit_eta
+#vector<float> llphoton_refit_phi
+#vector<float> llphoton_refit_m
+#vector<float> llphoton_refit_dphi
+#vector<float> llphoton_refit_deta
+#vector<float> llphoton_refit_dr
+
+float llphoton_refit_pt
+float llphoton_refit_eta
+float llphoton_refit_phi
+float llphoton_refit_m
+float llphoton_refit_dphi
+float llphoton_refit_deta
+float llphoton_refit_dr
+
 
 ###################   gammagamma   ##################
 int nphotonphoton
@@ -292,15 +301,26 @@ vector<int>   ll_i1
 vector<int>   ll_i2
 vector<int>   ll_charge
 
-vector<float> ll_refit_pt
-vector<float> ll_refit_eta
-vector<float> ll_refit_phi
-vector<float> ll_refit_m
-vector<float> ll_refit_l1_pt
-vector<float> ll_refit_l2_pt
-vector<int>   ll_refit_status
-vector<int>   ll_refit_covmat_status
-vector<float> ll_refit_minnll
+#vector<float> ll_refit_pt
+#vector<float> ll_refit_eta
+#vector<float> ll_refit_phi
+#vector<float> ll_refit_m
+#vector<float> ll_refit_l1_pt
+#vector<float> ll_refit_l2_pt
+#vector<int>   ll_refit_status
+#vector<int>   ll_refit_covmat_status
+#vector<float> ll_refit_minnll
+float ll_refit_pt
+float ll_refit_eta
+float ll_refit_phi
+float ll_refit_m
+float ll_refit_l1_pt
+float ll_refit_l2_pt
+int   ll_refit_status
+int   ll_refit_covmat_status
+float ll_refit_minnll
+
+
 
 ##################   Photons   ###################
 int nphoton

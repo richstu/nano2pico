@@ -79,6 +79,10 @@ class KinZfitter {
   double GetM4lErr();
   double GetRefitM4lErrFullCov();
 
+  float GetMinNll();
+  int   GetStatus();
+  int   GetCovMatStatus();
+
   std::vector<TLorentzVector> GetRefitP4s();
   std::vector<TLorentzVector> GetP4s();
 
@@ -115,6 +119,11 @@ class KinZfitter {
   // covariance matrix
   // what directly coming from Refit
   TMatrixDSym covMatrixZ1_;
+
+  //status' returned for fits
+  int status_;
+  int covmat_status_;
+  double minnll_;
 
   // refit energy scale with respect to reco pT
   double lZ1_l1_, lZ1_l2_;

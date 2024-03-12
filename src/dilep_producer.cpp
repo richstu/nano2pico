@@ -8,18 +8,18 @@ using namespace std;
 
 DileptonProducer::DileptonProducer(int year_){
     year = year_;
-    kinZfitter = new KinZfitter();
+//    kinZfitter = new KinZfitter();
 
   //This variable is to debug how often the kinematic refitting code is used
-    cnt_refit = 0;
+//    cnt_refit = 0;
 
 }
 
 DileptonProducer::~DileptonProducer(){
-    kinZfitter = new KinZfitter();
+//    kinZfitter = new KinZfitter();
 
   //This variable is to debug how often the kinematic refitting code is used
-    cnt_refit = 0;
+//    cnt_refit = 0;
 
 }
 
@@ -32,7 +32,7 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
   TLorentzVector l1err, l2err;
   double ptl1err, ptl2err;
   double dml1, dml2;
-  int idx_fsr1, idx_fsr2;
+  /*int idx_fsr1, idx_fsr2;
   //KinZfitter::KinZfitter kinZfitter= KinZfitter();
   //KinZfitter *kinZfitter = new KinZfitter();
   TLorentzVector ll_refit(0,0,0,0);
@@ -43,7 +43,7 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
   TLorentzVector fsrphoton1, fsrphoton2;
   int status, covmatstatus = -5;
   float minnll = -5;
-
+  */
 
   if (pico.out_nmu()>=2)
     for(size_t i(0); i < sig_mu_pico_idx.size(); i++) 
@@ -51,8 +51,8 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
         int imu1 = sig_mu_pico_idx.at(i);
         int imu2 = sig_mu_pico_idx.at(j);
         TLorentzVector mu1, mu2, dimu;
-        fsrphoton1 = TLorentzVector(0,0,0,0); 
-        fsrphoton2 = TLorentzVector(0,0,0,0);
+        //fsrphoton1 = TLorentzVector(0,0,0,0); 
+        //fsrphoton2 = TLorentzVector(0,0,0,0);
 
         mu1.SetPtEtaPhiM(pico.out_mu_pt()[imu1], pico.out_mu_eta()[imu1],
                          pico.out_mu_phi()[imu1], 0.10566);
@@ -76,6 +76,7 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
         dml1 = (l1err + mu2).M() - dimu.M();
         dml2 = (mu1 + l2err).M() - dimu.M();
 
+        /*
         leptons_map[0] = mu1;
         leptons_map[1] = mu2;
         leptons_pterr_map[0] = ptl1err;
@@ -121,6 +122,7 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
         
           ll_refit = TLorentzVector(0,0,0,0);
         }
+        */
 
         pico.out_nll()++;
         pico.out_ll_pt()   .insert(pico.out_ll_pt()   .begin()+shift, dimu.Pt());
@@ -138,20 +140,20 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
         pico.out_ll_charge()     .insert(pico.out_ll_charge()     .begin()+shift, pico.out_mu_charge()[imu1]+pico.out_mu_charge()[imu2]);
 
         //Assigns the refit lepton/dilepton quantities
-        pico.out_ll_refit_pt()   .insert(pico.out_ll_refit_pt()   .begin()+shift, ll_refit.Pt());
-        pico.out_ll_refit_eta()  .insert(pico.out_ll_refit_eta()  .begin()+shift, ll_refit.Eta());
-        pico.out_ll_refit_phi()  .insert(pico.out_ll_refit_phi()  .begin()+shift, ll_refit.Phi());
-        pico.out_ll_refit_m()    .insert(pico.out_ll_refit_m()    .begin()+shift, ll_refit.M());
-        pico.out_ll_refit_l1_pt().insert(pico.out_ll_refit_l1_pt().begin()+shift, refit_leptons[0].Pt());
-        pico.out_ll_refit_l2_pt().insert(pico.out_ll_refit_l2_pt().begin()+shift, refit_leptons[1].Pt());
+        //pico.out_ll_refit_pt()   .insert(pico.out_ll_refit_pt()   .begin()+shift, ll_refit.Pt());
+        //pico.out_ll_refit_eta()  .insert(pico.out_ll_refit_eta()  .begin()+shift, ll_refit.Eta());
+        //pico.out_ll_refit_phi()  .insert(pico.out_ll_refit_phi()  .begin()+shift, ll_refit.Phi());
+        //pico.out_ll_refit_m()    .insert(pico.out_ll_refit_m()    .begin()+shift, ll_refit.M());
+        //pico.out_ll_refit_l1_pt().insert(pico.out_ll_refit_l1_pt().begin()+shift, refit_leptons[0].Pt());
+        //pico.out_ll_refit_l2_pt().insert(pico.out_ll_refit_l2_pt().begin()+shift, refit_leptons[1].Pt());
 
-        pico.out_ll_refit_status()   .insert(pico.out_ll_refit_status()   .begin()+shift, status);
-        pico.out_ll_refit_covmat_status()   .insert(pico.out_ll_refit_covmat_status()   .begin()+shift, covmatstatus);
-        pico.out_ll_refit_minnll()   .insert(pico.out_ll_refit_minnll()   .begin()+shift, minnll);
+        //pico.out_ll_refit_status()   .insert(pico.out_ll_refit_status()   .begin()+shift, status);
+        //pico.out_ll_refit_covmat_status()   .insert(pico.out_ll_refit_covmat_status()   .begin()+shift, covmatstatus);
+        //pico.out_ll_refit_minnll()   .insert(pico.out_ll_refit_minnll()   .begin()+shift, minnll);
 
         nll++;
       }
-  fsrphotons_map.clear();
+//  fsrphotons_map.clear();
   if (pico.out_nel()>=2)
     for(size_t i(0); i < sig_el_pico_idx.size(); i++) 
       for(size_t j(i+1); j < sig_el_pico_idx.size(); j++) {
@@ -182,7 +184,7 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
         dml1 = (l1err + el2).M() - diel.M();
         dml2 = (el1 + l2err).M() - diel.M();
 
-
+        /*
         leptons_map[0] = el1;
         leptons_map[1] = el2;
         leptons_pterr_map[0] = ptl1err;
@@ -205,6 +207,7 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
         
           ll_refit = TLorentzVector(0,0,0,0);
         }
+        */
 
         pico.out_nll()++;
         pico.out_ll_pt()   .insert(pico.out_ll_pt()   .begin()+shift, diel.Pt());
@@ -222,7 +225,7 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
         pico.out_ll_charge()     .insert(pico.out_ll_charge()     .begin()+shift, pico.out_el_charge()[iel1]+pico.out_el_charge()[iel2]);
 
         //Assigns the refit lepton/dilepton quantities
-        pico.out_ll_refit_pt()   .insert(pico.out_ll_refit_pt()   .begin()+shift, ll_refit.Pt());
+        /*pico.out_ll_refit_pt()   .insert(pico.out_ll_refit_pt()   .begin()+shift, ll_refit.Pt());
         pico.out_ll_refit_eta()  .insert(pico.out_ll_refit_eta()  .begin()+shift, ll_refit.Eta());
         pico.out_ll_refit_phi()  .insert(pico.out_ll_refit_phi()  .begin()+shift, ll_refit.Phi());
         pico.out_ll_refit_m()    .insert(pico.out_ll_refit_m()    .begin()+shift, ll_refit.M());
@@ -232,7 +235,7 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
         pico.out_ll_refit_status()   .insert(pico.out_ll_refit_status()   .begin()+shift, status);
         pico.out_ll_refit_covmat_status()   .insert(pico.out_ll_refit_covmat_status()   .begin()+shift, covmatstatus);
         pico.out_ll_refit_minnll()   .insert(pico.out_ll_refit_minnll()   .begin()+shift, minnll);
-
+        */
         nll++;
       }
 

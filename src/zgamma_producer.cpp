@@ -2,14 +2,18 @@
 
 #include "utilities.hpp"
 #include "TLorentzVector.h"
+#include "KinZfitter.hpp"
 
 using namespace std;
 
 ZGammaVarProducer::ZGammaVarProducer(int year_){
     year = year_;
+    kinZfitter = new KinZfitter();
 }
 
 ZGammaVarProducer::~ZGammaVarProducer(){
+    kinZfitter = new KinZfitter();
+
 }
 
 void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector<int> sig_jet_nano_idx){
@@ -33,17 +37,16 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
     return;
   }
 
-  for(size_t ill(0); ill < pico.out_ll_pt().size(); ill++)
+  for(size_t ill(0); ill < pico.out_ll_pt().size(); ill++){
     for(size_t igamma(0); igamma < pico.out_photon_pt().size(); igamma++) {
-      TLorentzVector dilep, dilep_refit, photon, llg, llg_refit;
+      TLorentzVector dilep, dilep_refit, photon, llg;
       dilep.SetPtEtaPhiM(pico.out_ll_pt()[ill], pico.out_ll_eta()[ill],
                          pico.out_ll_phi()[ill],pico.out_ll_m()[ill]);
-      dilep_refit.SetPtEtaPhiM(pico.out_ll_refit_pt()[ill], pico.out_ll_refit_eta()[ill],
-                               pico.out_ll_refit_phi()[ill],pico.out_ll_refit_m()[ill]);
+      //dilep_refit.SetPtEtaPhiM(pico.out_ll_refit_pt()[ill], pico.out_ll_refit_eta()[ill],
+      //                         pico.out_ll_refit_phi()[ill],pico.out_ll_refit_m()[ill]);
 
       photon.SetPtEtaPhiM(pico.out_photon_pt()[igamma], pico.out_photon_eta()[igamma], pico.out_photon_phi()[igamma], 0);
       llg = dilep + photon;
-      llg_refit = dilep_refit + photon; 
       pico.out_nllphoton()++;
       pico.out_llphoton_pt().push_back(llg.Pt());
       pico.out_llphoton_eta().push_back(llg.Eta());
@@ -53,13 +56,14 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
       pico.out_llphoton_dphi().push_back(dilep.DeltaPhi(photon));
       pico.out_llphoton_deta().push_back(fabs(dilep.Eta() - photon.Eta()));
 
-      pico.out_llphoton_refit_pt().push_back(llg_refit.Pt());
-      pico.out_llphoton_refit_eta().push_back(llg_refit.Eta());
-      pico.out_llphoton_refit_phi().push_back(llg_refit.Phi());
-      pico.out_llphoton_refit_m().push_back(llg_refit.M());
-      pico.out_llphoton_refit_dr().push_back(dilep_refit.DeltaR(photon));
-      pico.out_llphoton_refit_dphi().push_back(dilep_refit.DeltaPhi(photon));
-      pico.out_llphoton_refit_deta().push_back(fabs(dilep_refit.Eta() - photon.Eta()));
+      //llg_refit = dilep_refit + photon; 
+      //pico.out_llphoton_refit_pt().push_back(llg_refit.Pt());
+      //pico.out_llphoton_refit_eta().push_back(llg_refit.Eta());
+      //pico.out_llphoton_refit_phi().push_back(llg_refit.Phi());
+      //pico.out_llphoton_refit_m().push_back(llg_refit.M());
+      //pico.out_llphoton_refit_dr().push_back(dilep_refit.DeltaR(photon));
+      //pico.out_llphoton_refit_dphi().push_back(dilep_refit.DeltaPhi(photon));
+      //pico.out_llphoton_refit_deta().push_back(fabs(dilep_refit.Eta() - photon.Eta()));
 
       pico.out_llphoton_iph().push_back(igamma);
       pico.out_llphoton_ill().push_back(ill);
@@ -209,7 +213,110 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
 
       //pico.out_llphoton_costhj().push_back(cosThetaJeff(lminus,lplus,photon));
     }
+  }
 
+  //Code Executing the kinematic refit
+  if(pico.out_nllphoton() > 0){
+
+    //Definitions of variables for the refit
+    TLorentzVector ll_refit(0,0,0,0);
+    std::vector<TLorentzVector> refit_leptons{ll_refit,ll_refit};
+    std::map<unsigned int, TLorentzVector> leptons_map;
+    std::map<unsigned int, double> leptons_pterr_map;
+    std::map<unsigned int, TLorentzVector> fsrphotons_map;
+    TLorentzVector fsrphoton1, fsrphoton2,l1,l2,photon;
+    int status, covmatstatus = -5;
+    float minnll = -5;
+    int idx_l1 = pico.out_ll_i1()[0];
+    int idx_l2 = pico.out_ll_i2()[0];
+
+    if(pico.out_ll_lepid()[0] == 13){
+       int idx_fsr1, idx_fsr2;
+
+       l1.SetPtEtaPhiM(pico.out_mu_pt()[idx_l1], pico.out_mu_eta()[idx_l1],
+                       pico.out_mu_phi()[idx_l1], 0.10566);
+       l2.SetPtEtaPhiM(pico.out_mu_pt()[idx_l2], pico.out_mu_eta()[idx_l2],
+                       pico.out_mu_phi()[idx_l2], 0.10566);
+
+      leptons_map[0] = l1;
+      leptons_map[1] = l2;
+      leptons_pterr_map[0] = pico.out_mu_ptErr()[idx_l1];
+      leptons_pterr_map[1] = pico.out_mu_ptErr()[idx_l2];
+     
+      //Loops through FSRphotons to find which leptons are associated with to be used for constrained fit
+      idx_fsr1 = -1; idx_fsr2 = -1;
+      for(size_t idx_fsr = 0; idx_fsr < static_cast<unsigned int>(pico.out_nfsrphoton()); idx_fsr++){
+        if(pico.out_fsrphoton_muonidx()[idx_fsr]==idx_l1){
+          if(idx_fsr1 != -1 && (pico.out_fsrphoton_droveret2()[idx_fsr1] <  pico.out_fsrphoton_droveret2()[idx_fsr])){ continue;}
+            idx_fsr1 = idx_fsr; continue;
+        }
+        if(pico.out_fsrphoton_muonidx()[idx_fsr]==idx_l2){
+          if(idx_fsr2 != -1 && (pico.out_fsrphoton_droveret2()[idx_fsr2] <  pico.out_fsrphoton_droveret2()[idx_fsr])){ continue;}
+            idx_fsr2 = idx_fsr; continue;
+          }
+        }
+
+      //Adds the FSR photons to a map
+      fsrphotons_map.clear();
+      int fsr_cnt = 0;
+      if(idx_fsr1!=-1){
+        fsrphoton1.SetPtEtaPhiM( pico.out_fsrphoton_pt()[idx_fsr1],pico.out_fsrphoton_eta()[idx_fsr1],pico.out_fsrphoton_phi()[idx_fsr1],0 );
+        fsrphotons_map[fsr_cnt] = fsrphoton1;
+        fsr_cnt++;
+      }
+      if(idx_fsr2!=-1){
+        fsrphoton2.SetPtEtaPhiM( pico.out_fsrphoton_pt()[idx_fsr2],pico.out_fsrphoton_eta()[idx_fsr2],pico.out_fsrphoton_phi()[idx_fsr2],0 ); 
+        fsrphotons_map[fsr_cnt] = fsrphoton2;     
+      } 
+    } else {
+      l1.SetPtEtaPhiM(pico.out_el_pt()[idx_l1], pico.out_el_eta()[idx_l1],
+                      pico.out_el_phi()[idx_l1], 0.000511);
+      l2.SetPtEtaPhiM(pico.out_el_pt()[idx_l2], pico.out_el_eta()[idx_l2],
+                      pico.out_el_phi()[idx_l2], 0.000511);
+
+      leptons_map[0] = l1;
+      leptons_map[1] = l2; 
+      leptons_pterr_map[0] = pico.out_el_energyErr()[idx_l1]*l1.Pt()/l1.P();
+      leptons_pterr_map[1] = pico.out_el_energyErr()[idx_l2]*l2.Pt()/l2.P();
+    }
+
+      kinZfitter->Setup(leptons_map, fsrphotons_map, leptons_pterr_map);
+      kinZfitter->KinRefitZ1();
+      refit_leptons = kinZfitter->GetRefitP4s();
+      ll_refit     = refit_leptons[0] + refit_leptons[1];
+      status       = kinZfitter -> GetStatus();
+      covmatstatus = kinZfitter -> GetCovMatStatus();
+      minnll       = kinZfitter -> GetMinNll();
+
+      //debug statement
+      //cnt_refit++; std::cout << cnt_refit << std::endl;
+
+      photon.SetPtEtaPhiM(pico.out_photon_pt()[0], pico.out_photon_eta()[0], pico.out_photon_phi()[0], 0);
+      TLorentzVector llg_refit = ll_refit + photon;
+
+      //Assigns the refit lepton/dilepton quantities
+      pico.out_ll_refit_pt()    = ll_refit.Pt();
+      pico.out_ll_refit_eta()   = ll_refit.Eta();
+      pico.out_ll_refit_phi()   = ll_refit.Phi();
+      pico.out_ll_refit_m()     = ll_refit.M();
+      pico.out_ll_refit_l1_pt() = refit_leptons[0].Pt();
+      pico.out_ll_refit_l2_pt() = refit_leptons[1].Pt();
+
+      pico.out_ll_refit_status()        = status;
+      pico.out_ll_refit_covmat_status() = covmatstatus;
+      pico.out_ll_refit_minnll()        = minnll;
+
+      pico.out_llphoton_refit_pt()   = llg_refit.Pt();
+      pico.out_llphoton_refit_eta()  = llg_refit.Eta();
+      pico.out_llphoton_refit_phi()  = llg_refit.Phi();
+      pico.out_llphoton_refit_m()    = llg_refit.M();
+      pico.out_llphoton_refit_dr()   = ll_refit.DeltaR(photon);
+      pico.out_llphoton_refit_dphi() = ll_refit.DeltaPhi(photon);
+      pico.out_llphoton_refit_deta() = fabs(ll_refit.Eta() - photon.Eta());
+
+    } //else {  
+      //    ll_refit = TLorentzVector(0,0,0,0);
+      //}
 
 
   // Bitmap for zgamma cut flow
