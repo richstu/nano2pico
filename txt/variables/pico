@@ -299,7 +299,6 @@ vector<float> ll_deta
 vector<int>   ll_lepid
 vector<int>   ll_i1
 vector<int>   ll_i2
-vector<int>   ll_charge
 
 #vector<float> ll_refit_pt
 #vector<float> ll_refit_eta
