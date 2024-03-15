@@ -73,15 +73,10 @@ vector<int>   llphoton_iph
 vector<int>   llphoton_ill
 vector<float> llphoton_dijet_dphi
 vector<float> llphoton_dijet_balance
-vector<float> llphoton_pTt2
-
-#vector<float> llphoton_refit_pt
-#vector<float> llphoton_refit_eta
-#vector<float> llphoton_refit_phi
-#vector<float> llphoton_refit_m
-#vector<float> llphoton_refit_dphi
-#vector<float> llphoton_refit_deta
-#vector<float> llphoton_refit_dr
+vector<float> llphoton_dijet_dr
+vector<float> llphoton_pTt
+vector<float> llphoton_pTt_an_hig019014
+vector<float> llphoton_pTt_oldpicos
 
 float llphoton_refit_pt
 float llphoton_refit_eta
@@ -358,6 +353,7 @@ vector<bool>  photon_sig
 vector<int>   photon_elidx
 vector<bool>  photon_pixelseed
 vector<float> photon_jet_mindr
+vector<float> photon_jet_maxdr
 vector<float> photon_zeppenfeld
 
 #################   FsrPhotons  ##################

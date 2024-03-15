@@ -74,13 +74,18 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
         dijet = j1 + j2;
         pico.out_llphoton_dijet_dphi().push_back(llg.DeltaPhi(dijet));
         pico.out_llphoton_dijet_balance().push_back((dilep+photon+j1+j2).Pt()/(dilep.Pt()+photon.Pt()+j1.Pt()+j2.Pt()));
+        pico.out_llphoton_dijet_dr().push_back(llg.DeltaR(dijet));
         pico.out_photon_jet_mindr().push_back(min(photon.DeltaR(j1), photon.DeltaR(j2)));
+        pico.out_photon_jet_maxdr().push_back(max(photon.DeltaR(j1), photon.DeltaR(j2)));
         pico.out_photon_zeppenfeld().push_back(abs(photon.Eta() - (j1.Eta() + j2.Eta())/2));
+
         TVector3 g = photon.Vect();
         TVector3 h = llg.Vect();
         TVector3 z = dilep.Vect();
         g.SetZ(0); h.SetZ(0); z.SetZ(0);
-        pico.out_llphoton_pTt2().push_back(h.Cross(z-g).Mag()/h.Mag());
+        pico.out_llphoton_pTt().push_back( fabs(h.Cross(z-g).Pz())/(z-g).Pt());
+        pico.out_llphoton_pTt_an_hig019014().push_back( fabs(h.Cross(z-g).Pz())/h.Mag() );
+        pico.out_llphoton_pTt_oldpicos().push_back(h.Cross(z-g).Mag()/h.Mag());
       }
       TLorentzVector lminus, lplus;
       TLorentzVector lep1, lep2;
