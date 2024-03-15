@@ -77,6 +77,9 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
         pico.out_llphoton_dijet_dr().push_back(llg.DeltaR(dijet));
         pico.out_photon_jet_mindr().push_back(min(photon.DeltaR(j1), photon.DeltaR(j2)));
         pico.out_photon_jet_maxdr().push_back(max(photon.DeltaR(j1), photon.DeltaR(j2)));
+        pico.out_photon_jet1_dr().push_back(photon.DeltaR(j1));
+        pico.out_photon_jet2_dr().push_back(photon.DeltaR(j2));
+
         pico.out_photon_zeppenfeld().push_back(abs(photon.Eta() - (j1.Eta() + j2.Eta())/2));
 
         TVector3 g = photon.Vect();
