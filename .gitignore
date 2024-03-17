@@ -50,9 +50,15 @@ archive
 sftp-config.json
 apply*.json
 auto*.json
-*cmds.json
-checked*.json
-resubmit*.json
-skim*.json
-skim*.py
+*cmds.json*
+*checked*.json*
+*resubmit*.json*
+*process_nano_cmds*.json*
+*process_nano_cmds*.py*
+*apply_corr_cmds*.json*
+*apply_corr_cmds*.py*
+*skim*cmds*.json*
+*skim*cmds*.py*
+*slim*cmds.json*
+*slim*cmds.py*
 

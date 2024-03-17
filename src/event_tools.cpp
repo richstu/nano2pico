@@ -486,6 +486,24 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
   pico.out_HLT_Ele15_IsoVVVL_PFHT600() = nano.HLT_Ele15_IsoVVVL_PFHT600();
   pico.out_HLT_Ele50_IsoVVVL_PFHT450() = nano.HLT_Ele50_IsoVVVL_PFHT450();
 
+  //Ele32_WPTight_Gsf was not in menu for most of 2017, but can be emulated by
+  //AND of Ele32_WPTight_Gsf_L1DoubleEG and single EG L1 seeds
+  if (year==2017) {
+    bool pass_l1_singleeg = false;
+    for (unsigned itrig = 0; itrig < nano.TrigObj_id().size(); itrig++) {
+      if (nano.TrigObj_id()[itrig]==11) {
+        if ((nano.TrigObj_filterBits()[itrig] & 0x400)!=0) {
+          pass_l1_singleeg = true;
+        }
+      }
+    }
+    pico.out_HLT_Ele32_WPTight_Gsf_Emu() = nano.HLT_Ele32_WPTight_Gsf_L1DoubleEG() 
+                                           && pass_l1_singleeg;
+  }
+  else {
+    pico.out_HLT_Ele32_WPTight_Gsf_Emu() = false;
+  }
+
   bool muon_trigs = nano.HLT_IsoMu20() || nano.HLT_IsoMu22() || nano.HLT_IsoMu24() ||
                     nano.HLT_IsoMu27() || nano.HLT_IsoTkMu20() || nano.HLT_IsoTkMu22() ||
                     nano.HLT_IsoTkMu24() || nano.HLT_Mu50() || nano.HLT_Mu55() ||
