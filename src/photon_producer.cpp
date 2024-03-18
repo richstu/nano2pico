@@ -88,7 +88,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
     bool isSignal = (nano.Photon_mvaID_WP80()[iph] &&
                      eVeto && minLepDR > 0.3 && 
                      pt > SignalPhotonPtCut &&
-                     photon_el_pico_idx[iph]==-1);
+                     (photon_el_pico_idx[iph]==-1 || !(pico.out_el_sig()[photon_el_pico_idx[iph]])));
 
     // Photons passing the object selections are placed at the front
     if(isSignal) {

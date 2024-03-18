@@ -354,6 +354,9 @@ vector<int>   photon_elidx
 vector<bool>  photon_pixelseed
 vector<float> photon_jet_mindr
 vector<float> photon_jet_maxdr
+vector<float> photon_jet1_dr
+vector<float> photon_jet2_dr
+
 vector<float> photon_zeppenfeld
 
 #################   FsrPhotons  ##################
