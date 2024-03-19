@@ -661,7 +661,7 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
 
   }
   if (year==2017) {
-    pico.out_trig_single_el() = nano.HLT_Ele32_WPTight_Gsf_L1DoubleEG();
+    pico.out_trig_single_el() = pico.out_HLT_Ele32_WPTight_Gsf_Emu();
     pico.out_trig_double_el() = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL();
     pico.out_trig_single_mu() = nano.HLT_IsoMu27();
     pico.out_trig_double_mu() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8() || 
