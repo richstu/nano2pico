@@ -1,6 +1,5 @@
 #include "dilep_producer.hpp"
 #include "utilities.hpp"
-#include "KinZfitter.hpp"
 
 #include "TLorentzVector.h"
 
@@ -8,18 +7,9 @@ using namespace std;
 
 DileptonProducer::DileptonProducer(int year_){
     year = year_;
-//    kinZfitter = new KinZfitter();
-
-  //This variable is to debug how often the kinematic refitting code is used
-//    cnt_refit = 0;
-
 }
 
 DileptonProducer::~DileptonProducer(){
-//    kinZfitter = new KinZfitter();
-
-  //This variable is to debug how often the kinematic refitting code is used
-//    cnt_refit = 0;
 
 }
 
@@ -33,7 +23,6 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
   double ptl1err, ptl2err;
   double dml1, dml2;
   int dilep_charge;
-
 
   if (pico.out_nmu()>=2)
     for(size_t i(0); i < sig_mu_pico_idx.size(); i++) 
@@ -55,7 +44,7 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
         
 
         // Dilepton closest to Z mass gets put at the front
-        if((abs(dimu.M() - zmass) < mindm)) { 
+        if(abs(dimu.M() - zmass) < mindm){ 
           mindm = abs(dimu.M() - zmass);
           shift = 0;
         }
@@ -84,7 +73,6 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
         pico.out_ll_i2()   .insert(pico.out_ll_i2()   .begin()+shift, imu2);
         pico.out_ll_l1_masserr() .insert(pico.out_ll_l1_masserr() .begin()+shift, dml1);
         pico.out_ll_l2_masserr() .insert(pico.out_ll_l2_masserr() .begin()+shift, dml2);
-        //pico.out_ll_charge()     .insert(pico.out_ll_charge()     .begin()+shift, dilep_charge);
         nll++;
       }
   if (pico.out_nel()>=2)
@@ -135,10 +123,7 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
         pico.out_ll_i2()   .insert(pico.out_ll_i2()   .begin()+shift, iel2);
         pico.out_ll_l1_masserr() .insert(pico.out_ll_l1_masserr() .begin()+shift, dml1);
         pico.out_ll_l2_masserr() .insert(pico.out_ll_l2_masserr() .begin()+shift, dml2);
-        //pico.out_ll_charge()     .insert(pico.out_ll_charge()     .begin()+shift, dilep_charge);
         nll++;
       }
-
-  //delete kinZfitter;
   return;
 }

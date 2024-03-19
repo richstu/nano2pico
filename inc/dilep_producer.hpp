@@ -2,7 +2,6 @@
 #define H_DILEP_PRODUCER
 
 #include "pico_tree.hpp"
-#include "KinZfitter.hpp"
 
 class DileptonProducer{
 public:
@@ -15,10 +14,6 @@ public:
 
 private:
   int year;
-  //KinZfitter *kinZfitter;
-
-  //Below value is used for debug purposes
-  //int cnt_refit;
 };
 
 #endif
