@@ -68,15 +68,16 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
         pico.out_photon_jet_maxdr().push_back(max(photon.DeltaR(j1), photon.DeltaR(j2)));
         pico.out_photon_jet1_dr().push_back(photon.DeltaR(j1));
         pico.out_photon_jet2_dr().push_back(photon.DeltaR(j2));
-
         pico.out_photon_zeppenfeld().push_back(abs(photon.Eta() - (j1.Eta() + j2.Eta())/2));
 
-        TVector3 g_pT = photon.Vect();
-        TVector3 h_pT = llg.Vect();
-        TVector3 z_pT = dilep.Vect();
-        g_pT.SetZ(0); h_pT.SetZ(0); z_pT.SetZ(0);
-        pico.out_llphoton_pTt().push_back( h_pT.Cross((z_pT-g_pT).Unit()).Mag() );
       }
+
+      TVector3 g_pT = photon.Vect();
+      TVector3 h_pT = llg.Vect();
+      TVector3 z_pT = dilep.Vect();
+      g_pT.SetZ(0); h_pT.SetZ(0); z_pT.SetZ(0);
+      pico.out_llphoton_pTt().push_back( h_pT.Cross((z_pT-g_pT).Unit()).Mag() );
+
       TLorentzVector lminus, lplus;
       TLorentzVector lep1, lep2;
       TLorentzVector l1err, l2err, pherr;
@@ -309,10 +310,122 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
       pico.out_llphoton_refit_dphi() = ll_refit.DeltaPhi(photon);
       pico.out_llphoton_refit_deta() = fabs(ll_refit.Eta() - photon.Eta());
 
-    } //else {  
-      //    ll_refit = TLorentzVector(0,0,0,0);
-      //}
+      if(sig_jet_nano_idx.size() > 1) {
+        TLorentzVector j1, j2, dijet;
+        j1.SetPtEtaPhiM(nano.Jet_pt()[sig_jet_nano_idx[0]], nano.Jet_eta()[sig_jet_nano_idx[0]], nano.Jet_phi()[sig_jet_nano_idx[0]], nano.Jet_mass()[sig_jet_nano_idx[0]]);
+        j2.SetPtEtaPhiM(nano.Jet_pt()[sig_jet_nano_idx[1]], nano.Jet_eta()[sig_jet_nano_idx[1]], nano.Jet_phi()[sig_jet_nano_idx[1]], nano.Jet_mass()[sig_jet_nano_idx[1]]);
+        dijet = j1 + j2;
+        pico.out_llphoton_refit_dijet_dphi()    = llg_refit.DeltaPhi(dijet);
+        pico.out_llphoton_refit_dijet_balance() = (ll_refit+photon+j1+j2).Pt()/(ll_refit.Pt()+photon.Pt()+j1.Pt()+j2.Pt());
+        pico.out_llphoton_refit_dijet_dr()      = llg_refit.DeltaR(dijet);
 
+      }
+
+
+      //Refit angles and various variables using the kinematic refit quantities
+      TVector3 g_pT = photon.Vect();
+      TVector3 h_pT = llg_refit.Vect();
+      TVector3 z_pT = ll_refit.Vect();
+      g_pT.SetZ(0); h_pT.SetZ(0); z_pT.SetZ(0);
+      pico.out_llphoton_refit_pTt() = h_pT.Cross((z_pT-g_pT).Unit()).Mag();
+
+      TLorentzVector lminus, lplus;
+      TLorentzVector lep1, lep2;
+      TLorentzVector l1err, l2err, pherr;
+      double ptl1err, ptl2err, ptpherr;
+      double dml1, dml2, dmph;
+      ptpherr = pico.out_photon_energyErr()[0] * photon.Pt() / photon.P();
+      pherr.SetPtEtaPhiM(pico.out_photon_pt()[0] + ptpherr,
+                         pico.out_photon_eta()[0], pico.out_photon_phi()[0], 0);
+      lep1 = refit_leptons[0];
+      lep2 = refit_leptons[1];
+      if(pico.out_ll_lepid()[0] == 11) {
+        int iel1 = pico.out_ll_i1()[0];
+        int iel2 = pico.out_ll_i2()[0];
+        if(pico.out_el_charge()[iel1] < 0) {
+          lminus = lep1;
+          lplus  = lep2;
+        }
+        else {
+          lminus = lep2;
+          lplus  = lep1;
+        }
+        ptl1err = pico.out_el_energyErr()[iel1] * lep1.Pt() / lep1.P();
+        ptl2err = pico.out_el_energyErr()[iel2] * lep2.Pt() / lep2.P();
+        l1err.SetPtEtaPhiM(lep1.Pt() + ptl1err, lep1.Eta(), lep1.Phi(), 0.000511);
+        l2err.SetPtEtaPhiM(lep2.Pt() + ptl2err, lep2.Eta(), lep2.Phi(), 0.000511);
+        dml1 = (l1err + lep2 + photon).M() - (lep1 + lep2 + photon).M();
+        dml2 = (lep1 + l2err + photon).M() - (lep1 + lep2 + photon).M();
+        dmph = (lep1 + lep2 + pherr).M() - (lep1 + lep2 + photon).M();
+      }
+      else {
+        int imu1 = pico.out_ll_i1()[0];
+        int imu2 = pico.out_ll_i2()[0];
+        if(pico.out_mu_charge()[imu1] < 0) {
+          lminus = lep1;
+          lplus  = lep2;
+        }
+        else {
+          lminus = lep2;
+          lplus  = lep1;
+        }
+        ptl1err = pico.out_mu_ptErr()[imu1];
+        ptl2err = pico.out_mu_ptErr()[imu2];
+        l1err.SetPtEtaPhiM(lep1.Pt() + ptl1err, lep1.Eta(), lep1.Phi(), 0.1056);
+        l2err.SetPtEtaPhiM(lep2.Pt() + ptl2err, lep2.Eta(), lep2.Phi(), 0.1056);
+        dml1 = (l1err + lep2 + photon).M() - (lep1 + lep2 + photon).M();
+        dml2 = (lep1 + l2err + photon).M() - (lep1 + lep2 + photon).M();
+        dmph = (lep1 + lep2 + pherr).M() - (lep1 + lep2 + photon).M();
+      }
+      pico.out_llphoton_refit_l1_masserr() = dml1;
+      pico.out_llphoton_refit_l2_masserr() = dml2;
+      pico.out_llphoton_refit_ph_masserr() = dmph;
+
+      // Variables used for defining kinematic angles presented in https://arxiv.org/pdf/1108.2274.pdf
+      double M = llg_refit.M(), mll_refit = ll_refit.M();
+      double lZ = sqrt(pow(llg_refit.Dot(ll_refit)/M,2)-pow(mll_refit,2));
+      TVector3 hBoost = llg_refit.BoostVector();
+
+      // Cosine of angle between lepton 1 and parent Z
+      double costheta = llg_refit.Dot(lminus-lplus)/(M*lZ);
+      pico.out_llphoton_refit_costheta() = costheta;
+
+      // 4-momenta of q1/q2 (quarks from gluon-gluon fusion)
+      TLorentzVector q, qBar;
+      TVector3 hTransverseBoost = llg_refit.BoostVector();
+      hTransverseBoost.SetZ(0);
+      TLorentzVector hH = llg_refit;
+      hH.Boost(-1*hTransverseBoost);
+      double hPz = hH.Pz(), hE = hH.E();
+      q.SetPxPyPzE(0, 0, (hPz+hE)/2, (hE+hPz)/2);
+      qBar.SetPxPyPzE(0, 0, (hPz-hE)/2, (hE-hPz)/2);
+      q.Boost(hTransverseBoost);
+      qBar.Boost(hTransverseBoost);
+
+      // Cosine of angle between incoming quarks and outgoing Zs in Higgs frame
+      double cosTheta = (qBar-q).Dot(ll_refit)/(M*lZ);
+      double sinTheta = sqrt(1 - pow(cosTheta, 2));
+      pico.out_llphoton_refit_cosTheta() = cosTheta;
+
+      // Angle phi
+      ll_refit.Boost(-1*hBoost);
+      TVector3 zBoost = ll_refit.BoostVector();
+      q.Boost(-1*hBoost);
+      lminus.Boost(-1*hBoost);
+      lplus.Boost(-1*hBoost);
+      TVector3 l1_vec = lminus.Vect(), l2_vec = lplus.Vect(), Z_vec = ll_refit.Vect();
+      TVector3 qvec = q.Vect();
+      double cospsi = -1*l1_vec.Cross(l2_vec).Dot(qvec.Cross(Z_vec))/l1_vec.Cross(l2_vec).Mag()/qvec.Cross(Z_vec).Mag();
+      double sinpsi = -1*l1_vec.Cross(l2_vec).Dot(qvec)/l1_vec.Cross(l2_vec).Mag()/qvec.Mag()/sinTheta;
+      if (cospsi > 1) cospsi = 1;
+      else if (cospsi < -1) cospsi = -1;
+      double psi(0);
+      if(sinpsi < 0) psi = -1*acos(cospsi);
+      else           psi = acos(cospsi);
+      pico.out_llphoton_refit_psi() = psi;
+
+
+    }
 
   //================Bitmap for zgamma cut flow================//
 
@@ -324,7 +437,7 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
       if(pico.out_trig_double_el() && pico.out_lep_pt().at(0)>25 && pico.out_lep_pt().at(1)>15){
         pico.out_trig_el_pt() = true;
       }
-    } else if(pico.out_nel > 0){
+    } else if(pico.out_nel() > 0){
       if(pico.out_trig_single_el() && pico.out_lep_pt().at(0)>30){
         pico.out_trig_el_pt() = true;
       }
@@ -346,7 +459,7 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
       if(pico.out_trig_double_el() && pico.out_lep_pt().at(0)>25 && pico.out_lep_pt().at(1)>15){
         pico.out_trig_el_pt() = true;
       }
-    } else if(pico.out_nel > 0){
+    } else if(pico.out_nel() > 0){
       if(pico.out_trig_single_el() && pico.out_lep_pt().at(0)>35){
         pico.out_trig_el_pt() = true;
       }
@@ -368,7 +481,7 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
       if(pico.out_trig_double_el() && pico.out_lep_pt().at(0)>25 && pico.out_lep_pt().at(1)>15){
         pico.out_trig_el_pt() = true;
       }
-    } else if(pico.out_nel > 0){
+    } else if(pico.out_nel() > 0){
       if(pico.out_trig_single_el() && pico.out_lep_pt().at(0)>35){
         pico.out_trig_el_pt() = true;
       }
@@ -409,7 +522,7 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
   if (pico.out_nphoton()>=1){baseBit+= 0b00000100000;}
   if (pico.out_ll_m().at(pico.out_llphoton_ill().at(0))>=80 && pico.out_ll_m().at(pico.out_llphoton_ill().at(0))<=100){baseBit+= 0b00000010000;}
   if(pico.out_photon_pt().at(pico.out_llphoton_iph().at(0))/pico.out_llphoton_m().at(0) >=15.0/110){baseBit+= 0b00000001000;}
-  if(pico.out_ll_m().at(pico.out_llphoton_ill().at())+pico.out_llphoton_m().at(0) > 185){baseBit+= 0b00000000100}
+  if(pico.out_ll_m().at(pico.out_llphoton_ill().at(0))+pico.out_llphoton_m().at(0) > 185){baseBit+= 0b00000000100;}
   if (pico.out_llphoton_m().at(0)>=100 && pico.out_llphoton_m().at(0)<=180){baseBit+= 0b00000000010;}
   if(pico.out_llphoton_m().at(0)<=122 || pico.out_llphoton_m().at(0)>=128){baseBit+= 0b00000000001;}
 
