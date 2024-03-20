@@ -13,8 +13,8 @@
 
 using namespace std;
 
-EventWeighter::EventWeighter(int year, bool preVFP, const vector<float> &btag_wpts){
-  if (year==2016 && preVFP) {
+EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
+  if (year=="2016APV") {
     in_file_electron_        = "data/zgamma/2016preVFP_UL/electron_WPL.json";
     in_file_photon_          = "data/zgamma/2016preVFP_UL/photon.json";
     in_file_photon_mceff_    = "data/zgamma/2016preVFP_UL/photon_csev_mceff.json";
@@ -27,7 +27,7 @@ EventWeighter::EventWeighter(int year, bool preVFP, const vector<float> &btag_wp
     in_file_btag_mceff_      = "data/zgamma/2016preVFP_UL/btag_mceff.json";
     key_                     = "2016preVFP";
     puName_                  = "Collisions16_UltraLegacy_goldenJSON";
-  } else if (year==2016) {
+  } else if (year=="2016") {
     in_file_electron_        = "data/zgamma/2016postVFP_UL/electron_WPL.json";
     in_file_photon_          = "data/zgamma/2016postVFP_UL/photon.json";
     in_file_photon_mceff_    = "data/zgamma/2016postVFP_UL/photon_csev_mceff.json";
@@ -40,7 +40,7 @@ EventWeighter::EventWeighter(int year, bool preVFP, const vector<float> &btag_wp
     in_file_btag_mceff_      = "data/zgamma/2016postVFP_UL/btag_mceff.json";
     key_                     = "2016postVFP";
     puName_                  = "Collisions16_UltraLegacy_goldenJSON";
-  } else if (year==2017) {
+  } else if (year=="2017") {
     in_file_electron_        = "data/zgamma/2017_UL/electron_WPL.json";
     in_file_photon_          = "data/zgamma/2017_UL/photon.json";
     in_file_photon_mceff_    = "data/zgamma/2017_UL/photon_csev_mceff.json";
@@ -53,7 +53,7 @@ EventWeighter::EventWeighter(int year, bool preVFP, const vector<float> &btag_wp
     in_file_btag_mceff_      = "data/zgamma/2017_UL/btag_mceff.json";
     key_                     = "2017";
     puName_                  = "Collisions17_UltraLegacy_goldenJSON";
-  } else if (year==2018) {
+  } else if (year=="2018") {
     in_file_electron_        = "data/zgamma/2018_UL/electron_WPL.json";
     in_file_photon_          = "data/zgamma/2018_UL/photon.json";
     in_file_photon_mceff_    = "data/zgamma/2018_UL/photon_csev_mceff.json";
@@ -66,7 +66,7 @@ EventWeighter::EventWeighter(int year, bool preVFP, const vector<float> &btag_wp
     in_file_btag_mceff_      = "data/zgamma/2018_UL/btag_mceff.json";
     key_                     = "2018";
     puName_                  = "Collisions18_UltraLegacy_goldenJSON";
-  } else if (year==2022){
+  } else if (year=="2022"){
     std::cout<<"Using 2018 JSONs by default for now in event_weighter.cpp"<<endl;
     in_file_electron_        = "data/zgamma/2018_UL/electron_WPL.json";
     in_file_photon_          = "data/zgamma/2018_UL/photon.json";
@@ -75,12 +75,12 @@ EventWeighter::EventWeighter(int year, bool preVFP, const vector<float> &btag_wp
     in_file_muon_lowpt_reco_ = "data/zgamma/2018_UL/muon_Jpsi_reco.json";
     in_file_muon_lowpt_id_   = "data/zgamma/2018_UL/muon_Jpsi_id.json";
     in_file_muon_mceff_      = "data/zgamma/2018_UL/muon_mceff.json";
-    in_file_pu_              = "data/zgamma/2018_UL/puWeights.json";
+    in_file_pu_              = "data/zgamma/2022/puWeights.json";
     in_file_btag_            = "data/zgamma/2018_UL/btagging.json";
     in_file_btag_mceff_      = "data/zgamma/2018_UL/btag_mceff.json";
     key_                     = "2018";
-    puName_                  = "Collisions18_UltraLegacy_goldenJSON";
-  } else if (year==2023){
+    puName_                  = "Collisions2022_355100_357900_eraBCD_GoldenJson";
+  } else if (year=="2022EE"){
     std::cout<<"Using 2018 JSONs by default for now in event_weighter.cpp"<<endl;
     in_file_electron_        = "data/zgamma/2018_UL/electron_WPL.json";
     in_file_photon_          = "data/zgamma/2018_UL/photon.json";
@@ -89,11 +89,39 @@ EventWeighter::EventWeighter(int year, bool preVFP, const vector<float> &btag_wp
     in_file_muon_lowpt_reco_ = "data/zgamma/2018_UL/muon_Jpsi_reco.json";
     in_file_muon_lowpt_id_   = "data/zgamma/2018_UL/muon_Jpsi_id.json";
     in_file_muon_mceff_      = "data/zgamma/2018_UL/muon_mceff.json";
-    in_file_pu_              = "data/zgamma/2018_UL/puWeights.json";
+    in_file_pu_              = "data/zgamma/2022EE/puWeights.json";
     in_file_btag_            = "data/zgamma/2018_UL/btagging.json";
     in_file_btag_mceff_      = "data/zgamma/2018_UL/btag_mceff.json";
     key_                     = "2018";
-    puName_                  = "Collisions18_UltraLegacy_goldenJSON";
+    puName_                  = "Collisions2022_359022_362760_eraEFG_GoldenJson";
+  } else if (year=="2023"){
+    std::cout<<"Using 2018 JSONs by default for now in event_weighter.cpp"<<endl;
+    in_file_electron_        = "data/zgamma/2018_UL/electron_WPL.json";
+    in_file_photon_          = "data/zgamma/2018_UL/photon.json";
+    in_file_photon_mceff_    = "data/zgamma/2018_UL/photon_csev_mceff.json";
+    in_file_muon_            = "data/zgamma/2018_UL/muon_Z.json";
+    in_file_muon_lowpt_reco_ = "data/zgamma/2018_UL/muon_Jpsi_reco.json";
+    in_file_muon_lowpt_id_   = "data/zgamma/2018_UL/muon_Jpsi_id.json";
+    in_file_muon_mceff_      = "data/zgamma/2018_UL/muon_mceff.json";
+    in_file_pu_              = "data/zgamma/2023/puWeights.json";
+    in_file_btag_            = "data/zgamma/2018_UL/btagging.json";
+    in_file_btag_mceff_      = "data/zgamma/2018_UL/btag_mceff.json";
+    key_                     = "2018";
+    puName_                  = "Collisions2023_366403_369802_eraBC_GoldenJson";
+  } else if (year=="2023BPix"){
+    std::cout<<"Using 2018 JSONs by default for now in event_weighter.cpp"<<endl;
+    in_file_electron_        = "data/zgamma/2018_UL/electron_WPL.json";
+    in_file_photon_          = "data/zgamma/2018_UL/photon.json";
+    in_file_photon_mceff_    = "data/zgamma/2018_UL/photon_csev_mceff.json";
+    in_file_muon_            = "data/zgamma/2018_UL/muon_Z.json";
+    in_file_muon_lowpt_reco_ = "data/zgamma/2018_UL/muon_Jpsi_reco.json";
+    in_file_muon_lowpt_id_   = "data/zgamma/2018_UL/muon_Jpsi_id.json";
+    in_file_muon_mceff_      = "data/zgamma/2018_UL/muon_mceff.json";
+    in_file_pu_              = "data/zgamma/2023BPix/puWeights.json";
+    in_file_btag_            = "data/zgamma/2018_UL/btagging.json";
+    in_file_btag_mceff_      = "data/zgamma/2018_UL/btag_mceff.json";
+    key_                     = "2018";
+    puName_                  = "Collisions2023_369803_370790_eraD_GoldenJson";
   } else {
     std::cout<<"Year has not been implemented in event_weighter"<<endl;
   }

@@ -114,6 +114,33 @@ int main(int argc, char *argv[]){
     }
   }
 
+  bool is2023preBPix = false;
+  if(year == 2023){ 
+    if(isData){
+      if (Contains(in_file, "2023B") || Contains(in_file, "2023C")){
+        is2023preBPix = true;
+      }
+    } else {
+      if (!Contains(in_file, "Summer23BPix")){
+        is2023preBPix = true;
+      }
+    }
+  }
+
+  string year_string;
+  if (year == 2016 && isAPV)               year_string = "2016APV";
+  else if (year == 2016 && !isAPV)         year_string = "2016";
+  else if (year == 2017)                   year_string = "2017";
+  else if (year == 2018)                   year_string = "2018";
+  else if (year == 2022 && is2022preEE)    year_string = "2022";
+  else if (year == 2022 && !is2022preEE)   year_string = "2022EE";
+  else if (year == 2023 && is2023preBPix)  year_string = "2023";
+  else if (year == 2023 && !is2023preBPix) year_string = "2023BPix";
+  else {
+    cout << "ERROR: unknown year";
+    exit(1);
+  }
+
   //if (Contains(in_file, "RunIISummer20")) { 
   //  is_preUL = false;
   //  if (Contains(in_file, "RunIISummer20UL16NanoAODAPV")) isAPV = true;
@@ -255,7 +282,7 @@ int main(int argc, char *argv[]){
   LeptonWeighter lep_weighter16gh(year, isZgamma, true);
   PhotonWeighter photon_weighter(year, isZgamma || isHiggsino);
   // UL scale factors
-  EventWeighter event_weighter(year, isAPV, btag_df_wpts[year]);
+  EventWeighter event_weighter(year_string, btag_df_wpts[year]);
   TriggerWeighter trigger_weighter(year, isAPV);
   //cout<<"Is APV: "<<isAPV<<endl;
 

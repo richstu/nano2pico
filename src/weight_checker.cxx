@@ -64,10 +64,10 @@ int main() {
   };
 
   vector<EventWeighter> weighters;
-  weighters.push_back(EventWeighter(2016, true, btag_wps[2016]));
-  weighters.push_back(EventWeighter(2016, false, btag_wps[2016]));
-  weighters.push_back(EventWeighter(2017, false, btag_wps[2017]));
-  weighters.push_back(EventWeighter(2018, false, btag_wps[2018]));
+  weighters.push_back(EventWeighter("2016APV", btag_wps[2016]));
+  weighters.push_back(EventWeighter("2016", btag_wps[2016]));
+  weighters.push_back(EventWeighter("2017", btag_wps[2017]));
+  weighters.push_back(EventWeighter("2018", btag_wps[2018]));
 
   vector<TriggerWeighter> trigger_weighters;
   trigger_weighters.push_back(TriggerWeighter(2016, true));
