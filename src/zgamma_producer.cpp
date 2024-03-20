@@ -30,7 +30,7 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
     pico.out_dijet_deta() = fabs(j1.Eta() - j2.Eta());
   }
   pico.out_nllphoton() = 0;
-  int baseBit = 0b0000000000000;//If 0, no selections applied. Placed here to get 0 for cases where no dilep or photon
+  int baseBit = 0b00000000000;//If 0, no selections applied. Placed here to get 0 for cases where no dilep or photon
   if (pico.out_ll_pt().size() == 0 || pico.out_nphoton() == 0){
     pico.out_zg_cutBitMap() = baseBit;
     return;
@@ -314,39 +314,104 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
       //}
 
 
-  // Bitmap for zgamma cut flow
+  //================Bitmap for zgamma cut flow================//
 
-  float minlead_epT = 25; //probably store these in zgamma_producer.hpp
-  float minsublead_epT = 15;
-  float minlead_mupT = 20;
-  float minsublead_mupT = 10;
+  //First, generate pT cut summary branches:
+  pico.out_trig_el_pt() = false;
+  pico.out_trig_mu_pt() = false;
+  if (year==2016) {
+    if(pico.out_nel() > 1){
+      if(pico.out_trig_double_el() && pico.out_lep_pt().at(0)>25 && pico.out_lep_pt().at(1)>15){
+        pico.out_trig_el_pt() = true;
+      }
+    } else if(pico.out_nel > 0){
+      if(pico.out_trig_single_el() && pico.out_lep_pt().at(0)>30){
+        pico.out_trig_el_pt() = true;
+      }
+    }
+  
+    if(pico.out_nmu() > 1){
+      if(pico.out_trig_double_mu() && pico.out_lep_pt().at(0)>20 && pico.out_lep_pt().at(1)>10){
+        pico.out_trig_mu_pt() = true;
+      } 
+    }else if(pico.out_nmu() > 0){ 
+      if(pico.out_trig_single_mu() && pico.out_lep_pt().at(0)>25){
+        pico.out_trig_mu_pt() = true;
+      }
+    }
+  }
+  
+  if (year==2017) {
+    if(pico.out_nel() > 1){
+      if(pico.out_trig_double_el() && pico.out_lep_pt().at(0)>25 && pico.out_lep_pt().at(1)>15){
+        pico.out_trig_el_pt() = true;
+      }
+    } else if(pico.out_nel > 0){
+      if(pico.out_trig_single_el() && pico.out_lep_pt().at(0)>35){
+        pico.out_trig_el_pt() = true;
+      }
+    }
+  
+    if(pico.out_nmu() > 1){
+      if(pico.out_trig_double_mu() && pico.out_lep_pt().at(0)>20 && pico.out_lep_pt().at(1)>10){
+        pico.out_trig_mu_pt() = true;
+      } 
+    }else if(pico.out_nmu() > 0){ 
+      if(pico.out_trig_single_mu() && pico.out_lep_pt().at(0)>28){
+        pico.out_trig_mu_pt() = true;
+      }
+    }
+  }
+
+  if (year==2018 || year==2022 || year==2023) {
+    if(pico.out_nel() > 1){
+      if(pico.out_trig_double_el() && pico.out_lep_pt().at(0)>25 && pico.out_lep_pt().at(1)>15){
+        pico.out_trig_el_pt() = true;
+      }
+    } else if(pico.out_nel > 0){
+      if(pico.out_trig_single_el() && pico.out_lep_pt().at(0)>35){
+        pico.out_trig_el_pt() = true;
+      }
+    }
+  
+    if(pico.out_nmu() > 1){
+      if(pico.out_trig_double_mu() && pico.out_lep_pt().at(0)>20 && pico.out_lep_pt().at(1)>10){
+        pico.out_trig_mu_pt() = true;
+      } 
+    }else if(pico.out_nmu() > 0){ 
+      if(pico.out_trig_single_mu() && pico.out_lep_pt().at(0)>25){
+        pico.out_trig_mu_pt() = true;
+      }
+    }
+  }
+
+
+
 
 
   //Read from left. Bit 1 n_ll>=2, Bit 2 n_ee>=2, Bit 3 n_mumu>=2, Bit 4 trigs single lep, Bit 5 trigs dilep, Bit 6 leading lepton pT, Bit 7 subleading lepton pT
   // Bit 8 nphoton>=1, Bit 9 photon_id80, Bit 10 m_ll cut, Bit 11 m_lly cut, Bit 12 15/110, Bit 13 is 1 if outside m_lly signal region
+  //New:
+  //Read from left. Bit 1 n_ll>=2, Bit 2 n_ee>=2, Bit 3 n_mumu>=2, Bit 4 passes triggers Bit 5 passes lep pT cut, Bit 6 nphoton>=1, Bit 7 m_ll cut, Bit 8 15/110 ratio cut, bit 9 m_lly+mll cut, Bit 10 m_lly cut, Bit 11 signal blinding window
 
 
 
   if (pico.out_nel()>=2 && pico.out_ll_lepid().at(0)==11){
-    baseBit += 0b1010000000000; 
-    if(pico.out_trig_single_el() == true){baseBit +=0b0001000000000;}
-    if(pico.out_trig_double_el() == true){baseBit +=0b0000100000000;}
-    if (pico.out_el_pt().at(0)>=minlead_epT){baseBit += 0b0000010000000;}
-    if(pico.out_el_pt().at(1)>=minsublead_epT){baseBit+= 0b0000001000000;}
+    baseBit += 0b11000000000; 
+    if(pico.out_trig_single_el() || pico.out_trig_double_el()){baseBit +=0b00010000000;}
+    if(pico.out_trig_el_pt()){baseBit += 0b00001000000;}
   }
   if (pico.out_nmu()>=2 && pico.out_ll_lepid().at(0)==13){
-    baseBit += 0b1100000000000;
-    if(pico.out_trig_single_mu() == true){baseBit +=0b0001000000000;}
-    if(pico.out_trig_double_mu() == true){baseBit +=0b0000100000000;}
-    if (pico.out_mu_pt().at(0)>=minlead_mupT){baseBit += 0b0000010000000;}
-    if(pico.out_mu_pt().at(1)>=minsublead_mupT){baseBit+= 0b0000001000000;}
+    baseBit += 0b10100000000;
+    if(pico.out_trig_single_mu() || pico.out_trig_double_mu()){baseBit +=0b00010000000;}
+    if(pico.out_trig_mu_pt()){baseBit +=0b00001000000;}
   }
-  if (pico.out_nphoton()>=1){baseBit+= 0b0000000100000;}
-  if (pico.out_photon_id80().at(pico.out_llphoton_iph().at(0))){baseBit+= 0b0000000010000;}
-  if (pico.out_ll_m().at(pico.out_llphoton_ill().at(0))>=80 && pico.out_ll_m().at(pico.out_llphoton_ill().at(0))<=100){baseBit+= 0b0000000001000;}
-  if (pico.out_llphoton_m().at(0)>=100 && pico.out_llphoton_m().at(0)<=180){baseBit+= 0b0000000000100;}
-  if(pico.out_photon_pt().at(pico.out_llphoton_iph().at(0))/pico.out_llphoton_m().at(0) >=15/110){baseBit+= 0b0000000000010;}
-  if(pico.out_llphoton_m().at(0)<=122 || pico.out_llphoton_m().at(0)>=128){baseBit+= 0b0000000000001;}
+  if (pico.out_nphoton()>=1){baseBit+= 0b00000100000;}
+  if (pico.out_ll_m().at(pico.out_llphoton_ill().at(0))>=80 && pico.out_ll_m().at(pico.out_llphoton_ill().at(0))<=100){baseBit+= 0b00000010000;}
+  if(pico.out_photon_pt().at(pico.out_llphoton_iph().at(0))/pico.out_llphoton_m().at(0) >=15.0/110){baseBit+= 0b00000001000;}
+  if(pico.out_ll_m().at(pico.out_llphoton_ill().at())+pico.out_llphoton_m().at(0) > 185){baseBit+= 0b00000000100}
+  if (pico.out_llphoton_m().at(0)>=100 && pico.out_llphoton_m().at(0)<=180){baseBit+= 0b00000000010;}
+  if(pico.out_llphoton_m().at(0)<=122 || pico.out_llphoton_m().at(0)>=128){baseBit+= 0b00000000001;}
 
   pico.out_zg_cutBitMap() = baseBit;
 //End Bitmap for zgamma cut flow
