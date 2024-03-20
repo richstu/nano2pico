@@ -12,6 +12,7 @@
 #include "event_weighter.hpp"
 #include "trigger_weighter.hpp"
 
+using std::cin;
 using std::cout;
 using std::endl;
 using std::isnan;
@@ -20,8 +21,13 @@ using std::map;
 using std::string;
 using std::vector;
 
+unsigned max(unsigned a, unsigned b) {
+  if (a>b) return a;
+  return b;
+}
+
 bool sf_is_bad(float value) {
-  return isnan(value) || isinf(value) || (fabs(value)>100.0);
+  return isnan(value) || isinf(value) || (fabs(value)>25.0);
 }
 
 void incr_vector(vector<unsigned>& vec, unsigned max) {
@@ -109,12 +115,14 @@ int main() {
 
   pico_tree pico("","temp.root");
 
-  bool check_electron_weights = false;
-  bool check_muon_weights = false;
-  bool check_photon_csev_weights = false;
+  bool check_electron_weights = true;
+  bool check_muon_weights = true;
+  bool check_photon_csev_weights = true;
   bool check_trigger_weights = true;
-  bool check_btag_weights = false;
+  bool check_btag_weights = true;
+  bool verbose = false;
   unsigned trig_nlep_max = 3;
+  unsigned trig_nlep_min = 2;
 
   for (unsigned iyear = 0; iyear < weighters.size(); iyear++) {
 
@@ -155,14 +163,17 @@ int main() {
             pico.out_el_phi().clear();
             pico.out_el_phi().push_back(0.0);
             weighters[iyear].ElectronSF(pico);
-            cout << "pt: " << el_pt_bins[ipt] << "--" << el_pt_bins[ipt+1];
-            cout << ", eta: " << el_eta_bins[ieta] << "--" << el_eta_bins[ieta+1];
-            cout << ", sig: " << el_sig;
-            cout << ", sf = " << pico.out_w_el() << ", up = " << pico.out_sys_el()[0];
-            cout << ", dn = " << pico.out_sys_el()[1] << endl;
-            if (sf_is_bad(pico.out_w_el()) || 
-                sf_is_bad(pico.out_sys_el()[0]) || 
-                sf_is_bad(pico.out_sys_el()[1])) {
+            bool found_bad = sf_is_bad(pico.out_w_el()) || 
+                             sf_is_bad(pico.out_sys_el()[0]) || 
+                             sf_is_bad(pico.out_sys_el()[1]);
+            if (verbose || found_bad) {
+              cout << "pt: " << el_pt_bins[ipt] << "--" << el_pt_bins[ipt+1];
+              cout << ", eta: " << el_eta_bins[ieta] << "--" << el_eta_bins[ieta+1];
+              cout << ", sig: " << el_sig;
+              cout << ", sf = " << pico.out_w_el() << ", up = " << pico.out_sys_el()[0];
+              cout << ", dn = " << pico.out_sys_el()[1] << endl;
+            }
+            if (found_bad) {
               cout << "!!! Found bad SF" << endl;
               return 1;
             }
@@ -196,14 +207,17 @@ int main() {
             pico.out_mu_phi().clear();
             pico.out_mu_phi().push_back(0.0);
             weighters[iyear].MuonSF(pico);
-            cout << "pt: " << mu_pt_bins[ipt] << "--" << mu_pt_bins[ipt+1];
-            cout << ", eta: " << mu_eta_bins[ieta] << "--" << mu_eta_bins[ieta+1];
-            cout << ", sig: " << mu_sig;
-            cout << ", sf = " << pico.out_w_mu() << ", up = " << pico.out_sys_mu()[0];
-            cout << ", dn = " << pico.out_sys_mu()[1] << endl;
-            if (sf_is_bad(pico.out_w_mu()) || 
-                sf_is_bad(pico.out_sys_mu()[0]) || 
-                sf_is_bad(pico.out_sys_mu()[1])) {
+            bool found_bad = sf_is_bad(pico.out_w_mu()) || 
+                             sf_is_bad(pico.out_sys_mu()[0]) || 
+                             sf_is_bad(pico.out_sys_mu()[1]);
+            if (verbose || found_bad) {
+              cout << "pt: " << mu_pt_bins[ipt] << "--" << mu_pt_bins[ipt+1];
+              cout << ", eta: " << mu_eta_bins[ieta] << "--" << mu_eta_bins[ieta+1];
+              cout << ", sig: " << mu_sig;
+              cout << ", sf = " << pico.out_w_mu() << ", up = " << pico.out_sys_mu()[0];
+              cout << ", dn = " << pico.out_sys_mu()[1] << endl;
+            }
+            if (found_bad) {
               cout << "!!! Found bad SF" << endl;
               return 1;
             }
@@ -238,13 +252,16 @@ int main() {
             vector<float> sys_photon_csev;
             sys_photon_csev.resize(2,1.0);
             weighters[iyear].PhotonCSEVSF(pico, w_photon_csev, sys_photon_csev);
-            cout << "r9: " << photon_r9_bins[ir9] << "--" << photon_r9_bins[ir9+1];
-            cout << ", EB: " << photon_iseb << ", veto: " << eveto;
-            cout << ", sf = " << w_photon_csev << ", up = " << sys_photon_csev[0];
-            cout << ", dn = " << sys_photon_csev[1] << endl;
-            if (sf_is_bad(w_photon_csev) ||
-                sf_is_bad(sys_photon_csev[0]) ||
-                sf_is_bad(sys_photon_csev[1])) {
+            bool found_bad = sf_is_bad(w_photon_csev) ||
+                             sf_is_bad(sys_photon_csev[0]) ||
+                             sf_is_bad(sys_photon_csev[1]);
+            if (verbose || found_bad) {
+              cout << "r9: " << photon_r9_bins[ir9] << "--" << photon_r9_bins[ir9+1];
+              cout << ", EB: " << photon_iseb << ", veto: " << eveto;
+              cout << ", sf = " << w_photon_csev << ", up = " << sys_photon_csev[0];
+              cout << ", dn = " << sys_photon_csev[1] << endl;
+            }
+            if (found_bad) {
               cout << "!!! Found bad SF" << endl;
               return 1;
             }
@@ -263,7 +280,7 @@ int main() {
       cout << "Trigger weights" << endl;
       //consider up to 4 leptons for now
       for (unsigned nel = 0; nel < trig_nlep_max; nel++) {
-        for (unsigned nmu = 0; nmu < trig_nlep_max-nel; nmu++) {
+        for (unsigned nmu = max(trig_nlep_min-nel,0); nmu < trig_nlep_max-nel; nmu++) {
           for (vector<unsigned> iptel(nel,0); 
                stop_vector(iptel,nel);
                incr_vector(iptel,trig_el_pt_bins.size()-1)) {
@@ -304,32 +321,36 @@ int main() {
                     }
                     //get trigger weight and check sanity
                     vector<float> sfs = trigger_weighters[iyear].GetSF(pico);
-                    cout << "el_pt: ";
-                    for (unsigned iel = 0; iel<nel; iel++)
-                      cout << pico.out_el_pt()[iel] << ", ";
-                    cout << endl;
-                    cout << "el_eta: ";
-                    for (unsigned iel = 0; iel<nel; iel++)
-                      cout << pico.out_el_eta()[iel] << ", ";
-                    cout << endl;
-                    cout << "mu_pt: ";
-                    for (unsigned imu = 0; imu<nmu; imu++)
-                      cout << pico.out_mu_pt()[imu] << ", ";
-                    cout << endl;
-                    cout << "mu_eta: ";
-                    for (unsigned imu = 0; imu<nmu; imu++)
-                      cout << pico.out_mu_eta()[imu] << ", ";
-                    cout << endl;
-                    cout << "trig_single_el: " << trig_decision[0] << endl;
-                    cout << "trig_single_mu: " << trig_decision[1] << endl;
-                    cout << "trig_double_el: " << trig_decision[2] << endl;
-                    cout << "trig_double_mu: " << trig_decision[3] << endl;
-                    cout << "sf = " << sfs[0] << ", up = " << sfs[1] << ", dn = " << sfs[2] << endl;
-                    if (sf_is_bad(sfs[0]) || 
-                        sf_is_bad(sfs[1]) || 
-                        sf_is_bad(sfs[2])) {
+                    bool found_bad = sf_is_bad(sfs[0]) || sf_is_bad(sfs[1]) || sf_is_bad(sfs[2]);
+                    if (verbose || found_bad) {
+                      cout << "el_pt: ";
+                      for (unsigned iel = 0; iel<nel; iel++)
+                        cout << pico.out_el_pt()[iel] << ", ";
+                      cout << endl;
+                      cout << "el_eta: ";
+                      for (unsigned iel = 0; iel<nel; iel++)
+                        cout << pico.out_el_eta()[iel] << ", ";
+                      cout << endl;
+                      cout << "mu_pt: ";
+                      for (unsigned imu = 0; imu<nmu; imu++)
+                        cout << pico.out_mu_pt()[imu] << ", ";
+                      cout << endl;
+                      cout << "mu_eta: ";
+                      for (unsigned imu = 0; imu<nmu; imu++)
+                        cout << pico.out_mu_eta()[imu] << ", ";
+                      cout << endl;
+                      cout << "trig_single_el: " << trig_decision[0] << endl;
+                      cout << "trig_single_mu: " << trig_decision[1] << endl;
+                      cout << "trig_double_el: " << trig_decision[2] << endl;
+                      cout << "trig_double_mu: " << trig_decision[3] << endl;
+                      cout << "sf = " << sfs[0] << ", up = " << sfs[1] << ", dn = " << sfs[2] << endl;
+                    }
+                    if (found_bad) {
                       cout << "!!! Found bad SF" << endl;
-                      return 1;
+                      string temp;
+                      cin >> temp;
+                      if (temp != "c")
+                        return 1;
                     }
                   }
                 }
@@ -361,20 +382,23 @@ int main() {
               pico.out_jet_eta().clear();
               pico.out_jet_eta().push_back((jet_eta_bins[ieta]+jet_eta_bins[ieta+1])/2.0);
               weighters[iyear].bTaggingSF(pico);
-              cout << "pt: " << jet_pt_bins[ipt] << "--" << jet_pt_bins[ipt+1];
-              cout << ", eta: " << jet_eta_bins[ieta] << "--" << jet_eta_bins[ieta+1];
-              cout << ", flavor: " << jet_flav_bins[iflav];
-              cout << ", df: " << jet_df_bins[idf] << "--" << jet_df_bins[idf+1];
-              cout << ", sf = " << pico.out_w_bhig_df();
-              cout << ", up = " << pico.out_sys_bchig()[0];
-              cout << ", dn = " << pico.out_sys_bchig()[1];
-              cout << ", up = " << pico.out_sys_udsghig()[0];
-              cout << ", dn = " << pico.out_sys_udsghig()[1] << endl;
-              if (sf_is_bad(pico.out_w_bhig_df()) || 
-                  sf_is_bad(pico.out_sys_bchig()[0]) || 
-                  sf_is_bad(pico.out_sys_bchig()[1]) || 
-                  sf_is_bad(pico.out_sys_udsghig()[0]) || 
-                  sf_is_bad(pico.out_sys_udsghig()[1])) {
+              bool found_bad = sf_is_bad(pico.out_w_bhig_df()) || 
+                               sf_is_bad(pico.out_sys_bchig()[0]) || 
+                               sf_is_bad(pico.out_sys_bchig()[1]) || 
+                               sf_is_bad(pico.out_sys_udsghig()[0]) || 
+                               sf_is_bad(pico.out_sys_udsghig()[1]);
+              if (verbose || found_bad) {
+                cout << "pt: " << jet_pt_bins[ipt] << "--" << jet_pt_bins[ipt+1];
+                cout << ", eta: " << jet_eta_bins[ieta] << "--" << jet_eta_bins[ieta+1];
+                cout << ", flavor: " << jet_flav_bins[iflav];
+                cout << ", df: " << jet_df_bins[idf] << "--" << jet_df_bins[idf+1];
+                cout << ", sf = " << pico.out_w_bhig_df();
+                cout << ", up = " << pico.out_sys_bchig()[0];
+                cout << ", dn = " << pico.out_sys_bchig()[1];
+                cout << ", up = " << pico.out_sys_udsghig()[0];
+                cout << ", dn = " << pico.out_sys_udsghig()[1] << endl;
+              }
+              if (found_bad) {
                 cout << "!!! Found bad SF" << endl;
                 return 1;
               }
