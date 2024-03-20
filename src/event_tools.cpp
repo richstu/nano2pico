@@ -627,11 +627,32 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
   pico.out_HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90() = nano.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90();
   pico.out_HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95() = nano.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95();
 
+
+  //Ele32_WPTight_Gsf was not in menu for most of 2017, but can be emulated by
+  //AND of Ele32_WPTight_Gsf_L1DoubleEG and single EG L1 seeds
+  if (year==2017) {
+    bool pass_l1_singleeg = false;
+    for (unsigned itrig = 0; itrig < nano.TrigObj_id().size(); itrig++) {
+      if (nano.TrigObj_id()[itrig]==11) {
+        if ((nano.TrigObj_filterBits()[itrig] & 0x400)!=0) {
+          pass_l1_singleeg = true;
+        }
+      }
+    }
+    pico.out_HLT_Ele32_WPTight_Gsf_Emu() = nano.HLT_Ele32_WPTight_Gsf_L1DoubleEG() 
+                                           && pass_l1_singleeg;
+  }
+  else {
+    pico.out_HLT_Ele32_WPTight_Gsf_Emu() = false;
+  }
+
   //trigger summary branches for H->Zgamma
   pico.out_trig_single_el() = false;
   pico.out_trig_double_el() = false;
+  pico.out_trig_el_pt() = false;
   pico.out_trig_single_mu() = false;
   pico.out_trig_double_mu() = false;
+  pico.out_trig_mu_pt() = false;
   if (year==2016) {
     pico.out_trig_single_el() = nano.HLT_Ele27_WPTight_Gsf();
     pico.out_trig_double_el() = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ();
@@ -640,36 +661,64 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
                                 nano.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL() || 
                                 nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ() ||
                                 nano.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ();
+    if((pico.out_trig_single_el() && pico.out_lep_pt().at(0)>30) || (pico.out_trig_double_el() && pico.out_lep_pt().at(0)>25 && pico.out_lep_pt().at(1)>15)){
+      pico.out_trig_el_pt() = true;
+    }
+    if((pico.out_trig_single_mu() && pico.out_lep_pt().at(0)>25) || (pico.out_trig_double_mu() && pico.out_lep_pt().at(0)>20 && pico.out_lep_pt().at(1)>10)){
+      pico.out_trig_mu_pt() = true;
+    }
 
   }
   if (year==2017) {
-    pico.out_trig_single_el() = nano.HLT_Ele32_WPTight_Gsf_L1DoubleEG();
+    pico.out_trig_single_el() = pico.out_HLT_Ele32_WPTight_Gsf_Emu();
     pico.out_trig_double_el() = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL();
     pico.out_trig_single_mu() = nano.HLT_IsoMu27();
     pico.out_trig_double_mu() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8() || 
                                 nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8();
+    if((pico.out_trig_single_el() && pico.out_lep_pt().at(0)>35) || (pico.out_trig_double_el() && pico.out_lep_pt().at(0)>25 && pico.out_lep_pt().at(1)>15)){
+      pico.out_trig_el_pt() = true;
+    }
+    if((pico.out_trig_single_mu() && pico.out_lep_pt().at(0)>28) || (pico.out_trig_double_mu() && pico.out_lep_pt().at(0)>20 && pico.out_lep_pt().at(1)>10)){
+      pico.out_trig_mu_pt() = true;
+    }
   }
   if (year==2018) {
     pico.out_trig_single_el() = nano.HLT_Ele32_WPTight_Gsf();
     pico.out_trig_double_el() = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL();
     pico.out_trig_single_mu() = nano.HLT_IsoMu24();
     pico.out_trig_double_mu() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8();
+    if((pico.out_trig_single_el() && pico.out_lep_pt().at(0)>35) || (pico.out_trig_double_el() && pico.out_lep_pt().at(0)>25 && pico.out_lep_pt().at(1)>15)){
+      pico.out_trig_el_pt() = true;
+    }
+    if((pico.out_trig_single_mu() && pico.out_lep_pt().at(0)>25) || (pico.out_trig_double_mu() && pico.out_lep_pt().at(0)>20 && pico.out_lep_pt().at(1)>10)){
+      pico.out_trig_mu_pt() = true;
+    }
   }
   if (year==2022) {
-    //No official Egamma recommendations yet
-    //others seem the same based on POG presentations
-    pico.out_trig_single_el() = nano.HLT_Ele32_WPTight_Gsf() || nano.HLT_Ele30_WPTight_Gsf(); 
+    pico.out_trig_single_el() = nano.HLT_Ele30_WPTight_Gsf(); 
     pico.out_trig_double_el() = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL();
     pico.out_trig_single_mu() = nano.HLT_IsoMu24();
     pico.out_trig_double_mu() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8();
+    if((pico.out_trig_single_el() && pico.out_lep_pt().at(0)>35) || (pico.out_trig_double_el() && pico.out_lep_pt().at(0)>25 && pico.out_lep_pt().at(1)>15)){
+      pico.out_trig_el_pt() = true;
+    }
+    if((pico.out_trig_single_mu() && pico.out_lep_pt().at(0)>25) || (pico.out_trig_double_mu() && pico.out_lep_pt().at(0)>20 && pico.out_lep_pt().at(1)>10)){
+      pico.out_trig_mu_pt() = true;
+    }
   }
   if (year==2023) {
     //Ele30 is enabled & unprescaled in some of 2023, but it is unclear from
     //POG presentations whether it was enabled until the LHC RQX.L8 incident
-    pico.out_trig_single_el() = nano.HLT_Ele32_WPTight_Gsf() || nano.HLT_Ele30_WPTight_Gsf(); 
+    pico.out_trig_single_el() = nano.HLT_Ele30_WPTight_Gsf(); 
     pico.out_trig_double_el() = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL();
     pico.out_trig_single_mu() = nano.HLT_IsoMu24();
     pico.out_trig_double_mu() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8();
+    if((pico.out_trig_single_el() && pico.out_lep_pt().at(0)>35) || (pico.out_trig_double_el() && pico.out_lep_pt().at(0)>25 && pico.out_lep_pt().at(1)>15)){
+      pico.out_trig_el_pt() = true;
+    }
+    if((pico.out_trig_single_mu() && pico.out_lep_pt().at(0)>25) || (pico.out_trig_double_mu() && pico.out_lep_pt().at(0)>20 && pico.out_lep_pt().at(1)>10)){
+      pico.out_trig_mu_pt() = true;
+    }
   }
 
   //overlap removal performed based on trigger decisions

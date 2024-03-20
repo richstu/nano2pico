@@ -416,8 +416,10 @@ float w_trig
 #------------------------------
 bool trig_single_el
 bool trig_double_el
+bool trig_el_pt
 bool trig_single_mu
 bool trig_double_mu
+bool trig_mu_pt
 
 # Muon triggers
 #------------------------------
