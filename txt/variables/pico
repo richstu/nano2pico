@@ -454,6 +454,7 @@ bool HLT_Ele27_WPTight_Gsf
 bool HLT_Ele28_WPTight_Gsf
 bool HLT_Ele30_WPTight_Gsf
 bool HLT_Ele32_WPTight_Gsf_L1DoubleEG
+bool HLT_Ele32_WPTight_Gsf_Emu
 bool HLT_Ele32_WPTight_Gsf
 bool HLT_Ele35_WPTight_Gsf
 bool HLT_Ele20_WPLoose_Gsf

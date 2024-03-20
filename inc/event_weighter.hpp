@@ -1,6 +1,7 @@
 #ifndef H_EVENT_WEIGHTER
 #define H_EVENT_WEIGHTER
 
+#include <string>
 #include <vector>
 #include <utility>
 
@@ -13,7 +14,7 @@
 
 class EventWeighter{
 public:
-  EventWeighter(int year, bool preVFP, const std::vector<float> &btag_wpts);
+  EventWeighter(std::string year, const std::vector<float> &btag_wpts);
 
   void ElectronSF(pico_tree &pico);
 
