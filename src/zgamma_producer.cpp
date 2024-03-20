@@ -200,6 +200,79 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
 
   //================Bitmap for zgamma cut flow================//
 
+  //First, generate pT cut summary branches:
+  pico.out_trig_el_pt() = false;
+  pico.out_trig_mu_pt() = false;
+  if (year==2016) {
+    if(pico.out_nel() > 1){
+      if(pico.out_trig_double_el() && pico.out_lep_pt().at(0)>25 && pico.out_lep_pt().at(1)>15){
+        pico.out_trig_el_pt() = true;
+      }
+    } else if(pico.out_nel > 0){
+      if(pico.out_trig_single_el() && pico.out_lep_pt().at(0)>30){
+        pico.out_trig_el_pt() = true;
+      }
+    }
+  
+    if(pico.out_nmu() > 1){
+      if(pico.out_trig_double_mu() && pico.out_lep_pt().at(0)>20 && pico.out_lep_pt().at(1)>10){
+        pico.out_trig_mu_pt() = true;
+      } 
+    }else if(pico.out_nmu() > 0){ 
+      if(pico.out_trig_single_mu() && pico.out_lep_pt().at(0)>25){
+        pico.out_trig_mu_pt() = true;
+      }
+    }
+  }
+  
+  if (year==2017) {
+    if(pico.out_nel() > 1){
+      if(pico.out_trig_double_el() && pico.out_lep_pt().at(0)>25 && pico.out_lep_pt().at(1)>15){
+        pico.out_trig_el_pt() = true;
+      }
+    } else if(pico.out_nel > 0){
+      if(pico.out_trig_single_el() && pico.out_lep_pt().at(0)>35){
+        pico.out_trig_el_pt() = true;
+      }
+    }
+  
+    if(pico.out_nmu() > 1){
+      if(pico.out_trig_double_mu() && pico.out_lep_pt().at(0)>20 && pico.out_lep_pt().at(1)>10){
+        pico.out_trig_mu_pt() = true;
+      } 
+    }else if(pico.out_nmu() > 0){ 
+      if(pico.out_trig_single_mu() && pico.out_lep_pt().at(0)>28){
+        pico.out_trig_mu_pt() = true;
+      }
+    }
+  }
+
+  if (year==2018 || year==2022 || year==2023) {
+    if(pico.out_nel() > 1){
+      if(pico.out_trig_double_el() && pico.out_lep_pt().at(0)>25 && pico.out_lep_pt().at(1)>15){
+        pico.out_trig_el_pt() = true;
+      }
+    } else if(pico.out_nel > 0){
+      if(pico.out_trig_single_el() && pico.out_lep_pt().at(0)>35){
+        pico.out_trig_el_pt() = true;
+      }
+    }
+  
+    if(pico.out_nmu() > 1){
+      if(pico.out_trig_double_mu() && pico.out_lep_pt().at(0)>20 && pico.out_lep_pt().at(1)>10){
+        pico.out_trig_mu_pt() = true;
+      } 
+    }else if(pico.out_nmu() > 0){ 
+      if(pico.out_trig_single_mu() && pico.out_lep_pt().at(0)>25){
+        pico.out_trig_mu_pt() = true;
+      }
+    }
+  }
+
+
+
+
+
   //Read from left. Bit 1 n_ll>=2, Bit 2 n_ee>=2, Bit 3 n_mumu>=2, Bit 4 trigs single lep, Bit 5 trigs dilep, Bit 6 leading lepton pT, Bit 7 subleading lepton pT
   // Bit 8 nphoton>=1, Bit 9 photon_id80, Bit 10 m_ll cut, Bit 11 m_lly cut, Bit 12 15/110, Bit 13 is 1 if outside m_lly signal region
   //New:
