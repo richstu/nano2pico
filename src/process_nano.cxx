@@ -90,6 +90,7 @@ int main(int argc, char *argv[]){
       else if (regex_search(in_file, std::regex("Run3Summer22"))) year = 2022;
     }
   } else { // Data
+    if (Contains(in_file, "HIPM")) isAPV = true;
     if (Contains(in_file, "Run2016")) year = 2016;
     else if (Contains(in_file, "Run2017")) year = 2017;
     else if (Contains(in_file, "Run2018")) year = 2018;
