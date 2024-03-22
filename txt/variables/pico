@@ -75,6 +75,7 @@ vector<float> llphoton_dijet_dphi
 vector<float> llphoton_dijet_balance
 vector<float> llphoton_dijet_dr
 vector<float> llphoton_pTt
+vector<float> llphoton_pTt_an_hig019014
 
 float llphoton_refit_pt
 float llphoton_refit_eta
@@ -93,6 +94,7 @@ float llphoton_refit_dijet_dphi
 float llphoton_refit_dijet_balance
 float llphoton_refit_dijet_dr
 float llphoton_refit_pTt
+float llphoton_refit_pTt_an_hig019014
 
 ###################   gammagamma   ##################
 int nphotonphoton

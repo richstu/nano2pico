@@ -77,6 +77,7 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
       TVector3 z_pT = dilep.Vect();
       g_pT.SetZ(0); h_pT.SetZ(0); z_pT.SetZ(0);
       pico.out_llphoton_pTt().push_back( h_pT.Cross((z_pT-g_pT).Unit()).Mag() );
+      pico.out_llphoton_pTt_an_hig019014().push_back( h_pT.Unit().Cross(z_pT-g_pT).Mag() );
 
       TLorentzVector lminus, lplus;
       TLorentzVector lep1, lep2;
@@ -328,6 +329,7 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
       TVector3 z_pT = ll_refit.Vect();
       g_pT.SetZ(0); h_pT.SetZ(0); z_pT.SetZ(0);
       pico.out_llphoton_refit_pTt() = h_pT.Cross((z_pT-g_pT).Unit()).Mag();
+      pico.out_llphoton_refit_pTt_an_hig019014() = h_pT.Unit().Cross(z_pT-g_pT).Mag();
 
       TLorentzVector lminus, lplus;
       TLorentzVector lep1, lep2;
