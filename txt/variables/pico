@@ -73,7 +73,28 @@ vector<int>   llphoton_iph
 vector<int>   llphoton_ill
 vector<float> llphoton_dijet_dphi
 vector<float> llphoton_dijet_balance
-vector<float> llphoton_pTt2
+vector<float> llphoton_dijet_dr
+vector<float> llphoton_pTt
+vector<float> llphoton_pTt_an_hig019014
+
+float llphoton_refit_pt
+float llphoton_refit_eta
+float llphoton_refit_phi
+float llphoton_refit_m
+float llphoton_refit_dphi
+float llphoton_refit_deta
+float llphoton_refit_dr
+float llphoton_refit_l1_masserr
+float llphoton_refit_l2_masserr
+float llphoton_refit_ph_masserr
+float llphoton_refit_costheta
+float llphoton_refit_cosTheta
+float llphoton_refit_psi
+float llphoton_refit_dijet_dphi
+float llphoton_refit_dijet_balance
+float llphoton_refit_dijet_dr
+float llphoton_refit_pTt
+float llphoton_refit_pTt_an_hig019014
 
 ###################   gammagamma   ##################
 int nphotonphoton
@@ -282,7 +303,18 @@ vector<float> ll_deta
 vector<int>   ll_lepid
 vector<int>   ll_i1
 vector<int>   ll_i2
-vector<int>   ll_charge
+
+float ll_refit_pt
+float ll_refit_eta
+float ll_refit_phi
+float ll_refit_m
+float ll_refit_l1_pt
+float ll_refit_l2_pt
+int   ll_refit_status
+int   ll_refit_covmat_status
+float ll_refit_minnll
+
+
 
 ##################   Photons   ###################
 int nphoton
@@ -321,6 +353,10 @@ vector<bool>  photon_sig
 vector<int>   photon_elidx
 vector<bool>  photon_pixelseed
 vector<float> photon_jet_mindr
+vector<float> photon_jet_maxdr
+vector<float> photon_jet1_dr
+vector<float> photon_jet2_dr
+
 vector<float> photon_zeppenfeld
 
 #################   FsrPhotons  ##################
@@ -416,8 +452,10 @@ float w_trig
 #------------------------------
 bool trig_single_el
 bool trig_double_el
+bool trig_el_pt
 bool trig_single_mu
 bool trig_double_mu
+bool trig_mu_pt
 
 # Muon triggers
 #------------------------------
@@ -453,6 +491,7 @@ bool HLT_Ele25_WPTight_Gsf
 bool HLT_Ele27_WPTight_Gsf
 bool HLT_Ele28_WPTight_Gsf
 bool HLT_Ele30_WPTight_Gsf
+bool HLT_Ele32_WPTight_Gsf_Emu
 bool HLT_Ele32_WPTight_Gsf_L1DoubleEG
 bool HLT_Ele32_WPTight_Gsf
 bool HLT_Ele35_WPTight_Gsf

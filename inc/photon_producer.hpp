@@ -24,6 +24,7 @@ public:
   const float FsrPhotonEtaCut   = 2.4;
   const float FsrPhotonIsoCut   = 1.8;
   const float FsrPhotondRCut    = 0.012;
+  const float FsrSeparationReq  = 0.2;
 
   std::vector<int> WritePhotons(nano_tree &nano, pico_tree &pico, 
                                 std::vector<int> &jet_isphoton_nano_idx, 

@@ -1,5 +1,4 @@
 #include "dilep_producer.hpp"
-
 #include "utilities.hpp"
 
 #include "TLorentzVector.h"
@@ -11,6 +10,7 @@ DileptonProducer::DileptonProducer(int year_){
 }
 
 DileptonProducer::~DileptonProducer(){
+
 }
 
 void DileptonProducer::WriteDileptons(pico_tree &pico, 
@@ -22,6 +22,7 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
   TLorentzVector l1err, l2err;
   double ptl1err, ptl2err;
   double dml1, dml2;
+  int dilep_charge;
 
   if (pico.out_nmu()>=2)
     for(size_t i(0); i < sig_mu_pico_idx.size(); i++) 
@@ -29,14 +30,21 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
         int imu1 = sig_mu_pico_idx.at(i);
         int imu2 = sig_mu_pico_idx.at(j);
         TLorentzVector mu1, mu2, dimu;
+        dilep_charge = pico.out_mu_charge()[imu1]+pico.out_mu_charge()[imu2];
+
+        if(dilep_charge != 0){
+          continue;
+        }
 
         mu1.SetPtEtaPhiM(pico.out_mu_pt()[imu1], pico.out_mu_eta()[imu1],
                          pico.out_mu_phi()[imu1], 0.10566);
         mu2.SetPtEtaPhiM(pico.out_mu_pt()[imu2], pico.out_mu_eta()[imu2],
                          pico.out_mu_phi()[imu2], 0.10566);
         dimu = mu1 + mu2;
+        
+
         // Dilepton closest to Z mass gets put at the front
-        if(abs(dimu.M() - zmass) < mindm) { 
+        if(abs(dimu.M() - zmass) < mindm){ 
           mindm = abs(dimu.M() - zmass);
           shift = 0;
         }
@@ -65,7 +73,6 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
         pico.out_ll_i2()   .insert(pico.out_ll_i2()   .begin()+shift, imu2);
         pico.out_ll_l1_masserr() .insert(pico.out_ll_l1_masserr() .begin()+shift, dml1);
         pico.out_ll_l2_masserr() .insert(pico.out_ll_l2_masserr() .begin()+shift, dml2);
-        pico.out_ll_charge()     .insert(pico.out_ll_charge()     .begin()+shift, pico.out_mu_charge()[imu1]+pico.out_mu_charge()[imu2]);
         nll++;
       }
   if (pico.out_nel()>=2)
@@ -74,17 +81,23 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
         int iel1 = sig_el_pico_idx.at(i);
         int iel2 = sig_el_pico_idx.at(j);
         TLorentzVector el1, el2, diel;
+        dilep_charge = pico.out_el_charge()[iel1]+pico.out_el_charge()[iel2];
+
+        if(dilep_charge != 0){
+          continue;
+        }
 
         el1.SetPtEtaPhiM(pico.out_el_pt()[iel1] ,pico.out_el_eta()[iel1],
                          pico.out_el_phi()[iel1],0.000511);
         el2.SetPtEtaPhiM(pico.out_el_pt()[iel2], pico.out_el_eta()[iel2],
                          pico.out_el_phi()[iel2],0.000511);
         diel = el1 + el2;
-        // Dilepton closest to Z mass gets put at the front
+ 
+        // Dilepton closest to Z mass (not overlapping with leading signal photon) gets put at the front
         if(abs(diel.M() - zmass) < mindm) {
           mindm = abs(diel.M() - zmass);
           shift = 0;
-        }
+        } 
         else
           shift = nll;
 
@@ -110,7 +123,6 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
         pico.out_ll_i2()   .insert(pico.out_ll_i2()   .begin()+shift, iel2);
         pico.out_ll_l1_masserr() .insert(pico.out_ll_l1_masserr() .begin()+shift, dml1);
         pico.out_ll_l2_masserr() .insert(pico.out_ll_l2_masserr() .begin()+shift, dml2);
-        pico.out_ll_charge()     .insert(pico.out_ll_charge()     .begin()+shift, pico.out_el_charge()[iel1]+pico.out_el_charge()[iel2]);
         nll++;
       }
   return;

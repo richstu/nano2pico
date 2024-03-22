@@ -4,6 +4,7 @@
 
 #include "nano_tree.hpp"
 #include "pico_tree.hpp"
+#include "KinZfitter.hpp"
 
 class ZGammaVarProducer{
 public:
@@ -15,7 +16,7 @@ public:
 
 private:
   int year;
-  
+  KinZfitter *kinZfitter; 
 };
 
 #endif
