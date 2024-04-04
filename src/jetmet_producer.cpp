@@ -220,6 +220,8 @@ void JetMetProducer::GetJetUncertainties(nano_tree &nano, pico_tree &pico,
 //writes other MET variables and non-jet MET uncertainties
 void JetMetProducer::WriteMet(nano_tree &nano, pico_tree &pico) {
   pico.out_met_calo()    = nano.CaloMET_pt();
+  pico.out_met_tk()      = nano.TkMET_pt();
+  pico.out_met_tk_phi()  = nano.TkMET_phi();
   pico.out_met_tru()     = nano.GenMET_pt();
   pico.out_met_tru_phi() = nano.GenMET_phi();
   pico.out_ht_isr_me()   = nano.LHE_HTIncoming();

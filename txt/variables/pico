@@ -27,6 +27,8 @@ float met_phi
 float met_calo
 float met_tru
 float met_tru_phi
+float met_tk
+float met_tk_phi
 float mt
 float mt_tru
 float ht_isr_me
@@ -309,6 +311,7 @@ vector<float> photon_hoe
 vector<float> photon_esoversc
 vector<float> photon_essigmarr
 vector<float> photon_idmva
+vector<float> photon_pudisc
 vector<int>   photon_pflavor
 vector<bool>  photon_id
 vector<bool>  photon_id80
