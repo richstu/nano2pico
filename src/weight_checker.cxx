@@ -123,6 +123,7 @@ int main() {
   bool verbose = false;
   unsigned trig_nlep_max = 3;
   unsigned trig_nlep_min = 2;
+  bool do_all_trig = false; //consider events not passing baseline
 
   for (unsigned iyear = 0; iyear < weighters.size(); iyear++) {
 
@@ -175,7 +176,10 @@ int main() {
             }
             if (found_bad) {
               cout << "!!! Found bad SF" << endl;
-              return 1;
+              string temp;
+              cin >> temp;
+              if (temp != "c")
+                return 1;
             }
           }
         }
@@ -219,7 +223,10 @@ int main() {
             }
             if (found_bad) {
               cout << "!!! Found bad SF" << endl;
-              return 1;
+              string temp;
+              cin >> temp;
+              if (temp != "c")
+                return 1;
             }
           }
         }
@@ -263,7 +270,10 @@ int main() {
             }
             if (found_bad) {
               cout << "!!! Found bad SF" << endl;
-              return 1;
+              string temp;
+              cin >> temp;
+              if (temp != "c")
+                return 1;
             }
           }
         }
@@ -305,12 +315,23 @@ int main() {
                     pico.out_mu_sig().clear();
                     pico.out_mu_pt().clear();
                     pico.out_mu_eta().clear();
+                    float lead_el_pt = 0;
+                    float subl_el_pt = 0;
+                    float lead_mu_pt = 0;
+                    float subl_mu_pt = 0;
                     for (unsigned iel = 0; iel < nel; iel++) {
                       pico.out_el_sig().push_back(true);
                       pico.out_el_pt().push_back(
                           (trig_el_pt_bins[iptel[iel]]+trig_el_pt_bins[iptel[iel]+1])/2.0);
                       pico.out_el_eta().push_back(
                           (trig_el_eta_bins[ietael[iel]]+trig_el_eta_bins[ietael[iel]+1])/2.0);
+                      if (pico.out_el_pt().back() > lead_el_pt) {
+                        subl_el_pt = lead_el_pt;
+                        lead_el_pt = pico.out_el_pt().back();
+                      }
+                      else if (pico.out_el_pt().back() > subl_el_pt) {
+                        subl_el_pt = pico.out_el_pt().back();
+                      }
                     }
                     for (unsigned imu = 0; imu < nmu; imu++) {
                       pico.out_mu_sig().push_back(true);
@@ -318,11 +339,23 @@ int main() {
                           (trig_mu_pt_bins[iptmu[imu]]+trig_mu_pt_bins[iptmu[imu]+1])/2.0);
                       pico.out_mu_eta().push_back(
                           (trig_mu_eta_bins[ietamu[imu]]+trig_mu_eta_bins[ietamu[imu]+1])/2.0);
+                      if (pico.out_mu_pt().back() > lead_mu_pt) {
+                        subl_mu_pt = lead_mu_pt;
+                        lead_mu_pt = pico.out_mu_pt().back();
+                      }
+                      else if (pico.out_mu_pt().back() > subl_mu_pt) {
+                        subl_mu_pt = pico.out_mu_pt().back();
+                      }
                     }
                     //get trigger weight and check sanity
                     vector<float> sfs = trigger_weighters[iyear].GetSF(pico);
                     bool found_bad = sf_is_bad(sfs[0]) || sf_is_bad(sfs[1]) || sf_is_bad(sfs[2]);
-                    if (verbose || found_bad) {
+                    bool trig_in_sr = false;
+                    if (pico.out_trig_single_el() && lead_el_pt > 30) trig_in_sr = true;
+                    if (pico.out_trig_double_el() && lead_el_pt > 25 && subl_el_pt > 15) trig_in_sr = true;
+                    if (pico.out_trig_single_mu() && lead_mu_pt > 25) trig_in_sr = true;
+                    if (pico.out_trig_double_mu() && lead_mu_pt > 20 && subl_el_pt > 10) trig_in_sr = true;
+                    if (verbose || (found_bad && (trig_in_sr || do_all_trig))) {
                       cout << "el_pt: ";
                       for (unsigned iel = 0; iel<nel; iel++)
                         cout << pico.out_el_pt()[iel] << ", ";
@@ -345,7 +378,7 @@ int main() {
                       cout << "trig_double_mu: " << trig_decision[3] << endl;
                       cout << "sf = " << sfs[0] << ", up = " << sfs[1] << ", dn = " << sfs[2] << endl;
                     }
-                    if (found_bad) {
+                    if (found_bad && (trig_in_sr || do_all_trig)) {
                       cout << "!!! Found bad SF" << endl;
                       string temp;
                       cin >> temp;
@@ -360,7 +393,6 @@ int main() {
         }
       }
     }
-
 
     //PU doesn't really need checking since straight from file
 

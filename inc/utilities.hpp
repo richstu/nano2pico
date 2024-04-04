@@ -101,6 +101,9 @@ std::string CopyReplaceAll(const std::string str, const std::string &orig, const
 
 void SplitFilePath(const std::string &path, std::string &dir_name, std::string &base_name);
 
+void propagate_uncertainty_product(float a, float a_unc, float b, float b_unc, float& prod, float& prod_unc);
+void propagate_uncertainty_ratio(float num, float num_unc, float den, float den_unc, float& ratio, float& ratio_unc);
+
 void getMETWithJEC(nano_tree & nano, int year, bool isFastsim, float & MET_pt, float & MET_phi, bool is_preUL);
 void getJetWithJEC(nano_tree & nano, bool isFastsim, std::vector<float> & Jet_pt, std::vector<float> & Jet_mass);
 void getJetId(nano_tree & nano, float nanoaod_version, std::vector<int> & Jet_jetId);

@@ -164,8 +164,10 @@ void EventWeighter::ElectronSF(pico_tree &pico){
   //SF logic: for each true electron, weight by prob(MC)/prob(data) which is
   //prob(reco and pass id) or prob(fail)=1-prob(reco and pass id)
   for (unsigned imc = 0; imc < pico.out_mc_id().size(); imc++) {
-    if (abs(pico.out_mc_id().at(imc))==11 && ((pico.out_mc_statusflag().at(imc) & 0x2000)!=0)) {
-      //is electron and last copy
+    if (abs(pico.out_mc_id().at(imc))==11 && 
+        ((pico.out_mc_statusflag().at(imc) & 0x2000)!=0) &&
+        ((pico.out_mc_statusflag().at(imc) & 0x1) != 0)) {
+      //is electron and last copy and prompt
       if ((pico.out_mc_pt().at(imc)<7) || (fabs(pico.out_mc_eta().at(imc))>2.5)) continue;
       bool pass_id = false;
       float reco_pt = -999;
@@ -175,7 +177,7 @@ void EventWeighter::ElectronSF(pico_tree &pico){
         if (pico.out_el_sig().at(iel)) {
           float dr = dR(pico.out_mc_eta().at(imc),pico.out_el_eta().at(iel),
                         pico.out_mc_phi().at(imc),pico.out_el_phi().at(iel));
-          if (dr < 0.2 && dr < min_dr) {
+          if (dr < 0.4 && dr < min_dr) {
             reco_pt = pico.out_el_pt().at(iel);
             reco_eta = pico.out_el_eta().at(iel);
             min_dr = dr;
@@ -193,18 +195,18 @@ void EventWeighter::ElectronSF(pico_tree &pico){
       float data_unc = map_electron_->evaluate({"systdata", reco_eta, reco_pt});
       float pass_sf = 1.0;
       float fail_sf = 1.0;
-      if (mc_eff != 0.0) pass_sf = data_eff/mc_eff;
-      if (mc_eff != 1.0) fail_sf = (1.0-data_eff)/(1.0-mc_eff);
-      float pass_unc = hypotf(data_unc*mc_eff, mc_unc*data_eff);
-      float fail_unc = hypotf(data_unc*(1.0-mc_eff), mc_unc*(1.0-data_eff));
+      float pass_unc = 0.0;
+      float fail_unc = 0.0;
+      propagate_uncertainty_ratio(data_eff, data_unc, mc_eff, mc_unc, pass_sf, pass_unc);
+      propagate_uncertainty_ratio(1.0-data_eff, data_unc, 1.0-mc_eff, mc_unc, fail_sf, fail_unc);
       if (pass_id) {
         sf_tot *= pass_sf;
         sf_tot_up *= (pass_sf+pass_unc);
-        sf_tot_dn *= (pass_sf-pass_unc);
+        sf_tot_dn *= fmax(pass_sf-pass_unc,0);
       }
       else {
         sf_tot *= fail_sf;
-        sf_tot_up *= (fail_sf-fail_unc);
+        sf_tot_up *= fmax(fail_sf-fail_unc,0);
         sf_tot_dn *= (fail_sf+fail_unc);
       }
     }
@@ -258,21 +260,21 @@ void EventWeighter::PhotonCSEVSF(pico_tree &pico, float &w_photon_csev, std::vec
       }
     }
     float sf = map_photon_csev_->evaluate({key_, "sf", "MVA", category});
-    float sf_up = map_photon_csev_->evaluate({key_, "sf", "MVA", category});
-    float sf_dn = map_photon_csev_->evaluate({key_, "sf", "MVA", category});
+    float sf_up = map_photon_csev_->evaluate({key_, "sfup", "MVA", category});
+    float sf_dn = map_photon_csev_->evaluate({key_, "sfdown", "MVA", category});
     float mc_eff = map_photon_csev_mceff_->evaluate({"effmc", category});
     float mc_syst_up = map_photon_csev_mceff_->evaluate({"systmc_up", category});
     float mc_syst_dn = map_photon_csev_mceff_->evaluate({"systmc_dn", category});
-
+    float data_eff = 1.0;
+    float data_syst_up = 0.0;
+    float data_syst_dn = 0.0;
     float fail_sf = 1.0;
-    if (mc_eff != 1.0) fail_sf = (1.0-mc_eff*sf)/(1.0-mc_eff);
-    float sf_unc_up = sf_up - sf;
-    float sf_unc_dn = sf - sf_dn;
-    float fail_unc_up = hypotf((1.0-mc_eff*sf)*mc_syst_dn,
-                               (1.0-mc_eff)*hypotf(mc_eff*sf_unc_up,sf*mc_syst_dn));
-    float fail_unc_dn = hypotf((1.0-mc_eff*sf)*mc_syst_up,
-                               (1.0-mc_eff)*hypotf(mc_eff*sf_unc_dn,sf*mc_syst_up));
-    float ph_sf(1.0), ph_sf_up(1.0), ph_sf_dn(1.0);
+    float fail_unc_up = 0.0;
+    float fail_unc_dn = 0.0;
+    propagate_uncertainty_product(mc_eff, mc_syst_up, sf, fabs(sf_up-sf), data_eff, data_syst_up);
+    propagate_uncertainty_product(mc_eff, mc_syst_dn, sf, fabs(sf-sf_dn), data_eff, data_syst_dn);
+    propagate_uncertainty_ratio(1.0-data_eff, data_syst_up, 1.0-mc_eff, mc_syst_dn, fail_sf, fail_unc_up);
+    propagate_uncertainty_ratio(1.0-data_eff, data_syst_dn, 1.0-mc_eff, mc_syst_up, fail_sf, fail_unc_dn);
     if (eveto) { //passes csev
       sf_tot *= sf;
       sf_tot_up *= sf_up;
@@ -280,12 +282,9 @@ void EventWeighter::PhotonCSEVSF(pico_tree &pico, float &w_photon_csev, std::vec
     }
     else { //fails csev
       sf_tot *= fail_sf;
-      sf_tot_up *= (fail_sf-fail_unc_up);
+      sf_tot_up *= fmax(fail_sf-fail_unc_up,0);
       sf_tot_dn *= (fail_sf+fail_unc_dn);
     }
-    sf_tot *= ph_sf;
-    sf_tot_up *= ph_sf_up;
-    sf_tot_dn *= ph_sf_dn;
   }
   w_photon_csev = sf_tot;
   sys_photon_csev[0] *= sf_tot_up;
@@ -358,16 +357,19 @@ void EventWeighter::MuonSF(pico_tree &pico){
         sf_up = id_sf_up*iso_sf_up;
         sf_dn = id_sf_dn*iso_sf_dn;
       }
+      //mc_eff is efficiency to pass reco,ID,and Iso
       float mc_eff = map_muon_mceff_->evaluate({"effmc", std::abs(reco_eta), reco_pt});
       float mc_syst = map_muon_mceff_->evaluate({"systmc", std::abs(reco_eta), reco_pt});
       float fail_sf = 1.0;
-      if (mc_eff != 1.0) fail_sf = (1.0-mc_eff*sf)/(1.0-mc_eff);
-      float sf_unc_up = sf_up - sf;
-      float sf_unc_dn = sf - sf_dn;
-      float fail_unc_up = hypotf((1.0-mc_eff*sf)*mc_syst,
-                                 (1.0-mc_eff)*hypotf(mc_eff*sf_unc_up,sf*mc_syst));
-      float fail_unc_dn = hypotf((1.0-mc_eff*sf)*mc_syst,
-                                 (1.0-mc_eff)*hypotf(mc_eff*sf_unc_dn,sf*mc_syst));
+      float fail_unc_up = 0.0;
+      float fail_unc_dn = 0.0;
+      float data_eff = 1.0;
+      float data_unc_up = 0.0;
+      float data_unc_dn = 0.0;
+      propagate_uncertainty_product(mc_eff, mc_syst, sf, fabs(sf_up-sf), data_eff, data_unc_up);
+      propagate_uncertainty_product(mc_eff, mc_syst, sf, fabs(sf-sf_dn), data_eff, data_unc_dn);
+      propagate_uncertainty_ratio(1.0-data_eff, data_unc_up, 1.0-mc_eff, mc_syst, fail_sf, fail_unc_up);
+      propagate_uncertainty_ratio(1.0-data_eff, data_unc_dn, 1.0-mc_eff, mc_syst, fail_sf, fail_unc_dn);
       if (pass_id) {
         sf_tot *= sf;
         sf_tot_up *= sf_up;
@@ -375,7 +377,7 @@ void EventWeighter::MuonSF(pico_tree &pico){
       }
       else {
         sf_tot *= fail_sf;
-        sf_tot_up *= (fail_sf-fail_unc_up);
+        sf_tot_up *= fmax(fail_sf-fail_unc_up,0);
         sf_tot_dn *= (fail_sf+fail_unc_dn);
       }
     }

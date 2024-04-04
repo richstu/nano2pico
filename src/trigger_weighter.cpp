@@ -121,10 +121,10 @@ std::vector<float> TriggerWeighter::GetSF(std::vector<float> electron_pt,
     pass_dimu, false);
 
   //calculate SFs
+  if (mc_prob[0] < 0.001) mc_prob[0] = 0.0;
   float sf = 1.0;
-  if (mc_prob[0] > 0.001)
-    sf = data_prob[0]/mc_prob[0];
-  float unc = hypotf(data_prob[0]*mc_prob[1],mc_prob[0]*data_prob[1]);
+  float unc = 0.0;
+  propagate_uncertainty_ratio(data_prob[0], data_prob[1], mc_prob[0], mc_prob[1], sf, unc);
   float sf_up = sf+unc;
   float sf_dn = fmax(sf-unc,0);
 
