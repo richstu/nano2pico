@@ -77,7 +77,7 @@ if __name__ == "__main__":
   pico_directory = args.output_folder
   log_filename = args.output_log
 
-  n_entries = 30000 # about 1 min for process_nano.exe (~550 Hz). 
+  n_entries = 3000 # about 1 min for process_nano.exe (~550 Hz). 
   higgsino_test_commands = []
   # For DYJets and EG data
   higgsino_test_commands.extend(makeTestCommands(mc_nanoaod_directory=input_pico_folder+"/NanoAODv9/nano/2016APV/mc", 

@@ -20,6 +20,7 @@ drop *hig*
 
 keep fsrphoton_*
 keep photon_*
+keep lep_*
 keep el_*
 keep mu_*
 keep dijet_*

@@ -14,7 +14,6 @@ public:
 
 private:
   int year;
-  
 };
 
 #endif
