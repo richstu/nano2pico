@@ -126,9 +126,9 @@ std::vector<float> TriggerWeighter::GetSF(std::vector<float> electron_pt,
   float sf_dn = data_prob[2]/mc_prob[1];
 
   //deal with signal leptons with low probabilities
-  if (mc_prob[0]<0.001 || data_prob[0]<0.001) sf = 1.0;
-  if (mc_prob[1]<0.001 || data_prob[1]<0.001) sf_up = 1.0;
-  if (mc_prob[2]<0.001 || data_prob[2]<0.001) sf_dn = 1.0;
+  if (mc_prob[0]<0.001f || data_prob[0]<0.001f) sf = 1.0;
+  if (mc_prob[1]<0.001f || data_prob[1]<0.001f) sf_up = 1.0;
+  if (mc_prob[2]<0.001f || data_prob[2]<0.001f) sf_dn = 1.0;
 
   return {sf, sf_up, sf_dn};
 }
@@ -342,8 +342,8 @@ std::vector<float> TriggerWeighter::GetLeptonProbability(float lepton_pt, float 
   float uncr = (*prob_map)->evaluate({unc_name, std::abs(lepton_eta), lepton_pt});
   float up = prob + uncr;
   float down = prob - uncr;
-  if (up > 1.0) up = 1.0;
-  if (down < 0.0) down = 0.0;
+  if (up > 1.0f) up = 1.0;
+  if (down < 0.0f) down = 0.0;
   return {prob, up, down};
 }
 

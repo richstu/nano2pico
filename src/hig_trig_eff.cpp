@@ -31,7 +31,7 @@ namespace hig_trig_eff{
   float eff(pico_tree &pico){
       float errup(0), errdown(0); // Not used, but for reference
       errup+=errdown;
-      float eff = 1., met = pico.met(), ht = pico.ht();
+      float eff = 1., met = pico.met(), ht = pico.ht(); //Note that these are floats being compared to literals (default double. . .)
       if(ht>   0 && ht<= 200 && met> 150 && met<= 155) {eff = 0.532; errup = 0.013; errdown = 0.013;}
       else if(ht> 200 && ht<= 600 && met> 150 && met<= 155) {eff = 0.612; errup = 0.005; errdown = 0.005;}
       else if(ht> 600 && ht<= 800 && met> 150 && met<= 155) {eff = 0.589; errup = 0.023; errdown = 0.024;}

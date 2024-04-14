@@ -25,11 +25,11 @@ bool MuonProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma) {
   if(isZgamma) { // For Zgamma productions
     if (pt <= ZgMuonPtCut) return false;
     if (fabs(eta) > MuonEtaCut) return false;
-    if (fabs(nano.Muon_dz()[nano_idx])>1.0)  return false;
-    if (fabs(nano.Muon_dxy()[nano_idx])>0.5) return false; 
-    if ((nano.Muon_looseId()[nano_idx] || (pt > 200 && nano.Muon_highPtId()[nano_idx])) && 
+    if (fabs(nano.Muon_dz()[nano_idx])>dzCut)  return false;
+    if (fabs(nano.Muon_dxy()[nano_idx])>dxyCut) return false; 
+    if ((nano.Muon_looseId()[nano_idx] || (pt > MuonHighPt && nano.Muon_highPtId()[nano_idx])) && 
          nano.Muon_pfRelIso03_all()[nano_idx] < MuonRelIsoCut &&
-         nano.Muon_sip3d()[nano_idx] < 4)
+         nano.Muon_sip3d()[nano_idx] < MuonSip3dCut)
       return true;
     return false;
   }
@@ -39,7 +39,7 @@ bool MuonProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma) {
     if (fabs(eta) > MuonEtaCut) return false;
     if (pt > SignalMuonPtCut &&
       nano.Muon_miniPFRelIso_all()[nano_idx] < MuonMiniIsoCut &&
-      fabs(nano.Muon_dz()[nano_idx])<=0.5 &&
+      fabs(nano.Muon_dz()[nano_idx])<=0.5 && //Maybe compare with floats here. . .
       fabs(nano.Muon_dxy()[nano_idx])<=0.2)
       return true;
     return false;
@@ -82,8 +82,8 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
     if(isZgamma) { // For Zgamma productions
       if (pt <= ZgMuonPtCut) continue;
       if (fabs(eta) > MuonEtaCut) continue;
-      if (fabs(nano.Muon_dz()[imu])>1.0)  continue;
-      if (fabs(nano.Muon_dxy()[imu])>0.5) continue; 
+      if (fabs(nano.Muon_dz()[imu])>dzCut)  continue;
+      if (fabs(nano.Muon_dxy()[imu])>dxyCut) continue; 
       isSignal = IsSignal(nano, imu, isZgamma);
       pico.out_mu_sip3d().push_back(nano.Muon_sip3d()[imu]);
       pico.out_mu_mediumid().push_back(nano.Muon_mediumId()[imu]);
@@ -132,14 +132,14 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
 
     // veto muon selection
     if (nano.Muon_miniPFRelIso_all()[imu] < MuonMiniIsoCut && 
-        fabs(nano.Muon_dz()[imu])<=0.5 &&
-        fabs(nano.Muon_dxy()[imu])<=0.2) {
+        fabs(nano.Muon_dz()[imu])<=0.5f &&
+        fabs(nano.Muon_dxy()[imu])<=0.2f) {
       pico.out_nvmu()++;
       pico.out_nvlep()++;
       // save indices of matching jets
       for (int ijet(0); ijet<nano.nJet(); ijet++) {
-        if (dR(nano.Muon_eta()[imu], nano.Jet_eta()[ijet], nano.Muon_phi()[imu], nano.Jet_phi()[ijet])<0.4 &&
-          fabs(Jet_pt[ijet] - nano.Muon_pt()[imu])/nano.Muon_pt()[imu] < 1)
+        if (dR(nano.Muon_eta()[imu], nano.Jet_eta()[ijet], nano.Muon_phi()[imu], nano.Jet_phi()[ijet])<0.4f &&
+          fabs(Jet_pt[ijet] - nano.Muon_pt()[imu])/nano.Muon_pt()[imu] < 1.0f)
           jet_isvlep_nano_idx.push_back(ijet);
       }
     }
@@ -151,8 +151,8 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
 
       // save indices of matching jets
       for (int ijet(0); ijet<nano.nJet(); ijet++) {
-        if (dR(nano.Muon_eta()[imu], nano.Jet_eta()[ijet], nano.Muon_phi()[imu], nano.Jet_phi()[ijet])<0.4 &&
-          fabs(Jet_pt[ijet] - nano.Muon_pt()[imu])/nano.Muon_pt()[imu] < 1)
+        if (dR(nano.Muon_eta()[imu], nano.Jet_eta()[ijet], nano.Muon_phi()[imu], nano.Jet_phi()[ijet])<0.4f &&
+          fabs(Jet_pt[ijet] - nano.Muon_pt()[imu])/nano.Muon_pt()[imu] < 1.0f)
           jet_islep_nano_idx.push_back(ijet);
       }
     }

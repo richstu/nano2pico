@@ -112,7 +112,7 @@ void ISRTools::WriteISRJetMultiplicity(nano_tree &nano, pico_tree &pico) {
       for (size_t idau(0); idau < child_map[imc].size(); idau++) {
         float dr_ = dR(pico.out_jet_eta()[ijet], nano.GenPart_eta()[child_map[imc][idau]], 
                       pico.out_jet_phi()[ijet], nano.GenPart_phi()[child_map[imc][idau]]);
-        if(dr_<0.3){
+        if(dr_<0.3f){
           if (verbose) cout<<"Jet: ("<<pico.out_jet_pt()[ijet]<<", "<<pico.out_jet_eta()[ijet]<<", "
                            <<pico.out_jet_phi()[ijet]<<"), MC: ("<<nano.GenPart_pt()[child_map[imc][idau]]
                            <<", "<<nano.GenPart_eta()[child_map[imc][idau]]<<", "
