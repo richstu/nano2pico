@@ -39,8 +39,8 @@ bool MuonProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma) {
     if (fabs(eta) > MuonEtaCut) return false;
     if (pt > SignalMuonPtCut &&
       nano.Muon_miniPFRelIso_all()[nano_idx] < MuonMiniIsoCut &&
-      fabs(nano.Muon_dz()[nano_idx])<=0.5 && //Maybe compare with floats here. . .
-      fabs(nano.Muon_dxy()[nano_idx])<=0.2)
+      fabs(nano.Muon_dz()[nano_idx])<=0.5f && 
+      fabs(nano.Muon_dxy()[nano_idx])<=0.2f)
       return true;
     return false;
   }

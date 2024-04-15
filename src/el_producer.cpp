@@ -77,8 +77,8 @@ bool ElectronProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma) {
     if (pt <= SignalElectronPtCut) return false;
     if (fabs(eta) > ElectronEtaCut) return false;
     if (!idElectron_noIso(bitmap, 1)) return false;
-    if ((isBarrel && fabs(dz)>0.10) || (!isBarrel && fabs(dz)>0.20)) return false;
-    if ((isBarrel && fabs(dxy)>0.05) || (!isBarrel && fabs(dxy)>0.10)) return false; 
+    if ((isBarrel && fabs(dz)>0.10f) || (!isBarrel && fabs(dz)>0.20f)) return false;
+    if ((isBarrel && fabs(dxy)>0.05f) || (!isBarrel && fabs(dxy)>0.10f)) return false; 
     return (id && miniiso < ElectronMiniIsoCut);
   }
   return false;
@@ -185,9 +185,9 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
       if (fabs(eta) > ElectronEtaCut) continue;
       int bitmap = nano.Electron_vidNestedWPBitmap()[iel];
       if (!idElectron_noIso(bitmap, 1)) continue;
-      bool isBarrel = fabs(eta) <= 1.479;
-      if ((isBarrel && fabs(dz)>0.10) || (!isBarrel && fabs(dz)>0.20)) continue;
-      if ((isBarrel && fabs(dxy)>0.05) || (!isBarrel && fabs(dxy)>0.10)) continue; 
+      bool isBarrel = fabs(eta) <= 1.479f;
+      if ((isBarrel && fabs(dz)>0.10f) || (!isBarrel && fabs(dz)>0.20f)) continue;
+      if ((isBarrel && fabs(dxy)>0.05f) || (!isBarrel && fabs(dxy)>0.10f)) continue; 
       isSignal = IsSignal(nano, iel, isZgamma);
       id = idElectron_noIso(bitmap,3);
     }
