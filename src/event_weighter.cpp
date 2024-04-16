@@ -137,7 +137,7 @@ void EventWeighter::ElectronSF(pico_tree &pico){
   for (unsigned imc = 0; imc < pico.out_mc_id().size(); imc++) {
     if (abs(pico.out_mc_id().at(imc))==11 && ((pico.out_mc_statusflag().at(imc) & 0x2000)!=0)) {
       //is electron and last copy
-      if ((pico.out_mc_pt().at(imc)<10) || (fabs(pico.out_mc_eta().at(imc))>2.5)) continue;
+      if ((pico.out_mc_pt().at(imc)<10f) || (fabs(pico.out_mc_eta().at(imc))>2.5f)) continue;
       bool pass_id = false;
       float reco_pt = -999;
       float reco_eta = -999;
@@ -146,7 +146,7 @@ void EventWeighter::ElectronSF(pico_tree &pico){
         if (pico.out_el_sig().at(iel)) {
           float dr = dR(pico.out_mc_eta().at(imc),pico.out_el_eta().at(iel),
                         pico.out_mc_phi().at(imc),pico.out_el_phi().at(iel));
-          if (dr < 0.2 && dr < min_dr) {
+          if (dr < 0.2f && dr < min_dr) {
             reco_pt = pico.out_el_pt().at(iel);
             reco_eta = pico.out_el_eta().at(iel);
             min_dr = dr;
@@ -166,10 +166,10 @@ void EventWeighter::ElectronSF(pico_tree &pico){
       float data_eff_dn = data_eff-data_unc;
       float mc_eff_up = mc_eff+mc_unc;
       float mc_eff_dn = mc_eff-mc_unc;
-      if (data_eff_up > 1.0) data_eff_up = 1.0;
-      if (data_eff_dn < 0.0) data_eff_dn = 0.0;
-      if (mc_eff_up > 1.0) mc_eff_up = 1.0;
-      if (mc_eff_dn < 0.0) mc_eff_dn = 0.0;
+      if (data_eff_up > 1.0f) data_eff_up = 1.0;
+      if (data_eff_dn < 0.0f) data_eff_dn = 0.0;
+      if (mc_eff_up > 1.0f) mc_eff_up = 1.0;
+      if (mc_eff_dn < 0.0f) mc_eff_dn = 0.0;
       //for variations consider "worst case": data overestimated and mc 
       //underestimated or vice-versa
       float sf = data_eff/mc_eff;
@@ -220,17 +220,17 @@ void EventWeighter::PhotonCSEVSF(pico_tree &pico, float &w_photon_csev, std::vec
                      (pico.out_photon_isScEtaEE().at(iph) && mva>-0.58));
     float drmin = pico.out_photon_drmin().at(iph);
     bool eveto = pico.out_photon_elveto().at(iph);
-    if (pt < 15 || !pass_mva || drmin < 0.4) continue;
+    if (pt < 15f || !pass_mva || drmin < 0.4f) continue;
     if (pico.out_photon_pflavor().at(iph) != 1) continue;
     //find category
     if (pico.out_photon_isScEtaEB().at(iph)) {
-      if (fabs(pico.out_photon_r9().at(iph)) > 0.94) {
+      if (fabs(pico.out_photon_r9().at(iph)) > 0.94f) {
         category = "EBHighR9";
       } else {
         category = "EBLowR9";
       }
     } else {
-      if (fabs(pico.out_photon_r9().at(iph)) > 0.94) {
+      if (fabs(pico.out_photon_r9().at(iph)) > 0.94f) {
         category = "EEHighR9";
       } else {
         category = "EELowR9";
@@ -280,7 +280,7 @@ void EventWeighter::MuonSF(pico_tree &pico){
   for (unsigned imc = 0; imc < pico.out_mc_id().size(); imc++) {
     if (abs(pico.out_mc_id().at(imc))==13 && ((pico.out_mc_statusflag().at(imc) & 0x2000)!=0)) {
       //is muon and last copy
-      if (pico.out_mc_pt().at(imc)<5 || fabs(pico.out_mc_eta().at(imc))>2.4) continue;
+      if (pico.out_mc_pt().at(imc)<5f || fabs(pico.out_mc_eta().at(imc))>2.4f) continue;
       bool pass_id = false;
       float reco_pt = -999;
       float reco_eta = -999;
@@ -289,7 +289,7 @@ void EventWeighter::MuonSF(pico_tree &pico){
         if (pico.out_mu_sig().at(imu)) {
           float dr = dR(pico.out_mc_eta().at(imc),pico.out_mu_eta().at(imu),
                         pico.out_mc_phi().at(imc),pico.out_mu_phi().at(imu));
-          if (dr < 0.1 && dr < min_dr) {
+          if (dr < 0.1f && dr < min_dr) {
             reco_pt = pico.out_mu_pt().at(imu);
             reco_eta = pico.out_mu_eta().at(imu);
             min_dr = dr;
@@ -304,7 +304,7 @@ void EventWeighter::MuonSF(pico_tree &pico){
       float sf = 1.0;
       float sf_up = 1.0;
       float sf_dn = 1.0;
-      if (reco_pt < 15) {
+      if (reco_pt < 15f) {
         float reco_sf = map_muon_lowpt_reco_->evaluate({"sf", std::abs(reco_eta), reco_pt});
         float reco_sf_unc = map_muon_lowpt_reco_->evaluate({"unc", std::abs(reco_eta), reco_pt});
         float id_sf = map_muon_lowpt_id_->evaluate({"sf", std::abs(reco_eta), reco_pt});
@@ -314,7 +314,7 @@ void EventWeighter::MuonSF(pico_tree &pico){
         sf_dn = (reco_sf-reco_sf_unc)*(id_sf-id_sf_unc);
         if (sf_dn < 0) sf_dn = 0;
       }
-      else if (reco_pt < 200) {
+      else if (reco_pt < 200f) {
         float id_sf = map_muon_looseid_->evaluate({key_ + "_UL", std::abs(reco_eta), reco_pt, "sf"});
         float id_sf_up = map_muon_looseid_->evaluate({key_ + "_UL", std::abs(reco_eta), reco_pt, "systup"});
         float id_sf_dn = map_muon_looseid_->evaluate({key_ + "_UL", std::abs(reco_eta), reco_pt, "systdown"});
@@ -340,8 +340,8 @@ void EventWeighter::MuonSF(pico_tree &pico){
       float mc_syst = map_muon_mceff_->evaluate({"systmc", std::abs(reco_eta), reco_pt});
       float mc_eff_up = mc_eff+mc_syst;
       float mc_eff_dn = mc_eff-mc_syst;
-      if (mc_eff_up > 1.0) mc_eff_up = 1.0;
-      if (mc_eff_dn < 0.0) mc_eff_dn = 0.0;
+      if (mc_eff_up > 1.0f) mc_eff_up = 1.0;
+      if (mc_eff_dn < 0.0f) mc_eff_dn = 0.0;
       float data_eff = sf*mc_eff;
       float data_eff_up = sf_up*mc_eff;
       float data_eff_dn = sf_dn*mc_eff;

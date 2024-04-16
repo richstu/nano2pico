@@ -436,21 +436,21 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
   pico.out_trig_mu_pt() = false;
   if (year==2016) {
     if(pico.out_nel() > 1){
-      if(pico.out_trig_double_el() && pico.out_lep_pt().at(0)>25 && pico.out_lep_pt().at(1)>15){
+      if(pico.out_trig_double_el() && pico.out_lep_pt().at(0)>25.f && pico.out_lep_pt().at(1)>15.f){
         pico.out_trig_el_pt() = true;
       }
     } else if(pico.out_nel() > 0){
-      if(pico.out_trig_single_el() && pico.out_lep_pt().at(0)>30){
+      if(pico.out_trig_single_el() && pico.out_lep_pt().at(0)>30.f){
         pico.out_trig_el_pt() = true;
       }
     }
   
     if(pico.out_nmu() > 1){
-      if(pico.out_trig_double_mu() && pico.out_lep_pt().at(0)>20 && pico.out_lep_pt().at(1)>10){
+      if(pico.out_trig_double_mu() && pico.out_lep_pt().at(0)>20.f && pico.out_lep_pt().at(1)>10.f){
         pico.out_trig_mu_pt() = true;
       } 
     }else if(pico.out_nmu() > 0){ 
-      if(pico.out_trig_single_mu() && pico.out_lep_pt().at(0)>25){
+      if(pico.out_trig_single_mu() && pico.out_lep_pt().at(0)>25.f){
         pico.out_trig_mu_pt() = true;
       }
     }
@@ -458,21 +458,21 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
   
   if (year==2017) {
     if(pico.out_nel() > 1){
-      if(pico.out_trig_double_el() && pico.out_lep_pt().at(0)>25 && pico.out_lep_pt().at(1)>15){
+      if(pico.out_trig_double_el() && pico.out_lep_pt().at(0)>25.f && pico.out_lep_pt().at(1)>15.f){
         pico.out_trig_el_pt() = true;
       }
     } else if(pico.out_nel() > 0){
-      if(pico.out_trig_single_el() && pico.out_lep_pt().at(0)>35){
+      if(pico.out_trig_single_el() && pico.out_lep_pt().at(0)>35.f){
         pico.out_trig_el_pt() = true;
       }
     }
   
     if(pico.out_nmu() > 1){
-      if(pico.out_trig_double_mu() && pico.out_lep_pt().at(0)>20 && pico.out_lep_pt().at(1)>10){
+      if(pico.out_trig_double_mu() && pico.out_lep_pt().at(0)>20.f && pico.out_lep_pt().at(1)>10.f){
         pico.out_trig_mu_pt() = true;
       } 
     }else if(pico.out_nmu() > 0){ 
-      if(pico.out_trig_single_mu() && pico.out_lep_pt().at(0)>28){
+      if(pico.out_trig_single_mu() && pico.out_lep_pt().at(0)>28.f){
         pico.out_trig_mu_pt() = true;
       }
     }
@@ -480,21 +480,21 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
 
   if (year==2018 || year==2022 || year==2023) {
     if(pico.out_nel() > 1){
-      if(pico.out_trig_double_el() && pico.out_lep_pt().at(0)>25 && pico.out_lep_pt().at(1)>15){
+      if(pico.out_trig_double_el() && pico.out_lep_pt().at(0)>25.f && pico.out_lep_pt().at(1)>15.f){
         pico.out_trig_el_pt() = true;
       }
     } else if(pico.out_nel() > 0){
-      if(pico.out_trig_single_el() && pico.out_lep_pt().at(0)>35){
+      if(pico.out_trig_single_el() && pico.out_lep_pt().at(0)>35.f){
         pico.out_trig_el_pt() = true;
       }
     }
   
     if(pico.out_nmu() > 1){
-      if(pico.out_trig_double_mu() && pico.out_lep_pt().at(0)>20 && pico.out_lep_pt().at(1)>10){
+      if(pico.out_trig_double_mu() && pico.out_lep_pt().at(0)>20.f && pico.out_lep_pt().at(1)>10.f){
         pico.out_trig_mu_pt() = true;
       } 
     }else if(pico.out_nmu() > 0){ 
-      if(pico.out_trig_single_mu() && pico.out_lep_pt().at(0)>25){
+      if(pico.out_trig_single_mu() && pico.out_lep_pt().at(0)>25.f){
         pico.out_trig_mu_pt() = true;
       }
     }
@@ -522,11 +522,11 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
     if(pico.out_trig_mu_pt()){baseBit +=0b00001000000;}
   }
   if (pico.out_nphoton()>=1){baseBit+= 0b00000100000;}
-  if (pico.out_ll_m().at(pico.out_llphoton_ill().at(0))>=80 && pico.out_ll_m().at(pico.out_llphoton_ill().at(0))<=100){baseBit+= 0b00000010000;}
-  if(pico.out_photon_pt().at(pico.out_llphoton_iph().at(0))/pico.out_llphoton_m().at(0) >=15.0/110){baseBit+= 0b00000001000;}
-  if(pico.out_ll_m().at(pico.out_llphoton_ill().at(0))+pico.out_llphoton_m().at(0) > 185){baseBit+= 0b00000000100;}
-  if (pico.out_llphoton_m().at(0)>=100 && pico.out_llphoton_m().at(0)<=180){baseBit+= 0b00000000010;}
-  if(pico.out_llphoton_m().at(0)<=122 || pico.out_llphoton_m().at(0)>=128){baseBit+= 0b00000000001;}
+  if (pico.out_ll_m().at(pico.out_llphoton_ill().at(0))>=80.f && pico.out_ll_m().at(pico.out_llphoton_ill().at(0))<=100.f){baseBit+= 0b00000010000;}
+  if(pico.out_photon_pt().at(pico.out_llphoton_iph().at(0))/pico.out_llphoton_m().at(0) >=15.0f/110.f){baseBit+= 0b00000001000;}
+  if(pico.out_ll_m().at(pico.out_llphoton_ill().at(0))+pico.out_llphoton_m().at(0) > 185.f){baseBit+= 0b00000000100;}
+  if (pico.out_llphoton_m().at(0)>=100.f && pico.out_llphoton_m().at(0)<=180.f){baseBit+= 0b00000000010;}
+  if(pico.out_llphoton_m().at(0)<=122.f || pico.out_llphoton_m().at(0)>=128.f){baseBit+= 0b00000000001;}
 
   pico.out_zg_cutBitMap() = baseBit;
 //End Bitmap for zgamma cut flow

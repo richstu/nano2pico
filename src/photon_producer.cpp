@@ -86,7 +86,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
     }
 
     bool isSignal = (nano.Photon_mvaID_WP80()[iph] &&
-                    eVeto && minLepDR > 0.3 && 
+                    eVeto && minLepDR > 0.3f && 
                     pt > SignalPhotonPtCut &&
                     (photon_el_pico_idx[iph]==-1 || !(pico.out_el_sig()[photon_el_pico_idx[iph]])));
 
@@ -231,7 +231,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
         jet_isphoton_nano_idx.push_back(Photon_jetIdx[iph]);
       else
         for (int ijet(0); ijet<nano.nJet(); ijet++)
-          if (dR(eta, nano.Jet_eta()[ijet], phi, nano.Jet_phi()[ijet])<0.4)
+          if (dR(eta, nano.Jet_eta()[ijet], phi, nano.Jet_phi()[ijet])<0.4f)
             jet_isphoton_nano_idx.push_back(ijet);
     }
   }
