@@ -92,8 +92,8 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
                     eVeto && minLepDR > 0.3f && 
                     pt > SignalPhotonPtCut &&
                     (photon_el_pico_idx[iph]==-1 || !(pico.out_el_sig()[photon_el_pico_idx[iph]])));
-    bool isSignalhig019014 = (((nano.Photon_isScEtaEB()[iph] && mva > -0.4) || (nano.Photon_isScEtaEE()[iph] && mva > -0.58)) &&
-                             eVeto && minLepDR > 0.4 && pt > SignalPhotonPtCut);
+    bool isSignalhig019014 = (((nano.Photon_isScEtaEB()[iph] && mva > -0.4f) || (nano.Photon_isScEtaEE()[iph] && mva > -0.58f)) &&
+                             eVeto && minLepDR > 0.4f && pt > SignalPhotonPtCut);
 
     if(hig019014_photon_idx==-1 && isSignalhig019014){
       pico.out_photon_idx_hig019014() = iph;
