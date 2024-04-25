@@ -216,7 +216,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
       // save indices of matching jets
       for (int ijet(0); ijet<nano.nJet(); ijet++) {
         if (dR(eta, nano.Jet_eta()[ijet], phi, nano.Jet_phi()[ijet])<0.4f &&
-            fabs(Jet_pt[ijet] - nano.Electron_pt()[iel])/nano.Electron_pt()[iel] < 1f)
+            fabs(Jet_pt[ijet] - nano.Electron_pt()[iel])/nano.Electron_pt()[iel] < 1.f)
           jet_isvlep_nano_idx.push_back(ijet);
       }
     }
