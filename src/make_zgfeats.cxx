@@ -108,7 +108,7 @@ int main(int argc, char *argv[]){
     // Find best Z candidate and save attributes of Zcand and leptons
     //--------------------------------------------------------------
     if (debug) cout<<"INFO:: Filling Z candidate features."<<endl;
-    double mindm(1000);
+    double mindm(100000);
     int biz(-1);
     for(int iz(0); iz < pico.nll(); iz++)
       if(abs(pico.ll_m()[iz] - 91.1876) < mindm)

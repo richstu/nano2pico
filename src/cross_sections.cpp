@@ -6,7 +6,7 @@
 using namespace std;
 
 namespace xsec{
-
+  //Cross sections for primary signals and backgrounds for H->Zgamma updated 2024-03-14. Other xsec values not guaranteed.
   float crossSection(const TString &file, int year){
     float xsec(-999999.), Htobb(0.5824), HToZG(0.001533), ZToLL(0.100974);
     float HToGG(0.00227), HToMM(0.000218), HToTT(0.06256);
@@ -39,7 +39,7 @@ namespace xsec{
 
 
         // cross sections from mcm
-        if(file.Contains("TTG")) xsec = 3.697;
+        if(file.Contains("TTG")) xsec = 3.757; //was 3.697 but this disagrees with XSDB
         if(file.Contains("TTTT_Tune")) xsec = 0.009103; //twiki table
         // mcm cross section times the same kfactors used for leptonic samples
         if(file.Contains("WJetsToQQ_HT-600ToInf")) xsec = 95.14*1.21;
@@ -113,19 +113,23 @@ namespace xsec{
         if(file.Contains("TTWJetsToLNu_TuneCUETP8M1"))                  xsec = 0.2043; //TWiki table (NLO)
         if(file.Contains("ttWJets_TuneCP5"))                            xsec = 0.4611; //XSDB
         if(file.Contains("ttWJetsToLNu"))                               xsec = 0.2149; //XSDB
+        if(file.Contains("EWKZ2Jets"))                                  xsec = 6.215; // XSDB
 
         //https://twiki.cern.ch/twiki/bin/viewauth/CMS/SummaryTable1G25ns#Diboson
         if(file.Contains("WWTo2L2Nu_13TeV-powheg"))    xsec = 12.178; //NNLO
         if(file.Contains("WWToLNuQQ_13TeV-powheg"))    xsec = 49.997; //NNLO; RA2b tuples use WWTo1L1Nu2Q
         if(file.Contains("ttHTobb_M125")) xsec = 0.2934;
 
+        if(file.Contains("WW_Tune"))                xsec = 75.95;    // from XSDB
+        if(file.Contains("WZ_Tune"))                xsec = 27.59;    // from XSDB
         if(file.Contains("WZTo1L3Nu"))              xsec = 3.054; // from XSDB(LO); 3.05 in Humboldtv3+earlier
         if(file.Contains("WZTo1L1Nu2Q"))            xsec = 10.73; // from XSDB(LO); 10.96 in Humbdoltv3+earlier
         if(file.Contains("WZTo2L2Q"))               xsec = 5.595;
         if(file.Contains("WZTo3LNu_TuneCUETP8M1"))  xsec = 4.42965;
         if(file.Contains("VVTo2L2Nu"))              xsec = 11.95;
         if(file.Contains("ZZ_TuneCUETP8M1"))        xsec = 16.523;
-        if(file.Contains("ZZ_TuneCP5"))             xsec = 16.91;
+        if(file.Contains("ZZ_TuneCP5") && !file.Contains("ZZZ") && !file.Contains("WZZ"))             xsec = 12.17;//Explicitly not the WZZ and ZZZ. Before it was based on order.
+
 
         // Calculated at 13 TeV in
         // https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt1314TeV
@@ -163,7 +167,8 @@ namespace xsec{
         }
 
         // from cross XSDB
-        if(file.Contains("TTG")) xsec = 3.697; //from twiki summary table; 4.078 in Humboldtv3+earlier
+        //if(file.Contains("TTG")) xsec = 3.697; //from twiki summary table; 4.078 in Humboldtv3+earlier
+        if(file.Contains("TTG")) xsec = 3.774; //XSDB new
         if(file.Contains("TTTT_Tune")) xsec = 0.008213; //XSDB/GenXSecAnalyzer
 
         // From https://cms-pdmv.cern.ch/mcm
@@ -305,7 +310,10 @@ namespace xsec{
         if(file.Contains("TTWJetsToLNu"))                   xsec = 0.2149; //XSDB
         if(file.Contains("ttWJets_TuneCP5"))                xsec = 0.4611; //XSDB
         if(file.Contains("ttWJetsToLNu"))                   xsec = 0.2149; //XSDB
+        if(file.Contains("EWKZ2Jets"))                      xsec = 6.214; // XSDB
 
+        if(file.Contains("WW_Tune"))                    xsec = 76.25;    // from XSDB
+        if(file.Contains("WZ_Tune"))                    xsec = 27.55;    // from XSDB
         // https://twiki.cern.ch/twiki/bin/viewauth/CMS/SummaryTable1G25ns#Diboson
         if(file.Contains("WWTo2L2Nu_NNPDF31_TuneCP5"))   xsec = 12.178; //NNLO
         if(file.Contains("WWToLNuQQ_NNPDF31_TuneCP5"))   xsec = 49.997; //NNLO RA2b uses WWTo1L1Nu2Q
@@ -322,7 +330,8 @@ namespace xsec{
         if(file.Contains("WZTo2L2Q"))   xsec = 5.606;
         if(file.Contains("WZTo3LNu_TuneCP5"))   xsec = 4.42965;
         if(file.Contains("VVTo2L2Nu"))   xsec = 11.95;
-        if(file.Contains("ZZ_TuneCP5"))   xsec = 16.91; // https://arxiv.org/pdf/1405.2219.pdf
+        if(file.Contains("ZZ_TuneCP5") && !file.Contains("ZZZ") && !file.Contains("WZZ"))             xsec = 12.23;//Explicitly not the WZZ and ZZZ. Before it was based on order.
+
 
         // Calculated at 13 TeV in
         // https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt1314TeV
@@ -346,7 +355,6 @@ namespace xsec{
 
     // Zgamma cross sections at 13 TeV
     // https://twiki.cern.ch/twiki/bin/viewauth/CMS/SummaryTable1G25ns
-    if(file.Contains("EWKZ2Jets"))                    xsec = 6.215; // from XSDB
     if(file.Contains("ZGamma2JToGamma2L2J_EWK"))      xsec = 0.1145; // from XSDB
     //NOT FOUND ON XSDB if(file.Contains("ZG2JtoG2L2J_EWK_MLL-50_MJJ-120_TuneCP5_withDipoleRecoil_13p6TeV"))      xsec = ; // from XSDB
 
@@ -359,14 +367,12 @@ namespace xsec{
 
 
     if(file.Contains("TTJets_Tune") && file.Contains("madgraphMLM"))  xsec = 833.9;
-    if(file.Contains("TGJets") && !file.Contains("TTGJets")) xsec = 2.967;
+    if(file.Contains("TGJets") && !file.Contains("TTGJets")) xsec = 2.997;
     if(file.Contains("ST_s-channel_4f_leptonDecays_TuneCP5_13TeV")) xsec = 3.549; // from XSDB
     if(file.Contains("ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV")) xsec = 32.51; // from XSDB
     if(file.Contains("ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV")) xsec = 32.45; // from XSDB
 
     if(file.Contains("LLAJJ"))                      xsec = 0.1084;  // from XSDB
-    if(file.Contains("WZ_Tune"))                    xsec = 27.6;    // from XSDB
-    if(file.Contains("WW_Tune"))                    xsec = 75.8;    // from XSDB
     if(file.Contains("WWG_Tune"))                   xsec = 0.2147;  // from XSDB Note: One W forced to l nu. Also possible bug for lvlv
     if(file.Contains("WZG_Tune"))                   xsec = 0.04345; // from XSDB Note: W forced to l nu
     if(file.Contains("ZZGTo4L_Tune"))               xsec = 0.02202; // from XSDB
@@ -435,19 +441,34 @@ namespace xsec{
 
 
     // Zgamma signal
-    if(file.Contains("GluGluHToZG"))          xsec = HToZG * ZToLL * 48.58 ;
-    if(file.Contains("VBFHToZG"))             xsec = HToZG * ZToLL * 3.782 ;
-    if(file.Contains("WplusH_HToZG"))         xsec = HToZG * 0.831 ; // WplusH, WminusH, ZH, ttH samples do not require decay of Z to leptons
-    if(file.Contains("WminusH_HToZG"))        xsec = HToZG * 0.527 ; // New samples are requested with this decay incorporated
-    if(file.Contains("ZH_HToZG"))             xsec = HToZG * 0.8839; // Add ZToLL when updated samples are available
-    if(file.Contains("ZH_ZToAll_HToZG"))      xsec = HToZG * 0.8839;
-    if(file.Contains("ttHToZG"))              xsec = HToZG * 0.5071;
+    if(!(year == 2022 || year == 2023)){
+        if(file.Contains("GluGluHToZG"))          xsec = HToZG * ZToLL * 48.58 ;
+        if(file.Contains("VBFHToZG"))             xsec = HToZG * ZToLL * 3.782 ;
+        if(file.Contains("WplusH_HToZG"))         xsec = HToZG * 0.8400 ; // CERNYellowReportPageAt13TeV mH=125. WplusH, WminusH, ZH, ttH samples do not require decay of Z to leptons
+        if(file.Contains("WminusH_HToZG"))        xsec = HToZG * 0.5328 ; // CERNYellowReportPageAt13TeV mH=125. New samples are requested with this decay incorporated
+        if(file.Contains("ZH_HToZG"))             xsec = HToZG * 0.8839; // Add ZToLL when updated samples are available
+        if(file.Contains("ZH_ZToAll_HToZG"))      xsec = HToZG * 0.8839;
+        if(file.Contains("ttHToZG"))              xsec = HToZG * 0.5071;
 
-    if(file.Contains("WplusH_HToZG_WToAll_ZToLL"))  xsec = HToZG * 0.831 * ZToLL ;
-    if(file.Contains("WminusH_HToZG_WToAll_ZToLL")) xsec = HToZG * 0.527 * ZToLL ;
-    if(file.Contains("ZH_HToZG_ZToAll_ZToLL"))      xsec = HToZG * 0.8839 * ZToLL * ZToQQ;
-    if(file.Contains("ttHToZG_ZToLL"))              xsec = HToZG * 0.5071 * ZToLL ;
+        if(file.Contains("WplusH_HToZG_WToAll_ZToLL"))  xsec = HToZG * 0.8400 * ZToLL ; //Currently H to ZZ, do not use 2024-03-07
+        if(file.Contains("WminusH_HToZG_WToAll_ZToLL")) xsec = HToZG * 0.5328 * ZToLL ; //Currently H to ZZ, do not use 2024-03-07
+        if(file.Contains("ZH_HToZG_ZToAll_ZToLL"))      xsec = HToZG * 0.8839 * ZToLL * ZToQQ;
+        if(file.Contains("ttHToZG_ZToLL"))              xsec = HToZG * 0.5071 * ZToLL ;
+    } else {
+        if(file.Contains("GluGluHToZG"))          xsec = HToZG * ZToLL * 52.23 ;
+        if(file.Contains("VBFHToZG"))             xsec = HToZG * ZToLL * 4.078 ;
+        if(file.Contains("WplusH_HToZG"))         xsec = HToZG * 0.8889 ; // CERNYellowReportPageAt13TeV mH=125. WplusH, WminusH, ZH, ttH samples do not require decay of Z to leptons
+        if(file.Contains("WminusH_HToZG"))        xsec = HToZG * 0.5677 ; // CERNYellowReportPageAt13TeV mH=125. New samples are requested with this decay incorporated
+        if(file.Contains("ZH_HToZG"))             xsec = HToZG * 0.9439; // Add ZToLL when updated samples are available
+        if(file.Contains("ZH_ZToAll_HToZG"))      xsec = HToZG * 0.9439; //Are these two identical?
+        if(file.Contains("ttHToZG"))              xsec = HToZG * 0.5700;
 
+        if(file.Contains("WplusH_HToZG_WToAll_ZToLL"))  xsec = HToZG * 0.8400 * ZToLL ; //Currently H to ZZ, do not use 2024-03-07
+        if(file.Contains("WminusH_HToZG_WToAll_ZToLL")) xsec = HToZG * 0.5677 * ZToLL ; //Currently H to ZZ, do not use 2024-03-07
+        if(file.Contains("ZH_HToZG_ZToAll_ZToLL"))      xsec = HToZG * 0.9439 * ZToLL * ZToQQ;
+        if(file.Contains("ttHToZG_ZToLL"))              xsec = HToZG * 0.5700 * ZToLL ;
+
+    }
 
     double H120ToZG = 0.00110; double H130ToZG = 0.001941;
     if(file.Contains("GluGluHToZG_ZToLL_M-120"))    xsec = H120ToZG * ZToLL * 52.22;

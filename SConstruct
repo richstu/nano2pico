@@ -30,7 +30,7 @@ def addRootEnv(_env):
   _env.Append (CCFLAGS = '`root-config --cflags`' )
   _env.Append (LINKFLAGS = '`root-config --glibs`') 
   _env.Append (LINKFLAGS = '`root-config --ldflags`')
-  _env.Append (LINKFLAGS = ['-lRooFit', '-lGenVector', '-lRooStats'])
+  _env.Append (LINKFLAGS = ['-lRooFit', '-lGenVector', '-lRooStats', '-lRooFitCore'])
 
 def addWarningEnv(_env):
   _env.Append (CCFLAGS = ['-pedantic', 
