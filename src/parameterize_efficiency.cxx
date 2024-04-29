@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
         if(entry % (num_entries/100) == 0) 
             UpdateProgressBar(float(entry)/num_entries);
         for(int ijet = 0; ijet < nJet; ijet++) {
-            if (Jet_nElectrons[ijet] != 0 || Jet_nMuons[ijet] != 0 || Jet_pt[ijet] < 30 || abs(Jet_eta[ijet]) > 2.4) 
+            if (Jet_nElectrons[ijet] != 0 || Jet_nMuons[ijet] != 0 || Jet_pt[ijet] < 30.0f || abs(Jet_eta[ijet]) > 2.4f) 
               continue;
             flavor = abs(Jet_hadronFlavour[ijet]);
             pt = Jet_pt[ijet];

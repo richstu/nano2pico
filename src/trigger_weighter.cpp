@@ -121,7 +121,7 @@ std::vector<float> TriggerWeighter::GetSF(std::vector<float> electron_pt,
     pass_dimu, false);
 
   //calculate SFs
-  if (mc_prob[0] < 0.001) mc_prob[0] = 0.0;
+  if (mc_prob[0] < 0.001f) mc_prob[0] = 0.0;
   float sf = 1.0;
   float unc = 0.0;
   propagate_uncertainty_ratio(data_prob[0], data_prob[1], mc_prob[0], mc_prob[1], sf, unc);
@@ -129,9 +129,9 @@ std::vector<float> TriggerWeighter::GetSF(std::vector<float> electron_pt,
   float sf_dn = fmax(sf-unc,0);
 
   ////deal with signal leptons with low probabilities
-  //if (mc_prob[0]<0.001 || data_prob[0]<0.001) sf = 1.0;
-  //if (mc_prob[1]<0.001 || data_prob[1]<0.001) sf_up = 1.0;
-  //if (mc_prob[2]<0.001 || data_prob[2]<0.001) sf_dn = 1.0;
+  //if (mc_prob[0]<0.001f || data_prob[0]<0.001f) sf = 1.0;
+  //if (mc_prob[1]<0.001f || data_prob[1]<0.001f) sf_up = 1.0;
+  //if (mc_prob[2]<0.001f || data_prob[2]<0.001f) sf_dn = 1.0;
 
   return {sf, sf_up, sf_dn};
 }

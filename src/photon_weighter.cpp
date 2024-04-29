@@ -103,11 +103,11 @@ void PhotonWeighter::FullSim(pico_tree &pico, float &w_photon, vector<float> &sy
 
 // Returns 1.5(EB high R9), 2.5(EB low R9), 4.5(EE high R9), 5.5(EE low R9)
 float PhotonWeighter::GetRegion(float const & eta, float const & r9) {
-  if (fabs(eta) < 1.4442) { //EB
-    if (fabs(r9) > 0.94) return 1.5;
+  if (fabs(eta) < 1.4442f) { //EB
+    if (fabs(r9) > 0.94f) return 1.5;
     else return 2.5;
-  } else if (fabs(eta) < 2.5) {
-    if (fabs(r9) > 0.94) return 4.5;
+  } else if (fabs(eta) < 2.5f) {
+    if (fabs(r9) > 0.94f) return 4.5;
     else return 5.5;
   } else return -0.5;
 }

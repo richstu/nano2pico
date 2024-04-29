@@ -21,6 +21,11 @@ public:
   const float ElectronMiniIsoCut = 0.1;
   const float ElectronRelIsoCut = 0.35;
 
+  const float dxyCut = 0.5;
+  const float dzCut = 1.0;
+  const float jetDRCut = 0.4;
+  const float jetpTCut = 1.0;
+
   std::vector<int> WriteElectrons(nano_tree &nano, pico_tree &pico, 
                                   std::vector<int> &jet_islep_nano_idx, 
                                   std::vector<int> &jet_isvlep_nano_idx, 

@@ -68,27 +68,27 @@ bool IsoTrackProducer::IsGoodTk(pico_tree &pico, bool isNanoElectron, bool isNan
   if (pdgid!=11 && pdgid!=13 && pdgid!=211) return false; 
   
   if (pdgid==11 || pdgid==13) {
-    if (pt < 5) {
+    if (pt < 5.0f) {
       return false;
-    } else if (pt < 25) { // fail both relative and absolute isolation! (N.B. in this pT range, absolute is always looser...)
-      if (reliso_chg >= 0.2 && reliso_chg*pt >= 5) return false; 
+    } else if (pt < 25.0f) { // fail both relative and absolute isolation! (N.B. in this pT range, absolute is always looser...)
+      if (reliso_chg >= 0.2f && reliso_chg*pt >= 5.0f) return false; 
     } else {
-      if (reliso_chg >= 0.2) return false;
+      if (reliso_chg >= 0.2f) return false;
     }
   } else {
-    if (pt < 10) {
+    if (pt < 10.0f) {
       return false;
-    } else if (pt < 25) {
-      if (reliso_chg >= 0.1 && reliso_chg*pt >= 5) return false;
+    } else if (pt < 25.0f) {
+      if (reliso_chg >= 0.1f && reliso_chg*pt >= 5.0f) return false;
     } else {
-      if (reliso_chg >= 0.1) return false;
+      if (reliso_chg >= 0.1f) return false;
     }
   }
 
-  if (fabs(eta) > 2.5) return false; // not applied to all tracks in Nano
-  if (fabs(dxy)  > 0.2) return false; //applied to tracks but not leptons in Nano
-  if (fabs(dz)  > 0.1) return false; //applied to tracks but not leptons in Nano
-  if (mt > 100) return false; // we should revisit whether this is useful
+  if (fabs(eta) > 2.5f) return false; // not applied to all tracks in Nano
+  if (fabs(dxy)  > 0.2f) return false; //applied to tracks but not leptons in Nano
+  if (fabs(dz)  > 0.1f) return false; //applied to tracks but not leptons in Nano
+  if (mt > 100.0f) return false; // we should revisit whether this is useful
 
   pico.out_tk_pdgid().push_back(pdgid);
   pico.out_tk_pt().push_back(pt);

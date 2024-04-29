@@ -56,8 +56,8 @@ bool ElectronProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma) {
   if (isZgamma) {
     if (pt <= ZgElectronPtCut) return false;
     if (fabs(etasc) > ElectronEtaCut) return false;
-    if (fabs(dz) > 1.0) return false;
-    if (fabs(dxy) > 0.5) return false; 
+    if (fabs(dz) > dzCut) return false;
+    if (fabs(dxy) > dxyCut) return false; 
     switch(year) {
       case 2016:
       case 2017:
@@ -77,8 +77,8 @@ bool ElectronProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma) {
     if (pt <= SignalElectronPtCut) return false;
     if (fabs(eta) > ElectronEtaCut) return false;
     if (!idElectron_noIso(bitmap, 1)) return false;
-    if ((isBarrel && fabs(dz)>0.10) || (!isBarrel && fabs(dz)>0.20)) return false;
-    if ((isBarrel && fabs(dxy)>0.05) || (!isBarrel && fabs(dxy)>0.10)) return false; 
+    if ((isBarrel && fabs(dz)>0.10f) || (!isBarrel && fabs(dz)>0.20f)) return false;
+    if ((isBarrel && fabs(dxy)>0.05f) || (!isBarrel && fabs(dxy)>0.10f)) return false; 
     return (id && miniiso < ElectronMiniIsoCut);
   }
   return false;
@@ -131,8 +131,8 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
     if(isZgamma) { // For Zgamma productions
       if (pt <= ZgElectronPtCut) continue;
       if (fabs(etasc) > ElectronEtaCut) continue;
-      if (fabs(dz) > 1.0)  continue;
-      if (fabs(dxy) > 0.5) continue; 
+      if (fabs(dz) > dzCut)  continue;
+      if (fabs(dxy) > dxyCut) continue; 
       isSignal = IsSignal(nano, iel, isZgamma);
       float scale_syst_up = 1.0;
       float scale_syst_dn = 1.0;
@@ -185,9 +185,9 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
       if (fabs(eta) > ElectronEtaCut) continue;
       int bitmap = nano.Electron_vidNestedWPBitmap()[iel];
       if (!idElectron_noIso(bitmap, 1)) continue;
-      bool isBarrel = fabs(eta) <= 1.479;
-      if ((isBarrel && fabs(dz)>0.10) || (!isBarrel && fabs(dz)>0.20)) continue;
-      if ((isBarrel && fabs(dxy)>0.05) || (!isBarrel && fabs(dxy)>0.10)) continue; 
+      bool isBarrel = fabs(eta) <= 1.479f;
+      if ((isBarrel && fabs(dz)>0.10f) || (!isBarrel && fabs(dz)>0.20f)) continue;
+      if ((isBarrel && fabs(dxy)>0.05f) || (!isBarrel && fabs(dxy)>0.10f)) continue; 
       isSignal = IsSignal(nano, iel, isZgamma);
       id = idElectron_noIso(bitmap,3);
     }
@@ -215,8 +215,8 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
       pico.out_nvlep()++;
       // save indices of matching jets
       for (int ijet(0); ijet<nano.nJet(); ijet++) {
-        if (dR(eta, nano.Jet_eta()[ijet], phi, nano.Jet_phi()[ijet])<0.4 &&
-            fabs(Jet_pt[ijet] - nano.Electron_pt()[iel])/nano.Electron_pt()[iel] < 1)
+        if (dR(eta, nano.Jet_eta()[ijet], phi, nano.Jet_phi()[ijet])<0.4f &&
+            fabs(Jet_pt[ijet] - nano.Electron_pt()[iel])/nano.Electron_pt()[iel] < 1.0f)
           jet_isvlep_nano_idx.push_back(ijet);
       }
     }
@@ -233,8 +233,8 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
       sig_el_pico_idx.push_back(pico_idx);
       // save indices of matching jets
       for (int ijet(0); ijet<nano.nJet(); ijet++) {
-        if (dR(eta, nano.Jet_eta()[ijet], phi, nano.Jet_phi()[ijet])<0.4 &&
-            fabs(Jet_pt[ijet] - nano.Electron_pt()[iel])/nano.Electron_pt()[iel] < 1)
+        if (dR(eta, nano.Jet_eta()[ijet], phi, nano.Jet_phi()[ijet])<jetDRCut &&
+            fabs(Jet_pt[ijet] - nano.Electron_pt()[iel])/nano.Electron_pt()[iel] < jetpTCut)
           jet_islep_nano_idx.push_back(ijet);
       }
     }

@@ -133,7 +133,7 @@ void JetMetProducer::GetJetUncertainties(nano_tree &nano, pico_tree &pico,
       float jet_raw_pt = jet_type_pt[ijet]/jec;
       float jet_raw_pt_nomu = jet_raw_pt*(1.0-jet_type_muonfactor[ijet]);
       float jet_l1l2l3_pt_nomu = jet_raw_pt_nomu*jec;
-      if (jet_type == 1 && jet_l1l2l3_pt_nomu < 15) continue;
+      if (jet_type == 1 && jet_l1l2l3_pt_nomu < 15.0f) continue;
 
       //calculate JER (smearing) factors
       //https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution#Smearing_procedures
@@ -148,7 +148,7 @@ void JetMetProducer::GetJetUncertainties(nano_tree &nano, pico_tree &pico,
       for (int igen(0); igen<nano.nGenJet(); ++igen) {
         float dr = dR(jet_type_eta[ijet], nano.GenJet_eta()[igen], jet_type_phi[ijet], nano.GenJet_phi()[ijet]);
         float dpt = jet_type_pt[ijet]-nano.GenJet_pt()[igen];
-        if (dr < 0.2 && fabs(dpt) < 3.0*sigmajer*jet_type_pt[ijet]) {
+        if (dr < 0.2f && fabs(dpt) < 3.0f*sigmajer*jet_type_pt[ijet]) {
           found_genjet = true;
           indiv_jer_nm = (1.0+(sjer_nom-1.0)*dpt/jet_type_pt[ijet]);
           indiv_jer_up = (1.0+(sjer_up-1.0)*dpt/jet_type_pt[ijet]);
@@ -187,7 +187,7 @@ void JetMetProducer::GetJetUncertainties(nano_tree &nano, pico_tree &pico,
       float jet_sinphi = sin(jet_type_phi[ijet]);
       //starting from T1 corrected MET in contrast with NanoAOD-tools
       //i.e. L2L3-L1 already done, just need to worry about variations
-      if (jet_l1l2l3_pt_nomu > 15 && fabs(jet_type_eta[ijet])<5.2 && emef < 0.9) {
+      if (jet_l1l2l3_pt_nomu > 15.0f && fabs(jet_type_eta[ijet])<5.2f && emef < 0.9f) {
         met_x_nom -= jet_cosphi*(jet_type_pt[ijet]*indiv_jer_nm-jet_type_pt[ijet]);
         met_y_nom -= jet_sinphi*(jet_type_pt[ijet]*indiv_jer_nm-jet_type_pt[ijet]);
         met_x_jerup -= jet_cosphi*(jet_type_pt[ijet]*indiv_jer_up-jet_type_pt[ijet]);
@@ -245,7 +245,7 @@ void JetMetProducer::WriteMet(nano_tree &nano, pico_tree &pico) {
   for (int iel = 0; iel < pico.out_nel(); iel++) {
     if (pico.out_el_sig()[iel]) {
       float unc_factor = 0.006; //EB
-      if (fabs(pico.out_el_eta()[iel])>1.5051) unc_factor = 0.015; //EE
+      if (fabs(pico.out_el_eta()[iel])>1.5051f) unc_factor = 0.015; //EE
       met_x_leptonphotonup += 
           unc_factor*cos(pico.out_el_phi()[iel])*pico.out_el_pt()[iel];
       met_y_leptonphotonup += 
@@ -259,7 +259,7 @@ void JetMetProducer::WriteMet(nano_tree &nano, pico_tree &pico) {
   for (int iph = 0; iph < pico.out_nphoton(); iph++) {
     if (pico.out_photon_sig()[iph]) {
       float unc_factor = 0.006; //EB
-      if (fabs(pico.out_photon_eta()[iph])>1.5051) unc_factor = 0.015; //EE
+      if (fabs(pico.out_photon_eta()[iph])>1.5051f) unc_factor = 0.015; //EE
       met_x_leptonphotonup += 
           unc_factor*cos(pico.out_photon_phi()[iph])*pico.out_photon_pt()[iph];
       met_y_leptonphotonup += 
@@ -405,16 +405,16 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
 
     float veto = 0; 
     float vetoEE = 0;
-    double phicorr;
-    if(nano.Jet_phi().at(ijet)>3.1415926){ //a dumb addition because sometimes jet phi is slightly larger than pi
+    float phicorr;
+    if(nano.Jet_phi().at(ijet)>3.1415926f){ //a dumb addition because sometimes jet phi is slightly larger than pi
       phicorr = 3.1415926;
-    } else if (nano.Jet_phi().at(ijet)<-3.1415926){
+    } else if (nano.Jet_phi().at(ijet)<-3.1415926f){
       phicorr = -3.1415926;
     } else {
       phicorr = nano.Jet_phi().at(ijet);
     }
 
-    if (fabs(nano.Jet_eta()[ijet])<5.191) {
+    if (fabs(nano.Jet_eta()[ijet])<5.191f) {
       if (year==2022 && is2022preEE==true){
         map_jetveto_ = cs_jetveto_->at("Winter22Run3_RunCD_V1");
         veto = map_jetveto_->evaluate({"jetvetomap", nano.Jet_eta().at(ijet),phicorr});
@@ -447,7 +447,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
                           nano.Jet_phi()[ijet], nano.Jet_mass_jerUp()[ijet]);
           sys_higvars[0].jet_lv.push_back(lv);
         }
-        if (fabs(nano.Jet_eta()[ijet]) < 2.4)
+        if (fabs(nano.Jet_eta()[ijet]) < 2.4f)
           sys_jet_met_dphi.at(0).push_back(DeltaPhi(nano.Jet_phi()[ijet], pico.out_sys_met_phi()[0]));
       }
       if (nano.Jet_pt_jerDown()[ijet] > min_jet_pt) {
@@ -479,7 +479,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
                           nano.Jet_phi()[ijet], nano.Jet_mass_jesTotalUp()[ijet]);
           sys_higvars[2].jet_lv.push_back(lv);
         }
-        if (fabs(nano.Jet_eta()[ijet]) < 2.4)
+        if (fabs(nano.Jet_eta()[ijet]) < 2.4f)
           sys_jet_met_dphi.at(2).push_back(DeltaPhi(nano.Jet_phi()[ijet], pico.out_sys_met_phi()[2]));
       }
       if (nano.Jet_pt_jesTotalDown()[ijet] > min_jet_pt) {
@@ -495,7 +495,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
                           nano.Jet_phi()[ijet], nano.Jet_mass_jesTotalDown()[ijet]);
           sys_higvars[3].jet_lv.push_back(lv);
         }
-        if (fabs(nano.Jet_eta()[ijet]) < 2.4)
+        if (fabs(nano.Jet_eta()[ijet]) < 2.4f)
           sys_jet_met_dphi.at(3).push_back(DeltaPhi(nano.Jet_phi()[ijet], pico.out_sys_met_phi()[3]));
       }
     }
@@ -712,7 +712,7 @@ void JetMetProducer::WriteFatJets(nano_tree &nano, pico_tree &pico){
     pico.out_fjet_subjet_idx2().push_back(FatJet_subJetIdx2[ifjet]);
 
     for(unsigned ijet(0); ijet<pico.out_jet_pt().size(); ++ijet){
-      if (dR(pico.out_jet_eta()[ijet], nano.FatJet_eta()[ifjet], pico.out_jet_phi()[ijet], nano.FatJet_phi()[ifjet])<0.8)
+      if (dR(pico.out_jet_eta()[ijet], nano.FatJet_eta()[ifjet], pico.out_jet_phi()[ijet], nano.FatJet_phi()[ifjet])<0.8f)
         pico.out_jet_fjet_idx()[ijet] = ifjet;
     }
 
@@ -744,7 +744,7 @@ void JetMetProducer::WriteSubJets(nano_tree &nano, pico_tree &pico){
       float idr = dR(pico.out_jet_eta()[ijet], nano.SubJet_eta()[isubj], pico.out_jet_phi()[ijet], nano.SubJet_phi()[isubj]);
       if (idr<mindr){
         mindr = idr;
-        if (mindr<0.4 && matched_ak4_jets.find(ijet)==matched_ak4_jets.end()) {
+        if (mindr<0.4f && matched_ak4_jets.find(ijet)==matched_ak4_jets.end()) {
           closest_jet = ijet;
           matched_ak4_jets.insert(ijet);
           break; 
