@@ -58,7 +58,12 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
   getPhoton_jetIdx(nano, nanoaod_version, Photon_jetIdx);
   vector<int> Photon_cutBased;
   getPhoton_cutBased(nano, nanoaod_version, Photon_cutBased);
- 
+
+  int hig019014_photon_idx = -1;
+  //Set a default value 
+  pico.out_photon_idx_hig019014() = -1;
+
+
   for(int iph(0); iph<nano.nPhoton(); ++iph){
     float pt = nano.Photon_pt()[iph];
     float eta = nano.Photon_eta()[iph];
@@ -89,6 +94,14 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
                     eVeto && minLepDR > 0.3f && 
                     pt > SignalPhotonPtCut &&
                     (photon_el_pico_idx[iph]==-1 || !(pico.out_el_sig()[photon_el_pico_idx[iph]])));
+
+    bool isSignalhig019014 = (((nano.Photon_isScEtaEB()[iph] && mva > -0.4f) || (nano.Photon_isScEtaEE()[iph] && mva > -0.58f)) &&
+                             eVeto && minLepDR > 0.4f && pt > SignalPhotonPtCut);
+
+    if(hig019014_photon_idx==-1 && isSignalhig019014){
+      pico.out_photon_idx_hig019014() = iph;
+      hig019014_photon_idx = iph;
+    }
 
     // Photons passing the object selections are placed at the front
     if(isSignal) {
