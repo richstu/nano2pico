@@ -320,6 +320,7 @@ float ll_refit_minnll
 
 ##################   Photons   ###################
 int nphoton
+int photon_idx_hig019014
 vector<float> photon_pt
 vector<float> photon_eta
 vector<float> photon_phi
