@@ -199,6 +199,26 @@ void SplitFilePath(const string &path, string &dir_name, string &base_name){
   base_name = basename(&cstr.at(0));
 }
 
+//simple propagation of Gaussian uncertainties based on linear Taylor expansion
+void propagate_uncertainty_product(float a, float a_unc, float b, float b_unc, float& prod, float& prod_unc) {
+  prod = a*b;
+  prod_unc = hypotf(a_unc*b,b_unc*a);
+}
+
+//simple propagation of Gaussian uncertainties based on linear Taylor expansion
+void propagate_uncertainty_ratio(float num, float num_unc, float den, float den_unc, float& ratio, float& ratio_unc) {
+  ratio = 1.0;
+  ratio_unc = 1.0;
+  if (den != 0.0) {
+    ratio = num/den;
+    ratio_unc = hypotf(num_unc/den, den_unc*num/den/den);
+  }
+  //else if (den_unc != 0.0) {
+  //  ratio = num/(den_unc/2.0);
+  //  ratio_unc = fabs(ratio-num/den_unc);
+  //}
+}
+
 void getMETWithJEC(nano_tree & nano, int year, bool isFastsim, float & MET_pt, float & MET_phi, bool is_preUL) {
   if (isFastsim) { 
     if (year==2017 && is_preUL) {

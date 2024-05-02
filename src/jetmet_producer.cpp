@@ -133,7 +133,7 @@ void JetMetProducer::GetJetUncertainties(nano_tree &nano, pico_tree &pico,
       float jet_raw_pt = jet_type_pt[ijet]/jec;
       float jet_raw_pt_nomu = jet_raw_pt*(1.0-jet_type_muonfactor[ijet]);
       float jet_l1l2l3_pt_nomu = jet_raw_pt_nomu*jec;
-      if (jet_type == 1 && jet_l1l2l3_pt_nomu < 15f) continue;
+      if (jet_type == 1 && jet_l1l2l3_pt_nomu < 15.0f) continue;
 
       //calculate JER (smearing) factors
       //https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution#Smearing_procedures
@@ -187,7 +187,7 @@ void JetMetProducer::GetJetUncertainties(nano_tree &nano, pico_tree &pico,
       float jet_sinphi = sin(jet_type_phi[ijet]);
       //starting from T1 corrected MET in contrast with NanoAOD-tools
       //i.e. L2L3-L1 already done, just need to worry about variations
-      if (jet_l1l2l3_pt_nomu > 15f && fabs(jet_type_eta[ijet])<5.2f && emef < 0.9f) {
+      if (jet_l1l2l3_pt_nomu > 15.0f && fabs(jet_type_eta[ijet])<5.2f && emef < 0.9f) {
         met_x_nom -= jet_cosphi*(jet_type_pt[ijet]*indiv_jer_nm-jet_type_pt[ijet]);
         met_y_nom -= jet_sinphi*(jet_type_pt[ijet]*indiv_jer_nm-jet_type_pt[ijet]);
         met_x_jerup -= jet_cosphi*(jet_type_pt[ijet]*indiv_jer_up-jet_type_pt[ijet]);
@@ -220,6 +220,8 @@ void JetMetProducer::GetJetUncertainties(nano_tree &nano, pico_tree &pico,
 //writes other MET variables and non-jet MET uncertainties
 void JetMetProducer::WriteMet(nano_tree &nano, pico_tree &pico) {
   pico.out_met_calo()    = nano.CaloMET_pt();
+  pico.out_met_tk()      = nano.TkMET_pt();
+  pico.out_met_tk_phi()  = nano.TkMET_phi();
   pico.out_met_tru()     = nano.GenMET_pt();
   pico.out_met_tru_phi() = nano.GenMET_phi();
   pico.out_ht_isr_me()   = nano.LHE_HTIncoming();

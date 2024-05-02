@@ -27,6 +27,8 @@ float met_phi
 float met_calo
 float met_tru
 float met_tru_phi
+float met_tk
+float met_tk_phi
 float mt
 float mt_tru
 float ht_isr_me
@@ -342,6 +344,7 @@ vector<float> photon_hoe
 vector<float> photon_esoversc
 vector<float> photon_essigmarr
 vector<float> photon_idmva
+vector<float> photon_pudisc
 vector<int>   photon_pflavor
 vector<bool>  photon_id
 vector<bool>  photon_id80
@@ -492,8 +495,8 @@ bool HLT_Ele25_WPTight_Gsf
 bool HLT_Ele27_WPTight_Gsf
 bool HLT_Ele28_WPTight_Gsf
 bool HLT_Ele30_WPTight_Gsf
-bool HLT_Ele32_WPTight_Gsf_Emu
 bool HLT_Ele32_WPTight_Gsf_L1DoubleEG
+bool HLT_Ele32_WPTight_Gsf_Emu
 bool HLT_Ele32_WPTight_Gsf
 bool HLT_Ele35_WPTight_Gsf
 bool HLT_Ele20_WPLoose_Gsf

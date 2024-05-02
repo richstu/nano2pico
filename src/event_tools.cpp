@@ -118,7 +118,7 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
         float ph_pt = nano.GenPart_pt().at(mc_idx);
         float ph_eta = nano.GenPart_eta().at(mc_idx);
         float ph_phi = nano.GenPart_phi().at(mc_idx);
-        if (ph_pt > 13.f && fabs(ph_eta)<3.0.f && (nano.GenPart_statusFlags().at(mc_idx) & 0x1) == 1) {
+        if (ph_pt > 13.f && fabs(ph_eta)<3.0f && (nano.GenPart_statusFlags().at(mc_idx) & 0x1) == 1) {
           //check if another genparticle nearby
           bool deltar_fail = false;
           for (unsigned int mc_idx_2 = 0; mc_idx_2 < nano.GenPart_pdgId().size(); mc_idx_2++) {
@@ -284,10 +284,10 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
   }
   //Note: removed overlap removal for WW and WWG since WWG sample may have bug
 
-  if(isDYJets_LO  && nano.LHE_HT()>70f) 
+  if(isDYJets_LO  && nano.LHE_HT()>70.0f) 
     pico.out_stitch_htmet() = pico.out_stitch_ht() = pico.out_stitch() = false;
   
-  if(isWJets_LO  && nano.LHE_HT()>70f) 
+  if(isWJets_LO  && nano.LHE_HT()>70.0f) 
     pico.out_stitch_htmet() = pico.out_stitch_ht() = pico.out_stitch() = false;
   return;
 }
@@ -308,7 +308,7 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
     // Fastsim: veto if certain central jets have no matching GenJet as per SUSY recommendation:
     // https://twiki.cern.ch/twiki/bin/view/CMS/SUSRecommendations18#Cleaning_up_of_fastsim_jets_from
     for(int ijet(0); ijet<nano.nJet(); ++ijet){
-      if(Jet_pt[ijet] > 20f && fabs(nano.Jet_eta()[ijet])<=2.5f && nano.Jet_chHEF()[ijet] < 0.1f) {
+      if(Jet_pt[ijet] > 20.0f && fabs(nano.Jet_eta()[ijet])<=2.5f && nano.Jet_chHEF()[ijet] < 0.1f) {
         bool found_match = false;
         for(int igenjet(0); igenjet<nano.nGenJet(); ++igenjet){
           if (dR(nano.Jet_eta()[ijet], nano.GenJet_eta()[igenjet], nano.Jet_phi()[ijet], nano.GenJet_phi()[igenjet])<=0.3f) {
@@ -367,7 +367,7 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
       if (isFastsim) jet_pt = nano.Jet_pt_nom()[ijet];
       if (jet_pt>30 && fabs(nano.Jet_eta()[ijet])>2.4f && fabs(nano.Jet_eta()[ijet])<5.0f) {
         dphi = DeltaPhi(nano.Jet_phi()[ijet], pico.out_met_phi());
-        if (nano.Jet_pt()[ijet]>250f && (dphi > 2.6f || dphi < 0.1f)) goodjet[counter] = false;
+        if (nano.Jet_pt()[ijet]>250.0f && (dphi > 2.6f || dphi < 0.1f)) goodjet[counter] = false;
         ++counter;
       }
     }
@@ -488,6 +488,24 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
   pico.out_HLT_Ele15_IsoVVVL_PFHT450() = nano.HLT_Ele15_IsoVVVL_PFHT450();
   pico.out_HLT_Ele15_IsoVVVL_PFHT600() = nano.HLT_Ele15_IsoVVVL_PFHT600();
   pico.out_HLT_Ele50_IsoVVVL_PFHT450() = nano.HLT_Ele50_IsoVVVL_PFHT450();
+
+  //Ele32_WPTight_Gsf was not in menu for most of 2017, but can be emulated by
+  //AND of Ele32_WPTight_Gsf_L1DoubleEG and single EG L1 seeds
+  if (year==2017) {
+    bool pass_l1_singleeg = false;
+    for (unsigned itrig = 0; itrig < nano.TrigObj_id().size(); itrig++) {
+      if (nano.TrigObj_id()[itrig]==11) {
+        if ((nano.TrigObj_filterBits()[itrig] & 0x400)!=0) {
+          pass_l1_singleeg = true;
+        }
+      }
+    }
+    pico.out_HLT_Ele32_WPTight_Gsf_Emu() = nano.HLT_Ele32_WPTight_Gsf_L1DoubleEG() 
+                                           && pass_l1_singleeg;
+  }
+  else {
+    pico.out_HLT_Ele32_WPTight_Gsf_Emu() = false;
+  }
 
   bool muon_trigs = nano.HLT_IsoMu20() || nano.HLT_IsoMu22() || nano.HLT_IsoMu24() ||
                     nano.HLT_IsoMu27() || nano.HLT_IsoTkMu20() || nano.HLT_IsoTkMu22() ||

@@ -121,14 +121,17 @@ std::vector<float> TriggerWeighter::GetSF(std::vector<float> electron_pt,
     pass_dimu, false);
 
   //calculate SFs
-  float sf = data_prob[0]/mc_prob[0];
-  float sf_up = data_prob[1]/mc_prob[2];
-  float sf_dn = data_prob[2]/mc_prob[1];
+  if (mc_prob[0] < 0.001f) mc_prob[0] = 0.0;
+  float sf = 1.0;
+  float unc = 0.0;
+  propagate_uncertainty_ratio(data_prob[0], data_prob[1], mc_prob[0], mc_prob[1], sf, unc);
+  float sf_up = sf+unc;
+  float sf_dn = fmax(sf-unc,0);
 
-  //deal with signal leptons with low probabilities
-  if (mc_prob[0]<0.001f || data_prob[0]<0.001f) sf = 1.0;
-  if (mc_prob[1]<0.001f || data_prob[1]<0.001f) sf_up = 1.0;
-  if (mc_prob[2]<0.001f || data_prob[2]<0.001f) sf_dn = 1.0;
+  ////deal with signal leptons with low probabilities
+  //if (mc_prob[0]<0.001f || data_prob[0]<0.001f) sf = 1.0;
+  //if (mc_prob[1]<0.001f || data_prob[1]<0.001f) sf_up = 1.0;
+  //if (mc_prob[2]<0.001f || data_prob[2]<0.001f) sf_dn = 1.0;
 
   return {sf, sf_up, sf_dn};
 }
@@ -147,15 +150,14 @@ std::vector<float> TriggerWeighter::GetTotalProbability(
     pass_singlemu, pass_dimu, is_data, false);
 
   //calculate probability and uncertainty
-  //assume electron and muon triggers uncorrelated
+  //assume electron and muon triggers independent
   float prob = electron_prob[0]+muon_prob[0]-electron_prob[0]*muon_prob[0];
-  float prob_up = electron_prob[1]+muon_prob[1]-electron_prob[1]*muon_prob[1];
-  float prob_dn = electron_prob[2]+muon_prob[2]-electron_prob[2]*muon_prob[2];
-  if (isnan(prob) || isnan(prob_up) || isnan(prob_dn)) {
+  float unc = hypotf(electron_prob[1],hypotf(muon_prob[1],hypotf(electron_prob[0]*muon_prob[1],muon_prob[0]*electron_prob[1])));
+  if (isnan(prob) || isnan(unc)) {
     DBG("Error: NaN propagated in trigger weighter.\n");
     exit(1);
   }
-  return {prob, prob_up, prob_dn};
+  return {prob, unc};
 }
 
 
@@ -175,13 +177,12 @@ std::vector<float> TriggerWeighter::GetFlavorProbability(
   //can be directly calculated and the sum of all categories consistent with
   //the event trigger decision gives the total probability.
   
-  if (lepton_pt.size()==0) 
-    return {0.0, 0.0, 0.0};
+  if (lepton_pt.size()==0)
+    return {0.0, 0.0};
 
   std::vector<LeptonHLTStatus> lepton_status;
   float tot_prob = 0.0;
-  float tot_prob_up = 0.0;
-  float tot_prob_dn = 0.0;
+  float tot_unc = 0.0;
   for (unsigned int ilep = 0; ilep < lepton_pt.size(); ilep++) 
     lepton_status.push_back(LeptonHLTStatus::fail_all);
   //loop over every category
@@ -206,12 +207,10 @@ std::vector<float> TriggerWeighter::GetFlavorProbability(
       //the probability for an exclusive category is just the product of the 
       //probabilities for each lepton in the category
       float cat_prob = 1.0;
-      float cat_prob_up = 1.0;
-      float cat_prob_dn = 1.0;
+      float cat_unc = 0.0;
       for (unsigned int ilep = 0; ilep < lepton_status.size(); ilep++) {
         float lep_prob = 0.0;
-        float lep_prob_up = 0.0;
-        float lep_prob_dn = 0.0;
+        float lep_unc = 0.0;
 
         //probability to fail all is 1 - probability to pass dilep lower leg
         if (lepton_status[ilep]==LeptonHLTStatus::fail_all) {
@@ -219,8 +218,7 @@ std::vector<float> TriggerWeighter::GetFlavorProbability(
               lepton_eta[ilep],is_data,is_electron,
               LeptonHLTStatus::pass_lowerdilep);
           lep_prob = 1.0-prob_lower[0];
-          lep_prob_up = 1.0-prob_lower[1];
-          lep_prob_dn = 1.0-prob_lower[2];
+          lep_unc = prob_lower[1];
         }
 
         //probability to pass only lower leg is prob(lower leg)-prob(upper leg)
@@ -232,8 +230,7 @@ std::vector<float> TriggerWeighter::GetFlavorProbability(
               lepton_eta[ilep],is_data,is_electron,
               LeptonHLTStatus::pass_upperdilep);
           lep_prob = prob_lower[0]-prob_upper[0];
-          lep_prob_up = prob_lower[1]-prob_upper[1];
-          lep_prob_dn = prob_lower[2]-prob_upper[2];
+          lep_unc = hypotf(prob_lower[1], prob_upper[1]);
         }
 
         //probability to pass upper leg but fail single lep is 
@@ -246,8 +243,7 @@ std::vector<float> TriggerWeighter::GetFlavorProbability(
               lepton_eta[ilep],is_data,is_electron,
               LeptonHLTStatus::pass_singlelep);
           lep_prob = prob_upper[0]-prob_single[0];
-          lep_prob_up = prob_upper[1]-prob_single[1];
-          lep_prob_dn = prob_upper[2]-prob_single[2];
+          lep_unc = hypotf(prob_upper[1], prob_single[1]);
         }
 
         //probability to pass single lep trigger
@@ -256,25 +252,20 @@ std::vector<float> TriggerWeighter::GetFlavorProbability(
               lepton_eta[ilep],is_data,is_electron,
               LeptonHLTStatus::pass_singlelep);
           lep_prob = prob_single[0];
-          lep_prob_up = prob_single[1];
-          lep_prob_dn = prob_single[2];
+          lep_unc = prob_single[1];
         }
 
         //deal with rounding errors/low stats categories
         if (lep_prob < 0) lep_prob = 0;
-        if (lep_prob_up < 0) lep_prob_up = 0;
-        if (lep_prob_dn < 0) lep_prob_dn = 0;
 
         //combine lepton probability into total
+        cat_unc = hypotf(lep_unc*cat_prob,cat_unc*lep_prob);
         cat_prob *= lep_prob;
-        cat_prob_up *= lep_prob_up;
-        cat_prob_dn *= lep_prob_dn;
       }
 
       //add to total probability
       tot_prob += cat_prob;
-      tot_prob_up += cat_prob_up;
-      tot_prob_dn += cat_prob_dn;
+      tot_unc = hypotf(tot_unc,cat_unc);
     }
 
     //iterate to next category
@@ -299,7 +290,7 @@ std::vector<float> TriggerWeighter::GetFlavorProbability(
     }
   }
 
-  return {tot_prob, tot_prob_up, tot_prob_dn};
+  return {tot_prob, tot_unc};
 }
 
 
@@ -340,11 +331,7 @@ std::vector<float> TriggerWeighter::GetLeptonProbability(float lepton_pt, float 
   //evaluate
   float prob = (*prob_map)->evaluate({eff_name, std::abs(lepton_eta), lepton_pt});
   float uncr = (*prob_map)->evaluate({unc_name, std::abs(lepton_eta), lepton_pt});
-  float up = prob + uncr;
-  float down = prob - uncr;
-  if (up > 1.0f) up = 1.0;
-  if (down < 0.0f) down = 0.0;
-  return {prob, up, down};
+  return {prob, uncr};
 }
 
 
