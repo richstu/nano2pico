@@ -21,7 +21,7 @@ public:
   const float MuonEtaCut        = 2.4;
   const float MuonMiniIsoCut    = 0.2;
   const float MuonRelIsoCut     = 0.35;
-  const float dzCut         = 0.1;
+  const float dzCut         = 1.0;
   const float dxyCut        = 0.5;
   const float MuonHighPt        = 200;
   const float MuonSip3dCut      = 4.0;
