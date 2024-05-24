@@ -65,15 +65,14 @@ bool ElectronProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma) {
         return nano.Electron_mvaFall17V2Iso_WPL()[nano_idx];
       case 2022:
       case 2023:
-	float mvaHZZ = nano.Electron_mvaHZZIso()[nano_idx];
 	// got these values from : https://twiki.cern.ch/twiki/bin/viewauth/CMS/MultivariateElectronIdentificationRun2#HZZ_MVA_training_details_and_wor
 	//early Run 3 HZZ SF is approved applying the 2018 WP
-	return ((pt < 10. && fabs(eta) < 0.800 && mvaHZZ > 1.49603193295) ||\
-		(pt < 10. && fabs(eta) >= 0.800 && abs(eta) < 1.479 && mvaHZZ > 1.52414154008) ||\
-		(pt < 10. && fabs(eta) >= 1.479 && mvaHZZ > 1.77694249574)||\
-		(pt >= 10. && fabs(eta) < 0.800 && mvaHZZ > 0.199463934736) ||\
-		(pt >= 10. && fabs(eta) >= 0.800 && abs(eta) < 1.479 && mvaHZZ > 0.076063564084) ||\
-		(pt >= 10. && fabs(eta) >= 1.479 && mvaHZZ > -0.572118857519));
+	return ((pt < 10. && fabs(eta) < 0.800 && nano.Electron_mvaHZZIso()[nano_idx] > 1.49603193295) ||\
+		(pt < 10. && fabs(eta) >= 0.800 && fabs(eta) < 1.479 && nano.Electron_mvaHZZIso()[nano_idx] > 1.52414154008) ||\
+		(pt < 10. && fabs(eta) >= 1.479 && nano.Electron_mvaHZZIso()[nano_idx] > 1.77694249574)||\
+		(pt >= 10. && fabs(eta) < 0.800 && nano.Electron_mvaHZZIso()[nano_idx] > 0.199463934736) ||\
+		(pt >= 10. && fabs(eta) >= 0.800 && fabs(eta) < 1.479 && nano.Electron_mvaHZZIso()[nano_idx] > 0.076063564084) ||\
+		(pt >= 10. && fabs(eta) >= 1.479 && nano.Electron_mvaHZZIso()[nano_idx] > -0.572118857519));
       default:
         return nano.Electron_mvaIso_WP90()[nano_idx];
     }
@@ -180,6 +179,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
           pico.out_el_idLoose().push_back(nano.Electron_mvaIso_WP90()[iel]);
           pico.out_el_etPt().push_back(nano.Electron_scEtOverPt()[iel]);
           pico.out_el_eminusp().push_back(nano.Electron_eInvMinusPInv()[iel]);
+	  pico.out_el_fsrphotonidx().push_back(nano.Electron_fsrPhotonIdx()[iel]);
           break;
         default:
           std::cout<<"Need code for new year in getZGammaElBr (in el_producer.cpp)"<<endl;
