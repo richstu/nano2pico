@@ -210,6 +210,7 @@ int main(int argc, char *argv[]){
     if (is_nanoAODv7_found) nanoaod_version = 7;
   }
   if (Contains(in_dir, "NanoAODv9UCSB")) nanoaod_version = 9.5;
+  if (Contains(in_dir, "NanoAODv12")) nanoaod_version = 12;
   cout<<"Using NanoAOD version: "<<nanoaod_version<<endl;
 
   time_t begtime, endtime;
@@ -219,19 +220,22 @@ int main(int argc, char *argv[]){
   if(isZgamma) max_jet_eta  =  4.7;
 
   // B-tag working points
-  map<int, vector<float>> btag_wpts{
-    {2016, vector<float>({0.2217, 0.6321, 0.8953})},
-    {2017, vector<float>({0.1522, 0.4941, 0.8001})},
-    {2018, vector<float>({0.1241, 0.4184, 0.7527})},
-    {2022, vector<float>({0.1241, 0.4184, 0.7527})},
-    {2023, vector<float>({0.1241, 0.4184, 0.7527})}
-  };
   map<int, vector<float>> btag_df_wpts{
     {2016, vector<float>({0.0614, 0.3093, 0.7221})},
     {2017, vector<float>({0.0521, 0.3033, 0.7489})},
     {2018, vector<float>({0.0494, 0.2770, 0.7264})},
     {2022, vector<float>({0.0494, 0.2770, 0.7264})},
     {2023, vector<float>({0.0494, 0.2770, 0.7264})}
+  };
+
+  map<string, vector<float>> btag_wpts{
+    {"2016", vector<float>({0.2217, 0.6321, 0.8953})},
+    {"2017", vector<float>({0.1522, 0.4941, 0.8001})},
+    {"2018", vector<float>({0.1241, 0.4184, 0.7527})},
+    {"2022", vector<float>({0.047,  0.245,  0.6734})},
+    {"2022EE", vector<float>({0.0499, 0.2605, 0.6915})},  
+    {"2023", vector<float>({0.0358, 0.1917, 0.6172})},
+    {"2023BPix", vector<float>({0.0359, 0.1919, 0.6133})}
   };
 
   // Rochester corrections
@@ -277,7 +281,7 @@ int main(int argc, char *argv[]){
   PrefireWeighter prefire_weighter(year, true);
   // Pre-UL scale factors
   const vector<BTagEntry::OperatingPoint> op_all = {BTagEntry::OP_LOOSE, BTagEntry::OP_MEDIUM, BTagEntry::OP_TIGHT};
-  BTagWeighter btag_weighter(year, isFastsim, false, btag_wpts[year]);
+  BTagWeighter btag_weighter(year, isFastsim, false, btag_wpts[year_string]);
   BTagWeighter btag_df_weighter(year, isFastsim, true, btag_df_wpts[year]);
   LeptonWeighter lep_weighter(year, isZgamma);
   LeptonWeighter lep_weighter16gh(year, isZgamma, true);
@@ -330,7 +334,6 @@ int main(int argc, char *argv[]){
     if (isData && !passed_trig) {
       continue;
     }
-
     // event info
     pico.out_event()     = nano.event();
     pico.out_lumiblock() = nano.luminosityBlock();
@@ -362,9 +365,9 @@ int main(int argc, char *argv[]){
     vector<int> sig_el_pico_idx = vector<int>();
     vector<int> sig_mu_pico_idx = vector<int>();
     vector<int> photon_el_pico_idx = vector<int>();
+    
     vector<int> sig_el_nano_idx = el_producer.WriteElectrons(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, sig_el_pico_idx, photon_el_pico_idx, isZgamma, isFastsim);
     vector<int> sig_mu_nano_idx = mu_producer.WriteMuons(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, sig_mu_pico_idx, isZgamma, isFastsim);
-
     // save a separate vector with just signal leptons ordered by pt
     struct SignalLepton{ float pt; float eta; float phi; int pdgid;};
     vector<SignalLepton> sig_leps;
@@ -383,17 +386,13 @@ int main(int argc, char *argv[]){
       pico.out_lep_phi().push_back(ilep.phi);
       pico.out_lep_pdgid().push_back(ilep.pdgid);
     }
-
     vector<int> jet_isphoton_nano_idx = vector<int>();
     if(isZgamma || isHiggsino) 
       vector<int> sig_ph_nano_idx = photon_producer.WritePhotons(nano, pico, jet_isphoton_nano_idx,
                                                                  sig_el_nano_idx, sig_mu_nano_idx,
                                                                  photon_el_pico_idx);
-
     event_tools.WriteStitch(nano, pico);
- 
     tk_producer.WriteIsoTracks(nano, pico, sig_el_nano_idx, sig_mu_nano_idx, isFastsim, is_preUL);
-
     dilep_producer.WriteDileptons(pico, sig_el_pico_idx, sig_mu_pico_idx);
 
     if (debug) cout<<"INFO:: Writing gen particles"<<endl;
@@ -406,9 +405,9 @@ int main(int argc, char *argv[]){
     vector<HiggsConstructionVariables> sys_higvars;
     vector<int> sig_jet_nano_idx = jetmet_producer.WriteJetMet(nano, pico, 
         jet_islep_nano_idx, jet_isvlep_nano_idx, jet_isphoton_nano_idx,
-        btag_wpts[year], btag_df_wpts[year], isFastsim, isSignal, 
+        btag_wpts[year_string], btag_df_wpts[year], isFastsim, isSignal, 
         is2022preEE, sys_higvars);
-    jetmet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year][1], isFastsim); // usually w.r.t. medium WP
+    jetmet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year_string][1], isFastsim); // usually w.r.t. medium WP
     jetmet_producer.WriteFatJets(nano, pico); // jetmet_producer.SetVerbose(nano.nSubJet()>0);
     jetmet_producer.WriteSubJets(nano, pico);
     isr_tools.WriteISRJetMultiplicity(nano, pico);
@@ -426,6 +425,7 @@ int main(int argc, char *argv[]){
           nano.Muon_pt()[sig_mu_nano_idx[0]], nano.Muon_phi()[sig_mu_nano_idx[0]]);
       }
     } 
+
     if (pico.out_ntrulep()==1) {
       for (unsigned imc(0); imc<pico.out_mc_id().size(); imc++){
         if (abs(pico.out_mc_id()[imc])==11 || abs(pico.out_mc_id()[imc])==13) {
@@ -439,12 +439,10 @@ int main(int argc, char *argv[]){
         }
       }
     } 
-
     if (debug) cout<<"INFO:: Writing analysis specific variables"<<endl;
     // might need as input sig_el_nano_idx, sig_mu_nano_idx, sig_ph_nano_idx
     if(isZgamma)
       zgamma_producer.WriteZGammaVars(nano, pico, sig_jet_nano_idx);
-
   
     if (isHiggsino) gammagamma_producer.WriteGammaGammaVars(pico);
     if (isHiggsino) bb_producer.WriteBBVars(pico, /*doDeepFlav*/false);
@@ -452,8 +450,8 @@ int main(int argc, char *argv[]){
     if (isHiggsino) bbgammagamma_producer.WriteBBGammaGammaVars(pico);
 
     //save higgs variables using DeepCSV and DeepFlavor
-    hig_producer.WriteHigVars(pico, false, isSignal, sys_higvars);
-    hig_producer.WriteHigVars(pico, true, isSignal, sys_higvars);
+    hig_producer.WriteHigVars(pico, false, isSignal, sys_higvars, nanoaod_version);
+    hig_producer.WriteHigVars(pico, true, isSignal, sys_higvars, nanoaod_version);
 
     if (debug) cout<<"INFO:: Writing filters and triggers"<<endl;
     // N.B. Jets: pico.out_pass_jets() and pico.out_pass_fsjets() filled in jetmet_producer
@@ -655,7 +653,7 @@ int main(int argc, char *argv[]){
         wgt_sums.out_sys_ps()[i] += pico.out_sys_ps()[i];
       }
     }
-
+    
     if (debug) cout<<"INFO:: Filling tree"<<endl;
     pico.Fill();
   } // loop over events
