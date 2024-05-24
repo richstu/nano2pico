@@ -61,10 +61,12 @@ array<float> Electron_scEtOverPt
 array<int> Electron_cutBased
 array<int> Electron_cutBased_Fall17_V1
 array<int> Electron_jetIdx
+array<short> Electron_jetIdx 12.0
 array<int> Electron_pdgId
 array<int> Electron_photonIdx
 array<short> Electron_photonIdx 11.9
 array<int> Electron_tightCharge
+array<UChar_t> Electron_tightCharge 12.0
 array<int> Electron_vidNestedWPBitmap
 array<int> Electron_vidNestedWPBitmapHEEP
 array<bool> Electron_convVeto
@@ -87,8 +89,19 @@ array<bool> Electron_mvaIso_WP80
 array<bool> Electron_mvaIso_WP90
 array<char> Electron_seedGain
 array<int> Electron_genPartIdx
+array<short> Electron_genPartIdx 12.0
 array<char> Electron_genPartFlav
 array<char> Electron_cleanmask
+# NanoAODv12
+array<float> Electron_mvaHZZIso
+array<float> Electron_mvaNoIso
+array<bool> Electron_mvaNoIso_WP80
+array<bool> Electron_mvaNoIso_WP90
+array<float> Electron_eCorr
+array<short> Electron_fsrPhotonIdx
+array<char> Electron_seediEtaOriX
+array<int> Electron_seediPhiOriY
+array<short> Electron_svIdx
 
 ################ Muons ################
 
@@ -121,10 +134,14 @@ array<int> Muon_fsrPhotonIdx
 array<short> Muon_fsrPhotonIdx 11.9
 array<int> Muon_charge
 array<int> Muon_jetIdx
+array<short> Muon_jetIdx 12.0
 array<int> Muon_nStations
+array<uchar> Muon_nStations 12.0
 array<int> Muon_nTrackerLayers
+array<uchar> Muon_nTrackerLayers 12.0
 array<int> Muon_pdgId
 array<int> Muon_tightCharge
+array<uchar> Muon_tightCharge 12.0
 array<char> Muon_highPtId
 array<bool> Muon_inTimeMuon
 array<bool> Muon_isGlobal
@@ -143,8 +160,17 @@ array<bool> Muon_tightId
 array<char> Muon_tkIsoId
 array<bool> Muon_triggerIdLoose
 array<int> Muon_genPartIdx
+array<short> Muon_genPartIdx 12.0
 array<char> Muon_genPartFlav
 array<char> Muon_cleanmask
+#NanoAODv12
+array<float> Muon_mvaLowPt
+array<float> Muon_mvaMuID
+array<uchar> Muon_mvaMuID_WP
+array<float> Muon_bsConstrainedChi2
+array<float> Muon_bsConstrainedPt
+array<float> Muon_bsConstrainedPtErr
+array<short> Muon_svIdx
 
 ################ Taus ################
 
@@ -259,6 +285,7 @@ array<bool> Photon_mvaID_WP90
 array<bool> Photon_pixelSeed
 array<char> Photon_seedGain
 array<int> Photon_genPartIdx
+array<short> Photon_genPartIdx 12.0
 array<char> Photon_genPartFlav
 array<char> Photon_cleanmask
 
@@ -272,6 +299,8 @@ array<short> FsrPhoton_muonIdx 11.9
 array<float> FsrPhoton_phi
 array<float> FsrPhoton_pt
 array<float> FsrPhoton_relIso03
+#nanoAODv12
+array<short> FsrPhoton_electronIdx
 
 ################ AK4 Jets ################
 
@@ -482,9 +511,11 @@ array<float> GenPart_mass
 array<float> GenPart_phi
 array<float> GenPart_pt
 array<int> GenPart_genPartIdxMother
+array<short> GenPart_genPartIdxMother 12.0
 array<int> GenPart_pdgId
 array<int> GenPart_status
 array<int> GenPart_statusFlags
+array<ushort> GenPart_statusFlags 12.0
 
 int nGenDressedLepton
 array<float> GenDressedLepton_eta
@@ -586,7 +617,9 @@ float PV_z
 float PV_chi2
 float PV_score
 int PV_npvs
+uchar PV_npvs 12.0
 int PV_npvsGood
+uchar PV_npvsGood 12.0
 
 ################ Secondary vertices ################
 int nSV

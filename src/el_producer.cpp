@@ -65,6 +65,15 @@ bool ElectronProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma) {
         return nano.Electron_mvaFall17V2Iso_WPL()[nano_idx];
       case 2022:
       case 2023:
+	float mvaHZZ = nano.Electron_mvaHZZIso()[nano_idx];
+	// got these values from : https://twiki.cern.ch/twiki/bin/viewauth/CMS/MultivariateElectronIdentificationRun2#HZZ_MVA_training_details_and_wor
+	//early Run 3 HZZ SF is approved applying the 2018 WP
+	return ((pt < 10. && fabs(eta) < 0.800 && mvaHZZ > 1.49603193295) ||\
+		(pt < 10. && fabs(eta) >= 0.800 && abs(eta) < 1.479 && mvaHZZ > 1.52414154008) ||\
+		(pt < 10. && fabs(eta) >= 1.479 && mvaHZZ > 1.77694249574)||\
+		(pt >= 10. && fabs(eta) < 0.800 && mvaHZZ > 0.199463934736) ||\
+		(pt >= 10. && fabs(eta) >= 0.800 && abs(eta) < 1.479 && mvaHZZ > 0.076063564084) ||\
+		(pt >= 10. && fabs(eta) >= 1.479 && mvaHZZ > -0.572118857519));
       default:
         return nano.Electron_mvaIso_WP90()[nano_idx];
     }
@@ -163,6 +172,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
         case 2022:
         case 2023:
           pico.out_el_idmva().push_back(nano.Electron_mvaIso()[iel]);
+	  pico.out_el_idmvaHZZ().push_back(nano.Electron_mvaHZZIso()[iel]);
           pico.out_el_sip3d().push_back(nano.Electron_sip3d()[iel]);
           pico.out_el_phidx().push_back(Electron_photonIdx[iel]);
           pico.out_el_id80().push_back(nano.Electron_mvaIso_WP80()[iel]);
