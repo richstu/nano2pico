@@ -97,7 +97,6 @@ array<float> Electron_mvaHZZIso
 array<float> Electron_mvaNoIso
 array<bool> Electron_mvaNoIso_WP80
 array<bool> Electron_mvaNoIso_WP90
-array<float> Electron_eCorr
 array<short> Electron_fsrPhotonIdx
 array<char> Electron_seediEtaOriX
 array<int> Electron_seediPhiOriY
@@ -136,12 +135,12 @@ array<int> Muon_charge
 array<int> Muon_jetIdx
 array<short> Muon_jetIdx 12.0
 array<int> Muon_nStations
-array<uchar> Muon_nStations 12.0
+array<char> Muon_nStations 12.0
 array<int> Muon_nTrackerLayers
-array<uchar> Muon_nTrackerLayers 12.0
+array<char> Muon_nTrackerLayers 12.0
 array<int> Muon_pdgId
 array<int> Muon_tightCharge
-array<uchar> Muon_tightCharge 12.0
+array<char> Muon_tightCharge 12.0
 array<char> Muon_highPtId
 array<bool> Muon_inTimeMuon
 array<bool> Muon_isGlobal
@@ -164,9 +163,8 @@ array<short> Muon_genPartIdx 12.0
 array<char> Muon_genPartFlav
 array<char> Muon_cleanmask
 #NanoAODv12
-array<float> Muon_mvaLowPt
 array<float> Muon_mvaMuID
-array<uchar> Muon_mvaMuID_WP
+array<char> Muon_mvaMuID_WP
 array<float> Muon_bsConstrainedChi2
 array<float> Muon_bsConstrainedPt
 array<float> Muon_bsConstrainedPtErr
@@ -331,19 +329,28 @@ array<float> Jet_rawFactor
 array<float> Jet_bRegCorr
 array<float> Jet_bRegRes
 array<int> Jet_electronIdx1
+array<short> Jet_electronIdx1 12
 array<int> Jet_electronIdx2
+array<short> Jet_electronIdx2 12
 array<int> Jet_jetId
 array<char> Jet_jetId 11.9
 array<int> Jet_muonIdx1
+array<short> Jet_muonIdx1 12
 array<int> Jet_muonIdx2
+array<short> Jet_muonIdx2 12
 array<int> Jet_nConstituents
 array<int> Jet_nElectrons
+array<char> Jet_nElectrons 12
 array<int> Jet_nMuons
+array<char> Jet_nMuons 12
 array<int> Jet_puId
 array<float> Jet_puIdDisc
 array<int> Jet_genJetIdx
+array<short> Jet_genJetIdx 12
 array<int> Jet_hadronFlavour
+array<char> Jet_hadronFlavour 12
 array<int> Jet_partonFlavour
+array<short> Jet_partonFlavour 12
 array<char> Jet_cleanmask
 array<float> Jet_pt_jerUp
 array<float> Jet_pt_jerDown
@@ -353,6 +360,19 @@ array<float> Jet_mass_jerUp
 array<float> Jet_mass_jerDown
 array<float> Jet_mass_jesTotalUp
 array<float> Jet_mass_jesTotalDown
+#NanoAODv12
+array<float> Jet_PNetRegPtRawCorr
+array<float> Jet_PNetRegPtRawCorrNeutrino
+array<float> Jet_PNetRegPtRawRes
+array<float> Jet_btagPNetB
+array<float> Jet_btagPNetCvB
+array<float> Jet_btagPNetCvL
+array<float> Jet_btagPNetQvG
+array<float> Jet_btagPNetTauVarrayJet
+array<float> Jet_btagRobustParTAK4B
+array<float> Jet_btagRobustParTAK4CvB
+array<float> Jet_btagRobustParTAK4CvL
+array<float> Jet_btagRobustParTAK4QG
 
 ################ Very soft Jets ################
 
@@ -617,9 +637,9 @@ float PV_z
 float PV_chi2
 float PV_score
 int PV_npvs
-uchar PV_npvs 12.0
+char PV_npvs 12.0
 int PV_npvsGood
-uchar PV_npvsGood 12.0
+char PV_npvsGood 12.0
 
 ################ Secondary vertices ################
 int nSV
