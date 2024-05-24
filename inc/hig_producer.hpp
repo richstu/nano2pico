@@ -20,7 +20,7 @@ public:
   ~HigVarProducer();
 
   void WriteHigVars(pico_tree& pico, bool doDeepFlav, bool isSignal,
-                    std::vector<HiggsConstructionVariables> sys_higvars);
+                    std::vector<HiggsConstructionVariables> sys_higvars, float nanoaod_version);
 
 private:
   int year;
