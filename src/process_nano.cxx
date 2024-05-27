@@ -220,18 +220,22 @@ int main(int argc, char *argv[]){
   if(isZgamma) max_jet_eta  =  4.7;
 
   // B-tag working points
-  map<int, vector<float>> btag_df_wpts{
-    {2016, vector<float>({0.0614, 0.3093, 0.7221})},
-    {2017, vector<float>({0.0521, 0.3033, 0.7489})},
-    {2018, vector<float>({0.0494, 0.2770, 0.7264})},
-    {2022, vector<float>({0.0494, 0.2770, 0.7264})},
-    {2023, vector<float>({0.0494, 0.2770, 0.7264})}
+  map<string, vector<float>> btag_df_wpts{
+    {"2016APV", vector<float>({0.0508, 0.2598, 0.6502})},
+    {"2016", vector<float>({0.0480, 0.2489, 0.6377})},
+    {"2017", vector<float>({0.0532, 0.3040, 0.7476})},
+    {"2018", vector<float>({0.0490, 0.2783, 0.7100})},
+    {"2022", vector<float>({0.0583, 0.3086, 0.7183})},
+    {"2022EE", vector<float>({0.0614, 0.3196, 0.73})},
+    {"2023", vector<float>({0.0479, 0.2431, 0.6553})},
+    {"2023BPix", vector<float>({0.048, 0.2435, 0.6563})}
   };
 
   map<string, vector<float>> btag_wpts{
-    {"2016", vector<float>({0.2217, 0.6321, 0.8953})},
-    {"2017", vector<float>({0.1522, 0.4941, 0.8001})},
-    {"2018", vector<float>({0.1241, 0.4184, 0.7527})},
+    {"2016APV", vector<float>({0.2027, 0.6001, 0.8819})},
+    {"2016", vector<float>({0.1918, 0.5847, 0.8767})},
+    {"2017", vector<float>({0.1355, 0.4506, 0.7738})},
+    {"2018", vector<float>({0.1208, 0.4168, 0.7665})},
     {"2022", vector<float>({0.047,  0.245,  0.6734})},
     {"2022EE", vector<float>({0.0499, 0.2605, 0.6915})},  
     {"2023", vector<float>({0.0358, 0.1917, 0.6172})},
@@ -282,12 +286,12 @@ int main(int argc, char *argv[]){
   // Pre-UL scale factors
   const vector<BTagEntry::OperatingPoint> op_all = {BTagEntry::OP_LOOSE, BTagEntry::OP_MEDIUM, BTagEntry::OP_TIGHT};
   BTagWeighter btag_weighter(year, isFastsim, false, btag_wpts[year_string]);
-  BTagWeighter btag_df_weighter(year, isFastsim, true, btag_df_wpts[year]);
+  BTagWeighter btag_df_weighter(year, isFastsim, true, btag_df_wpts[year_string]);
   LeptonWeighter lep_weighter(year, isZgamma);
   LeptonWeighter lep_weighter16gh(year, isZgamma, true);
   PhotonWeighter photon_weighter(year, isZgamma || isHiggsino);
   // UL scale factors
-  EventWeighter event_weighter(year_string, btag_df_wpts[year]);
+  EventWeighter event_weighter(year_string, btag_df_wpts[year_string]);
   TriggerWeighter trigger_weighter(year, isAPV);
   //cout<<"Is APV: "<<isAPV<<endl;
 
@@ -405,7 +409,7 @@ int main(int argc, char *argv[]){
     vector<HiggsConstructionVariables> sys_higvars;
     vector<int> sig_jet_nano_idx = jetmet_producer.WriteJetMet(nano, pico, 
         jet_islep_nano_idx, jet_isvlep_nano_idx, jet_isphoton_nano_idx,
-        btag_wpts[year_string], btag_df_wpts[year], isFastsim, isSignal, 
+        btag_wpts[year_string], btag_df_wpts[year_string], isFastsim, isSignal, 
         is2022preEE, sys_higvars);
     jetmet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year_string][1], isFastsim); // usually w.r.t. medium WP
     jetmet_producer.WriteFatJets(nano, pico); // jetmet_producer.SetVerbose(nano.nSubJet()>0);
