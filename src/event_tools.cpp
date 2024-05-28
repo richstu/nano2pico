@@ -981,7 +981,7 @@ int EventTools::GetEventType(){
     }else if(Contains(name, "HToBB")){     category = 4; bin = 0;
     }else if(Contains(name, "HToMuMu")){   category = 5; bin = 0;
     }
-  }else if(Contains(name, "WGTo") || !Contains(name,"WWG")){ sample = 30; category = 0; bin = 0;
+  }else if(Contains(name, "WGTo") && !Contains(name,"WWG")){ sample = 30; category = 0; bin = 0;
   }else if(Contains(name, "T1tttt")){ sample = 100; category = 0; bin = 0;
   }else if(Contains(name, "T2tt")){   sample = 101; category = 0; bin = 0;
   }else if(Contains(name, "T1bbbb")){ sample = 102; category = 0; bin = 0;
