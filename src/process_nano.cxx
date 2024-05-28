@@ -264,7 +264,7 @@ int main(int argc, char *argv[]){
   }
 
   //Initialize object producers
-  GenParticleProducer mc_producer(year);
+  GenParticleProducer mc_producer(year, nanoaod_version);
   ElectronProducer el_producer(year, isData, isAPV, nanoaod_version);
   MuonProducer mu_producer(year, isData, nanoaod_version, rocco_file);
   DileptonProducer dilep_producer(year);
@@ -299,7 +299,7 @@ int main(int argc, char *argv[]){
   EventTools event_tools(in_path, year, isData, nanoaod_version);
   int event_type = event_tools.GetEventType();
 
-  ISRTools isr_tools(in_path, year);
+  ISRTools isr_tools(in_path, year, nanoaod_version);
 
   // Initialize trees
   nano_tree nano(in_path, nanoaod_version);
