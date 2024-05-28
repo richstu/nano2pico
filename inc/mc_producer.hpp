@@ -8,7 +8,7 @@
 class GenParticleProducer{
 public:
 
-  explicit GenParticleProducer(int year);
+  explicit GenParticleProducer(int year,float nanoaod_version);
   ~GenParticleProducer();
 
   void WriteGenParticles(nano_tree &nano, pico_tree &pico);
@@ -19,7 +19,7 @@ public:
   int GetMotherIdx(nano_tree & nano, int imc, std::map<int, int> & mc_index_to_interested_index);
 private:
   int year;
-  
+  float nanoaod_version;
 };
 
 #endif

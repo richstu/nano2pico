@@ -120,5 +120,12 @@ void getPhoton_jetIdx(nano_tree & nano, float nanoaod_version, std::vector<int> 
 void getPhoton_cutBased(nano_tree & nano, float nanoaod_version, std::vector<int> & Photon_cutBased);
 void getFatJet_subJetIdx1(nano_tree & nano, float nanoaod_version, std::vector<int> & FatJet_subJetIdx1);
 void getFatJet_subJetIdx2(nano_tree & nano, float nanoaod_version, std::vector<int> & FatJet_subJetIdx2);
-
+void getMuon_nTrackerLayers(nano_tree & nano, float nanoaod_version, std::vector<int> & Muon_nTrackerLayers);
+void getMuon_genPartIdx(nano_tree & nano, float nanoaod_version, std::vector<int> & Muon_genPartIdx);
+void getJet_genJetIdx(nano_tree & nano, float nanoaod_version, std::vector<int> & Jet_genJetIdx);
+void getJet_hadronFlavour(nano_tree & nano, float nanoaod_version, std::vector<int> & Jet_hadronFlavour);
+void getJet_partonFlavour(nano_tree & nano, float nanoaod_version, std::vector<int> & Jet_partonFlavour);
+void getGenPart_genPartIdxMother(nano_tree & nano, float nanoaod_version, std::vector<int> & GenPart_genPartIdxMother);
+void getGenPart_statusFlags(nano_tree & nano, float nanoaod_version, std::vector<int> & GenPart_statusFlags);
+void getGenJet_partonFlavour(nano_tree & nano, float nanoaod_version, std::vector<int> & GenJet_partonFlavour);
 #endif

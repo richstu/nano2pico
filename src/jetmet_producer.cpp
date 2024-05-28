@@ -310,7 +310,6 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
   pico.out_nbl() = 0; pico.out_nbm() = 0; pico.out_nbt() = 0; 
   pico.out_nbdfl() = 0; pico.out_nbdfm() = 0; pico.out_nbdft() = 0; 
   pico.out_ngenjet() = 0;
-
   //add smearing to jets and calculate uncertainties
   vector<float> Jet_pt, Jet_mass;
   vector<float> jer_nm_factor, jer_up_factor, jer_dn_factor, jes_up_factor, jes_dn_factor;
@@ -350,7 +349,14 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
   }
   vector<int> Jet_jetId;
   getJetId(nano, nanoaod_version, Jet_jetId);
-  
+  vector<int> Jet_hadronFlavour;
+  getJet_hadronFlavour(nano, nanoaod_version, Jet_hadronFlavour);
+  vector<int> Jet_partonFlavour;
+  getJet_partonFlavour(nano, nanoaod_version, Jet_partonFlavour);
+  vector<int> Jet_genJetIdx;
+  if (!isData) getJet_genJetIdx(nano, nanoaod_version, Jet_genJetIdx);
+  vector<int> GenJet_partonFlavour;
+  if (!isData) getGenJet_partonFlavour(nano, nanoaod_version, GenJet_partonFlavour);
   // calculate MHT; needed when saving jet info
   TLorentzVector mht_vec;
   for(int ijet(0); ijet<nano.nJet(); ++ijet){
@@ -362,7 +368,6 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
   }
   pico.out_mht() = mht_vec.Pt();
   pico.out_mht_phi() = mht_vec.Phi();
-
   vector<vector<float>> sys_jet_met_dphi;
   if ((nanoaod_version+0.01) < 9) {
     if (isSignal) {
@@ -497,7 +502,6 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
       }
     }
 
-
     if (isvetojet) continue;
 
     if (Jet_pt[ijet] <= min_jet_pt && 
@@ -585,14 +589,13 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
         std::cout<<"Need code for new year in getZGammaJetBr in jetmet_producer.cpp"<<endl;
         exit(1);
     }
-    if (!isData && nano.Jet_hadronFlavour().size() > 0) {
-      pico.out_jet_hflavor().push_back(nano.Jet_hadronFlavour()[ijet]);
-      pico.out_jet_pflavor().push_back(nano.Jet_partonFlavour()[ijet]);
-      pico.out_jet_genjet_idx().push_back(nano.Jet_genJetIdx()[ijet]);
+    if (!isData && Jet_hadronFlavour.size() > 0) {
+      pico.out_jet_hflavor().push_back(Jet_hadronFlavour[ijet]);
+      pico.out_jet_pflavor().push_back(Jet_partonFlavour[ijet]);
+      pico.out_jet_genjet_idx().push_back(Jet_genJetIdx[ijet]);
     }
     // will be overwritten with the overlapping fat jet index, if such exists, in WriteFatJets
     pico.out_jet_fjet_idx().push_back(-999);
-
     //the jets for the higgs pair with smallest dm will be set to true in hig_producer
     pico.out_jet_h1d().push_back(false);
     pico.out_jet_h2d().push_back(false);
@@ -617,7 +620,6 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
       if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[2]) pico.out_nbdft()++; 
     }
   } // end jet loop
-
   pico.out_low_dphi_mht_e5() = false;
   pico.out_low_dphi_met_e5() = false;
   for (unsigned ijet(0); ijet<pico.out_jet_mht_dphi().size(); ijet++){
@@ -655,7 +657,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
       pico.out_genjet_eta().push_back(nano.GenJet_eta()[ijet]);
       pico.out_genjet_phi().push_back(nano.GenJet_phi()[ijet]);
       pico.out_genjet_m().push_back(nano.GenJet_mass()[ijet]);
-      pico.out_genjet_pflavor().push_back(nano.GenJet_partonFlavour()[ijet]);
+      pico.out_genjet_pflavor().push_back(GenJet_partonFlavour[ijet]);
       pico.out_genjet_hflavor().push_back(int(nano.GenJet_hadronFlavour()[ijet]));
     }
   }
