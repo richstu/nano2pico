@@ -389,7 +389,7 @@ void WriteNanoSource(const vector<Variable> &vars){
   file << "void nano_tree::GetEntry(const long entry){\n";
   file << "  // Reset read-trackers for input branches \n";
   for(vector<Variable>::const_iterator var = vars.begin(); var!= vars.end(); ++var){
-    file << "  c_" << var->name_ << "_ = false;\n";
+    file << "  c_" << var->get_out_name() << "_ = false;\n";
   }
   file << "  entry_ = intree_->LoadTree(entry);\n";
   file << "}\n\n";
@@ -401,7 +401,7 @@ void WriteNanoSource(const vector<Variable> &vars){
     } else {
       file << var->type_ << " & nano_tree::" << var->get_out_name() << "(){\n";
     }
-    file << "  if(!c_" << var->name_ << "_ && b_" << var->get_out_name() <<"_){\n";
+    file << "  if(!c_" << var->get_out_name() << "_ && b_" << var->get_out_name() <<"_){\n";
     if (Contains(var->type_, "array")){
       file << "    int bytes = b_" << var->get_out_name() << "_->GetEntry(entry_);\n";
       file << "    "<< var->get_out_name() <<"_ = vector<"<< var->base_type_ <<">(arr_"<< var->get_out_name() <<"_.begin(), arr_"<< var->get_out_name() <<"_.begin()+bytes/sizeof(arr_"<< var->get_out_name() <<"_[0]));\n";
