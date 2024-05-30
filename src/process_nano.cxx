@@ -221,7 +221,7 @@ int main(int argc, char *argv[]){
 
   // B-tag working points
   // Updated Values May-28-2024 from https://btv-wiki.docs.cern.ch/ScaleFactors/
-  // btag_df: Run 3 values are for PNet, Run 2 values are for deepCSV
+  // btag_df: WPs for deepJet (DeepFlavourB)
   map<string, vector<float>> btag_df_wpts{
     {"2016APV", vector<float>({0.0508, 0.2598, 0.6502})},
     {"2016", vector<float>({0.0480, 0.2489, 0.6377})},
@@ -232,7 +232,7 @@ int main(int argc, char *argv[]){
     {"2023", vector<float>({0.0479, 0.2431, 0.6553})},
     {"2023BPix", vector<float>({0.048, 0.2435, 0.6563})}
   };
-  // WPs for deepJet
+  // WPs for Run 3 values are for PNet, Run 2 values are for deepCSV (DeepB)
   map<string, vector<float>> btag_wpts{
     {"2016APV", vector<float>({0.2027, 0.6001, 0.8819})},
     {"2016", vector<float>({0.1918, 0.5847, 0.8767})},
