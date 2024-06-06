@@ -75,6 +75,7 @@ bool ElectronProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma) {
 		(pt >= 10. && fabs(etasc) >= 0.800 && fabs(etasc) < 1.479 && nano.Electron_mvaHZZIso()[nano_idx] > ConvertMVA(0.076063564084))|| \
 		(pt >= 10. && fabs(etasc) >= 1.479 && nano.Electron_mvaHZZIso()[nano_idx] > ConvertMVA(-0.572118857519)));
       default:
+	std::cout << "WARNING: year value not found in cases. Defaulting Electron MVA to WP90" << std::endl;
         return nano.Electron_mvaIso_WP90()[nano_idx];
     }
   }
@@ -277,7 +278,7 @@ bool ElectronProducer::idElectron_noIso(int bitmap, int level){
 }
 
 float ElectronProducer::ConvertMVA(float mva_mini) {
-  float mva_nano = 2.0 / (1.0 + exp(-2.0 * mva_mini) - 1);
+  float mva_nano = 2.0 / (1.0 + exp(-2.0 * mva_mini)) - 1;
   return mva_nano;
 }
 
