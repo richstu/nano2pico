@@ -18,8 +18,9 @@
 
 using namespace std;
 
-GenParticleProducer::GenParticleProducer(int year_){
+GenParticleProducer::GenParticleProducer(int year_, float nanoaod_version_){
   year = year_;
+  nanoaod_version= nanoaod_version_;
 }
 
 GenParticleProducer::~GenParticleProducer(){
@@ -41,8 +42,10 @@ int GenParticleProducer::GetFirstCopyIdxOrInterestingIdx(nano_tree & nano, int i
   if (imc <= 0) {
     return imc;
   }
+  vector<int> GenPart_genPartIdxMother;
+  getGenPart_genPartIdxMother(nano, nanoaod_version, GenPart_genPartIdxMother);
   int mc_id = nano.GenPart_pdgId().at(imc);
-  int mc_mom_index = nano.GenPart_genPartIdxMother().at(imc);
+  int mc_mom_index = GenPart_genPartIdxMother.at(imc);
   if (mc_mom_index == -1) {
     // Found that initial particles isFirstCopy is 0. Do not use below check.
     //if (bitset<15>(nano.GenPart_statusFlags().at(imc))[12] != 1) {
@@ -68,7 +71,9 @@ int GenParticleProducer::GetFirstCopyIdxOrInterestingIdx(nano_tree & nano, int i
 int GenParticleProducer::GetMotherIdx(nano_tree & nano, int imc, map<int, int> & mc_index_to_interested_index)
 {
   if (imc == 0) return -1;
-  int mc_mom_index = nano.GenPart_genPartIdxMother().at(imc);
+  vector<int> GenPart_genPartIdxMother;
+  getGenPart_genPartIdxMother(nano, nanoaod_version, GenPart_genPartIdxMother);
+  int mc_mom_index = GenPart_genPartIdxMother.at(imc);
   return GetFirstCopyIdxOrInterestingIdx(nano, mc_mom_index, mc_index_to_interested_index);
 }
 
@@ -91,11 +96,14 @@ void GenParticleProducer::WriteGenParticles(nano_tree &nano, pico_tree &pico){
   int ntrutaul = 0;
   int ntrutauh = 0;
 
+  vector<int> GenPart_statusFlags;
+  getGenPart_statusFlags(nano, nanoaod_version, GenPart_statusFlags);
+
   // Collect interesting particle indices
   vector<int> interested_mc_indices;
   for(int imc(0); imc<nano.nGenPart(); ++imc) {
     int mc_id = nano.GenPart_pdgId().at(imc);
-    bitset<15> mc_statusFlags(nano.GenPart_statusFlags().at(imc));
+    bitset<15> mc_statusFlags(GenPart_statusFlags.at(imc));
     bool is_interesting = IsInteresting(interested_mc_ids, interested_mc_ids_range, mc_id);
     bool lepton_interesting = IsInteresting(interested_lepton_ids, {}, mc_id);
     bool save_index = false;
@@ -163,7 +171,7 @@ void GenParticleProducer::WriteGenParticles(nano_tree &nano, pico_tree &pico){
     }
     //cout<<"imc: "<<imc<<" id: "<<mc_id<<" mc_mom_index: "<<mc_mom_index<<" mc_mom_idx: "<<mc_mom_idx<<endl;
     int mc_status     = nano.GenPart_status().at(imc);
-    int mc_statusflag = nano.GenPart_statusFlags().at(imc);
+    int mc_statusflag = GenPart_statusFlags.at(imc);
 
     // Save information
     pico.out_mc_pt().push_back(mc_pt);

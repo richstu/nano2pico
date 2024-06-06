@@ -284,6 +284,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
     pico.out_fsrphoton_reliso().push_back(nano.FsrPhoton_relIso03()[iph]);
     pico.out_fsrphoton_muonidx().push_back(FsrPhoton_muonIdx[iph]);
     pico.out_fsrphoton_droveret2().push_back(nano.FsrPhoton_dROverEt2()[iph]);
+    if (nanoaod_version +0.01 > 12) pico.out_fsrphoton_electronidx().push_back(nano.FsrPhoton_electronIdx()[iph]);
     pico.out_nfsrphoton()++;
   } 
 

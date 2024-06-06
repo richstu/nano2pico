@@ -92,11 +92,14 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
   pico.out_is_overlap_old() = true;
   pico.out_is_overlap() = false; 
   pico.out_old_stitch_dy() = true;
-
   if (isData){
     pico.out_is_overlap() = false; pico.out_use_event() = true; 
     return;
   }
+  vector<int> GenPart_genPartIdxMother;
+  getGenPart_genPartIdxMother(nano, nanoaod_version, GenPart_genPartIdxMother);
+  vector<int> GenPart_statusFlags;
+  getGenPart_statusFlags(nano, nanoaod_version, GenPart_statusFlags);
 
   if(isTTJets_LO_Incl && !isFastSim) {
     if (nano.LHE_HTIncoming()>600.f) 
@@ -118,7 +121,7 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
         float ph_pt = nano.GenPart_pt().at(mc_idx);
         float ph_eta = nano.GenPart_eta().at(mc_idx);
         float ph_phi = nano.GenPart_phi().at(mc_idx);
-        if (ph_pt > 13.f && fabs(ph_eta)<3.0f && (nano.GenPart_statusFlags().at(mc_idx) & 0x1) == 1) {
+        if (ph_pt > 13.f && fabs(ph_eta)<3.0f && (GenPart_statusFlags.at(mc_idx) & 0x1) == 1) {
           //check if another genparticle nearby
           bool deltar_fail = false;
           for (unsigned int mc_idx_2 = 0; mc_idx_2 < nano.GenPart_pdgId().size(); mc_idx_2++) {
@@ -134,7 +137,6 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
       }
     }
   }
-
   //Need to include the new overlap removal by including the newer values for ZGtoLLG_lowMll_lowGPt
   double ptmin = 9.0;
   double isocone = 0.05;
@@ -163,16 +165,15 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
   bool found_hadronic_w = false;
   bool found_higgs = false;
   int ntrulep = 0; //includes taus, unlike pico branch
-
   for(int mc_idx(0); mc_idx<nano.nGenPart(); mc_idx++) {
 
-    bitset<15> mc_statusFlags(nano.GenPart_statusFlags().at(mc_idx));
+    bitset<15> mc_statusFlags(GenPart_statusFlags.at(mc_idx));
 
     //check if event has a hadronic w decay
     int mom_id = -1;
     int mc_id = nano.GenPart_pdgId().at(mc_idx);
-    if (nano.GenPart_genPartIdxMother().at(mc_idx) != -1)
-      mom_id = nano.GenPart_pdgId().at(nano.GenPart_genPartIdxMother().at(mc_idx));
+    if (GenPart_genPartIdxMother.at(mc_idx) != -1)
+      mom_id = nano.GenPart_pdgId().at(GenPart_genPartIdxMother.at(mc_idx));
     if (abs(mom_id)==24 && abs(mc_id)>=1 && abs(mc_id)<=4)
       found_hadronic_w = true;
 
@@ -196,7 +197,7 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
           //check if another generator particle nearby
           bool found_other_particles = false;
           for (int mc_idx_2 = 0; mc_idx_2 < nano.nGenPart(); mc_idx_2++) {
-            bitset<15> mc_statusFlags2(nano.GenPart_statusFlags().at(mc_idx_2));
+            bitset<15> mc_statusFlags2(GenPart_statusFlags.at(mc_idx_2));
             compPart.SetPtEtaPhi(nano.GenPart_pt().at(mc_idx_2), 
                                  nano.GenPart_eta().at(mc_idx_2), 
                                  nano.GenPart_phi().at(mc_idx_2)); 
@@ -226,7 +227,7 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
           //check if another generator particle nearby
           bool found_other_particles = false;
           for (int mc_idx_2 = 0; mc_idx_2 < nano.nGenPart(); mc_idx_2++) {
-            bitset<15> mc_statusFlags2(nano.GenPart_statusFlags().at(mc_idx_2));
+            bitset<15> mc_statusFlags2(GenPart_statusFlags.at(mc_idx_2));
             compPart.SetPtEtaPhi(nano.GenPart_pt().at(mc_idx_2), 
                                  nano.GenPart_eta().at(mc_idx_2), 
                                  nano.GenPart_phi().at(mc_idx_2)); 
@@ -261,7 +262,6 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
 
     } //GenPart_pdgId==22
   } //loop over GenParts
-
   //This bit of code uses the overlap removal variable to then select whether an event should be kept or not. 
   //If the event contains should and does (does not) contain a generator photon then is_overlap_old = false, is_overlap = false, use_event = true (is_overlap_old=true, is_overlap=true, use_event=false)
   //If the event contains should not and does not (does) contain a generator photon then is_overlap_old = true, is_overlap = false, use_event = true (is_overlap_old=false, is_overlap=true, use_event=false)
