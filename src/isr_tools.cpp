@@ -8,9 +8,10 @@
 
 using namespace std;
 
-ISRTools::ISRTools(const string &name_, int year_, float nanoaod_version_):
+ISRTools::ISRTools(const string &name_, int year_, float nanoaod_version_, bool isData_):
   name(name_),
   year(year_),
+  isData(isData_),
   isTTJets_LO(false),
   isGluino(false),
   isTChi(false),
@@ -93,7 +94,7 @@ void ISRTools::WriteISRSystemPt(nano_tree &nano, pico_tree &pico) {
 std::map<int, std::vector<int> > ISRTools::GetChildMap(nano_tree & nano)
 {
   vector<int> GenPart_genPartIdxMother;
-  getGenPart_genPartIdxMother(nano, nanoaod_version, GenPart_genPartIdxMother);
+  if (!isData) getGenPart_genPartIdxMother(nano, nanoaod_version, GenPart_genPartIdxMother);
   map<int, vector<int> > child_map;
   for(int imc(0); imc<nano.nGenPart(); ++imc) {
     int mc_mom_index = GenPart_genPartIdxMother.at(imc);
@@ -106,7 +107,7 @@ void ISRTools::WriteISRJetMultiplicity(nano_tree &nano, pico_tree &pico) {
   bool verbose = false;
   map<int, vector<int> > child_map = GetChildMap(nano);
   vector<int> GenPart_genPartIdxMother;
-  getGenPart_genPartIdxMother(nano, nanoaod_version, GenPart_genPartIdxMother);
+  if (!isData) getGenPart_genPartIdxMother(nano, nanoaod_version, GenPart_genPartIdxMother);
   pico.out_nisr() = 0;
   for (size_t ijet(0); ijet<pico.out_jet_pt().size(); ijet++){
     if (!pico.out_jet_isgood()[ijet]) continue;

@@ -55,7 +55,7 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
   vector<int> Muon_nTrackerLayers;
   getMuon_nTrackerLayers(nano, nanoaod_version, Muon_nTrackerLayers);
   vector<int> Muon_genPartIdx;;
-  getMuon_genPartIdx(nano, nanoaod_version, Muon_genPartIdx);
+  if (!isData) getMuon_genPartIdx(nano, nanoaod_version, Muon_genPartIdx);
 
   //first, determine ordering based on signal and pt
   std::vector<NanoOrderEntry> nano_entries;

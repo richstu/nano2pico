@@ -137,7 +137,7 @@ array<short> Muon_jetIdx 12
 array<int> Muon_nStations
 array<char> Muon_nStations 12
 array<int> Muon_nTrackerLayers
-array<char> Muon_nTrackerLayers 12
+array<char> Muon_nTrackerLayers 11.9
 array<int> Muon_pdgId
 array<int> Muon_tightCharge
 array<char> Muon_tightCharge 12

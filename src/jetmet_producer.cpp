@@ -350,9 +350,9 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
   vector<int> Jet_jetId;
   getJetId(nano, nanoaod_version, Jet_jetId);
   vector<int> Jet_hadronFlavour;
-  getJet_hadronFlavour(nano, nanoaod_version, Jet_hadronFlavour);
+  if (!isData) getJet_hadronFlavour(nano, nanoaod_version, Jet_hadronFlavour);
   vector<int> Jet_partonFlavour;
-  getJet_partonFlavour(nano, nanoaod_version, Jet_partonFlavour);
+  if (!isData) getJet_partonFlavour(nano, nanoaod_version, Jet_partonFlavour);
   vector<int> Jet_genJetIdx;
   if (!isData) getJet_genJetIdx(nano, nanoaod_version, Jet_genJetIdx);
   vector<int> GenJet_partonFlavour;
@@ -561,9 +561,9 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
         pico.out_jet_m().push_back(Jet_mass[ijet]);
         //pico.out_jet_breg_corr().push_back(nano.Jet_bRegCorr()[ijet]);
         //pico.out_jet_breg_res().push_back(nano.Jet_bRegRes()[ijet]);
-	//        pico.out_jet_deepcsv().push_back(nano.Jet_btagDeepB()[ijet]);
-	pico.out_jet_btagpnetb().push_back(nano.Jet_btagPNetB()[ijet]);
-	pico.out_jet_btagak4b().push_back(nano.Jet_btagRobustParTAK4B()[ijet]);
+        if (nanoaod_version < 11.89) pico.out_jet_deepcsv().push_back(nano.Jet_btagDeepB()[ijet]);
+        if (nanoaod_version > 11.5) pico.out_jet_btagpnetb().push_back(nano.Jet_btagPNetB()[ijet]);
+        if (nanoaod_version > 11.95) pico.out_jet_btagak4b().push_back(nano.Jet_btagRobustParTAK4B()[ijet]);
         pico.out_jet_deepflav().push_back(nano.Jet_btagDeepFlavB()[ijet]);
         pico.out_jet_ne_emef().push_back(nano.Jet_neEmEF()[ijet]);
         //pico.out_jet_qgl().push_back(nano.Jet_qgl()[ijet]);
@@ -607,11 +607,11 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
       pico.out_njet()++;
       pico.out_ht() += Jet_pt[ijet];
       if ((nanoaod_version+0.01) < 12){
-	if (nano.Jet_btagDeepB()[ijet] > btag_wpts[0]) pico.out_nbl()++; 
-	if (nano.Jet_btagDeepB()[ijet] > btag_wpts[1]) pico.out_nbm()++; 
-	if (nano.Jet_btagDeepB()[ijet] > btag_wpts[2]) pico.out_nbt()++;
+        if (nano.Jet_btagDeepB()[ijet] > btag_wpts[0]) pico.out_nbl()++; 
+        if (nano.Jet_btagDeepB()[ijet] > btag_wpts[1]) pico.out_nbm()++; 
+        if (nano.Jet_btagDeepB()[ijet] > btag_wpts[2]) pico.out_nbt()++;
       } else {
-	if (nano.Jet_btagPNetB()[ijet] > btag_wpts[0]) pico.out_nbl()++;
+        if (nano.Jet_btagPNetB()[ijet] > btag_wpts[0]) pico.out_nbl()++;
         if (nano.Jet_btagPNetB()[ijet] > btag_wpts[1]) pico.out_nbm()++;
         if (nano.Jet_btagPNetB()[ijet] > btag_wpts[2]) pico.out_nbt()++;
       }
@@ -768,7 +768,7 @@ void JetMetProducer::WriteSubJets(nano_tree &nano, pico_tree &pico){
 }
 
 void JetMetProducer::WriteJetSystemPt(nano_tree &nano, pico_tree &pico, 
-				      vector<int> &sig_jet_nano_idx, const float &btag_wpt, bool isFastsim){
+                                      vector<int> &sig_jet_nano_idx, const float &btag_wpt, bool isFastsim){
 
   vector<float> Jet_pt, Jet_mass;
   getJetWithJEC(nano, isFastsim, Jet_pt, Jet_mass);
@@ -782,12 +782,12 @@ void JetMetProducer::WriteJetSystemPt(nano_tree &nano, pico_tree &pico,
 
     if (nanoaod_version+0.1 < 12) {
       if (nano.Jet_btagDeepB()[idx] <= btag_wpt){
-	njet_nob++;
-	jetsys_nob_v4 += ijet_v4;
+        njet_nob++;
+        jetsys_nob_v4 += ijet_v4;
       }
     } else {
       if (nano.Jet_btagPNetB()[idx] <= btag_wpt){
-	njet_nob++;
+        njet_nob++;
         jetsys_nob_v4 += ijet_v4;     
       }
     }

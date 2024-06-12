@@ -26,10 +26,10 @@ void HigVarProducer::WriteHigVars(pico_tree &pico, bool doDeepFlav, bool isSigna
   for (unsigned ijet(0); ijet<pico.out_jet_pt().size(); ijet++) {
     if (pico.out_jet_isgood()[ijet]) {
       float discr = -999;
-      if (nanoaod_version+0.01 < 12) {
-	discr = doDeepFlav ? pico.out_jet_deepflav()[ijet] : pico.out_jet_deepcsv()[ijet];
+      if (nanoaod_version+0.01 < 11.9) {
+        discr = doDeepFlav ? pico.out_jet_deepflav()[ijet] : pico.out_jet_deepcsv()[ijet];
       } else {
-	discr = doDeepFlav ? pico.out_jet_deepflav()[ijet] : pico.out_jet_btagpnetb()[ijet];
+        discr = doDeepFlav ? pico.out_jet_deepflav()[ijet] : pico.out_jet_btagpnetb()[ijet];
       }
       ordered_by_discr.push_back(make_pair(ijet, discr));
     }
@@ -112,8 +112,8 @@ void HigVarProducer::WriteHigVars(pico_tree &pico, bool doDeepFlav, bool isSigna
 
         vector<pair<TLorentzVector, float>> sys_ord_jet;
         for (unsigned ijet(0); ijet<sys_higvars[ijec].jet_lv.size(); ijet++) {
-	  sys_ord_jet.push_back(make_pair(sys_higvars[ijec].jet_lv[ijet], 
-					  sys_higvars[ijec].jet_deepcsv[ijet]));
+          sys_ord_jet.push_back(make_pair(sys_higvars[ijec].jet_lv[ijet], 
+          sys_higvars[ijec].jet_deepcsv[ijet]));
         }
 
         sort(sys_ord_jet.begin(), sys_ord_jet.end(), 

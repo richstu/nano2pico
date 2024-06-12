@@ -72,9 +72,9 @@ KinZfitter::KinZfitter(TString pdf_txtfile){
       std::istringstream iss(line);
       string p; double val;
       if(iss >> p >> val) {
-			if(p=="bwMean")  { BWmean_ = val; }
-			if(p=="bwGamma" ){ BWgamma_ = val;  }
-			if(p=="Gsigma" ) { sigmaValG_ = val; }
+        if(p=="bwMean")  { BWmean_ = val; }
+        if(p=="bwGamma" ){ BWgamma_ = val;  }
+        if(p=="Gsigma" ) { sigmaValG_ = val; }
       }
     }
   }
@@ -131,11 +131,11 @@ double KinZfitter::masserror( std::vector<TLorentzVector> Lep, std::vector<doubl
       variedLep.SetPtEtaPhiM(Lep[i].Pt()+ pterr[i], Lep[i].Eta(), Lep[i].Phi(), Lep[i].M());
       TLorentzVector compositeParticleVariation ;
       for(unsigned int j=0; j<Lep.size(); j++)
-	{
-	  if(i!=j)compositeParticleVariation+=Lep[j];
-	  else compositeParticleVariation+=variedLep;
-	}
-      masserr += (compositeParticleVariation.M()-mass)*(compositeParticleVariation.M()-mass);
+        {
+          if(i!=j)compositeParticleVariation+=Lep[j];
+          else compositeParticleVariation+=variedLep;
+        }
+     masserr += (compositeParticleVariation.M()-mass)*(compositeParticleVariation.M()-mass);
     }
   return sqrt(masserr);
 
@@ -452,9 +452,9 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
 
   // dot product to calculate (p1+p2+ph1+ph2).M()
   RooFormulaVar E1("E1", "TMath::Sqrt((@0*@0)/((TMath::Sin(@1))*(TMath::Sin(@1)))+@2*@2)",
-		   RooArgList(*pT1, *theta1, *m1));
+       RooArgList(*pT1, *theta1, *m1));
   RooFormulaVar E2("E2", "TMath::Sqrt((@0*@0)/((TMath::Sin(@1))*(TMath::Sin(@1)))+@2*@2)",
-		   RooArgList(*pT2, *theta2, *m2));
+       RooArgList(*pT2, *theta2, *m2));
   if(debug_) cout<<"E1 "<<E1.getVal()<<"; E2 "<<E2.getVal()<<endl;
 
   /////
@@ -472,16 +472,16 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
   RooRealVar* phiph2   = new RooRealVar("phiph2", "phi2", Vphiph2);
 
   RooFormulaVar Eph1("Eph1", "TMath::Sqrt((@0*@0)/((TMath::Sin(@1))*(TMath::Sin(@1))))",
-		     RooArgList(*pTph1, *thetaph1));
+         RooArgList(*pTph1, *thetaph1));
   RooFormulaVar Eph2("Eph2", "TMath::Sqrt((@0*@0)/((TMath::Sin(@1))*(TMath::Sin(@1))))",
-		     RooArgList(*pTph2, *thetaph2));
+         RooArgList(*pTph2, *thetaph2));
 
   //// dot products of 4-vectors
 
   // 3-vector DOT
   RooFormulaVar* p1v3D2 = new RooFormulaVar("p1v3D2",
-					    "@0*@1*( ((TMath::Cos(@2))*(TMath::Cos(@3)))/((TMath::Sin(@2))*(TMath::Sin(@3)))+(TMath::Cos(@4-@5)))",
-					    RooArgList(*pT1, *pT2, *theta1, *theta2, *phi1, *phi2));
+              "@0*@1*( ((TMath::Cos(@2))*(TMath::Cos(@3)))/((TMath::Sin(@2))*(TMath::Sin(@3)))+(TMath::Cos(@4-@5)))",
+              RooArgList(*pT1, *pT2, *theta1, *theta2, *phi1, *phi2));
   if(debug_) cout<<"p1 DOT p2 is "<<p1v3D2->getVal()<<endl;
   // 4-vector DOT metric 1 -1 -1 -1
   RooFormulaVar p1D2("p1D2", "@0*@1-@2", RooArgList(E1, E2, *p1v3D2));
@@ -490,16 +490,16 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
 
   // 3-vector DOT
   RooFormulaVar* p1v3Dph1 = new RooFormulaVar("p1v3Dph1",
-					      "@0*@1*( (TMath::Cos(@2)*TMath::Cos(@3))/(TMath::Sin(@2)*TMath::Sin(@3))+TMath::Cos(@4-@5))",
-					      RooArgList(*pT1, *pTph1, *theta1, *thetaph1, *phi1, *phiph1));
+                "@0*@1*( (TMath::Cos(@2)*TMath::Cos(@3))/(TMath::Sin(@2)*TMath::Sin(@3))+TMath::Cos(@4-@5))",
+                RooArgList(*pT1, *pTph1, *theta1, *thetaph1, *phi1, *phiph1));
 
   // 4-vector DOT metric 1 -1 -1 -1
   RooFormulaVar p1Dph1("p1Dph1", "@0*@1-@2", RooArgList(E1, Eph1, *p1v3Dph1));
 
   // 3-vector DOT
   RooFormulaVar* p2v3Dph1 = new RooFormulaVar("p2v3Dph1",
-					      "@0*@1*( (TMath::Cos(@2)*TMath::Cos(@3))/(TMath::Sin(@2)*TMath::Sin(@3))+TMath::Cos(@4-@5))",
-					      RooArgList(*pT2, *pTph1, *theta2, *thetaph1, *phi2, *phiph1));
+                "@0*@1*( (TMath::Cos(@2)*TMath::Cos(@3))/(TMath::Sin(@2)*TMath::Sin(@3))+TMath::Cos(@4-@5))",
+                RooArgList(*pT2, *pTph1, *theta2, *thetaph1, *phi2, *phiph1));
   // 4-vector DOT metric 1 -1 -1 -1
   RooFormulaVar p2Dph1("p2Dph1", "@0*@1-@2", RooArgList(E2, Eph1, *p2v3Dph1));
 
@@ -507,16 +507,16 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
 
   // 3-vector DOT
   RooFormulaVar* p1v3Dph2 = new RooFormulaVar("p1v3Dph2",
-					      "@0*@1*( (TMath::Cos(@2)*TMath::Cos(@3))/(TMath::Sin(@2)*TMath::Sin(@3))+TMath::Cos(@4-@5))",
-					      RooArgList(*pT1, *pTph2, *theta1, *thetaph2, *phi1, *phiph2));
+                "@0*@1*( (TMath::Cos(@2)*TMath::Cos(@3))/(TMath::Sin(@2)*TMath::Sin(@3))+TMath::Cos(@4-@5))",
+                RooArgList(*pT1, *pTph2, *theta1, *thetaph2, *phi1, *phiph2));
 
   // 4-vector DOT metric 1 -1 -1 -1
   RooFormulaVar p1Dph2("p1Dph2", "@0*@1-@2", RooArgList(E1, Eph2, *p1v3Dph2));
 
   // 3-vector DOT
   RooFormulaVar* p2v3Dph2 = new RooFormulaVar("p2v3Dph2",
-					      "@0*@1*( (TMath::Cos(@2)*TMath::Cos(@3))/(TMath::Sin(@2)*TMath::Sin(@3))+TMath::Cos(@4-@5))",
-					      RooArgList(*pT2, *pTph2, *theta2, *thetaph2, *phi2, *phiph2));
+                "@0*@1*( (TMath::Cos(@2)*TMath::Cos(@3))/(TMath::Sin(@2)*TMath::Sin(@3))+TMath::Cos(@4-@5))",
+                RooArgList(*pT2, *pTph2, *theta2, *thetaph2, *phi2, *phiph2));
   // 4-vector DOT metric 1 -1 -1 -1
   RooFormulaVar p2Dph2("p2Dph2", "@0*@1-@2", RooArgList(E2, Eph2, *p2v3Dph2));
 
@@ -524,8 +524,8 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
 
   // 3-vector DOT
   RooFormulaVar* ph1v3Dph2 = new RooFormulaVar("ph1v3Dph2",
-						 "@0*@1*( (TMath::Cos(@2)*TMath::Cos(@3))/(TMath::Sin(@2)*TMath::Sin(@3))+TMath::Cos(@4-@5))",
-					       RooArgList(*pTph1, *pTph2, *thetaph1, *thetaph2, *phiph1, *phiph2));
+                 "@0*@1*( (TMath::Cos(@2)*TMath::Cos(@3))/(TMath::Sin(@2)*TMath::Sin(@3))+TMath::Cos(@4-@5))",
+                 RooArgList(*pTph1, *pTph2, *thetaph1, *thetaph2, *phiph1, *phiph2));
   // 4-vector DOT metric 1 -1 -1 -1
   RooFormulaVar ph1Dph2("ph1Dph2", "@0*@1-@2", RooArgList(Eph1, Eph2, *ph1v3Dph2));
 
@@ -539,10 +539,10 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
     mZ1 = new RooFormulaVar("mZ1", "TMath::Sqrt(2*@0+@1*@1+@2*@2)", RooArgList(p1D2, *m1, *m2));
   } else if(p4sZ1ph_.size()==1) {
     mZ1 = new RooFormulaVar("mZ1", "TMath::Sqrt(2*@0+2*@1+2*@2+@3*@3+@4*@4)",
-			    RooArgList(p1D2, p1Dph1, p2Dph1, *m1, *m2));
+          RooArgList(p1D2, p1Dph1, p2Dph1, *m1, *m2));
   } else {
     mZ1 = new RooFormulaVar("mZ1", "TMath::Sqrt(2*@0+2*@1+2*@2+2*@3+2*@4+2*@5+@6*@6+@7*@7)",
-			    RooArgList(p1D2, p1Dph1, p2Dph1, p1Dph2, p2Dph2, ph1Dph2, *m1, *m2));
+          RooArgList(p1D2, p1Dph1, p2Dph1, p1Dph2, p2Dph2, ph1Dph2, *m1, *m2));
   }
 
   //If mll is outside the bounds of the fit return mll without a fit

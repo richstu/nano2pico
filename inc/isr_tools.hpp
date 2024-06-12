@@ -8,7 +8,7 @@
 class ISRTools{
 public:
 
-  explicit ISRTools(const std::string &name, int year, float nanoaod_version);
+  explicit ISRTools(const std::string &name, int year, float nanoaod_version, bool isData);
   ~ISRTools();
 
   bool IsLastCopyBeforeFSR_or_LastCopy(nano_tree &nano, int mc_index);
@@ -22,6 +22,7 @@ public:
 private:
   const std::string name;
   int year;
+  bool isData;
   bool isTTJets_LO;
   bool isGluino;
   bool isTChi;

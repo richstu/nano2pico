@@ -301,7 +301,7 @@ int main(int argc, char *argv[]){
   EventTools event_tools(in_path, year, isData, nanoaod_version);
   int event_type = event_tools.GetEventType();
 
-  ISRTools isr_tools(in_path, year, nanoaod_version);
+  ISRTools isr_tools(in_path, year, nanoaod_version, isData);
 
   // Initialize trees
   nano_tree nano(in_path, nanoaod_version);

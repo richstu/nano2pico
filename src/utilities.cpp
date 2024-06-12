@@ -385,7 +385,7 @@ void getFatJet_subJetIdx2(nano_tree & nano, float nanoaod_version, vector<int> &
 void getMuon_nTrackerLayers(nano_tree & nano, float nanoaod_version, vector<int> & Muon_nTrackerLayers) {
   Muon_nTrackerLayers.resize(nano.nMuon());
   for(int ipart(0); ipart<nano.nMuon(); ++ipart){
-    if (nanoaod_version+0.01 > 12) Muon_nTrackerLayers[ipart] = nano.Muon_nTrackerLayers_12p0()[ipart];
+    if (nanoaod_version+0.01 > 11.9) Muon_nTrackerLayers[ipart] = nano.Muon_nTrackerLayers_11p9()[ipart];
     else Muon_nTrackerLayers[ipart] = nano.Muon_nTrackerLayers()[ipart];
   }
 }
