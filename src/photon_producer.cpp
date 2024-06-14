@@ -275,7 +275,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
     if (nano.FsrPhoton_dROverEt2()[iph] > FsrPhotondRCut) continue;
 
     //Check for separation between fsrphoton and first photon candidate
-    if ( dR(pico.out_photon_eta()[0],nano.FsrPhoton_eta()[iph],pico.out_photon_phi()[0],nano.FsrPhoton_phi()[iph]) < FsrSeparationReq) continue;
+    if ((pico.out_nphoton() > 0) && dR(pico.out_photon_eta()[0],nano.FsrPhoton_eta()[iph],pico.out_photon_phi()[0],nano.FsrPhoton_phi()[iph]) < FsrSeparationReq) continue;
     
     //Add the values to the pico trees
     pico.out_fsrphoton_pt().push_back(nano.FsrPhoton_pt()[iph]);
