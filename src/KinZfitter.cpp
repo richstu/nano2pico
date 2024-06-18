@@ -420,14 +420,14 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
   double RECOpTph1max = RECOpTph1 < 2 ? RECOpTph1min : RECOpTph1+3*pTerrZ1_ph1;
   double RECOpTph2max = RECOpTph2 < 2 ? RECOpTph2min : RECOpTph2+3*pTerrZ1_ph2;
 
-  RooRealVar* pTph1RECO = new RooRealVar("pTph1RECO", "pTph1RECO", RECOpTph1, 2, 500);
-  RooRealVar* pTph2RECO = new RooRealVar("pTph2RECO", "pTph2RECO", RECOpTph2, 2, 500);
+  RooRealVar* pTph1RECO = new RooRealVar("pTph1RECO", "pTph1RECO", RECOpTph1, 2, 1200);
+  RooRealVar* pTph2RECO = new RooRealVar("pTph2RECO", "pTph2RECO", RECOpTph2, 2, 1200);
 
   RooRealVar* pTph1 = new RooRealVar("pTph1", "pTph1FIT", RECOpTph1, RECOpTph1min, RECOpTph1max);
   RooRealVar* pTph2 = new RooRealVar("pTph2", "pTph2FIT", RECOpTph2, RECOpTph2min, RECOpTph2max);
 
-  RooRealVar* pT1RECO = new RooRealVar("pT1RECO", "pT1RECO", RECOpT1, 5, 500);
-  RooRealVar* pT2RECO = new RooRealVar("pT2RECO", "pT2RECO", RECOpT2, 5, 500);
+  RooRealVar* pT1RECO = new RooRealVar("pT1RECO", "pT1RECO", RECOpT1, 5, 1200);
+  RooRealVar* pT2RECO = new RooRealVar("pT2RECO", "pT2RECO", RECOpT2, 5, 1200);
 
   double RECOpT1min = max(5.0, RECOpT1-3*pTerrZ1_1);
   double RECOpT2min = max(5.0, RECOpT2-3*pTerrZ1_2);
