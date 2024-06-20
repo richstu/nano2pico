@@ -141,7 +141,7 @@ int GetArrayLength(const std::string var_name){
   else if (var_type == "PSWeight") return 20;
   else if (var_type == "OtherPV") return 20;
   else if (var_type == "SV") return 40;
-  else if (var_type == "TrigObj") return 40;
+  else if (var_type == "TrigObj") return 100;
   else return -1;
 }
 

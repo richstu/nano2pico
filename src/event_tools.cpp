@@ -489,11 +489,13 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
   pico.out_HLT_Ele15_IsoVVVL_PFHT600() = nano.HLT_Ele15_IsoVVVL_PFHT600();
   pico.out_HLT_Ele50_IsoVVVL_PFHT450() = nano.HLT_Ele50_IsoVVVL_PFHT450();
 
+
+  
   //Ele32_WPTight_Gsf was not in menu for most of 2017, but can be emulated by
   //AND of Ele32_WPTight_Gsf_L1DoubleEG and single EG L1 seeds
   if (year==2017) {
     bool pass_l1_singleeg = false;
-    for (unsigned itrig = 0; itrig < nano.TrigObj_id().size(); itrig++) {
+    for (unsigned itrig = 0; itrig < nano.TrigObj_id().size(); itrig++) {  
       if (nano.TrigObj_id()[itrig]==11) {
         if ((nano.TrigObj_filterBits()[itrig] & 0x400)!=0) {
           pass_l1_singleeg = true;
@@ -647,25 +649,6 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
   pico.out_HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId_Mass55() = nano.HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId_Mass55();
   pico.out_HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90() = nano.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90();
   pico.out_HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95() = nano.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95();
-
-
-  //Ele32_WPTight_Gsf was not in menu for most of 2017, but can be emulated by
-  //AND of Ele32_WPTight_Gsf_L1DoubleEG and single EG L1 seeds
-  if (year==2017) {
-    bool pass_l1_singleeg = false;
-    for (unsigned itrig = 0; itrig < nano.TrigObj_id().size(); itrig++) {
-      if (nano.TrigObj_id()[itrig]==11) {
-        if ((nano.TrigObj_filterBits()[itrig] & 0x400)!=0) {
-          pass_l1_singleeg = true;
-        }
-      }
-    }
-    pico.out_HLT_Ele32_WPTight_Gsf_Emu() = nano.HLT_Ele32_WPTight_Gsf_L1DoubleEG() 
-                                           && pass_l1_singleeg;
-  }
-  else {
-    pico.out_HLT_Ele32_WPTight_Gsf_Emu() = false;
-  }
 
   //trigger summary branches for H->Zgamma
   pico.out_trig_single_el() = false;
