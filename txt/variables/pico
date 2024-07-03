@@ -11,6 +11,10 @@ bool old_stitch_dy
 bool is_overlap_old
 bool is_overlap
 bool use_event
+bool no_genb
+bool one_genb
+bool two_genb
+bool threeormore_genb
 
 ####################   Global   ###################
 int npv
@@ -620,6 +624,7 @@ bool HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId
 bool HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId_Mass55
 bool HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90
 bool HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95
+bool HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90
 
 
 ################  Systematic variations  ##################

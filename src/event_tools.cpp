@@ -20,6 +20,10 @@ EventTools::EventTools(const string &name_, int year_, bool isData_, float nanoa
   isWZ(false),
   isZZ(false),
   isFastSim(false),
+  isDiphoton(false),
+  isDiphoton1b(false),
+  isDiphoton2b(false),
+  isGJet(false),
   isData(isData_),
   nanoaod_version(nanoaod_version_),
   dataset(-1){
@@ -42,6 +46,17 @@ EventTools::EventTools(const string &name_, int year_, bool isData_, float nanoa
   if(Contains(name, "Fast"))
     isFastSim = true;
 
+  if(Contains(name, "DiPhotonJetsBox_MGG"))
+    isDiphoton = true;
+
+  if(Contains(name, "DiPhotonJetsBox1BJet"))
+    isDiphoton1b = true;
+
+  if(Contains(name, "DiPhotonJetsBox2BJets"))
+    isDiphoton2b = true;
+
+  if(Contains(name, "GJet_Pt"))
+    isGJet = true;
 
   //These four variables control the generator settings of the overlap removal variable in MC
   if(Contains(name, "WJetsToLNu") || Contains(name,"WGToLNuG_01J"))
@@ -161,6 +176,9 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
   if(isWW || isWZ){
     ptmin_old = 20;
   }
+  
+  int number_of_b = 0;
+  int number_of_promptgamma = 0;
 
   bool found_hadronic_w = false;
   bool found_higgs = false;
@@ -260,8 +278,57 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
         }
       }
 
+      //For bbgg analysis, if a prompt photon is found radiated off from a jet.
+      if(mc_statusFlags[0] && nano.GenPart_genPartIdxMother().at(mc_idx) != -1 && nano.GenPart_pt().at(mc_idx) >= 10){
+        
+        if (nano.GenPart_pdgId().at(nano.GenPart_genPartIdxMother().at(mc_idx)) == 5  || 
+            nano.GenPart_pdgId().at(nano.GenPart_genPartIdxMother().at(mc_idx)) == -5 || 
+            nano.GenPart_pdgId().at(nano.GenPart_genPartIdxMother().at(mc_idx)) == 4  || 
+            nano.GenPart_pdgId().at(nano.GenPart_genPartIdxMother().at(mc_idx)) == -4 || 
+            nano.GenPart_pdgId().at(nano.GenPart_genPartIdxMother().at(mc_idx)) == 3  || 
+            nano.GenPart_pdgId().at(nano.GenPart_genPartIdxMother().at(mc_idx)) == -3 || 
+            nano.GenPart_pdgId().at(nano.GenPart_genPartIdxMother().at(mc_idx)) == 2  || 
+            nano.GenPart_pdgId().at(nano.GenPart_genPartIdxMother().at(mc_idx)) == -2 || 
+            nano.GenPart_pdgId().at(nano.GenPart_genPartIdxMother().at(mc_idx)) == 1  || 
+            nano.GenPart_pdgId().at(nano.GenPart_genPartIdxMother().at(mc_idx)) == -1 || 
+            nano.GenPart_pdgId().at(nano.GenPart_genPartIdxMother().at(mc_idx)) == 21)    number_of_promptgamma += 1;     
+      } 
+
     } //GenPart_pdgId==22
+
+    //Overlap removal for bbgg analysis: between diphoton, diphoton1b and diphoton2b analysis
+    if(nano.GenPart_pdgId().at(mc_idx) == 5 || nano.GenPart_pdgId().at(mc_idx) == -5){
+      
+      if(mc_statusFlags[7] && nano.GenPart_pt().at(mc_idx) >= 10){  // isHardProcess and pt >= 10
+        TVector3 compPart,genb;
+        genb.SetPtEtaPhi(nano.GenPart_pt().at(mc_idx), 
+                            nano.GenPart_eta().at(mc_idx), 
+                            nano.GenPart_phi().at(mc_idx));      
+          
+        bool found_other_particles = false;
+        
+        for (int mc_idx_2 = 0; mc_idx_2 < nano.nGenPart(); mc_idx_2++) {     
+
+          double isocone_bbgg_b = 0.1;
+          bitset<15> mc_statusFlags2(nano.GenPart_statusFlags().at(mc_idx_2));
+          compPart.SetPtEtaPhi(nano.GenPart_pt().at(mc_idx_2), 
+                               nano.GenPart_eta().at(mc_idx_2), 
+                               nano.GenPart_phi().at(mc_idx_2));
+
+          if (nano.GenPart_pdgId().at(mc_idx_2) == 22) isocone_bbgg_b = 0.29; // 0.29 set instead of 0.3 because a lot of b were not meeting the criteria just because a photon was 0.29.. delta r away.
+
+          if ((compPart.Pt() >= 10.0) && (mc_idx != mc_idx_2) && (mc_statusFlags2[7] && genb.DeltaR(compPart) < isocone_bbgg_b)) {
+            found_other_particles = true;
+            break;
+          }     
+        }
+        if (!found_other_particles) number_of_b += 1;
+      } 
+
+    } //GenPart_pdgId==5/-5
+
   } //loop over GenParts
+
   //This bit of code uses the overlap removal variable to then select whether an event should be kept or not. 
   //If the event contains should and does (does not) contain a generator photon then is_overlap_old = false, is_overlap = false, use_event = true (is_overlap_old=true, is_overlap=true, use_event=false)
   //If the event contains should not and does not (does) contain a generator photon then is_overlap_old = true, is_overlap = false, use_event = true (is_overlap_old=false, is_overlap=true, use_event=false)
@@ -279,7 +346,28 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
     pico.out_use_event() = !pico.out_is_overlap();
   } else if( isZZ && ntrulep==4 ){ //ZZ only generated with ZZ->4l
     pico.out_use_event() = !pico.out_is_overlap();
-  } else {
+  } 
+    else if(isDiphoton || isDiphoton1b || isDiphoton2b){
+    if(number_of_b == 0){
+      pico.out_no_genb() = true;
+    }
+    else if(number_of_b == 1){
+      pico.out_one_genb() = true;
+    }
+    else if(number_of_b == 2){
+      pico.out_two_genb() = true;
+    }
+    else {
+      pico.out_threeormore_genb() = true;
+    }
+  }
+  else if(isGJet){
+    if(number_of_promptgamma == 1){
+      pico.out_use_event() = true; 
+    }
+  }
+
+  else {
     pico.out_is_overlap() = false; pico.out_use_event() = true;
   }
   //Note: removed overlap removal for WW and WWG since WWG sample may have bug
@@ -445,7 +533,7 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
   return;
 }
 
-bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZgamma){
+bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZgamma, bool isHiggsino){
 
   bool egamma_trigs = nano.HLT_Ele25_WPTight_Gsf() || nano.HLT_Ele27_WPTight_Gsf() || 
                       nano.HLT_Ele28_WPTight_Gsf() || nano.HLT_Ele30_WPTight_Gsf() || nano.HLT_Ele32_WPTight_Gsf() ||
@@ -616,7 +704,8 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
   // Dilepton and diphoton triggers
   bool doubleeg_trigs = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ() ||
       nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL() || nano.HLT_DoubleEle25_CaloIdL_MW() ||
-      nano.HLT_DoublePhoton70() || nano.HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId() ||
+      nano.HLT_DoublePhoton70() || nano.HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId() || 
+      nano.HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90() ||
       nano.HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId_Mass55() ||
       nano.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90() ||
       nano.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95();
@@ -649,6 +738,7 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
   pico.out_HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId_Mass55() = nano.HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId_Mass55();
   pico.out_HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90() = nano.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90();
   pico.out_HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95() = nano.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95();
+  pico.out_HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90() = nano.HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90();
 
   //trigger summary branches for H->Zgamma
   pico.out_trig_single_el() = false;
@@ -705,6 +795,13 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
     else if (dataset==Dataset::MuonEG && muoneg_trigs && !egamma_trigs && !doubleeg_trigs && !muon_trigs && !doublemuon_trigs) return true;
     else return false;
   }
+  else if (isHiggsino) {
+    // this assumes that we process either all the datasets or at least an ordered subset starting with the DoubleEG 
+    if (dataset==Dataset::DoubleEG                                 && doubleeg_trigs) return true;
+    else if (dataset==Dataset::EGamma                              && doubleeg_trigs) return true;
+    else if (dataset==Dataset::MET                    && met_trigs && !doubleeg_trigs) return true;
+    else return false;
+  }  
   else {
     // this assumes that we process either all the datasets or at least an ordered subset starting with the MET 
     // e.g. after measuring trigger efficiency, it would no longer be necessary to run on JetHT

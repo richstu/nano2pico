@@ -336,7 +336,7 @@ int main(int argc, char *argv[]){
       if(!inJSON(VVRunLumi, nano.run(), nano.luminosityBlock())) continue; 
     }
 
-    bool passed_trig = event_tools.SaveTriggerDecisions(nano, pico, isZgamma);
+    bool passed_trig = event_tools.SaveTriggerDecisions(nano, pico, isZgamma, isHiggsino);
     if (isData && !passed_trig) {
       continue;
     }
@@ -396,7 +396,7 @@ int main(int argc, char *argv[]){
     if(isZgamma || isHiggsino) 
       vector<int> sig_ph_nano_idx = photon_producer.WritePhotons(nano, pico, jet_isphoton_nano_idx,
                                                                  sig_el_nano_idx, sig_mu_nano_idx,
-                                                                 photon_el_pico_idx);
+                                                                 photon_el_pico_idx, isHiggsino);
     event_tools.WriteStitch(nano, pico);
     tk_producer.WriteIsoTracks(nano, pico, sig_el_nano_idx, sig_mu_nano_idx, isFastsim, is_preUL);
     dilep_producer.WriteDileptons(pico, sig_el_pico_idx, sig_mu_pico_idx);
@@ -413,6 +413,7 @@ int main(int argc, char *argv[]){
         jet_islep_nano_idx, jet_isvlep_nano_idx, jet_isphoton_nano_idx,
         btag_wpts[year_string], btag_df_wpts[year_string], isFastsim, isSignal, 
         is2022preEE, sys_higvars);
+
     jetmet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year_string][1], isFastsim); // usually w.r.t. medium WP
     jetmet_producer.WriteFatJets(nano, pico); // jetmet_producer.SetVerbose(nano.nSubJet()>0);
     jetmet_producer.WriteSubJets(nano, pico);
@@ -452,7 +453,7 @@ int main(int argc, char *argv[]){
   
     if (isHiggsino) gammagamma_producer.WriteGammaGammaVars(pico);
     if (isHiggsino) bb_producer.WriteBBVars(pico, /*doDeepFlav*/false);
-    if (isHiggsino) bb_producer.WriteBBVars(pico, /*doDeepFlav*/true);
+    //if (isHiggsino) bb_producer.WriteBBVars(pico, /*doDeepFlav*/true);
     if (isHiggsino) bbgammagamma_producer.WriteBBGammaGammaVars(pico);
 
     //save higgs variables using DeepCSV and DeepFlavor
@@ -464,12 +465,16 @@ int main(int argc, char *argv[]){
     event_tools.WriteDataQualityFilters(nano, pico, sig_jet_nano_idx, min_jet_pt, isFastsim, is_preUL);
 
     if (isHiggsino) event_tools.WriteTriggerEfficiency(pico);
-    if (isZgamma && !isData) {
+    if (isZgamma && !isData) { 
       std::vector<float> zgamma_trigsfs = trigger_weighter.GetSF(pico);
       pico.out_w_trig() = zgamma_trigsfs[0];
       pico.out_sys_trig().resize(2,0.);
       pico.out_sys_trig()[0] = zgamma_trigsfs[1];
       pico.out_sys_trig()[1] = zgamma_trigsfs[2];
+    }
+    else if(isHiggsino && !isData){ //Need to change this, hack for now
+      pico.out_sys_trig()[0] = 1;
+      pico.out_sys_trig()[1] = 1;
     }
 
     // ----------------------------------------------------------------------------------------------
@@ -600,16 +605,19 @@ int main(int argc, char *argv[]){
                           pico.out_w_lep() * pico.out_w_fs_lep() * pico.out_w_bhig() *
                           pico.out_w_isr() * pico.out_w_pu();
     }
-
     // ----------------------------------------------------------------------------------------------
     //              *** Add up weights to save for renormalization step ***
     // ----------------------------------------------------------------------------------------------
     if (debug) cout<<"INFO:: Writing sum of weights"<<endl;
     if (!isData) {
       wgt_sums.out_weight() += pico.out_weight();
-      // taking care of samples with negative weights
-      wgt_sums.out_neff() += nano.Generator_weight()>0 ? 1:-1;
-
+      
+      if (Contains(in_path, "DiPhotonJetsBox")){
+        wgt_sums.out_neff() += nano.Generator_weight(); //changed neff to double instead of int
+      }
+      else{
+        wgt_sums.out_neff() += nano.Generator_weight()>0 ? 1:-1;
+      }
       // leptons, keeping track of 0l and 1l totals separately to determine the SF for 0l events
       if(pico.out_nlep()==0){
         wgt_sums.out_nent_zlep() += 1.;
@@ -640,7 +648,7 @@ int main(int argc, char *argv[]){
       wgt_sums.out_w_pu()      += pico.out_w_pu();
       wgt_sums.out_w_trig()    += pico.out_w_trig();
 
-      for(size_t i = 0; i<2; ++i){ 
+      for(size_t i = 0; i<2; ++i){
         wgt_sums.out_sys_el()[i]         += pico.out_sys_el()[i];
         wgt_sums.out_sys_mu()[i]         += pico.out_sys_mu()[i];
         wgt_sums.out_sys_photon()[i]     += pico.out_sys_photon()[i];
@@ -652,6 +660,7 @@ int main(int argc, char *argv[]){
         wgt_sums.out_sys_isr()[i]        += pico.out_sys_isr()[i];
         wgt_sums.out_sys_pu()[i]         += pico.out_sys_pu()[i];
       }
+      
       for(size_t i = 0; i<pico.out_sys_murf().size(); ++i){ 
         wgt_sums.out_sys_murf()[i] += pico.out_sys_murf()[i];
       }
@@ -667,8 +676,6 @@ int main(int argc, char *argv[]){
   wgt_sums.Fill();
   wgt_sums.Write();
   pico.Write();
-
-  cout<<endl;
   time(&endtime); 
   cout<<"Time passed: "<<hoursMinSec(difftime(endtime, begtime))<<endl<<endl;  
 }

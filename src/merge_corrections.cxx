@@ -229,8 +229,8 @@ void FixLumi(corrections_tree &corr, const string &corr_path, int year){
     double exsec(0.);
     int mglu = GetHiggsinoMass(corr_path);
     xsec::higgsinoCrossSection(mglu, xsec, exsec);
-    xsec = xsec / .5824; // Remove H to bb branch ratio
-    exsec = exsec / .5824; // Remove H to bb branch ratio
+    xsec = xsec * (2*0.00227 - 0.00227 * 0.00227);
+    exsec = exsec; // Is exsec in cross_sec.cpp already multiplied by .5824 * .5824?
   } else if (Contains(corr_path, "SMS-TChi")){
     double exsec(0.);
     int mglu = GetHiggsinoMass(corr_path);
@@ -246,9 +246,8 @@ void FixLumi(corrections_tree &corr, const string &corr_path, int year){
     int mglu = GetGluinoMass(corr_path);
     xsec::gluinoCrossSection(mglu, xsec, exsec);
   }else{
-    xsec = xsec::crossSection(corr_path, year);  
+    xsec = xsec::crossSection(corr_path, year);
   }
-
   corr.out_w_lumi() = xsec*lumi/corr.out_neff();
 }
 

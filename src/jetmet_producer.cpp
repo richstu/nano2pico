@@ -347,6 +347,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
       Jet_mass.push_back(nano.Jet_mass()[ijet]*jer_nm_factor[ijet]);
     }
   }
+
   vector<int> Jet_jetId;
   getJetId(nano, nanoaod_version, Jet_jetId);
   vector<int> Jet_hadronFlavour;
@@ -385,7 +386,6 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
     pico.out_sys_njet().resize(4,0);
     //TODO add variations for deepflavor b-tagging
   }
-
   // saving jet info on all jets passing pt cut, including endcap
   for(int ijet(0); ijet<nano.nJet(); ++ijet){
     if (verbose) cout<<"Jet "<<ijet<<": pt = "<<setw(10)<<Jet_pt[ijet]
@@ -501,7 +501,6 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
           sys_jet_met_dphi.at(3).push_back(DeltaPhi(nano.Jet_phi()[ijet], pico.out_sys_met_phi()[3]));
       }
     }
-
     if (isvetojet) continue;
 
     if (Jet_pt[ijet] <= min_jet_pt && 
@@ -620,6 +619,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
       if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[2]) pico.out_nbdft()++; 
     }
   } // end jet loop
+  
   pico.out_low_dphi_mht_e5() = false;
   pico.out_low_dphi_met_e5() = false;
   for (unsigned ijet(0); ijet<pico.out_jet_mht_dphi().size(); ijet++){
@@ -639,8 +639,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
     if (ijet_e24==3) break;
     ijet_e24++;
   }
-
-  if (isSignal) {
+  if (isSignal && !sys_jet_met_dphi.empty()) {
     for (unsigned ijec(0); ijec < 4; ijec++) {
       for (unsigned ijet(0); ijet < sys_jet_met_dphi[ijec].size(); ijet++) {
         float cut_ = ijet<=1 ? 0.5 : 0.3;

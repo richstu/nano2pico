@@ -16,7 +16,7 @@ public:
   void WriteStitch(nano_tree &nano, pico_tree &pico);
   void WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, std::vector<int> sig_jet_nano_idx,
                                float min_jet_pt, bool isFastsim, bool is_preUL);
-  bool SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZgamma);
+  bool SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZgamma, bool isHiggsino);
   void WriteTriggerEfficiency(pico_tree &pico);
   int GetEventType();
 
@@ -35,6 +35,10 @@ private:
   bool isWZ;
   bool isZZ;
   bool isFastSim;
+  bool isDiphoton;
+  bool isDiphoton1b;
+  bool isDiphoton2b;
+  bool isGJet;
   bool isData;
   float nanoaod_version;
   int dataset;

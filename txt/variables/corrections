@@ -42,7 +42,7 @@ vector<float> sys_ps
 # vector<float> sys_pdf
 
 # additional variables
-int neff
+double neff
 int nent
 int neff_el
 int neff_pass_eltrigs

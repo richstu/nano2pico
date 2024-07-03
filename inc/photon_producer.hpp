@@ -30,7 +30,8 @@ public:
                                 std::vector<int> &jet_isphoton_nano_idx, 
                                 std::vector<int> &sig_el_nano_idx, 
                                 std::vector<int> &sig_mu_nano_idx,
-                                std::vector<int> &photon_el_pico_idx);
+                                std::vector<int> &photon_el_pico_idx,
+                                bool isHiggsino);
 
 private:
   int year;
