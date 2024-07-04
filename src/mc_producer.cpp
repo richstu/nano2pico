@@ -188,6 +188,7 @@ void GenParticleProducer::WriteGenParticles(nano_tree &nano, pico_tree &pico){
     pico.out_ntrumu()   = ntrumu;
     pico.out_ntrutaul() = ntrutaul;
     pico.out_ntrutauh() = ntrutauh;
+    pico.out_mc_weight() = nano.Generator_weight(); //only for undoing enhance factors for DiPhoton samples.
   }
 
   return;
