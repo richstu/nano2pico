@@ -231,6 +231,12 @@ void FixLumi(corrections_tree &corr, const string &corr_path, int year){
     xsec::higgsinoCrossSection(mglu, xsec, exsec);
     xsec = xsec * (2*0.00227 - 0.00227 * 0.00227);
     exsec = exsec; // Is exsec in cross_sec.cpp already multiplied by .5824 * .5824?
+  } else if (Contains(corr_path, "SMS-TChiHZ")&&Contains(corr_path, "HToGG")) {
+    double exsec(0.);
+    int mglu = GetHiggsinoMass(corr_path);
+    xsec::higgsinoCrossSection(mglu, xsec, exsec);
+    xsec = xsec * 2 * 0.5 * 0.5 * 0.00227; // assuming B(X->HG) = 0.5, B(X->ZG) = 0.5
+    exsec = exsec; // Is exsec in cross_sec.cpp already multiplied by .5824 * .5824?
   } else if (Contains(corr_path, "SMS-TChi")){
     double exsec(0.);
     int mglu = GetHiggsinoMass(corr_path);
