@@ -33,6 +33,8 @@ public:
                                   std::vector<int> &photon_el_pico_idx, 
                                   bool isZgamma, bool isFastsim);
 
+  float ConvertMVA(float mva_mini);
+
 private:
   int year;
   bool isData;

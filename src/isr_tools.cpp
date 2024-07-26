@@ -8,12 +8,14 @@
 
 using namespace std;
 
-ISRTools::ISRTools(const string &name_, int year_):
+ISRTools::ISRTools(const string &name_, int year_, float nanoaod_version_, bool isData_):
   name(name_),
   year(year_),
+  isData(isData_),
   isTTJets_LO(false),
   isGluino(false),
-  isTChi(false){
+  isTChi(false),
+  nanoaod_version(nanoaod_version_){
 
   if(Contains(name, "TTJets_") && Contains(name, "madgraphMLM")) 
     isTTJets_LO = true;
@@ -29,15 +31,20 @@ ISRTools::~ISRTools(){
 }
 
 bool ISRTools::IsLastCopyBeforeFSR_or_LastCopy(nano_tree & nano, int imc){
-  bitset<15> mc_statusFlags(nano.GenPart_statusFlags().at(imc));
-  int mc_mom_index = nano.GenPart_genPartIdxMother().at(imc);
+  vector<int> GenPart_statusFlags;
+  getGenPart_statusFlags(nano, nanoaod_version, GenPart_statusFlags);
+  vector<int> GenPart_genPartIdxMother;
+  getGenPart_genPartIdxMother(nano, nanoaod_version, GenPart_genPartIdxMother);
+
+  bitset<15> mc_statusFlags(GenPart_statusFlags.at(imc));
+  int mc_mom_index = GenPart_genPartIdxMother.at(imc);
   int mc_id = nano.GenPart_pdgId().at(imc);
 
   // 14: isLastCopyBeforeFSR
   // 13: isLastCopy
   if (mc_statusFlags[13] == 1) {
     if (mc_mom_index == -1) return true;
-    bitset<15> mom_statusFlags(nano.GenPart_statusFlags().at(mc_mom_index));
+    bitset<15> mom_statusFlags(GenPart_statusFlags.at(mc_mom_index));
     int mom_id = nano.GenPart_pdgId().at(mc_mom_index);
     // A lastCopyBeforeFSR exists
     if (mom_id == mc_id && mom_statusFlags[14] == 1) return false;
@@ -86,9 +93,11 @@ void ISRTools::WriteISRSystemPt(nano_tree &nano, pico_tree &pico) {
 
 std::map<int, std::vector<int> > ISRTools::GetChildMap(nano_tree & nano)
 {
+  vector<int> GenPart_genPartIdxMother;
+  if (!isData) getGenPart_genPartIdxMother(nano, nanoaod_version, GenPart_genPartIdxMother);
   map<int, vector<int> > child_map;
   for(int imc(0); imc<nano.nGenPart(); ++imc) {
-    int mc_mom_index = nano.GenPart_genPartIdxMother().at(imc);
+    int mc_mom_index = GenPart_genPartIdxMother.at(imc);
     child_map[mc_mom_index].push_back(imc);
   }
   return child_map;
@@ -97,7 +106,8 @@ std::map<int, std::vector<int> > ISRTools::GetChildMap(nano_tree & nano)
 void ISRTools::WriteISRJetMultiplicity(nano_tree &nano, pico_tree &pico) {
   bool verbose = false;
   map<int, vector<int> > child_map = GetChildMap(nano);
-
+  vector<int> GenPart_genPartIdxMother;
+  if (!isData) getGenPart_genPartIdxMother(nano, nanoaod_version, GenPart_genPartIdxMother);
   pico.out_nisr() = 0;
   for (size_t ijet(0); ijet<pico.out_jet_pt().size(); ijet++){
     if (!pico.out_jet_isgood()[ijet]) continue;
@@ -106,7 +116,7 @@ void ISRTools::WriteISRJetMultiplicity(nano_tree &nano, pico_tree &pico) {
     for (int imc(0); imc < nano.nGenPart(); imc++) {
       if (matched) break;
       if (nano.GenPart_status()[imc]!=23 || abs(nano.GenPart_pdgId()[imc])>5) continue;
-      int momid = abs(nano.GenPart_pdgId()[nano.GenPart_genPartIdxMother()[imc]]);
+      int momid = abs(nano.GenPart_pdgId()[GenPart_genPartIdxMother[imc]]);
       if(!(momid==6 || momid==23 || momid==24 || momid==25 || momid>1e6)) continue; 
       //check against daughter in case of hard initial splitting
       for (size_t idau(0); idau < child_map[imc].size(); idau++) {

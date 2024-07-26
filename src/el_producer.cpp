@@ -65,7 +65,17 @@ bool ElectronProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma) {
         return nano.Electron_mvaFall17V2Iso_WPL()[nano_idx];
       case 2022:
       case 2023:
+       // got these values from : https://twiki.cern.ch/twiki/bin/viewauth/CMS/MultivariateElectronIdentificationRun2#HZZ_MVA_training_details_and_wor
+       //early Run 3 HZZ SF is approved applying the 2018 WP
+       // 2.0 / (1.0 + exp(-2.0 * response)) - 1)
+       return ((pt < 10. && fabs(etasc) < 0.800 && nano.Electron_mvaHZZIso()[nano_idx] > ConvertMVA(1.49603193295)) || \
+         (pt < 10. && fabs(etasc) >= 0.800 && fabs(etasc) < 1.479 && nano.Electron_mvaHZZIso()[nano_idx] > ConvertMVA(1.52414154008)) || \
+         (pt < 10. && fabs(etasc) >= 1.479 && nano.Electron_mvaHZZIso()[nano_idx] > ConvertMVA(1.77694249574))|| \
+         (pt >= 10. && fabs(etasc) < 0.800 && nano.Electron_mvaHZZIso()[nano_idx] > ConvertMVA(0.199463934736)) || \
+         (pt >= 10. && fabs(etasc) >= 0.800 && fabs(etasc) < 1.479 && nano.Electron_mvaHZZIso()[nano_idx] > ConvertMVA(0.076063564084))|| \
+         (pt >= 10. && fabs(etasc) >= 1.479 && nano.Electron_mvaHZZIso()[nano_idx] > ConvertMVA(-0.572118857519)));
       default:
+        std::cout << "WARNING: year value not found in cases. Defaulting Electron MVA to WP90" << std::endl;
         return nano.Electron_mvaIso_WP90()[nano_idx];
     }
   }
@@ -163,6 +173,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
         case 2022:
         case 2023:
           pico.out_el_idmva().push_back(nano.Electron_mvaIso()[iel]);
+          pico.out_el_idmvaHZZ().push_back(nano.Electron_mvaHZZIso()[iel]);
           pico.out_el_sip3d().push_back(nano.Electron_sip3d()[iel]);
           pico.out_el_phidx().push_back(Electron_photonIdx[iel]);
           pico.out_el_id80().push_back(nano.Electron_mvaIso_WP80()[iel]);
@@ -170,6 +181,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
           pico.out_el_idLoose().push_back(nano.Electron_mvaIso_WP90()[iel]);
           pico.out_el_etPt().push_back(nano.Electron_scEtOverPt()[iel]);
           pico.out_el_eminusp().push_back(nano.Electron_eInvMinusPInv()[iel]);
+          pico.out_el_fsrphotonidx().push_back(nano.Electron_fsrPhotonIdx()[iel]);
           break;
         default:
           std::cout<<"Need code for new year in getZGammaElBr (in el_producer.cpp)"<<endl;
@@ -263,6 +275,11 @@ bool ElectronProducer::idElectron_noIso(int bitmap, int level){
     if ( ((bitmap >> i*3) & 0x7) < level) pass = false;
   }
   return pass;
+}
+
+float ElectronProducer::ConvertMVA(float mva_mini) {
+  float mva_nano = 2.0 / (1.0 + exp(-2.0 * mva_mini)) - 1;
+  return mva_nano;
 }
 
 bool ElectronProducer::EcalDriven(int bitmap){
