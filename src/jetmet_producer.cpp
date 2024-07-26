@@ -163,6 +163,18 @@ void JetMetProducer::GetJetUncertainties(nano_tree &nano, pico_tree &pico,
         indiv_jer_dn = 1.0+rng_.Gaus(0,sigmajer)*sqrt(std::max(sjer_dn*sjer_dn-1.0,0.0));
       }
 
+      //untested: turn off smearing for jets with pT<50 and 2.8<|eta|<3 in 2017UL and 2018UL
+      //this fixes an issue with PU jets in the horn region
+      //roughly modified strategy 2 from VBF SUSY: 
+      //https://indico.cern.ch/event/1046356/contributions/4397877/attachments/2259227/3834282/BrendaFabelaEnriquez_VBFSUSY_METstudies_JERCMeeting_June7_2021.pdf#page=7
+      if ((year==2017 || year==2018) && !is_preUL) {
+        if (fabs(jet_type_eta[ijet])>2.5 && fabs(jet_type_eta[ijet])<3.0 && jet_type_pt[ijet]<50.0) {
+          indiv_jer_nm = 1.0;
+          indiv_jer_up = 1.0;
+          indiv_jer_dn = 1.0;
+        }
+      }
+
       //Following NanoAOD-tools, JES uncertainties are evaluated post-smearing
       float jes_unc = map_jes_->evaluate({jet_type_eta[ijet],jet_type_pt[ijet]*indiv_jer_nm});
 
