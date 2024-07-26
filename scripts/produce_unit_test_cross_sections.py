@@ -127,3 +127,29 @@ if __name__ == "__main__":
         cross_section = map_nanoaodv9_cross_sections[filename][year][1]
         cross_section_log.write("filepath: "+path+" year: "+str(year)+" cross-section: "+str(cross_section)+" pb\n")
     cross_section_log.close()
+
+  elif args.nanoAOD_version == 'nanoaodv12':
+    # Print cross sections for NanoAODv12 mc files
+    # Get all NanoAODv9 filenames
+    nanoaodv12_folders = ["/net/cms11/cms11r0/pico/NanoAODv12/nano/2022/mc",
+                          "/net/cms11/cms11r0/pico/NanoAODv12/nano/2022EE/mc",
+                         ]
+    nanoaodv12_files = get_nanoaod_files(nanoaodv12_folders)
+    #nanoaodv12_cross_sections = [(path, cross section in pb)]
+    nanoaodv12_cross_sections = get_cross_sections(nanoaodv12_files)
+    # Organize cross sections
+    #map_nanoaodv12_cross_sections[filename][year] = (path, cross section in pb)
+    map_nanoaodv12_cross_sections = {}
+    for ifile, file_info in enumerate(nanoaodv12_files):
+      filename = file_info[0]
+      year = file_info[1]
+      cross_section = nanoaodv12_cross_sections[ifile][1]
+      map_nanoaodv12_cross_sections[os.path.basename(filename)] = {year:[filename, cross_section]}
+    # Write to log
+    cross_section_log = open(cross_section_log_name,'w')
+    for filename in sorted(map_nanoaodv12_cross_sections):
+      for year in sorted(map_nanoaodv12_cross_sections[filename]):
+        path = map_nanoaodv12_cross_sections[filename][year][0]
+        cross_section = map_nanoaodv12_cross_sections[filename][year][1]
+        cross_section_log.write("filepath: "+path+" year: "+str(year)+" cross-section: "+str(cross_section)+" pb\n")
+    cross_section_log.close()
