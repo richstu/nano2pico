@@ -516,9 +516,6 @@ int main(int argc, char *argv[]){
         pico.out_w_photon()       = w_photon_id * w_photon_csev;
         pico.out_sys_photon()[0]  = sys_photon[0];
         pico.out_sys_photon()[1]  = sys_photon[1];
-        pico.out_w_prefire()      = nano.L1PreFiringWeight_Nom();
-        pico.out_sys_prefire()[0] = nano.L1PreFiringWeight_Up();
-        pico.out_sys_prefire()[1] = nano.L1PreFiringWeight_Dn();
         pico.out_sys_fs_bchig().resize(2,1.); 
         pico.out_sys_fs_udsghig().resize(2,1.); 
         pico.out_sys_fs_lep().resize(2,1.);
@@ -526,6 +523,16 @@ int main(int argc, char *argv[]){
         pico.out_w_btag_df() = 1.; 
         pico.out_w_bhig()    = 1.; 
         pico.out_w_fs_lep()  = 1.;
+        if (year >= 2022) {
+          pico.out_w_prefire()      = 1.0;
+          pico.out_sys_prefire()[0] = 1.0;
+          pico.out_sys_prefire()[1] = 1.0;
+        }
+        else {
+          pico.out_w_prefire()      = nano.L1PreFiringWeight_Nom();
+          pico.out_sys_prefire()[0] = nano.L1PreFiringWeight_Up();
+          pico.out_sys_prefire()[1] = nano.L1PreFiringWeight_Dn();
+        }
       } else { // Pre-UL run 2
         pico.out_w_btag()    = btag_weighter.EventWeight(pico, BTagEntry::OP_MEDIUM, ctr, ctr);; 
         pico.out_w_btag_df() = btag_df_weighter.EventWeight(pico, BTagEntry::OP_MEDIUM, ctr, ctr); 
