@@ -426,6 +426,7 @@ vector<int>   mc_mom
 vector<int>   mc_momidx
 vector<int>   mc_status
 vector<int>   mc_statusflag
+float	      mc_weight
 
 int ntrulep
 int ntrumu
