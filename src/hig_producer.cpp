@@ -23,6 +23,7 @@ void HigVarProducer::WriteHigVars(pico_tree &pico, bool doDeepFlav, bool isSigna
   // get jet 4-vectors ordered by decreasing b-tag discriminator value,
   // also saving their original index in the pico.out_jet* vectors
   vector<pair<int, float>>  ordered_by_discr;
+  vector<pair<int, float>>  ordered_by_pt; //* new addition
   for (unsigned ijet(0); ijet<pico.out_jet_pt().size(); ijet++) {
     if (pico.out_jet_isgood()[ijet]) {
       float discr = -999;
@@ -32,6 +33,7 @@ void HigVarProducer::WriteHigVars(pico_tree &pico, bool doDeepFlav, bool isSigna
         discr = doDeepFlav ? pico.out_jet_deepflav()[ijet] : pico.out_jet_btagpnetb()[ijet];
       }
       ordered_by_discr.push_back(make_pair(ijet, discr));
+      ordered_by_pt.push_back(make_pair(ijet, pico.out_jet_pt()[ijet])); //* new addition
     }
   }
   // enough jets to make two higgses?
@@ -41,7 +43,15 @@ void HigVarProducer::WriteHigVars(pico_tree &pico, bool doDeepFlav, bool isSigna
           [](const pair<int, float> &a, const pair<int, float> &b) -> bool {
             return a.second > b.second;
           });
-
+    sort(ordered_by_pt.begin(), ordered_by_pt.end(), //* new addition
+          [](const pair<int, float> &a, const pair<int, float> &b) -> bool {
+            return a.second > b.second;
+          }); //* end of new addition
+    pico.out_jet_ordered_pt_indices().push_back(ordered_by_pt[0].first); //* new addition
+    pico.out_jet_ordered_pt_indices().push_back(ordered_by_pt[1].first); //* new addition
+    pico.out_jet_ordered_pt_indices().push_back(ordered_by_pt[2].first); //* new addition
+    pico.out_jet_ordered_pt_indices().push_back(ordered_by_pt[3].first); //* new addition
+ 
     vector<TLorentzVector> jets_lv;
     for (unsigned ijet(0); ijet<4; ijet++) {
       TLorentzVector lv;
@@ -77,6 +87,7 @@ void HigVarProducer::WriteHigVars(pico_tree &pico, bool doDeepFlav, bool isSigna
         pico.out_hig_df_cand_dm().insert(pico.out_hig_df_cand_dm().begin()+pos, idm);
         pico.out_hig_df_cand_am().insert(pico.out_hig_df_cand_am().begin()+pos, iam);
         pico.out_hig_df_cand_drmax().insert(pico.out_hig_df_cand_drmax().begin()+pos, idrmax);
+        if (pos==0) icomb_min_dm = ic; //* new addition       
       } else {
         for (unsigned i(0); i< pico.out_hig_cand_dm().size(); i++){
           if (idm > pico.out_hig_cand_dm()[i]) pos = i+1;
@@ -97,7 +108,13 @@ void HigVarProducer::WriteHigVars(pico_tree &pico, bool doDeepFlav, bool isSigna
       pico.out_jet_h2d()[ordered_by_discr[hcombs[icomb_min_dm][2]].first] = true;
       pico.out_jet_h2d()[ordered_by_discr[hcombs[icomb_min_dm][3]].first] = true;
 
-    }
+    } else{ //* new addition (save indices for deepflav)
+      pico.out_jet_h1_indices().push_back(ordered_by_discr[hcombs[icomb_min_dm][0]].first);
+      pico.out_jet_h1_indices().push_back(ordered_by_discr[hcombs[icomb_min_dm][1]].first);
+      pico.out_jet_h2_indices().push_back(ordered_by_discr[hcombs[icomb_min_dm][2]].first);
+      pico.out_jet_h2_indices().push_back(ordered_by_discr[hcombs[icomb_min_dm][3]].first);
+    } //* end of new addition
+
   } //if at least 4 good jets
 
   //make systematic variations. for now leave NanoAODv12
