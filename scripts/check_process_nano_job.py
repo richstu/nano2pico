@@ -63,7 +63,7 @@ outfile_path = tmp[6]+'/raw_pico/raw_pico_'+tmp[2]
 infile = TChain("Events");
 infile.Add(infile_path);
 in_nent = 0
-if 'data' in infile_path:
+if 'data/' in infile_path: # changed 'data' to 'data/' so that nano2pico can be run locally without errors 
   for i in range(0, infile.GetEntries()):
     infile.GetEntry(i)
     #check triggers, matching overlap removal scheme in event_tools.cpp
