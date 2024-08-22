@@ -67,7 +67,11 @@ int main(int argc, char *argv[]){
 
   //bool isData = Contains(in_file, "Run201") ? true : false;
   bool isData = Contains(in_file, "Run20") ? true : false; //Changed to allow for Run 3 data
-  bool isFastsim = Contains(in_file, "Fast") ? true : false;
+  //bool isFastsim = Contains(in_file, "Fast") ? true : false;  // new fastsim filenames use "FSUL" instead
+  //isFastsim = Contains(in_file, "FSUL") ? true : false;
+  bool isFastsim = false;
+  if (Contains(in_file, "Fast")) isFastsim = true;
+  if (Contains(in_file, "FSUL")) isFastsim = true;    
   bool isSignal = Contains(in_file, "TChiHH") || Contains(in_file, "T5qqqqZH") ? true : false;
   bool isZgamma = Contains(out_dir, "zgamma");
   bool isHiggsino = Contains(out_dir, "higgsino");
@@ -76,6 +80,7 @@ int main(int argc, char *argv[]){
   int is_preUL = true;
   if (regex_search(in_file, std::regex("RunIISummer\\d\\dUL"))) is_preUL = false;
   if (regex_search(in_file, std::regex("UL201\\d"))) is_preUL = false;
+  if (regex_search(in_file, std::regex("FSUL\\d\\d_FSUL\\d\\d"))) is_preUL = false; 
   // Find year and isAPV for MC
   if (!isData) { // MC
     if (!is_preUL) { // UL
@@ -83,6 +88,7 @@ int main(int argc, char *argv[]){
       if (regex_search(in_file, std::regex("RunIISummer\\d\\dUL16"))) year = 2016;
       else if (regex_search(in_file, std::regex("RunIISummer\\d\\dUL17"))) year = 2017;
       else if (regex_search(in_file, std::regex("RunIISummer\\d\\dUL18"))) year = 2018;
+      else if (regex_search(in_file, std::regex("FSUL16_FSUL16"))) year = 2016;
     } else { // Not UL
       if (regex_search(in_file, std::regex("RunIISummer16"))) year = 2016;
       else if (regex_search(in_file, std::regex("RunIIFall17"))) year = 2017;
@@ -473,6 +479,7 @@ int main(int argc, char *argv[]){
       pico.out_sys_trig()[1] = zgamma_trigsfs[2];
     }
     else if(isHiggsino && !isData){ //Need to change this, hack for now
+      pico.out_sys_trig().resize(2,0.);
       pico.out_sys_trig()[0] = 1;
       pico.out_sys_trig()[1] = 1;
     }
