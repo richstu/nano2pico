@@ -184,6 +184,10 @@ vector<float> jet_met_dphi
 vector<bool>  jet_h1d
 vector<bool>  jet_h2d
 vector<int>   jet_fjet_idx
+vector<int>   jet_h1_indices
+vector<int>   jet_h2_indices
+vector<int>   jet_ordered_pt_indices
+
 
 int ngenjet
 vector<float> genjet_pt
