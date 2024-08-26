@@ -27,6 +27,8 @@ float met_phi
 float met_calo
 float met_tru
 float met_tru_phi
+float met_tk
+float met_tk_phi
 float mt
 float mt_tru
 float ht_isr_me
@@ -159,6 +161,8 @@ vector<float> jet_breg_corr
 vector<float> jet_breg_res
 vector<float> jet_deepcsv
 vector<float> jet_deepflav
+vector<float> jet_btagpnetb
+vector<float> jet_btagak4b
 vector<int>   jet_puid
 vector<float> jet_puid_disc
 vector<float> jet_ne_emef
@@ -279,6 +283,7 @@ vector<float> el_dxy
 vector<float> el_ip3d
 vector<float> el_sip3d
 vector<float> el_idmva
+vector<float> el_idmvaHZZ
 vector<bool>  el_id
 vector<bool>  el_id80
 vector<bool>  el_id90
@@ -288,6 +293,7 @@ vector<bool>  el_ispf
 vector<int>   el_charge
 vector<int>   el_pflavor
 vector<bool>  el_ecal
+vector<int>   el_fsrphotonidx
 
 ##################   Di-Leptons   ################
 int nll
@@ -318,6 +324,7 @@ float ll_refit_minnll
 
 ##################   Photons   ###################
 int nphoton
+int photon_idx_hig019014
 vector<float> photon_pt
 vector<float> photon_eta
 vector<float> photon_phi
@@ -341,6 +348,7 @@ vector<float> photon_hoe
 vector<float> photon_esoversc
 vector<float> photon_essigmarr
 vector<float> photon_idmva
+vector<float> photon_pudisc
 vector<int>   photon_pflavor
 vector<bool>  photon_id
 vector<bool>  photon_id80
@@ -367,6 +375,7 @@ vector<float> fsrphoton_phi
 vector<float> fsrphoton_pt
 vector<float> fsrphoton_reliso
 vector<int>   fsrphoton_muonidx
+vector<int> fsrphoton_electronidx
 
 ###################   Tracks    ##################
 int ntk
@@ -491,8 +500,8 @@ bool HLT_Ele25_WPTight_Gsf
 bool HLT_Ele27_WPTight_Gsf
 bool HLT_Ele28_WPTight_Gsf
 bool HLT_Ele30_WPTight_Gsf
-bool HLT_Ele32_WPTight_Gsf_Emu
 bool HLT_Ele32_WPTight_Gsf_L1DoubleEG
+bool HLT_Ele32_WPTight_Gsf_Emu
 bool HLT_Ele32_WPTight_Gsf
 bool HLT_Ele35_WPTight_Gsf
 bool HLT_Ele20_WPLoose_Gsf

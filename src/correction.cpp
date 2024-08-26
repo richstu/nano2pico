@@ -585,7 +585,7 @@ double CompoundCorrection::evaluate(const std::vector<Variable::Type>& values) c
         case UpdateOp::Multiply: std::get<double>(ivalues[pos]) *= sf; break;
         case UpdateOp::Divide: std::get<double>(ivalues[pos]) /= sf; break;
         case UpdateOp::Last: throw std::logic_error("Illegal update op");
-	default: ;// Do nothing
+        default: ;// Do nothing
       }
     }
     if ( start ) { out = sf; start = false; }
@@ -595,7 +595,7 @@ double CompoundCorrection::evaluate(const std::vector<Variable::Type>& values) c
         case UpdateOp::Multiply: out *= sf; break;
         case UpdateOp::Divide: out /= sf; break;
         case UpdateOp::Last: out = sf;
-	default: ;// Do nothing
+        default: ;// Do nothing
       }
     }
   }

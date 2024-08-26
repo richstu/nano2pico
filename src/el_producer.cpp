@@ -56,8 +56,8 @@ bool ElectronProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma) {
   if (isZgamma) {
     if (pt <= ZgElectronPtCut) return false;
     if (fabs(etasc) > ElectronEtaCut) return false;
-    if (fabs(dz) > 1.0) return false;
-    if (fabs(dxy) > 0.5) return false; 
+    if (fabs(dz) > dzCut) return false;
+    if (fabs(dxy) > dxyCut) return false; 
     switch(year) {
       case 2016:
       case 2017:
@@ -65,7 +65,17 @@ bool ElectronProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma) {
         return nano.Electron_mvaFall17V2Iso_WPL()[nano_idx];
       case 2022:
       case 2023:
+       // got these values from : https://twiki.cern.ch/twiki/bin/viewauth/CMS/MultivariateElectronIdentificationRun2#HZZ_MVA_training_details_and_wor
+       //early Run 3 HZZ SF is approved applying the 2018 WP
+       // 2.0 / (1.0 + exp(-2.0 * response)) - 1)
+       return ((pt < 10. && fabs(etasc) < 0.800 && nano.Electron_mvaHZZIso()[nano_idx] > ConvertMVA(1.49603193295)) || \
+         (pt < 10. && fabs(etasc) >= 0.800 && fabs(etasc) < 1.479 && nano.Electron_mvaHZZIso()[nano_idx] > ConvertMVA(1.52414154008)) || \
+         (pt < 10. && fabs(etasc) >= 1.479 && nano.Electron_mvaHZZIso()[nano_idx] > ConvertMVA(1.77694249574))|| \
+         (pt >= 10. && fabs(etasc) < 0.800 && nano.Electron_mvaHZZIso()[nano_idx] > ConvertMVA(0.199463934736)) || \
+         (pt >= 10. && fabs(etasc) >= 0.800 && fabs(etasc) < 1.479 && nano.Electron_mvaHZZIso()[nano_idx] > ConvertMVA(0.076063564084))|| \
+         (pt >= 10. && fabs(etasc) >= 1.479 && nano.Electron_mvaHZZIso()[nano_idx] > ConvertMVA(-0.572118857519)));
       default:
+        std::cout << "WARNING: year value not found in cases. Defaulting Electron MVA to WP90" << std::endl;
         return nano.Electron_mvaIso_WP90()[nano_idx];
     }
   }
@@ -77,8 +87,8 @@ bool ElectronProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma) {
     if (pt <= SignalElectronPtCut) return false;
     if (fabs(eta) > ElectronEtaCut) return false;
     if (!idElectron_noIso(bitmap, 1)) return false;
-    if ((isBarrel && fabs(dz)>0.10) || (!isBarrel && fabs(dz)>0.20)) return false;
-    if ((isBarrel && fabs(dxy)>0.05) || (!isBarrel && fabs(dxy)>0.10)) return false; 
+    if ((isBarrel && fabs(dz)>0.10f) || (!isBarrel && fabs(dz)>0.20f)) return false;
+    if ((isBarrel && fabs(dxy)>0.05f) || (!isBarrel && fabs(dxy)>0.10f)) return false; 
     return (id && miniiso < ElectronMiniIsoCut);
   }
   return false;
@@ -131,8 +141,8 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
     if(isZgamma) { // For Zgamma productions
       if (pt <= ZgElectronPtCut) continue;
       if (fabs(etasc) > ElectronEtaCut) continue;
-      if (fabs(dz) > 1.0)  continue;
-      if (fabs(dxy) > 0.5) continue; 
+      if (fabs(dz) > dzCut)  continue;
+      if (fabs(dxy) > dxyCut) continue; 
       isSignal = IsSignal(nano, iel, isZgamma);
       float scale_syst_up = 1.0;
       float scale_syst_dn = 1.0;
@@ -163,6 +173,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
         case 2022:
         case 2023:
           pico.out_el_idmva().push_back(nano.Electron_mvaIso()[iel]);
+          pico.out_el_idmvaHZZ().push_back(nano.Electron_mvaHZZIso()[iel]);
           pico.out_el_sip3d().push_back(nano.Electron_sip3d()[iel]);
           pico.out_el_phidx().push_back(Electron_photonIdx[iel]);
           pico.out_el_id80().push_back(nano.Electron_mvaIso_WP80()[iel]);
@@ -170,6 +181,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
           pico.out_el_idLoose().push_back(nano.Electron_mvaIso_WP90()[iel]);
           pico.out_el_etPt().push_back(nano.Electron_scEtOverPt()[iel]);
           pico.out_el_eminusp().push_back(nano.Electron_eInvMinusPInv()[iel]);
+          pico.out_el_fsrphotonidx().push_back(nano.Electron_fsrPhotonIdx()[iel]);
           break;
         default:
           std::cout<<"Need code for new year in getZGammaElBr (in el_producer.cpp)"<<endl;
@@ -185,9 +197,9 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
       if (fabs(eta) > ElectronEtaCut) continue;
       int bitmap = nano.Electron_vidNestedWPBitmap()[iel];
       if (!idElectron_noIso(bitmap, 1)) continue;
-      bool isBarrel = fabs(eta) <= 1.479;
-      if ((isBarrel && fabs(dz)>0.10) || (!isBarrel && fabs(dz)>0.20)) continue;
-      if ((isBarrel && fabs(dxy)>0.05) || (!isBarrel && fabs(dxy)>0.10)) continue; 
+      bool isBarrel = fabs(eta) <= 1.479f;
+      if ((isBarrel && fabs(dz)>0.10f) || (!isBarrel && fabs(dz)>0.20f)) continue;
+      if ((isBarrel && fabs(dxy)>0.05f) || (!isBarrel && fabs(dxy)>0.10f)) continue; 
       isSignal = IsSignal(nano, iel, isZgamma);
       id = idElectron_noIso(bitmap,3);
     }
@@ -215,8 +227,8 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
       pico.out_nvlep()++;
       // save indices of matching jets
       for (int ijet(0); ijet<nano.nJet(); ijet++) {
-        if (dR(eta, nano.Jet_eta()[ijet], phi, nano.Jet_phi()[ijet])<0.4 &&
-            fabs(Jet_pt[ijet] - nano.Electron_pt()[iel])/nano.Electron_pt()[iel] < 1)
+        if (dR(eta, nano.Jet_eta()[ijet], phi, nano.Jet_phi()[ijet])<0.4f &&
+            fabs(Jet_pt[ijet] - nano.Electron_pt()[iel])/nano.Electron_pt()[iel] < 1.0f)
           jet_isvlep_nano_idx.push_back(ijet);
       }
     }
@@ -233,8 +245,8 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
       sig_el_pico_idx.push_back(pico_idx);
       // save indices of matching jets
       for (int ijet(0); ijet<nano.nJet(); ijet++) {
-        if (dR(eta, nano.Jet_eta()[ijet], phi, nano.Jet_phi()[ijet])<0.4 &&
-            fabs(Jet_pt[ijet] - nano.Electron_pt()[iel])/nano.Electron_pt()[iel] < 1)
+        if (dR(eta, nano.Jet_eta()[ijet], phi, nano.Jet_phi()[ijet])<jetDRCut &&
+            fabs(Jet_pt[ijet] - nano.Electron_pt()[iel])/nano.Electron_pt()[iel] < jetpTCut)
           jet_islep_nano_idx.push_back(ijet);
       }
     }
@@ -263,6 +275,11 @@ bool ElectronProducer::idElectron_noIso(int bitmap, int level){
     if ( ((bitmap >> i*3) & 0x7) < level) pass = false;
   }
   return pass;
+}
+
+float ElectronProducer::ConvertMVA(float mva_mini) {
+  float mva_nano = 2.0 / (1.0 + exp(-2.0 * mva_mini)) - 1;
+  return mva_nano;
 }
 
 bool ElectronProducer::EcalDriven(int bitmap){

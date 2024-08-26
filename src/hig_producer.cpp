@@ -18,14 +18,19 @@ HigVarProducer::~HigVarProducer(){
 }
 
 void HigVarProducer::WriteHigVars(pico_tree &pico, bool doDeepFlav, bool isSignal,
-                                  vector<HiggsConstructionVariables> sys_higvars){
+                                  vector<HiggsConstructionVariables> sys_higvars, float nanoaod_version){
 
   // get jet 4-vectors ordered by decreasing b-tag discriminator value,
   // also saving their original index in the pico.out_jet* vectors
   vector<pair<int, float>>  ordered_by_discr;
   for (unsigned ijet(0); ijet<pico.out_jet_pt().size(); ijet++) {
     if (pico.out_jet_isgood()[ijet]) {
-      float discr = doDeepFlav ? pico.out_jet_deepflav()[ijet] : pico.out_jet_deepcsv()[ijet];
+      float discr = -999;
+      if (nanoaod_version+0.01 < 11.9) {
+        discr = doDeepFlav ? pico.out_jet_deepflav()[ijet] : pico.out_jet_deepcsv()[ijet];
+      } else {
+        discr = doDeepFlav ? pico.out_jet_deepflav()[ijet] : pico.out_jet_btagpnetb()[ijet];
+      }
       ordered_by_discr.push_back(make_pair(ijet, discr));
     }
   }
@@ -95,8 +100,8 @@ void HigVarProducer::WriteHigVars(pico_tree &pico, bool doDeepFlav, bool isSigna
     }
   } //if at least 4 good jets
 
-  //make systematic variations
-  if (isSignal && !doDeepFlav) {
+  //make systematic variations. for now leave NanoAODv12
+  if (isSignal && !doDeepFlav && (nanoaod_version+0.01)<9) {
     pico.out_sys_hig_cand_dm().resize(4, -999.0);
     pico.out_sys_hig_cand_am().resize(4, -999.0);
     pico.out_sys_hig_cand_drmax().resize(4, -999.0);
@@ -108,7 +113,7 @@ void HigVarProducer::WriteHigVars(pico_tree &pico, bool doDeepFlav, bool isSigna
         vector<pair<TLorentzVector, float>> sys_ord_jet;
         for (unsigned ijet(0); ijet<sys_higvars[ijec].jet_lv.size(); ijet++) {
           sys_ord_jet.push_back(make_pair(sys_higvars[ijec].jet_lv[ijet], 
-                                sys_higvars[ijec].jet_deepcsv[ijet]));
+          sys_higvars[ijec].jet_deepcsv[ijet]));
         }
 
         sort(sys_ord_jet.begin(), sys_ord_jet.end(), 

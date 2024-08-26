@@ -91,7 +91,7 @@ void PrefireWeighter::EventWeight(nano_tree &nano, float & w_prefire, std::vecto
     //note: nanoAOD-tools also checks if the photon is in the electron list, we are following TreeMaker, which does not
     for (unsigned int ph_idx = 0; ph_idx < static_cast<unsigned int>(nano.nPhoton()); ph_idx++) {
       //note: TreeMaker seems to use a lower pt cut of 2. GeV while nanoAOD-tools uses a lower cut of 20. GeV
-      if (nano.Photon_pt()[ph_idx] < 2. || fabs(nano.Photon_eta()[ph_idx]) < 2.0 || fabs(nano.Photon_eta()[ph_idx]) > 3.0) {
+      if (nano.Photon_pt()[ph_idx] < 2.f || fabs(nano.Photon_eta()[ph_idx]) < 2.0f || fabs(nano.Photon_eta()[ph_idx]) > 3.0f) {
         //insert dummy SFs for unaffected photons to make indexing easier for overlap removal
         photon_sfs.push_back(std::pair<double,double>{1.,0.});
       }
@@ -102,7 +102,7 @@ void PrefireWeighter::EventWeight(nano_tree &nano, float & w_prefire, std::vecto
 
     //get prefiring SFs for jets and photons that overlap with jets
     for (unsigned int jet_idx = 0; jet_idx < static_cast<unsigned int>(nano.nJet()); jet_idx++) {
-      if (Jet_pt[jet_idx] < 2. || fabs(nano.Jet_eta()[jet_idx]) < 2.0 || fabs(nano.Jet_eta()[jet_idx]) > 3.0) continue;
+      if (Jet_pt[jet_idx] < 2.f || fabs(nano.Jet_eta()[jet_idx]) < 2.0f || fabs(nano.Jet_eta()[jet_idx]) > 3.0f) continue;
       float pt = Jet_pt[jet_idx];
       std::pair<double,double> jet_sf{1.,0.};
       if (use_jet_empt_) {
@@ -116,8 +116,8 @@ void PrefireWeighter::EventWeight(nano_tree &nano, float & w_prefire, std::vecto
       bool overlapping_photons = false;
       //photon overlap removal
       for (unsigned int ph_idx = 0; ph_idx < static_cast<unsigned int>(nano.nPhoton()); ph_idx++) {
-        if (nano.Photon_pt()[ph_idx] < 2. || fabs(nano.Photon_eta()[ph_idx]) < 2.0 || fabs(nano.Photon_eta()[ph_idx]) > 3.0) continue;
-        if (dR(nano.Photon_eta()[ph_idx], nano.Jet_eta()[jet_idx], nano.Photon_phi()[ph_idx], nano.Jet_phi()[jet_idx])<0.4) {
+        if (nano.Photon_pt()[ph_idx] < 2.f || fabs(nano.Photon_eta()[ph_idx]) < 2.0f || fabs(nano.Photon_eta()[ph_idx]) > 3.0f) continue;
+        if (dR(nano.Photon_eta()[ph_idx], nano.Jet_eta()[jet_idx], nano.Photon_phi()[ph_idx], nano.Jet_phi()[jet_idx])<0.4f) {
           overlapping_photons = true;
           if (jet_sf.first < photon_sfs[ph_idx].first) 
             //if jet non-prefire weight is lower, replace photon SF

@@ -1,5 +1,6 @@
 #include "event_weighter.hpp"
 
+#include <cmath>
 #include <iostream>
 #include <numeric>
 #include <string>
@@ -12,8 +13,8 @@
 
 using namespace std;
 
-EventWeighter::EventWeighter(int year, bool preVFP, const vector<float> &btag_wpts){
-  if (year==2016 && preVFP) {
+EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
+  if (year=="2016APV") {
     in_file_electron_        = "data/zgamma/2016preVFP_UL/electron_WPL.json";
     in_file_photon_          = "data/zgamma/2016preVFP_UL/photon.json";
     in_file_photon_mceff_    = "data/zgamma/2016preVFP_UL/photon_csev_mceff.json";
@@ -26,7 +27,7 @@ EventWeighter::EventWeighter(int year, bool preVFP, const vector<float> &btag_wp
     in_file_btag_mceff_      = "data/zgamma/2016preVFP_UL/btag_mceff.json";
     key_                     = "2016preVFP";
     puName_                  = "Collisions16_UltraLegacy_goldenJSON";
-  } else if (year==2016) {
+  } else if (year=="2016") {
     in_file_electron_        = "data/zgamma/2016postVFP_UL/electron_WPL.json";
     in_file_photon_          = "data/zgamma/2016postVFP_UL/photon.json";
     in_file_photon_mceff_    = "data/zgamma/2016postVFP_UL/photon_csev_mceff.json";
@@ -39,7 +40,7 @@ EventWeighter::EventWeighter(int year, bool preVFP, const vector<float> &btag_wp
     in_file_btag_mceff_      = "data/zgamma/2016postVFP_UL/btag_mceff.json";
     key_                     = "2016postVFP";
     puName_                  = "Collisions16_UltraLegacy_goldenJSON";
-  } else if (year==2017) {
+  } else if (year=="2017") {
     in_file_electron_        = "data/zgamma/2017_UL/electron_WPL.json";
     in_file_photon_          = "data/zgamma/2017_UL/photon.json";
     in_file_photon_mceff_    = "data/zgamma/2017_UL/photon_csev_mceff.json";
@@ -52,7 +53,7 @@ EventWeighter::EventWeighter(int year, bool preVFP, const vector<float> &btag_wp
     in_file_btag_mceff_      = "data/zgamma/2017_UL/btag_mceff.json";
     key_                     = "2017";
     puName_                  = "Collisions17_UltraLegacy_goldenJSON";
-  } else if (year==2018) {
+  } else if (year=="2018") {
     in_file_electron_        = "data/zgamma/2018_UL/electron_WPL.json";
     in_file_photon_          = "data/zgamma/2018_UL/photon.json";
     in_file_photon_mceff_    = "data/zgamma/2018_UL/photon_csev_mceff.json";
@@ -65,7 +66,7 @@ EventWeighter::EventWeighter(int year, bool preVFP, const vector<float> &btag_wp
     in_file_btag_mceff_      = "data/zgamma/2018_UL/btag_mceff.json";
     key_                     = "2018";
     puName_                  = "Collisions18_UltraLegacy_goldenJSON";
-  } else if (year==2022){
+  } else if (year=="2022"){
     std::cout<<"Using 2018 JSONs by default for now in event_weighter.cpp"<<endl;
     in_file_electron_        = "data/zgamma/2018_UL/electron_WPL.json";
     in_file_photon_          = "data/zgamma/2018_UL/photon.json";
@@ -74,12 +75,12 @@ EventWeighter::EventWeighter(int year, bool preVFP, const vector<float> &btag_wp
     in_file_muon_lowpt_reco_ = "data/zgamma/2018_UL/muon_Jpsi_reco.json";
     in_file_muon_lowpt_id_   = "data/zgamma/2018_UL/muon_Jpsi_id.json";
     in_file_muon_mceff_      = "data/zgamma/2018_UL/muon_mceff.json";
-    in_file_pu_              = "data/zgamma/2018_UL/puWeights.json";
+    in_file_pu_              = "data/zgamma/2022/puWeights.json";
     in_file_btag_            = "data/zgamma/2018_UL/btagging.json";
     in_file_btag_mceff_      = "data/zgamma/2018_UL/btag_mceff.json";
     key_                     = "2018";
-    puName_                  = "Collisions18_UltraLegacy_goldenJSON";
-  } else if (year==2023){
+    puName_                  = "Collisions2022_355100_357900_eraBCD_GoldenJson";
+  } else if (year=="2022EE"){
     std::cout<<"Using 2018 JSONs by default for now in event_weighter.cpp"<<endl;
     in_file_electron_        = "data/zgamma/2018_UL/electron_WPL.json";
     in_file_photon_          = "data/zgamma/2018_UL/photon.json";
@@ -88,11 +89,39 @@ EventWeighter::EventWeighter(int year, bool preVFP, const vector<float> &btag_wp
     in_file_muon_lowpt_reco_ = "data/zgamma/2018_UL/muon_Jpsi_reco.json";
     in_file_muon_lowpt_id_   = "data/zgamma/2018_UL/muon_Jpsi_id.json";
     in_file_muon_mceff_      = "data/zgamma/2018_UL/muon_mceff.json";
-    in_file_pu_              = "data/zgamma/2018_UL/puWeights.json";
+    in_file_pu_              = "data/zgamma/2022EE/puWeights.json";
     in_file_btag_            = "data/zgamma/2018_UL/btagging.json";
     in_file_btag_mceff_      = "data/zgamma/2018_UL/btag_mceff.json";
     key_                     = "2018";
-    puName_                  = "Collisions18_UltraLegacy_goldenJSON";
+    puName_                  = "Collisions2022_359022_362760_eraEFG_GoldenJson";
+  } else if (year=="2023"){
+    std::cout<<"Using 2018 JSONs by default for now in event_weighter.cpp"<<endl;
+    in_file_electron_        = "data/zgamma/2018_UL/electron_WPL.json";
+    in_file_photon_          = "data/zgamma/2018_UL/photon.json";
+    in_file_photon_mceff_    = "data/zgamma/2018_UL/photon_csev_mceff.json";
+    in_file_muon_            = "data/zgamma/2018_UL/muon_Z.json";
+    in_file_muon_lowpt_reco_ = "data/zgamma/2018_UL/muon_Jpsi_reco.json";
+    in_file_muon_lowpt_id_   = "data/zgamma/2018_UL/muon_Jpsi_id.json";
+    in_file_muon_mceff_      = "data/zgamma/2018_UL/muon_mceff.json";
+    in_file_pu_              = "data/zgamma/2023/puWeights.json";
+    in_file_btag_            = "data/zgamma/2018_UL/btagging.json";
+    in_file_btag_mceff_      = "data/zgamma/2018_UL/btag_mceff.json";
+    key_                     = "2018";
+    puName_                  = "Collisions2023_366403_369802_eraBC_GoldenJson";
+  } else if (year=="2023BPix"){
+    std::cout<<"Using 2018 JSONs by default for now in event_weighter.cpp"<<endl;
+    in_file_electron_        = "data/zgamma/2018_UL/electron_WPL.json";
+    in_file_photon_          = "data/zgamma/2018_UL/photon.json";
+    in_file_photon_mceff_    = "data/zgamma/2018_UL/photon_csev_mceff.json";
+    in_file_muon_            = "data/zgamma/2018_UL/muon_Z.json";
+    in_file_muon_lowpt_reco_ = "data/zgamma/2018_UL/muon_Jpsi_reco.json";
+    in_file_muon_lowpt_id_   = "data/zgamma/2018_UL/muon_Jpsi_id.json";
+    in_file_muon_mceff_      = "data/zgamma/2018_UL/muon_mceff.json";
+    in_file_pu_              = "data/zgamma/2023BPix/puWeights.json";
+    in_file_btag_            = "data/zgamma/2018_UL/btagging.json";
+    in_file_btag_mceff_      = "data/zgamma/2018_UL/btag_mceff.json";
+    key_                     = "2018";
+    puName_                  = "Collisions2023_369803_370790_eraD_GoldenJson";
   } else {
     std::cout<<"Year has not been implemented in event_weighter"<<endl;
   }
@@ -135,9 +164,11 @@ void EventWeighter::ElectronSF(pico_tree &pico){
   //SF logic: for each true electron, weight by prob(MC)/prob(data) which is
   //prob(reco and pass id) or prob(fail)=1-prob(reco and pass id)
   for (unsigned imc = 0; imc < pico.out_mc_id().size(); imc++) {
-    if (abs(pico.out_mc_id().at(imc))==11 && ((pico.out_mc_statusflag().at(imc) & 0x2000)!=0)) {
-      //is electron and last copy
-      if ((pico.out_mc_pt().at(imc)<10) || (fabs(pico.out_mc_eta().at(imc))>2.5)) continue;
+    if (abs(pico.out_mc_id().at(imc))==11 && 
+        ((pico.out_mc_statusflag().at(imc) & 0x2000)!=0) &&
+        ((pico.out_mc_statusflag().at(imc) & 0x1) != 0)) {
+      //is electron and last copy and prompt
+      if ((pico.out_mc_pt().at(imc)<7.0f) || (fabs(pico.out_mc_eta().at(imc))>2.5f)) continue;
       bool pass_id = false;
       float reco_pt = -999;
       float reco_eta = -999;
@@ -146,7 +177,7 @@ void EventWeighter::ElectronSF(pico_tree &pico){
         if (pico.out_el_sig().at(iel)) {
           float dr = dR(pico.out_mc_eta().at(imc),pico.out_el_eta().at(iel),
                         pico.out_mc_phi().at(imc),pico.out_el_phi().at(iel));
-          if (dr < 0.2 && dr < min_dr) {
+          if (dr < 0.4f && dr < min_dr) {
             reco_pt = pico.out_el_pt().at(iel);
             reco_eta = pico.out_el_eta().at(iel);
             min_dr = dr;
@@ -162,30 +193,22 @@ void EventWeighter::ElectronSF(pico_tree &pico){
       float data_eff = map_electron_->evaluate({"effdata", reco_eta, reco_pt});
       float mc_unc = map_electron_->evaluate({"systmc", reco_eta, reco_pt});
       float data_unc = map_electron_->evaluate({"systdata", reco_eta, reco_pt});
-      float data_eff_up = data_eff+data_unc;
-      float data_eff_dn = data_eff-data_unc;
-      float mc_eff_up = mc_eff+mc_unc;
-      float mc_eff_dn = mc_eff-mc_unc;
-      if (data_eff_up > 1.0) data_eff_up = 1.0;
-      if (data_eff_dn < 0.0) data_eff_dn = 0.0;
-      if (mc_eff_up > 1.0) mc_eff_up = 1.0;
-      if (mc_eff_dn < 0.0) mc_eff_dn = 0.0;
-      //for variations consider "worst case": data overestimated and mc 
-      //underestimated or vice-versa
-      float sf = data_eff/mc_eff;
-      float sf_up = data_eff_up/mc_eff_dn;
-      float sf_dn = data_eff_dn/mc_eff_up;
-      if (!pass_id) {
-        sf = (1.0-data_eff)/(1.0-mc_eff);
-        sf_up = (1.0-data_eff_up)/(1.0-mc_eff_dn);
-        sf_dn = (1.0-data_eff_dn)/(1.0-mc_eff_up);
+      float pass_sf = 1.0;
+      float fail_sf = 1.0;
+      float pass_unc = 0.0;
+      float fail_unc = 0.0;
+      propagate_uncertainty_ratio(data_eff, data_unc, mc_eff, mc_unc, pass_sf, pass_unc);
+      propagate_uncertainty_ratio(1.0-data_eff, data_unc, 1.0-mc_eff, mc_unc, fail_sf, fail_unc);
+      if (pass_id) {
+        sf_tot *= pass_sf;
+        sf_tot_up *= (pass_sf+pass_unc);
+        sf_tot_dn *= fmax(pass_sf-pass_unc,0);
       }
-      if (isnan(sf)||isinf(sf)) sf = 1.0;
-      if (isnan(sf_up)||isinf(sf_up)) sf_up = 1.0;
-      if (isnan(sf_dn)||isinf(sf_dn)) sf_dn = 1.0;
-      sf_tot *= sf;
-      sf_tot_up *= sf_up;
-      sf_tot_dn *= sf_dn;
+      else {
+        sf_tot *= fail_sf;
+        sf_tot_up *= fmax(fail_sf-fail_unc,0);
+        sf_tot_dn *= (fail_sf+fail_unc);
+      }
     }
   }
   pico.out_w_el() = sf_tot;
@@ -220,50 +243,48 @@ void EventWeighter::PhotonCSEVSF(pico_tree &pico, float &w_photon_csev, std::vec
                      (pico.out_photon_isScEtaEE().at(iph) && mva>-0.58));
     float drmin = pico.out_photon_drmin().at(iph);
     bool eveto = pico.out_photon_elveto().at(iph);
-    if (pt < 15 || !pass_mva || drmin < 0.4) continue;
+    if (pt < 15.0f || !pass_mva || drmin < 0.4f) continue;
     if (pico.out_photon_pflavor().at(iph) != 1) continue;
     //find category
     if (pico.out_photon_isScEtaEB().at(iph)) {
-      if (fabs(pico.out_photon_r9().at(iph)) > 0.94) {
+      if (fabs(pico.out_photon_r9().at(iph)) > 0.94f) {
         category = "EBHighR9";
       } else {
         category = "EBLowR9";
       }
     } else {
-      if (fabs(pico.out_photon_r9().at(iph)) > 0.94) {
+      if (fabs(pico.out_photon_r9().at(iph)) > 0.94f) {
         category = "EEHighR9";
       } else {
         category = "EELowR9";
       }
     }
     float sf = map_photon_csev_->evaluate({key_, "sf", "MVA", category});
-    float sf_up = map_photon_csev_->evaluate({key_, "sf", "MVA", category});
-    float sf_dn = map_photon_csev_->evaluate({key_, "sf", "MVA", category});
+    float sf_up = map_photon_csev_->evaluate({key_, "sfup", "MVA", category});
+    float sf_dn = map_photon_csev_->evaluate({key_, "sfdown", "MVA", category});
     float mc_eff = map_photon_csev_mceff_->evaluate({"effmc", category});
     float mc_syst_up = map_photon_csev_mceff_->evaluate({"systmc_up", category});
     float mc_syst_dn = map_photon_csev_mceff_->evaluate({"systmc_dn", category});
-    float mc_eff_up = mc_eff+mc_syst_up;
-    float mc_eff_dn = mc_eff+mc_syst_dn;
-    float data_eff = sf*mc_eff;
-    float data_eff_up = sf_up*mc_eff;
-    float data_eff_dn = sf_dn*mc_eff;
-    float ph_sf(1.0), ph_sf_up(1.0), ph_sf_dn(1.0);
+    float data_eff = 1.0;
+    float data_syst_up = 0.0;
+    float data_syst_dn = 0.0;
+    float fail_sf = 1.0;
+    float fail_unc_up = 0.0;
+    float fail_unc_dn = 0.0;
+    propagate_uncertainty_product(mc_eff, mc_syst_up, sf, fabs(sf_up-sf), data_eff, data_syst_up);
+    propagate_uncertainty_product(mc_eff, mc_syst_dn, sf, fabs(sf-sf_dn), data_eff, data_syst_dn);
+    propagate_uncertainty_ratio(1.0-data_eff, data_syst_up, 1.0-mc_eff, mc_syst_dn, fail_sf, fail_unc_up);
+    propagate_uncertainty_ratio(1.0-data_eff, data_syst_dn, 1.0-mc_eff, mc_syst_up, fail_sf, fail_unc_dn);
     if (eveto) { //passes csev
-      ph_sf = data_eff/mc_eff;
-      ph_sf_up = data_eff_up/mc_eff_dn;
-      ph_sf_dn = data_eff_dn/mc_eff_up;
+      sf_tot *= sf;
+      sf_tot_up *= sf_up;
+      sf_tot_dn *= sf_dn;
     }
     else { //fails csev
-      ph_sf = (1.0-data_eff)/(1.0-mc_eff);
-      ph_sf_up = (1.0-data_eff_up)/(1.0-mc_eff_dn);
-      ph_sf_dn = (1.0-data_eff_dn)/(1.0-mc_eff_up);
+      sf_tot *= fail_sf;
+      sf_tot_up *= fmax(fail_sf-fail_unc_up,0);
+      sf_tot_dn *= (fail_sf+fail_unc_dn);
     }
-    if (isinf(ph_sf)||isnan(ph_sf)) ph_sf = 1.0;
-    if (isinf(ph_sf_up)||isnan(ph_sf_up)) ph_sf_up = 1.0;
-    if (isinf(ph_sf_dn)||isnan(ph_sf_dn)) ph_sf_dn = 1.0;
-    sf_tot *= ph_sf;
-    sf_tot_up *= ph_sf_up;
-    sf_tot_dn *= ph_sf_dn;
   }
   w_photon_csev = sf_tot;
   sys_photon_csev[0] *= sf_tot_up;
@@ -280,7 +301,7 @@ void EventWeighter::MuonSF(pico_tree &pico){
   for (unsigned imc = 0; imc < pico.out_mc_id().size(); imc++) {
     if (abs(pico.out_mc_id().at(imc))==13 && ((pico.out_mc_statusflag().at(imc) & 0x2000)!=0)) {
       //is muon and last copy
-      if (pico.out_mc_pt().at(imc)<5 || fabs(pico.out_mc_eta().at(imc))>2.4) continue;
+      if (pico.out_mc_pt().at(imc)<5.0f || fabs(pico.out_mc_eta().at(imc))>2.4f) continue;
       bool pass_id = false;
       float reco_pt = -999;
       float reco_eta = -999;
@@ -289,7 +310,7 @@ void EventWeighter::MuonSF(pico_tree &pico){
         if (pico.out_mu_sig().at(imu)) {
           float dr = dR(pico.out_mc_eta().at(imc),pico.out_mu_eta().at(imu),
                         pico.out_mc_phi().at(imc),pico.out_mu_phi().at(imu));
-          if (dr < 0.1 && dr < min_dr) {
+          if (dr < 0.1f && dr < min_dr) {
             reco_pt = pico.out_mu_pt().at(imu);
             reco_eta = pico.out_mu_eta().at(imu);
             min_dr = dr;
@@ -304,7 +325,7 @@ void EventWeighter::MuonSF(pico_tree &pico){
       float sf = 1.0;
       float sf_up = 1.0;
       float sf_dn = 1.0;
-      if (reco_pt < 15) {
+      if (reco_pt < 15.0f) {
         float reco_sf = map_muon_lowpt_reco_->evaluate({"sf", std::abs(reco_eta), reco_pt});
         float reco_sf_unc = map_muon_lowpt_reco_->evaluate({"unc", std::abs(reco_eta), reco_pt});
         float id_sf = map_muon_lowpt_id_->evaluate({"sf", std::abs(reco_eta), reco_pt});
@@ -314,7 +335,7 @@ void EventWeighter::MuonSF(pico_tree &pico){
         sf_dn = (reco_sf-reco_sf_unc)*(id_sf-id_sf_unc);
         if (sf_dn < 0) sf_dn = 0;
       }
-      else if (reco_pt < 200) {
+      else if (reco_pt < 200.0f) {
         float id_sf = map_muon_looseid_->evaluate({key_ + "_UL", std::abs(reco_eta), reco_pt, "sf"});
         float id_sf_up = map_muon_looseid_->evaluate({key_ + "_UL", std::abs(reco_eta), reco_pt, "systup"});
         float id_sf_dn = map_muon_looseid_->evaluate({key_ + "_UL", std::abs(reco_eta), reco_pt, "systdown"});
@@ -336,31 +357,29 @@ void EventWeighter::MuonSF(pico_tree &pico){
         sf_up = id_sf_up*iso_sf_up;
         sf_dn = id_sf_dn*iso_sf_dn;
       }
+      //mc_eff is efficiency to pass reco,ID,and Iso
       float mc_eff = map_muon_mceff_->evaluate({"effmc", std::abs(reco_eta), reco_pt});
       float mc_syst = map_muon_mceff_->evaluate({"systmc", std::abs(reco_eta), reco_pt});
-      float mc_eff_up = mc_eff+mc_syst;
-      float mc_eff_dn = mc_eff-mc_syst;
-      if (mc_eff_up > 1.0) mc_eff_up = 1.0;
-      if (mc_eff_dn < 0.0) mc_eff_dn = 0.0;
-      float data_eff = sf*mc_eff;
-      float data_eff_up = sf_up*mc_eff;
-      float data_eff_dn = sf_dn*mc_eff;
-      //for variations consider "worst case": data overestimated and mc 
-      //underestimated or vice-versa
-      sf = data_eff/mc_eff;
-      sf_up = data_eff_up/mc_eff_dn;
-      sf_dn = data_eff_dn/mc_eff_up;
-      if (!pass_id) {
-        sf = (1.0-data_eff)/(1.0-mc_eff);
-        sf_up = (1.0-data_eff_up)/(1.0-mc_eff_dn);
-        sf_dn = (1.0-data_eff_dn)/(1.0-mc_eff_up);
+      float fail_sf = 1.0;
+      float fail_unc_up = 0.0;
+      float fail_unc_dn = 0.0;
+      float data_eff = 1.0;
+      float data_unc_up = 0.0;
+      float data_unc_dn = 0.0;
+      propagate_uncertainty_product(mc_eff, mc_syst, sf, fabs(sf_up-sf), data_eff, data_unc_up);
+      propagate_uncertainty_product(mc_eff, mc_syst, sf, fabs(sf-sf_dn), data_eff, data_unc_dn);
+      propagate_uncertainty_ratio(1.0-data_eff, data_unc_up, 1.0-mc_eff, mc_syst, fail_sf, fail_unc_up);
+      propagate_uncertainty_ratio(1.0-data_eff, data_unc_dn, 1.0-mc_eff, mc_syst, fail_sf, fail_unc_dn);
+      if (pass_id) {
+        sf_tot *= sf;
+        sf_tot_up *= sf_up;
+        sf_tot_dn *= sf_dn;
       }
-      if (isnan(sf)||isinf(sf)) sf = 1.0;
-      if (isnan(sf_up)||isinf(sf_up)) sf_up = 1.0;
-      if (isnan(sf_dn)||isinf(sf_dn)) sf_dn = 1.0;
-      sf_tot *= sf;
-      sf_tot_up *= sf_up;
-      sf_tot_dn *= sf_dn;
+      else {
+        sf_tot *= fail_sf;
+        sf_tot_up *= fmax(fail_sf-fail_unc_up,0);
+        sf_tot_dn *= (fail_sf+fail_unc_dn);
+      }
     }
   }
   pico.out_w_mu() = sf_tot;

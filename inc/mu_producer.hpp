@@ -21,6 +21,10 @@ public:
   const float MuonEtaCut        = 2.4;
   const float MuonMiniIsoCut    = 0.2;
   const float MuonRelIsoCut     = 0.35;
+  const float dzCut         = 1.0;
+  const float dxyCut        = 0.5;
+  const float MuonHighPt        = 200;
+  const float MuonSip3dCut      = 4.0;
 
   std::vector<int> WriteMuons(nano_tree &nano, pico_tree &pico, std::vector<int> &jet_islep_nano_idx, std::vector<int> &jet_isvlep_nano_idx, std::vector<int> &sig_mu_pico_idx, bool isZgamma, bool isFastsim);
 

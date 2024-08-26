@@ -61,10 +61,12 @@ array<float> Electron_scEtOverPt
 array<int> Electron_cutBased
 array<int> Electron_cutBased_Fall17_V1
 array<int> Electron_jetIdx
+array<short> Electron_jetIdx 12
 array<int> Electron_pdgId
 array<int> Electron_photonIdx
 array<short> Electron_photonIdx 11.9
 array<int> Electron_tightCharge
+array<UChar_t> Electron_tightCharge 12
 array<int> Electron_vidNestedWPBitmap
 array<int> Electron_vidNestedWPBitmapHEEP
 array<bool> Electron_convVeto
@@ -87,8 +89,18 @@ array<bool> Electron_mvaIso_WP80
 array<bool> Electron_mvaIso_WP90
 array<char> Electron_seedGain
 array<int> Electron_genPartIdx
+array<short> Electron_genPartIdx 12
 array<char> Electron_genPartFlav
 array<char> Electron_cleanmask
+# NanoAODv12
+array<float> Electron_mvaHZZIso
+array<float> Electron_mvaNoIso
+array<bool> Electron_mvaNoIso_WP80
+array<bool> Electron_mvaNoIso_WP90
+array<short> Electron_fsrPhotonIdx
+array<char> Electron_seediEtaOriX
+array<int> Electron_seediPhiOriY
+array<short> Electron_svIdx
 
 ################ Muons ################
 
@@ -121,10 +133,14 @@ array<int> Muon_fsrPhotonIdx
 array<short> Muon_fsrPhotonIdx 11.9
 array<int> Muon_charge
 array<int> Muon_jetIdx
+array<short> Muon_jetIdx 12
 array<int> Muon_nStations
+array<char> Muon_nStations 12
 array<int> Muon_nTrackerLayers
+array<char> Muon_nTrackerLayers 11.9
 array<int> Muon_pdgId
 array<int> Muon_tightCharge
+array<char> Muon_tightCharge 12
 array<char> Muon_highPtId
 array<bool> Muon_inTimeMuon
 array<bool> Muon_isGlobal
@@ -143,8 +159,16 @@ array<bool> Muon_tightId
 array<char> Muon_tkIsoId
 array<bool> Muon_triggerIdLoose
 array<int> Muon_genPartIdx
+array<short> Muon_genPartIdx 12
 array<char> Muon_genPartFlav
 array<char> Muon_cleanmask
+#NanoAODv12
+array<float> Muon_mvaMuID
+array<char> Muon_mvaMuID_WP
+array<float> Muon_bsConstrainedChi2
+array<float> Muon_bsConstrainedPt
+array<float> Muon_bsConstrainedPtErr
+array<short> Muon_svIdx
 
 ################ Taus ################
 
@@ -259,6 +283,7 @@ array<bool> Photon_mvaID_WP90
 array<bool> Photon_pixelSeed
 array<char> Photon_seedGain
 array<int> Photon_genPartIdx
+array<short> Photon_genPartIdx 12
 array<char> Photon_genPartFlav
 array<char> Photon_cleanmask
 
@@ -272,6 +297,8 @@ array<short> FsrPhoton_muonIdx 11.9
 array<float> FsrPhoton_phi
 array<float> FsrPhoton_pt
 array<float> FsrPhoton_relIso03
+#nanoAODv12
+array<short> FsrPhoton_electronIdx
 
 ################ AK4 Jets ################
 
@@ -302,19 +329,28 @@ array<float> Jet_rawFactor
 array<float> Jet_bRegCorr
 array<float> Jet_bRegRes
 array<int> Jet_electronIdx1
+array<short> Jet_electronIdx1 12
 array<int> Jet_electronIdx2
+array<short> Jet_electronIdx2 12
 array<int> Jet_jetId
 array<char> Jet_jetId 11.9
 array<int> Jet_muonIdx1
+array<short> Jet_muonIdx1 12
 array<int> Jet_muonIdx2
+array<short> Jet_muonIdx2 12
 array<int> Jet_nConstituents
 array<int> Jet_nElectrons
+array<char> Jet_nElectrons 12
 array<int> Jet_nMuons
+array<char> Jet_nMuons 12
 array<int> Jet_puId
 array<float> Jet_puIdDisc
 array<int> Jet_genJetIdx
+array<short> Jet_genJetIdx 12
 array<int> Jet_hadronFlavour
+array<char> Jet_hadronFlavour 12
 array<int> Jet_partonFlavour
+array<short> Jet_partonFlavour 12
 array<char> Jet_cleanmask
 array<float> Jet_pt_jerUp
 array<float> Jet_pt_jerDown
@@ -324,6 +360,19 @@ array<float> Jet_mass_jerUp
 array<float> Jet_mass_jerDown
 array<float> Jet_mass_jesTotalUp
 array<float> Jet_mass_jesTotalDown
+#NanoAODv12
+array<float> Jet_PNetRegPtRawCorr
+array<float> Jet_PNetRegPtRawCorrNeutrino
+array<float> Jet_PNetRegPtRawRes
+array<float> Jet_btagPNetB
+array<float> Jet_btagPNetCvB
+array<float> Jet_btagPNetCvL
+array<float> Jet_btagPNetQvG
+array<float> Jet_btagPNetTauVarrayJet
+array<float> Jet_btagRobustParTAK4B
+array<float> Jet_btagRobustParTAK4CvB
+array<float> Jet_btagRobustParTAK4CvL
+array<float> Jet_btagRobustParTAK4QG
 
 ################ Very soft Jets ################
 
@@ -482,9 +531,11 @@ array<float> GenPart_mass
 array<float> GenPart_phi
 array<float> GenPart_pt
 array<int> GenPart_genPartIdxMother
+array<short> GenPart_genPartIdxMother 12
 array<int> GenPart_pdgId
 array<int> GenPart_status
 array<int> GenPart_statusFlags
+array<ushort> GenPart_statusFlags 12
 
 int nGenDressedLepton
 array<float> GenDressedLepton_eta
@@ -510,6 +561,7 @@ array<float> GenJet_phi
 array<float> GenJet_pt
 array<char> GenJet_hadronFlavour
 array<int> GenJet_partonFlavour
+array<short> GenJet_partonFlavour 12
 
 int nGenJetAK8
 array<float> GenJetAK8_eta
@@ -586,7 +638,9 @@ float PV_z
 float PV_chi2
 float PV_score
 int PV_npvs
+char PV_npvs 12
 int PV_npvsGood
+char PV_npvsGood 12
 
 ################ Secondary vertices ################
 int nSV

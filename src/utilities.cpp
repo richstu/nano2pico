@@ -199,6 +199,26 @@ void SplitFilePath(const string &path, string &dir_name, string &base_name){
   base_name = basename(&cstr.at(0));
 }
 
+//simple propagation of Gaussian uncertainties based on linear Taylor expansion
+void propagate_uncertainty_product(float a, float a_unc, float b, float b_unc, float& prod, float& prod_unc) {
+  prod = a*b;
+  prod_unc = hypotf(a_unc*b,b_unc*a);
+}
+
+//simple propagation of Gaussian uncertainties based on linear Taylor expansion
+void propagate_uncertainty_ratio(float num, float num_unc, float den, float den_unc, float& ratio, float& ratio_unc) {
+  ratio = 1.0;
+  ratio_unc = 1.0;
+  if (den != 0.0) {
+    ratio = num/den;
+    ratio_unc = hypotf(num_unc/den, den_unc*num/den/den);
+  }
+  //else if (den_unc != 0.0) {
+  //  ratio = num/(den_unc/2.0);
+  //  ratio_unc = fabs(ratio-num/den_unc);
+  //}
+}
+
 void getMETWithJEC(nano_tree & nano, int year, bool isFastsim, float & MET_pt, float & MET_phi, bool is_preUL) {
   if (isFastsim) { 
     if (year==2017 && is_preUL) {
@@ -359,5 +379,69 @@ void getFatJet_subJetIdx2(nano_tree & nano, float nanoaod_version, vector<int> &
   for(int ipart(0); ipart<nano.nFatJet(); ++ipart){
     if (nanoaod_version+0.01 > 11.9) FatJet_subJetIdx2[ipart] = nano.FatJet_subJetIdx2_11p9()[ipart];
     else FatJet_subJetIdx2[ipart] = nano.FatJet_subJetIdx2()[ipart];
+  }
+}
+
+void getMuon_nTrackerLayers(nano_tree & nano, float nanoaod_version, vector<int> & Muon_nTrackerLayers) {
+  Muon_nTrackerLayers.resize(nano.nMuon());
+  for(int ipart(0); ipart<nano.nMuon(); ++ipart){
+    if (nanoaod_version+0.01 > 11.9) Muon_nTrackerLayers[ipart] = nano.Muon_nTrackerLayers_11p9()[ipart];
+    else Muon_nTrackerLayers[ipart] = nano.Muon_nTrackerLayers()[ipart];
+  }
+}
+
+void getMuon_genPartIdx(nano_tree & nano, float nanoaod_version, vector<int> & Muon_genPartIdx) {
+  Muon_genPartIdx.resize(nano.nMuon());
+  for(int ipart(0); ipart<nano.nMuon(); ++ipart){
+    if (nanoaod_version+0.01 > 12) Muon_genPartIdx[ipart] = nano.Muon_genPartIdx_12p0()[ipart];                                                                                                                                          
+    else Muon_genPartIdx[ipart] = nano.Muon_genPartIdx()[ipart];                                                                                                                                                                         
+  }
+}
+
+void getJet_genJetIdx(nano_tree & nano, float nanoaod_version, vector<int> & Jet_genJetIdx) {
+  Jet_genJetIdx.resize(nano.nJet());
+  for(int ipart(0); ipart<nano.nJet(); ++ipart){
+    if (nanoaod_version+0.01 > 12) Jet_genJetIdx[ipart] = nano.Jet_genJetIdx_12p0()[ipart];
+    else Jet_genJetIdx[ipart] = nano.Jet_genJetIdx()[ipart];
+  }
+}
+
+void getJet_hadronFlavour(nano_tree & nano, float nanoaod_version, vector<int> & Jet_hadronFlavour) {
+  Jet_hadronFlavour.resize(nano.nJet());
+  for(int ipart(0); ipart<nano.nJet(); ++ipart){
+    if (nanoaod_version+0.01 > 12) Jet_hadronFlavour[ipart] = nano.Jet_hadronFlavour_12p0()[ipart];
+    else Jet_hadronFlavour[ipart] = nano.Jet_hadronFlavour()[ipart];
+  }
+}
+
+void getJet_partonFlavour(nano_tree & nano, float nanoaod_version, vector<int> & Jet_partonFlavour) {
+  Jet_partonFlavour.resize(nano.nJet());
+  for(int ipart(0); ipart<nano.nJet(); ++ipart){
+    if (nanoaod_version+0.01 > 12) Jet_partonFlavour[ipart] = nano.Jet_partonFlavour_12p0()[ipart];
+    else Jet_partonFlavour[ipart] = nano.Jet_partonFlavour()[ipart];
+  }
+}
+
+void getGenPart_genPartIdxMother(nano_tree & nano, float nanoaod_version, vector<int> & GenPart_genPartIdxMother) {
+  GenPart_genPartIdxMother.resize(nano.nGenPart());
+  for(int ipart(0); ipart<nano.nGenPart(); ++ipart){
+    if (nanoaod_version+0.01 > 12) GenPart_genPartIdxMother[ipart] = nano.GenPart_genPartIdxMother_12p0()[ipart];
+    else GenPart_genPartIdxMother[ipart] = nano.GenPart_genPartIdxMother()[ipart];
+  }
+}
+
+void getGenPart_statusFlags(nano_tree & nano, float nanoaod_version, vector<int> & GenPart_statusFlags) {
+  GenPart_statusFlags.resize(nano.nGenPart());                                                                                                                                                                                                    
+  for(int ipart(0); ipart<nano.nGenPart(); ++ipart){
+    if (nanoaod_version+0.01 > 12) GenPart_statusFlags[ipart] = nano.GenPart_statusFlags_12p0()[ipart];                                                                                                                                  
+    else GenPart_statusFlags[ipart] = nano.GenPart_statusFlags()[ipart];                                                                                                                                                                 
+  }
+}
+
+void getGenJet_partonFlavour(nano_tree & nano, float nanoaod_version, vector<int> & GenJet_partonFlavour) {
+  GenJet_partonFlavour.resize(nano.nGenJet());
+  for(int ipart(0); ipart<nano.nGenJet(); ++ipart){
+    if (nanoaod_version+0.01 > 12) GenJet_partonFlavour[ipart] = nano.GenJet_partonFlavour_12p0()[ipart];
+    else GenJet_partonFlavour[ipart] = nano.GenJet_partonFlavour()[ipart];
   }
 }
