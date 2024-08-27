@@ -443,7 +443,7 @@ float isr_tru_eta
 float isr_tru_phi
 int mprod
 int mlsp
-float mc_weight
+
 
 ################  Weights   ##################
 float weight
