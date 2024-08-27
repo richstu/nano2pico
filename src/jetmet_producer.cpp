@@ -671,16 +671,21 @@ void JetMetProducer::WriteFatJets(nano_tree &nano, pico_tree &pico){
   vector<float> FatJet_particleNetWithMass_ZvsQCD;
   vector<float> FatJet_particleNetWithMass_TvsQCD;
   vector<float> FatJet_particleNet_mass;
+  vector<float> FatJet_particleNetMD_Xbb;
   vector<int> FatJet_subJetIdx1;
   vector<int> FatJet_subJetIdx2;
   getFatJet_btagDDBvL(nano, nanoaod_version, FatJet_btagDDBvL);
   getFatJet_subJetIdx1(nano, nanoaod_version, FatJet_subJetIdx1);
   getFatJet_subJetIdx2(nano, nanoaod_version, FatJet_subJetIdx2);
+//  getFatJet_particleNet_mass(nano, nanoaod_version, FatJet_particleNet_mass);
+//  getFatJet_particleNetMD_Xbb(nano, nanoaod_version, FatJet_particleNetMD_Xbb);
+
   if (nanoaod_version+0.01 > 9) {
     getFatJet_particleNetWithMass_WvsQCD(nano, nanoaod_version, FatJet_particleNetWithMass_WvsQCD);
     getFatJet_particleNetWithMass_ZvsQCD(nano, nanoaod_version, FatJet_particleNetWithMass_ZvsQCD);
     getFatJet_particleNetWithMass_TvsQCD(nano, nanoaod_version, FatJet_particleNetWithMass_TvsQCD);
     getFatJet_particleNet_mass(nano, nanoaod_version, FatJet_particleNet_mass);
+//    getFatJet_particleNetMD_Xbb(nano, nanoaod_version, FatJet_particleNetMD_Xbb);
   }
 
   for(int ifjet(0); ifjet<nano.nFatJet(); ++ifjet){
@@ -703,6 +708,8 @@ void JetMetProducer::WriteFatJets(nano_tree &nano, pico_tree &pico){
       pico.out_fjet_deep_md_hbb_jme().push_back(nano.FatJet_deepTagMD_HbbvsQCD()[ifjet]);
       pico.out_fjet_deep_md_tvsqcd().push_back(nano.FatJet_deepTagMD_TvsQCD()[ifjet]);
       pico.out_fjet_deep_tvsqcd().push_back(nano.FatJet_deepTag_TvsQCD()[ifjet]);
+      pico.out_fjet_pnet_md_xbb().push_back(nano.FatJet_particleNetMD_Xbb()[ifjet]);
+      pico.out_fjet_pnet_m().push_back(nano.FatJet_particleNet_mass()[ifjet]);
     }
     if (nanoaod_version+0.01 > 9) {
       pico.out_fjet_pnet_wtag().push_back(FatJet_particleNetWithMass_WvsQCD[ifjet]);

@@ -422,6 +422,7 @@ array<float> FatJet_mass
 array<float> FatJet_msoftdrop
 array<float> FatJet_n2b1
 array<float> FatJet_n3b1
+array<float> FatJet_particleNetMD_Xbb
 array<float> FatJet_particleNetWithMass_TvsQCD
 array<float> FatJet_particleNetWithMass_WvsQCD
 array<float> FatJet_particleNetWithMass_ZvsQCD

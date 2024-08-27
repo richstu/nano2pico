@@ -210,6 +210,7 @@ vector<float> fjet_mva_hbb_btv
 vector<float> fjet_deep_md_hbb_jme
 vector<float> fjet_deep_md_tvsqcd
 vector<float> fjet_deep_tvsqcd
+vector<float> fjet_pnet_md_xbb
 vector<float> fjet_pnet_wtag
 vector<float> fjet_pnet_ztag
 vector<float> fjet_pnet_ttag
