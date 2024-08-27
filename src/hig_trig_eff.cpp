@@ -122,8 +122,7 @@ namespace hig_trig_eff{
       else if(ht> 600 && ht<= 800 && met> 300 && met<=9999) {eff = 0.996; errup = 0.002; errdown = 0.003;}
       else if(ht> 800 && ht<=1000 && met> 300 && met<=9999) {eff = 1.000; errup = 0.000; errdown = 0.003;}
       else if(ht>1000 && ht<=9999 && met> 300 && met<=9999) {eff = 0.987; errup = 0.005; errdown = 0.008;}
-      std::cout<<ht<<" "<<met<<" "<<eff<<std::endl;
-
+     
       return eff;
   }
 
