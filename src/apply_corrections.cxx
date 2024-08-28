@@ -33,6 +33,7 @@ int main(int argc, char *argv[]){
   corr_file = CopyReplaceAll(in_dir, "/raw_pico/","/corrections/")+corr_file;
 
   bool is_zgamma = Contains(in_dir, "zgamma");
+  bool is_higgsino = Contains(in_dir, "higgsino");
 
   cout<<"Corrections file: "<<corr_file<<endl;
   corrections_tree corr(corr_file);
@@ -71,7 +72,8 @@ int main(int argc, char *argv[]){
     pico.out_w_bhig_df()  = pico.w_bhig_df()*corr.w_bhig_df();
     pico.out_w_photon()   = pico.w_photon()*corr.w_photon();
     
-    pico.out_w_trig()     = pico.w_trig()*corr.w_trig();
+    if (is_higgsino) { pico.out_w_trig() = pico.w_trig(); }
+    else { pico.out_w_trig() = pico.w_trig()*corr.w_trig(); }
     pico.out_w_isr()      = pico.w_isr()*corr.w_isr();
     pico.out_w_pu()       = pico.w_pu()*corr.w_pu();
 
