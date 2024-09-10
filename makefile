@@ -10,7 +10,7 @@ EXTRA_WARNINGS := -Wcast-align -Wcast-qual -Wdisabled-optimization -Wformat=2 -W
 CXXFLAGS := -isystem $(shell root-config --incdir) -isystem external_inc -Wall -Wextra -pedantic -Werror -Wshadow -Woverloaded-virtual -Wold-style-cast $(EXTRA_WARNINGS) $(shell root-config --cflags) -O2 -I $(INCDIR)
 LD := $(shell root-config --ld)
 LDFLAGS := $(shell root-config --ldflags) -lGenVector
-LDLIBS := $(shell root-config --libs) -lMinuit -lRooStats -lTreePlayer 
+LDLIBS := $(shell root-config --libs) -lMinuit -lRooStats -lTreePlayer -lRooFit -lRooFitCore 
 
 EXECUTABLES := $(addprefix $(EXEDIR)/, $(addsuffix .exe, $(notdir $(basename $(wildcard $(SRCDIR)/*.cxx))))) 
 OBJECTS := $(addprefix $(OBJDIR)/, $(addsuffix .o, $(notdir $(basename $(wildcard $(SRCDIR)/*.cpp)))))

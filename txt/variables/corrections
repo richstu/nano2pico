@@ -2,41 +2,41 @@
 # and some miscellaneous sum trackers for leptons and negative weights
 
 # require special treatment
-float weight
-float w_lumi
-float w_lep
-float w_fs_lep
-float w_photon
+double weight
+double w_lumi
+double w_lep
+double w_fs_lep
+double w_photon
 
 # just need to add up 
-float w_el
-float w_mu
-float w_btag
-float w_btag_df
-float w_bhig
-float w_bhig_df
-float w_trig
-float w_zvtx_pass
-float w_zvtx_fail
+double w_el
+double w_mu
+double w_btag
+double w_btag_df
+double w_bhig
+double w_bhig_df
+double w_trig
+double w_zvtx_pass
+double w_zvtx_fail
 
-float w_isr
-float w_pu
+double w_isr
+double w_pu
 
-vector<float> sys_el
-vector<float> sys_mu
-vector<float> sys_lep
-vector<float> sys_fs_lep
-vector<float> sys_photon
-vector<float> sys_bchig
-vector<float> sys_udsghig
-vector<float> sys_fs_bchig
-vector<float> sys_fs_udsghig
-vector<float> sys_trig
+vector<double> sys_el
+vector<double> sys_mu
+vector<double> sys_lep
+vector<double> sys_fs_lep
+vector<double> sys_photon
+vector<double> sys_bchig
+vector<double> sys_udsghig
+vector<double> sys_fs_bchig
+vector<double> sys_fs_udsghig
+vector<double> sys_trig
 
-vector<float> sys_isr
-vector<float> sys_pu
-vector<float> sys_murf
-vector<float> sys_ps
+vector<double> sys_isr
+vector<double> sys_pu
+vector<double> sys_murf
+vector<double> sys_ps
 
 # vector<float> w_pdf
 # vector<float> sys_pdf
