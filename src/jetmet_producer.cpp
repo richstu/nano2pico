@@ -343,8 +343,10 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
     MET_phi = pico.out_met_phi();
     WriteMet(nano, pico);
     for(int ijet(0); ijet<nano.nJet(); ++ijet) {
-      Jet_pt.push_back(nano.Jet_pt()[ijet]*jer_nm_factor[ijet]);
-      Jet_mass.push_back(nano.Jet_mass()[ijet]*jer_nm_factor[ijet]);
+      //Jet_pt.push_back(nano.Jet_pt()[ijet]*jer_nm_factor[ijet]);
+      //Jet_mass.push_back(nano.Jet_mass()[ijet]*jer_nm_factor[ijet]);
+      Jet_pt.push_back(nano.Jet_pt()[ijet]);
+      Jet_mass.push_back(nano.Jet_mass()[ijet]);
     }
   }
   vector<int> Jet_jetId;
