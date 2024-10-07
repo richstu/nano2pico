@@ -83,11 +83,14 @@ int main(int argc, char *argv[]){
       if (regex_search(in_file, std::regex("RunIISummer\\d\\dUL16"))) year = 2016;
       else if (regex_search(in_file, std::regex("RunIISummer\\d\\dUL17"))) year = 2017;
       else if (regex_search(in_file, std::regex("RunIISummer\\d\\dUL18"))) year = 2018;
+      else if (regex_search(in_file, std::regex("Run3Summer22"))) year = 2022;
+      else if (regex_search(in_file, std::regex("Run3Summer22"))) year = 2023;
     } else { // Not UL
       if (regex_search(in_file, std::regex("RunIISummer16"))) year = 2016;
       else if (regex_search(in_file, std::regex("RunIIFall17"))) year = 2017;
       else if (regex_search(in_file, std::regex("RunIIAutumn18"))) year = 2018;
       else if (regex_search(in_file, std::regex("Run3Summer22"))) year = 2022;
+      else if (regex_search(in_file, std::regex("Run3Summer22"))) year = 2023;
     }
   } else { // Data
     if (Contains(in_file, "HIPM")) isAPV = true;
