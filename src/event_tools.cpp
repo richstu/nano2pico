@@ -138,8 +138,8 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
     }
   }
   //Need to include the new overlap removal by including the newer values for ZGtoLLG_lowMll_lowGPt
-  double ptmin = 9.0;
-  double isocone = 0.05;
+  float ptmin = 9.0;
+  float isocone = 0.05;
   if(isZZ || isTTJets_LO_Incl || Contains(name,"TTGJets") || isEWKZ){
     ptmin = 10.0;
   }
@@ -150,9 +150,9 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
     ptmin = 15.0;
   }
 
-  double ptmin_old = 15.0;
-  double etamax_old = 2.6;
-  double isocone_old = 0.05;
+  float ptmin_old = 15.0;
+  float etamax_old = 2.6;
+  float isocone_old = 0.05;
   if(isWW || isZZ || isTTJets_LO_Incl || Contains(name,"TTGJets")){
     ptmin_old = 10.0;
     etamax_old= 99.0;
