@@ -157,10 +157,12 @@ void JetMetProducer::GetJetUncertainties(nano_tree &nano, pico_tree &pico,
         }
       }
 
-      if (!found_genjet) {
-        indiv_jer_nm = 1.0+rng_.Gaus(0,sigmajer)*sqrt(std::max(sjer_nom*sjer_nom-1.0,0.0));
-        indiv_jer_up = 1.0+rng_.Gaus(0,sigmajer)*sqrt(std::max(sjer_up*sjer_up-1.0,0.0));
-        indiv_jer_dn = 1.0+rng_.Gaus(0,sigmajer)*sqrt(std::max(sjer_dn*sjer_dn-1.0,0.0));
+      //Applying stochastic corrections in high eta region (eta(jet) > 2.5) if jet passes pileup id (in NanoAODv9). Not applying in v12 
+      bool puid_or_nanoaodv12 = ((nanoaod_version - 0.01 <= 9) && nano.Jet_puId()[ijet]) || (nanoaod_version - 0.01 >= 9);
+      if (!found_genjet && jet_raw_pt > 50 && puid_or_nanoaodv12){
+          indiv_jer_nm = 1.0+rng_.Gaus(0,sigmajer)*sqrt(std::max(sjer_nom*sjer_nom-1.0,0.0));
+          indiv_jer_up = 1.0+rng_.Gaus(0,sigmajer)*sqrt(std::max(sjer_up*sjer_up-1.0,0.0));
+          indiv_jer_dn = 1.0+rng_.Gaus(0,sigmajer)*sqrt(std::max(sjer_dn*sjer_dn-1.0,0.0));
       }
 
       //Following NanoAOD-tools, JES uncertainties are evaluated post-smearing
@@ -311,9 +313,9 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
   pico.out_nbdfl() = 0; pico.out_nbdfm() = 0; pico.out_nbdft() = 0; 
   pico.out_ngenjet() = 0;
   //add smearing to jets and calculate uncertainties
-  vector<float> Jet_pt, Jet_mass;
+  vector<float> Jet_pt, Jet_mass, Jet_pt_nosmear, Jet_mass_nosmear;
   vector<float> jer_nm_factor, jer_up_factor, jer_dn_factor, jes_up_factor, jes_dn_factor;
-  float MET_pt, MET_phi;
+  float MET_pt, MET_phi, MET_pt_nosmear, MET_phi_nosmear;
   if (isData) {
     WriteMet(nano, pico);
     MET_pt = pico.out_met();
@@ -325,6 +327,12 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
     jer_dn_factor.resize(Jet_pt.size(),1.0);
     jes_up_factor.resize(Jet_pt.size(),1.0);
     jes_dn_factor.resize(Jet_pt.size(),1.0);
+
+    //Test code for jet smearing
+    Jet_pt_nosmear = nano.Jet_pt();
+    Jet_mass_nosmear = nano.Jet_mass();
+    MET_pt_nosmear = pico.out_met();
+    MET_phi_nosmear = pico.out_met_phi();
   }
   else if ((nanoaod_version+0.01) < 9) {
     getJetWithJEC(nano, isFastsim, Jet_pt, Jet_mass);
@@ -335,18 +343,30 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
     jes_up_factor.resize(Jet_pt.size(),1.0);
     jes_dn_factor.resize(Jet_pt.size(),1.0);
     met_producer.WriteMet(nano, pico, isFastsim, isSignal, is_preUL);
+
+    //Test code for jet smearing
+    Jet_pt_nosmear = nano.Jet_pt();
+    Jet_mass_nosmear = nano.Jet_mass();
+    MET_pt_nosmear = pico.out_met();
+    MET_phi_nosmear = pico.out_met_phi();
   }
   else  {
+    //Test code for removing jet smearing for MET
+    MET_pt_nosmear = nano.MET_pt();
+    MET_phi_nosmear = nano.MET_phi();
+
     GetJetUncertainties(nano, pico, jer_nm_factor, jer_up_factor, jer_dn_factor, 
                         jes_up_factor, jes_dn_factor);
     MET_pt = pico.out_met();
     MET_phi = pico.out_met_phi();
     WriteMet(nano, pico);
     for(int ijet(0); ijet<nano.nJet(); ++ijet) {
-      //Jet_pt.push_back(nano.Jet_pt()[ijet]*jer_nm_factor[ijet]);
-      //Jet_mass.push_back(nano.Jet_mass()[ijet]*jer_nm_factor[ijet]);
-      Jet_pt.push_back(nano.Jet_pt()[ijet]);
-      Jet_mass.push_back(nano.Jet_mass()[ijet]);
+      Jet_pt.push_back(nano.Jet_pt()[ijet]*jer_nm_factor[ijet]);
+      Jet_mass.push_back(nano.Jet_mass()[ijet]*jer_nm_factor[ijet]);
+
+      //For Testing Want to save pT and mass without smearing
+      Jet_pt_nosmear.push_back(nano.Jet_pt()[ijet]);
+      Jet_mass_nosmear.push_back(nano.Jet_mass()[ijet]);
     }
   }
   vector<int> Jet_jetId;
@@ -554,6 +574,12 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
         pico.out_sys_jet_m_jesdn().push_back(Jet_mass[ijet]*jes_dn_factor[ijet]);
         pico.out_sys_jet_m_jerup().push_back(Jet_mass[ijet]*jer_up_factor[ijet]/jer_nm_factor[ijet]);
         pico.out_sys_jet_m_jerdn().push_back(Jet_mass[ijet]*jer_dn_factor[ijet]/jer_nm_factor[ijet]);
+
+        //For testing the new smearing procedure
+        pico.out_jet_pt_nosmear().push_back(Jet_pt_nosmear[ijet]);
+        pico.out_jet_m_nosmear().push_back(Jet_mass_nosmear[ijet]);
+        pico.out_met_nosmear().push_back(MET_pt_nosmear);
+        pico.out_met_phi_nosmear().push_back(MET_phi_nosmear);
         break;
       case 2022:
       case 2023:
@@ -586,6 +612,12 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
         pico.out_sys_jet_m_jesdn().push_back(Jet_mass[ijet]*jes_dn_factor[ijet]);
         pico.out_sys_jet_m_jerup().push_back(Jet_mass[ijet]*jer_up_factor[ijet]/jer_nm_factor[ijet]);
         pico.out_sys_jet_m_jerdn().push_back(Jet_mass[ijet]*jer_dn_factor[ijet]/jer_nm_factor[ijet]);
+
+        //For testing the new smearing procedure
+        pico.out_jet_pt_nosmear().push_back(Jet_pt_nosmear[ijet]);
+        pico.out_jet_m_nosmear().push_back(Jet_mass_nosmear[ijet]);
+        pico.out_met_nosmear().push_back(MET_pt_nosmear);
+        pico.out_met_phi_nosmear().push_back(MET_phi_nosmear);
         break;
       default:
         std::cout<<"Need code for new year in getZGammaJetBr in jetmet_producer.cpp"<<endl;

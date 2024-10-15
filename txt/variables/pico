@@ -181,6 +181,12 @@ vector<bool>  jet_h1d
 vector<bool>  jet_h2d
 vector<int>   jet_fjet_idx
 
+#Test branches for jet smearing
+vector<float> jet_pt_nosmear
+vector<float> jet_m_nosmear
+vector<float> met_nosmear
+vector<float> met_phi_nosmear
+
 int ngenjet
 vector<float> genjet_pt
 vector<float> genjet_eta
