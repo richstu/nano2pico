@@ -169,16 +169,16 @@ def processMc(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, 
   # Add mc commands
   process_commands = [
     #0 for specific datasets
-    #[notify_script+' "Start process nano '+mc_tag+'"',
-    #'./scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/mc/ --production '+PRODUCTION_NAME+' --dataset_list txt/datasets/'+NANOAOD_VERSION+'_bbgg_higgsino_'+YEAR+'_mc_dataset_paths --tag '+mc_tag,
-    #'auto_submit_jobs.py process_nano_cmds_'+mc_tag+'.json -c scripts/check_process_nano_job.py -f',
-    #notify_script+' "Finished process nano '+mc_tag+'"'], 
-    
-    #0 for all datasets inside mc folder
     [notify_script+' "Start process nano '+mc_tag+'"',
-    './scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/mc/ --production '+PRODUCTION_NAME+' --tag '+mc_tag,
+    './scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/mc/ --production '+PRODUCTION_NAME+' --dataset_list txt/datasets/'+NANOAOD_VERSION+'_higgsino4b_'+YEAR+'_mc_dataset_paths --tag '+mc_tag,
     'auto_submit_jobs.py process_nano_cmds_'+mc_tag+'.json -c scripts/check_process_nano_job.py -f',
     notify_script+' "Finished process nano '+mc_tag+'"'], 
+    
+    #0 for all datasets inside mc folder
+    #[notify_script+' "Start process nano '+mc_tag+'"',
+    #'./scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/mc/ --production '+PRODUCTION_NAME+' --tag '+mc_tag,
+    #'auto_submit_jobs.py process_nano_cmds_'+mc_tag+'.json -c scripts/check_process_nano_job.py -f',
+    #notify_script+' "Finished process nano '+mc_tag+'"'], 
 
     #1
     [notify_script+' "Start merge corrections '+mc_tag+'"',
@@ -318,14 +318,28 @@ Pico files: BASE_FOLDERNAME/NANOAOD_VERSION/TAG_NAME/(2016,2017,2018)/(data,mc,s
   years = args.years.split(',')
 
   # Check if dataset_list (nanoaod files to process) exist
-  dataset_list_files = []
-  for year in years:
-    dataset_list_files.append(f'txt/datasets/{args.nanoaod_version}_bbgg_higgsino_{year}_mc_dataset_paths')
-    #dataset_list_files.append(f'txt/datasets/{args.nanoaod_version}_bbgg_higgsino_{year}_data_dataset_paths')
+  dataset_list_files = [
+    'txt/datasets/'+args.nanoaod_version+'_higgsino4b_2016_mc_dataset_paths',
+    'txt/datasets/'+args.nanoaod_version+'_higgsino4b_2016APV_mc_dataset_paths',
+    'txt/datasets/'+args.nanoaod_version+'_higgsino4b_2017_mc_dataset_paths',
+    'txt/datasets/'+args.nanoaod_version+'_higgsino4b_2018_mc_dataset_paths',
+    ]
   for dataset_list_file in dataset_list_files:
     if not os.path.exists(dataset_list_file): 
       print('[Error] '+dataset_list_file+' does not exist. Existing.')
       sys.exit()
+
+
+
+  # Check if dataset_list (nanoaod files to process) exist
+  #dataset_list_files = []
+  #for year in years:
+  #  dataset_list_files.append(f'txt/datasets/{args.nanoaod_version}_bbgg_higgsino_{year}_mc_dataset_paths')
+  #  #dataset_list_files.append(f'txt/datasets/{args.nanoaod_version}_bbgg_higgsino_{year}_data_dataset_paths')
+  #for dataset_list_file in dataset_list_files:
+  #  if not os.path.exists(dataset_list_file): 
+  #    print('[Error] '+dataset_list_file+' does not exist. Existing.')
+  #    sys.exit()
 
   ## Check if dataset_list (nanoaod files to process) exist
   #dataset_list_files = [
