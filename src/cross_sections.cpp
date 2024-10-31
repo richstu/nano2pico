@@ -513,6 +513,107 @@ namespace xsec{
     if(file.Contains("QCD_Pt-40toInf_DoubleEMEnriched_MGG-80toInf"))  xsec = 113100;
     if(file.Contains("QCD_Pt-40ToInf_DoubleEMEnriched_MGG-80toInf"))  xsec = 113100;
 
+    // updated 4b background cross sections at 13 TeV
+    // TTJets background from https://pdg.lbl.gov/2024/reviews/rpp2024-rev-top-quark.pdf
+    if(file.Contains("TTJets_SingleLept") && !file.Contains("genMET-150"))		xsec=833.9*0.219; 
+    if(file.Contains("TTJets_DiLept") && !file.Contains("genMET-150"))			xsec=833.9*0.105;
+    if(file.Contains("TTJets_SingleLeptFromT_genMET-150"))				xsec=5.649; //XSDB
+    if(file.Contains("TTJets_SingleLeptFromTbar_genMET-150"))				xsec=5.662; //XSDB
+    if(file.Contains("TTJets_DiLept_genMET-150"))					xsec=3.326; //XSDB
+
+    // TT+X background
+    if(file.Contains("TTGJets_TuneCP5"))						xsec=3.774; //XSDB
+    if(file.Contains("TTZToLLNuNu_M-10_TuneCP5"))					xsec=0.2439; //XSDB
+    if(file.Contains("TTZToQQ_TuneCP5"))						xsec=0.5113; //XSDB
+    if(file.Contains("TTWJetsToLNu_TuneCP5"))						xsec=0.2163; //XSDB
+    if(file.Contains("TTWJetsToQQ_TuneCP5"))						xsec=0.4432; //XSDB
+    if(file.Contains("TTTT_TuneCP5"))							xsec=0.008091; //XSDB
+    // ttH xsec from https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt13TeV
+    // Hbb BR from https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageBR using mH=125
+    if(file.Contains("ttHTobb_M125_TuneCP5"))						xsec=0.5071*Htobb;
+    
+    // W+Jets background
+    if(file.Contains("WJetsToLNu_TuneCP5"))						xsec=66680; //XSDB
+    if(file.Contains("WJetsToLNu_HT-70To100_TuneCP5"))					xsec=1283.0; //XSDB
+    if(file.Contains("WJetsToLNu_HT-100To200_TuneCP5"))					xsec=1244.0; //XSDB
+    if(file.Contains("WJetsToLNu_HT-200To400_TuneCP5"))					xsec=337.8; //XSDB
+    if(file.Contains("WJetsToLNu_HT-400To600_TuneCP5"))					xsec=44.93; //XSDB
+    if(file.Contains("WJetsToLNu_HT-600To800_TuneCP5"))					xsec=11.19; //XSDB
+    if(file.Contains("WJetsToLNu_HT-800To1200_TuneCP5"))				xsec=4.926; //XSDB
+    if(file.Contains("WJetsToLNu_HT-1200To2500_TuneCP5"))				xsec=1.152; //XSDB
+    if(file.Contains("WJetsToLNu_HT-2500ToInf_TuneCP5"))				xsec=0.02646; //XSDB
+
+    // Z+Jets background
+    if(file.Contains("ZJetsToNuNu_HT-100To200_TuneCP5"))				xsec=271.3; //XSDB
+    if(file.Contains("ZJetsToNuNu_HT-200To400_TuneCP5"))				xsec=72.69; //XSDB
+    if(file.Contains("ZJetsToNuNu_HT-400To600_TuneCP5"))				xsec=9.961; //XSDB
+    if(file.Contains("ZJetsToNuNu_HT-600To800_TuneCP5"))				xsec=2.425; //XSDB
+    if(file.Contains("ZJetsToNuNu_HT-800To1200_TuneCP5"))				xsec=1.076; //XSDB
+    if(file.Contains("ZJetsToNuNu_HT-1200To2500_TuneCP5"))				xsec=0.2474; //XSDB
+    if(file.Contains("ZJetsToNuNu_HT-2500ToInf_TuneCP5"))				xsec=0.005609; //XSDB
+
+    // QCD background
+    if(file.Contains("QCD_HT100to200_TuneCP5"))						xsec=23500000; //XSDB
+    if(file.Contains("QCD_HT200to300_TuneCP5"))						xsec=1552000; //XSDB
+    if(file.Contains("QCD_HT300to500_TuneCP5"))						xsec=321100; //XSDB
+    if(file.Contains("QCD_HT500to700_TuneCP5"))						xsec=30250; //XSDB
+    if(file.Contains("QCD_HT700to1000_TuneCP5"))					xsec=6398; //XSDB
+    if(file.Contains("QCD_HT1000to1500_TuneCP5"))					xsec=1122; //XSDB
+    if(file.Contains("QCD_HT1500to2000_TuneCP5"))					xsec=109.4; //XSDB
+    if(file.Contains("QCD_HT2000toInf_TuneCP5"))					xsec=21.74; //XSDB
+
+    // Single top background
+    if(file.Contains("ST_tW_antitop_5f_NoFullyHadronicDecays"))				xsec=32.51*0.530775; //XSDB
+    if(file.Contains("ST_tW_top_5f_NoFullyHadronicDecays"))				xsec=32.45*0.530775; //XSDB
+    // t-channel cross sections from https://twiki.cern.ch/twiki/bin/view/LHCPhysics/SingleTopNNLORef
+    if(file.Contains("ST_t-channel_antitop_4f_InclusiveDecays"))			xsec=80.0;
+    if(file.Contains("ST_t-channel_top_4f_InclusiveDecays"))				xsec=134.2;
+    if(file.Contains("ST_s-channel_4f_leptonDecays_TuneCP5"))				xsec=3.549;
+
+    // DY+Jets background
+    // https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat13TeV
+    if(file.Contains("DYJetsToLL_M-50_TuneCP5"))					xsec=6077.22;
+    if(file.Contains("DYJetsToLL_M-50_HT-70to100_TuneCP5_PSweights"))			xsec= ;
+    if(file.Contains("DYJetsToLL_M-50_HT-100to200_TuneCP5_PSweights"))			xsec= ;
+    if(file.Contains("DYJetsToLL_M-50_HT-200to400_TuneCP5_PSweights"))			xsec= ;
+    if(file.Contains("DYJetsToLL_M-50_HT-400to600_TuneCP5_PSweights"))                  xsec= ;
+    if(file.Contains("DYJetsToLL_M-50_HT-600to800_TuneCP5_PSweights"))			xsec= ;
+    if(file.Contains("DYJetsToLL_M-50_HT-800to1200_TuneCP5_PSweights"))			xsec= ;
+    if(file.Contains("DYJetsToLL_M-50_HT-1200to2500_TuneCP5_PSweights"))		xsec= ;
+    if(file.Contains("DYJetsToLL_M-50_HT-2500toInf_TuneCP5_PSweights"))			xsec= ;
+
+    // GJets background
+    if(file.Contains("GJets_DR-0p4_HT-100To200_TuneCP5")){
+      if(year==2018) xsec=5034.0; //XSDB
+      else xsec=5001.0; //XSDB
+    }
+    if(file.Contains("GJets_DR-0p4_HT-200To400_TuneCP5")){
+      if(year==2018) xsec=1129.0; //XSDB
+      else xsec=1154.0; //XSDB
+    }
+    if(file.Contains("GJets_DR-0p4_HT-400To600_TuneCP5")){
+      if(year==2018) xsec=126.2; //XSDB
+      else xsec=127.2; //XSDB
+    }
+    if(file.Contains("GJets_DR-0p4_HT-600ToInf_TuneCP5")){
+      if(year==2018) xsec=41.31; //XSDB
+      else xsec=41.45; //XSDB
+    }
+
+    // Diboson background
+    // VH cross sections from https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt13TeV
+    if(file.Contains("WminusH_HToBB_WToLNu_M-125_TuneCP5"))				xsec=0.5328*Htobb*3*WToLNu;
+    if(file.Contains("WplusH_HToBB_WToLNu_M-125_TuneCP5"))				xsec=0.8400*Htobb*3*WToLNu;
+    // cross sections from "deprecated" https://twiki.cern.ch/twiki/bin/viewauth/CMS/SummaryTable1G25ns#Diboson
+    if(file.Contains("WWTo2L2Nu_TuneCP5"))						xsec=12.178;
+    if(file.Contains("WWTo1L1Nu2Q_4f_TuneCP5"))						xsec=49.997;
+    if(file.Contains("WZTo1L1Nu2Q_4f_TuneCP5"))						xsec=10.71;
+    if(file.Contains("WZTo1L3Nu_4f_TuneCP5"))						xsec=3.414; //XSDB
+    if(file.Contains("WZTo2Q2L_mllmin4p0_TuneCP5"))					xsec=5.595;
+    if(file.Contains("WZTo3LNu_TuneCP5"))						xsec=4.42965;
+    if(file.Contains("ZH_HToBB_ZToNuNu_M-125_TuneCP5"))					xsec=0.8839*Htobb*0.2;
+    if(file.Contains("ZZ_TuneCP5") && !file.Contains("ZZZ") && !file.Contains("WZZ")) 	xsec=12.23; //XSDB
+
 
     if(xsec<=0) std::cout<<"ERROR:: Cross section not found for "<<file<<std::endl;
 
@@ -536,6 +637,30 @@ namespace xsec{
 
     // Single top
     if (file.Contains("ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8")) fneg = 0.1884;
+
+    // fneg for new 4b background samples
+    if(file.Contains("TTGJets_TuneCP5"))		 		fneg=0.3169; //XSDB
+    if(file.Contains("TTZToLLNuNu_M-10_TuneCP5"))			fneg=0.2607; //XSDB
+    if(file.Contains("TTZToQQ_TuneCP5"))				fneg=0.2553; //XSDB
+    if(file.Contains("TTWJetsToLNu_TuneCP5"))				fneg=0.2207; //XSDB
+    if(file.Contains("TTWJetsToQQ_TuneCP5"))				fneg=0.2199; //XSDB
+    if(file.Contains("TTTT_TuneCP5_13TeV"))				fneg=0.2728; //XSDB
+
+    if(file.Contains("WJetsToLNu_TuneCP5"))				fneg=0.1586; //XSDB
+
+    if(file.Contains("ST_t-channel_antitop_4f_InclusiveDecays"))	fneg=0.0295; //XSDB
+    if(file.Contains("ST_t-channel_top_4f_InclusiveDecays")		fneg=0.0328; //XSDB
+    if(file.Contains("ST_s-channel_4f_leptonDecays"))			fneg=0.1787; //XSDB
+
+    if(file.Contains("WminusH_HToBB_WToLNu_M-125_TuneCP5"))		fneg=0.02897; //XSDB
+    if(file.Contains("WplusH_HToBB_WToLNu_M-125_TuneCP5"))		fneg=0.0283; //XSDB
+    if(file.Contains("WWTo2L2Nu_TuneCP5_13TeV"))			fneg=0.0016; //XSDB
+    if(file.Contains("WWTo1L1Nu2Q_4f_TuneCP5"))				fneg=0.2007; //XSDB
+    if(file.Contains("WZTo1L1Nu2Q_4f_TuneCP5"))				fneg=0.2132; //XSDB
+    if(file.Contains("WZTo1L3Nu_4f_TuneCP5"))				fneg=0.2112; //XSDB
+    if(file.Contains("WZTo2Q2L_mllmin4p0_TuneCP5"))			fneg=0.1859; //XSDB
+    if(file.Contains("WZTo3LNu_TuneCP5"))				fneg=0.169; //XSDB
+    if(file.Contains("ZH_HToBB_ZToNuNu_M-125_TuneCP5"))			fneg=0.02959; //XSDB
 
     return fneg;
   }
