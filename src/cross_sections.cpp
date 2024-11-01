@@ -573,14 +573,14 @@ namespace xsec{
     // DY+Jets background
     // https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat13TeV
     if(file.Contains("DYJetsToLL_M-50_TuneCP5"))					xsec=6077.22;
-    if(file.Contains("DYJetsToLL_M-50_HT-70to100_TuneCP5_PSweights"))			xsec= ;
-    if(file.Contains("DYJetsToLL_M-50_HT-100to200_TuneCP5_PSweights"))			xsec= ;
-    if(file.Contains("DYJetsToLL_M-50_HT-200to400_TuneCP5_PSweights"))			xsec= ;
-    if(file.Contains("DYJetsToLL_M-50_HT-400to600_TuneCP5_PSweights"))                  xsec= ;
-    if(file.Contains("DYJetsToLL_M-50_HT-600to800_TuneCP5_PSweights"))			xsec= ;
-    if(file.Contains("DYJetsToLL_M-50_HT-800to1200_TuneCP5_PSweights"))			xsec= ;
-    if(file.Contains("DYJetsToLL_M-50_HT-1200to2500_TuneCP5_PSweights"))		xsec= ;
-    if(file.Contains("DYJetsToLL_M-50_HT-2500toInf_TuneCP5_PSweights"))			xsec= ;
+    if(file.Contains("DYJetsToLL_M-50_HT-70to100_TuneCP5_PSweights"))			xsec=140.0;
+    if(file.Contains("DYJetsToLL_M-50_HT-100to200_TuneCP5_PSweights"))			xsec=139.2;
+    if(file.Contains("DYJetsToLL_M-50_HT-200to400_TuneCP5_PSweights"))			xsec=38.4;
+    if(file.Contains("DYJetsToLL_M-50_HT-400to600_TuneCP5_PSweights"))                  xsec=5.174;
+    if(file.Contains("DYJetsToLL_M-50_HT-600to800_TuneCP5_PSweights"))			xsec=1.258;
+    if(file.Contains("DYJetsToLL_M-50_HT-800to1200_TuneCP5_PSweights"))			xsec=0.5598;
+    if(file.Contains("DYJetsToLL_M-50_HT-1200to2500_TuneCP5_PSweights"))		xsec=0.1305;
+    if(file.Contains("DYJetsToLL_M-50_HT-2500toInf_TuneCP5_PSweights"))			xsec=0.002997;
 
     // GJets background
     if(file.Contains("GJets_DR-0p4_HT-100To200_TuneCP5")){
@@ -649,7 +649,7 @@ namespace xsec{
     if(file.Contains("WJetsToLNu_TuneCP5"))				fneg=0.1586; //XSDB
 
     if(file.Contains("ST_t-channel_antitop_4f_InclusiveDecays"))	fneg=0.0295; //XSDB
-    if(file.Contains("ST_t-channel_top_4f_InclusiveDecays")		fneg=0.0328; //XSDB
+    if(file.Contains("ST_t-channel_top_4f_InclusiveDecays"))		fneg=0.0328; //XSDB
     if(file.Contains("ST_s-channel_4f_leptonDecays"))			fneg=0.1787; //XSDB
 
     if(file.Contains("WminusH_HToBB_WToLNu_M-125_TuneCP5"))		fneg=0.02897; //XSDB
