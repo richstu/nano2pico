@@ -94,19 +94,33 @@ if __name__ == "__main__":
                                                  year = "2017",
                                                  pico_directory=pico_directory, n_entries=n_entries))
   higgsino_test_commands.extend(makeTestCommands(mc_nanoaod_directory=input_pico_folder+"/NanoAODv9/nano/2018/mc", mc_nanoaod_filename="DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8__RunIISummer20UL18NanoAODv9__106X_upgrade2018_realistic_v16_L1v1-v2__230000__00EA9563-5449-D24E-9566-98AE8E2A61AE.root", 
-                                                 data_nanoaod_directory=input_pico_folder+"/NanoAODv9/nano/2018/data", data_nanoaod_filename="EGamma__Run2018A__UL2018_MiniAODv2_NanoAODv9-v1__270000__00B7FFB1-3455-C941-AE3B-CF7085966A41.root", 
+                                                 data_nanoaod_directory=input_pico_folder+"/NanoAODv9/nano/2018/data", 
+                                                 data_nanoaod_filename="EGamma__Run2018A__UL2018_MiniAODv2_NanoAODv9-v1__270000__00B7FFB1-3455-C941-AE3B-CF7085966A41.root", 
                                                  year = "2018",
                                                  pico_directory=pico_directory, n_entries=n_entries))
-  higgsino_test_commands.extend(makeTestCommands(mc_nanoaod_directory=input_pico_folder+"/NanoAODv11/nano/2022/mc", mc_nanoaod_filename="DYto2L-2Jets_MLL-50_TuneCP5_13p6TeV_amcatnloFXFX-pythia8__Run3Summer22NanoAODv11__126X_mcRun3_2022_realistic_v2-v1__2560000__f2cc3f7c-3b6c-4035-b9ce-ea71117214c9.root", 
-                                                 data_nanoaod_directory=input_pico_folder+"/NanoAODv11/nano/2022/data", data_nanoaod_filename="EGamma__Run2022D__ReRecoNanoAODv11-v1__50000__8a30ea4b-ef45-4867-be5d-5d665fc3a003.root", 
+                                                
+  higgsino_test_commands.extend(makeTestCommands(mc_nanoaod_directory=input_pico_folder+"/NanoAODv12/nano/2022/mc", 
+                                                 mc_nanoaod_filename="DYto2L-2Jets_MLL-50_TuneCP5_13p6TeV_amcatnloFXFX-pythia8__Run3Summer22NanoAODv12__130X_mcRun3_2022_realistic_v5_ext1-v1__2560000__74ed7194-9623-484f-adf4-d55268f95320.root", 
+                                                 data_nanoaod_directory=input_pico_folder+"/NanoAODv12/nano/2022/data", 
+                                                 data_nanoaod_filename="Muon__Run2022D__22Sep2023-v1__2520000__2fe0b89f-4fef-4cd0-b81a-eb5c8964194e.root", 
                                                  year = "2022",
                                                  pico_directory=pico_directory, n_entries=n_entries))
-  higgsino_test_commands.extend(makeTestCommands(mc_nanoaod_directory=input_pico_folder+"/NanoAODv11/nano/2022EE/mc", mc_nanoaod_filename="DYto2L-2Jets_MLL-50_TuneCP5_13p6TeV_amcatnloFXFX-pythia8__Run3Summer22EENanoAODv11__126X_mcRun3_2022_realistic_postEE_v1-v1__2550000__fdd9bf65-f2f2-487d-a734-1de6852f5380.root", 
-                                                 data_nanoaod_directory=input_pico_folder+"/NanoAODv11/nano/2022EE/data", data_nanoaod_filename="EGamma__Run2022G__PromptNanoAODv11_v1-v2__80000__fdc45092-7b53-42cf-bcbe-db852373628c.root", 
+
+  higgsino_test_commands.extend(makeTestCommands(mc_nanoaod_directory=input_pico_folder+"/NanoAODv12/nano/2022EE/mc", 
+                                                 mc_nanoaod_filename="DYJetsToLL_M-50_TuneCP5_13p6TeV-madgraphMLM-pythia8__Run3Summer22EENanoAODv12__forPOG_130X_mcRun3_2022_realistic_postEE_v6-v2__2530000__94a3133e-238e-4b52-8862-1e5bf11cf441.root", 
+                                                 data_nanoaod_directory=input_pico_folder+"/NanoAODv12/nano/2022EE/data", 
+                                                 data_nanoaod_filename="EGamma__Run2022E__22Sep2023-v1__2530000__0900e874-435c-4ac1-aa69-dd6a5eff46c7.root", 
                                                  year = "2022EE",
                                                  pico_directory=pico_directory, n_entries=n_entries))
-  higgsino_test_commands.extend(makeTestCommands(data_nanoaod_directory=input_pico_folder+"/NanoAODv11p9/nano/2023/data", data_nanoaod_filename="EGamma1__Run2023C__PromptNanoAODv11p9_v1-v1__70000__43f9a82e-4e4f-4940-a4d8-0bbf6671a83d.root", 
+
+  higgsino_test_commands.extend(makeTestCommands(data_nanoaod_directory=input_pico_folder+"/NanoAODv12/nano/2023/data", 
+                                                 data_nanoaod_filename="Muon0__Run2023C__22Sep2023_v4-v1__50000__b62545f1-6761-4a06-8d2b-9b02e10685a7.root", 
                                                  year = "2023",
+                                                 pico_directory=pico_directory, n_entries=n_entries))
+
+  higgsino_test_commands.extend(makeTestCommands(data_nanoaod_directory=input_pico_folder+"/NanoAODv12/nano/2023BPix/data", 
+                                                 data_nanoaod_filename="Muon0__Run2023D__22Sep2023_v1-v1__2530000__45788039-83df-45b9-9c6c-490f2fd73c08.root", 
+                                                 year = "2023BPix",
                                                  pico_directory=pico_directory, n_entries=n_entries))
   # For ggH
   higgsino_test_commands.extend(makeTestCommands(mc_nanoaod_directory=input_pico_folder+"/NanoAODv9/nano/2016/mc", mc_nanoaod_filename="GluGluHToZG_ZToLL_M-125_TuneCP5_13TeV-powheg-pythia8__RunIISummer20UL16NanoAODv9__106X_mcRun2_asymptotic_v17-v1__40000__C3E0FC8E-4157-7E40-956C-F04E32F6B8C7.root", 
@@ -139,12 +153,28 @@ if __name__ == "__main__":
   higgsino_test_commands.extend(makeTestCommands(mc_nanoaod_directory=input_pico_folder+"/NanoAODv9UCSB1/nano/2018/mc", mc_nanoaod_filename="ZGToLLG_01J_5f_lowMLL_lowGPt_TuneCP5_13TeV-amcatnloFXFX-pythia8__RunIISummer20UL18NanoAODv9UCSB1__106X_upgrade2018_realistic_v16_L1v1-v1__028.root", 
                                                  year = "2018",
                                                  pico_directory=pico_directory, n_entries=n_entries))
-  higgsino_test_commands.extend(makeTestCommands(mc_nanoaod_directory=input_pico_folder+"/NanoAODv11/nano/2022/mc", mc_nanoaod_filename="DYGto2LG-1Jets_MLL-50_PTG-10to50_TuneCP5_13p6TeV_amcatnloFXFX-pythia8__Run3Summer22NanoAODv11__126X_mcRun3_2022_realistic_v2-v2__30000__2c25bb19-7069-4734-8348-39e27d383240.root", 
+
+  higgsino_test_commands.extend(makeTestCommands(mc_nanoaod_directory=input_pico_folder+"/NanoAODv12/nano/2022/mc", 
+                                                 mc_nanoaod_filename="DYGto2LG-1Jets_MLL-50_PTG-50to100_TuneCP5_13p6TeV_amcatnloFXFX-pythia8__Run3Summer22NanoAODv12__130X_mcRun3_2022_realistic_v5-v3__2560000__c894c764-6dcc-4723-a4d8-456f058e215e.root", 
                                                  year = "2022",
                                                  pico_directory=pico_directory, n_entries=n_entries))
-  higgsino_test_commands.extend(makeTestCommands(mc_nanoaod_directory=input_pico_folder+"/NanoAODv11/nano/2022EE/mc", mc_nanoaod_filename="DYGto2LG-1Jets_MLL-50_PTG-100to200_TuneCP5_13p6TeV_amcatnloFXFX-pythia8__Run3Summer22EENanoAODv11__126X_mcRun3_2022_realistic_postEE_v1-v3__30000__d236ed7f-4525-4dff-97b8-c893ca16ed1f.root", 
+
+  higgsino_test_commands.extend(makeTestCommands(mc_nanoaod_directory=input_pico_folder+"/NanoAODv12/nano/2022/mc", 
+                                                 mc_nanoaod_filename="GluGluHtoZG_Zto2L_M-125_TuneCP5_13p6TeV_powheg-pythia8__Run3Summer22NanoAODv12__130X_mcRun3_2022_realistic_v5-v2__2530000__6e37d56d-c21d-4d3d-b647-8e941c6fa844.root", 
+                                                 year = "2022",
+                                                 pico_directory=pico_directory, n_entries=n_entries))
+
+
+  higgsino_test_commands.extend(makeTestCommands(mc_nanoaod_directory=input_pico_folder+"/NanoAODv12/nano/2022EE/mc", 
+                                                 mc_nanoaod_filename="DYGto2LG-1Jets_MLL-50_PTG-50to100_TuneCP5_13p6TeV_amcatnloFXFX-pythia8__Run3Summer22EENanoAODv12__130X_mcRun3_2022_realistic_postEE_v6-v1__40000__9eaff41b-6b12-463b-97a1-b56f798821c5.root", 
                                                  year = "2022EE",
                                                  pico_directory=pico_directory, n_entries=n_entries))
+
+  higgsino_test_commands.extend(makeTestCommands(mc_nanoaod_directory=input_pico_folder+"/NanoAODv12/nano/2022EE/mc", 
+                                                 mc_nanoaod_filename="GluGluHtoZG_Zto2L_M-125_TuneCP5_13p6TeV_powheg-pythia8__Run3Summer22EENanoAODv12__130X_mcRun3_2022_realistic_postEE_v6-v2__2530000__4d0c2375-cd02-4dd3-a4e6-cd2648f3a7e3.root", 
+                                                 year = "2022EE",
+                                                 pico_directory=pico_directory, n_entries=n_entries))
+
 
   os.makedirs(pico_directory)
   log_file = open(pico_directory+"/"+log_filename, 'w')

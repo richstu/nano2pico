@@ -105,7 +105,17 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
 
     // Photons passing the object selections are placed at the front
     if(isSignal) {
-      shift = ndr;
+      for(int isig(0);isig<ndr;isig++){
+        if(pt>pico.out_photon_pt()[isig]){
+          shift = isig;
+          break;
+        }else if(isig==(ndr-1) && pt<=pico.out_photon_pt()[isig]){
+          shift = ndr;
+        }
+      }
+      if(ndr == 0){
+        shift = ndr;
+      }
       ndr++;
     }
     else
@@ -258,10 +268,9 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
       // save indices of matching jets
       if (Photon_jetIdx[iph]>=0)
         jet_isphoton_nano_idx.push_back(Photon_jetIdx[iph]);
-      else
-        for (int ijet(0); ijet<nano.nJet(); ijet++)
-          if (dR(eta, nano.Jet_eta()[ijet], phi, nano.Jet_phi()[ijet])<0.4f)
-            jet_isphoton_nano_idx.push_back(ijet);
+      for (int ijet(0); ijet<nano.nJet(); ijet++)
+        if (dR(eta, nano.Jet_eta()[ijet], phi, nano.Jet_phi()[ijet])<0.4f)
+          jet_isphoton_nano_idx.push_back(ijet);
     }
   }
 
