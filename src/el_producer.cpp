@@ -3,6 +3,8 @@
 #include "correction.hpp"
 #include "utilities.hpp"
 
+#include "TRandom3.h"
+
 #include <algorithm>
 #include <iomanip>
 #include <memory>
@@ -10,36 +12,53 @@
 
 using namespace std;
 
-ElectronProducer::ElectronProducer(int year_, bool isData_, bool preVFP, float nanoaod_version_){
+ElectronProducer::ElectronProducer(string year_, bool isData_, float nanoaod_version_){
   year = year_;
   isData = isData_;
-  if (year==2016 && preVFP) {
+  rng_ = TRandom3(4357);
+  if (year=="2016APV") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
         "data/zgamma/2016preVFP_UL/EGM_ScaleUnc.json");
     str_scale_syst_ = "2016preVFP";
+    map_scale_syst_ = cs_scale_syst_->at("UL-EGM_ScaleUnc");
   }
-  else if (year==2016) {
+  else if (year=="2016") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
         "data/zgamma/2016postVFP_UL/EGM_ScaleUnc.json");
     str_scale_syst_ = "2016postVFP";
+    map_scale_syst_ = cs_scale_syst_->at("UL-EGM_ScaleUnc");
   }
-  else if (year==2017) {
+  else if (year=="2017") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
         "data/zgamma/2017_UL/EGM_ScaleUnc.json");
     str_scale_syst_ = "2017";
+    map_scale_syst_ = cs_scale_syst_->at("UL-EGM_ScaleUnc");
   }
-  else if (year==2018) {
+  else if (year=="2018") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
         "data/zgamma/2018_UL/EGM_ScaleUnc.json");
     str_scale_syst_ = "2018";
+    map_scale_syst_ = cs_scale_syst_->at("UL-EGM_ScaleUnc");
+  }
+  else if (year=="2022") {
+    cs_scale_syst_ = correction::CorrectionSet::from_file(
+        "data/zgamma/2022/electronSS.json");
+    map_scale_ = cs_scale_syst_->at("2022Re-recoBCD_ScaleJSON");
+    map_smearing_ = cs_scale_syst_->at("2022Re-recoBCD_SmearingJSON");
+  }
+  else if (year=="2022EE") {
+    cs_scale_syst_ = correction::CorrectionSet::from_file(
+        "data/zgamma/2022EE/electronSS.json");
+    map_scale_ = cs_scale_syst_->at("2022Re-recoE+PromptFG_ScaleJSON");
+    map_smearing_ = cs_scale_syst_->at("2022Re-recoE+PromptFG_SmearingJSON");
   }
   else {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2018_UL/EGM_ScaleUnc.json");
-    str_scale_syst_ = "2018";
-    std::cout << "WARNING: No dedicated EGM scale/smearing JSONs, defaulting to 2018" << std::endl;
+        "data/zgamma/2022EE/electronSS.json");
+    map_scale_ = cs_scale_syst_->at("2022Re-recoE+PromptFG_ScaleJSON");
+    map_smearing_ = cs_scale_syst_->at("2022Re-recoE+PromptFG_SmearingJSON");
+    std::cout << "WARNING: No dedicated EGM scale/smearing JSONs, defaulting to 2022EE" << std::endl;
   }
-  map_scale_syst_ = cs_scale_syst_->at("UL-EGM_ScaleUnc");
   nanoaod_version = nanoaod_version_;
 }
 
@@ -58,13 +77,10 @@ bool ElectronProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma) {
     if (fabs(etasc) > ElectronEtaCut) return false;
     if (fabs(dz) > dzCut) return false;
     if (fabs(dxy) > dxyCut) return false; 
-    switch(year) {
-      case 2016:
-      case 2017:
-      case 2018:
-        return nano.Electron_mvaFall17V2Iso_WPL()[nano_idx];
-      case 2022:
-      case 2023:
+    if (year=="2016APV"||year=="2016"||year=="2017"||year=="2018") {
+      return nano.Electron_mvaFall17V2Iso_WPL()[nano_idx];
+    }
+    else if (year=="2022"||year=="2022EE"||year=="2023"||year=="2023BPix") {
        // got these values from : https://twiki.cern.ch/twiki/bin/viewauth/CMS/MultivariateElectronIdentificationRun2#HZZ_MVA_training_details_and_wor
        //early Run 3 HZZ SF is approved applying the 2018 WP
        // 2.0 / (1.0 + exp(-2.0 * response)) - 1)
@@ -74,9 +90,10 @@ bool ElectronProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma) {
          (pt >= 10. && fabs(etasc) < 0.800 && nano.Electron_mvaHZZIso()[nano_idx] > ConvertMVA(0.199463934736)) || \
          (pt >= 10. && fabs(etasc) >= 0.800 && fabs(etasc) < 1.479 && nano.Electron_mvaHZZIso()[nano_idx] > ConvertMVA(0.076063564084))|| \
          (pt >= 10. && fabs(etasc) >= 1.479 && nano.Electron_mvaHZZIso()[nano_idx] > ConvertMVA(-0.572118857519)));
-      default:
-        std::cout << "WARNING: year value not found in cases. Defaulting Electron MVA to WP90" << std::endl;
-        return nano.Electron_mvaIso_WP90()[nano_idx];
+    }
+    else {
+      std::cout << "WARNING: year value not found in cases. Defaulting Electron MVA to WP90" << std::endl;
+      return nano.Electron_mvaIso_WP90()[nano_idx];
     }
   }
   else {
@@ -138,54 +155,82 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
     float miniiso = nano.Electron_miniPFRelIso_all()[iel];
     bool isSignal = false;
     bool id = false;
+    float scaleres_corr = 1.0f;
     if(isZgamma) { // For Zgamma productions
       if (pt <= ZgElectronPtCut) continue;
       if (fabs(etasc) > ElectronEtaCut) continue;
       if (fabs(dz) > dzCut)  continue;
       if (fabs(dxy) > dxyCut) continue; 
       isSignal = IsSignal(nano, iel, isZgamma);
-      float scale_syst_up = 1.0;
-      float scale_syst_dn = 1.0;
-      if (year <= 2018) {
-        scale_syst_up = map_scale_syst_->evaluate({str_scale_syst_,"scaleup",etasc,
-            nano.Electron_seedGain()[iel]});
-        scale_syst_dn = map_scale_syst_->evaluate({str_scale_syst_,"scaledown",etasc,
-            nano.Electron_seedGain()[iel]});
+      float scale_syst_up = 1.0f;
+      float scale_syst_dn = 1.0f;
+      float smearing_syst_up = 1.0f;
+      float smearing_syst_dn = 1.0f;
+      //deal with scale/smearing (systematics only for NanoAODv9 [run 2], full
+      //correction for NanoAODv10+ [run3])
+      if ((year=="2016APV"||year=="2016"||year=="2017"||year=="2018") 
+          && !isData) {
+        scale_syst_up = map_scale_syst_->evaluate({str_scale_syst_,"scaleup",
+            etasc,nano.Electron_seedGain()[iel]});
+        scale_syst_dn = map_scale_syst_->evaluate({str_scale_syst_,"scaledown",
+            etasc,nano.Electron_seedGain()[iel]});
+        smearing_syst_up = 1.0f+nano.Electron_dEsigmaUp()[iel];
+        smearing_syst_dn = 1.0f+nano.Electron_dEsigmaDown()[iel];
+      }
+      else if (year=="2022"||year=="2022EE") {
+        //TODO add 2023(BPix) when available
+        float run = static_cast<float>(nano.run());
+        if (isData) {
+          //scale corrections applied to data
+          scaleres_corr = map_scale_->evaluate({"total_correction",
+              nano.Electron_seedGain()[iel],run,etasc,
+              nano.Electron_r9()[iel],pt});
+        }
+        else {
+          //smearing corrections applied to MC, syst.s also calculated
+          float rho = map_smearing_->evaluate({"rho",etasc,
+              nano.Electron_r9()[iel]});
+          float err_rho = map_smearing_->evaluate({"err_rho",etasc,
+              nano.Electron_r9()[iel]});
+          float scale_unc = map_scale_->evaluate({"total_uncertainty",
+              nano.Electron_seedGain()[iel],run,etasc,
+              nano.Electron_r9()[iel],pt});
+          float rand = rng_.Gaus();
+          scaleres_corr = 1.0f+rand*rho;
+          smearing_syst_up = 1.0f+rand*(rho+err_rho);
+          smearing_syst_dn = 1.0f+rand*(rho-err_rho);
+          scale_syst_up = (1.0f+scale_unc);
+          scale_syst_dn = (1.0f-scale_unc);
+        }
       }
 
-      switch(year) {
-        case 2016:
-        case 2017:
-        case 2018:
-          pico.out_el_idmva().push_back(nano.Electron_mvaFall17V2Iso()[iel]);
-          pico.out_el_sip3d().push_back(nano.Electron_sip3d()[iel]);
-          pico.out_el_phidx().push_back(Electron_photonIdx[iel]);
-          pico.out_el_id80().push_back(nano.Electron_mvaFall17V2Iso_WP80()[iel]);
-          pico.out_el_id90().push_back(nano.Electron_mvaFall17V2Iso_WP90()[iel]);
-          pico.out_el_idLoose().push_back(nano.Electron_mvaFall17V2Iso_WPL()[iel]);
-          pico.out_el_etPt().push_back(nano.Electron_scEtOverPt()[iel]);
-          pico.out_el_eminusp().push_back(nano.Electron_eInvMinusPInv()[iel]);
-          pico.out_sys_el_pt_resup().push_back(pt*(1.0+nano.Electron_dEsigmaUp()[iel]));
-          pico.out_sys_el_pt_resdn().push_back(pt*(1.0+nano.Electron_dEsigmaDown()[iel]));
-          pico.out_sys_el_pt_scaleup().push_back(pt*scale_syst_up);
-          pico.out_sys_el_pt_scaledn().push_back(pt*scale_syst_dn);
-          break;
-        case 2022:
-        case 2023:
-          pico.out_el_idmva().push_back(nano.Electron_mvaIso()[iel]);
-          pico.out_el_idmvaHZZ().push_back(nano.Electron_mvaHZZIso()[iel]);
-          pico.out_el_sip3d().push_back(nano.Electron_sip3d()[iel]);
-          pico.out_el_phidx().push_back(Electron_photonIdx[iel]);
-          pico.out_el_id80().push_back(nano.Electron_mvaIso_WP80()[iel]);
-          pico.out_el_id90().push_back(nano.Electron_mvaIso_WP90()[iel]);
-          pico.out_el_idLoose().push_back(nano.Electron_mvaIso_WP90()[iel]);
-          pico.out_el_etPt().push_back(nano.Electron_scEtOverPt()[iel]);
-          pico.out_el_eminusp().push_back(nano.Electron_eInvMinusPInv()[iel]);
-          pico.out_el_fsrphotonidx().push_back(nano.Electron_fsrPhotonIdx()[iel]);
-          break;
-        default:
-          std::cout<<"Need code for new year in getZGammaElBr (in el_producer.cpp)"<<endl;
-          exit(1);
+      pico.out_el_sip3d().push_back(nano.Electron_sip3d()[iel]);
+      pico.out_el_phidx().push_back(Electron_photonIdx[iel]);
+      pico.out_el_etPt().push_back(nano.Electron_scEtOverPt()[iel]);
+      pico.out_el_eminusp().push_back(nano.Electron_eInvMinusPInv()[iel]);
+      if (!isData) {
+        pico.out_sys_el_pt_resup().push_back(pt*smearing_syst_up);
+        pico.out_sys_el_pt_resdn().push_back(pt*smearing_syst_dn);
+        pico.out_sys_el_pt_scaleup().push_back(pt*scaleres_corr*scale_syst_up);
+        pico.out_sys_el_pt_scaledn().push_back(pt*scaleres_corr*scale_syst_dn);
+      }
+      if (year=="2016APV"||year=="2016"||year=="2017"||year=="2018") {
+        pico.out_el_idmva().push_back(nano.Electron_mvaFall17V2Iso()[iel]);
+        pico.out_el_id80().push_back(nano.Electron_mvaFall17V2Iso_WP80()[iel]);
+        pico.out_el_id90().push_back(nano.Electron_mvaFall17V2Iso_WP90()[iel]);
+        pico.out_el_idLoose().push_back(nano.Electron_mvaFall17V2Iso_WPL()[iel]);
+      }
+      else if (year=="2022"||year=="2022EE"||year=="2023"||year=="2023BPix") {
+        pico.out_el_idmva().push_back(nano.Electron_mvaIso()[iel]);
+        pico.out_el_idmvaHZZ().push_back(nano.Electron_mvaHZZIso()[iel]);
+        pico.out_el_id80().push_back(nano.Electron_mvaIso_WP80()[iel]);
+        pico.out_el_id90().push_back(nano.Electron_mvaIso_WP90()[iel]);
+        pico.out_el_idLoose().push_back(nano.Electron_mvaIso_WP90()[iel]);
+        pico.out_el_fsrphotonidx().push_back(nano.Electron_fsrPhotonIdx()[iel]);
+      }
+      else {
+        std::cout<<"Need code for new year in getZGammaElBr (in el_producer.cpp)"<<endl;
+        exit(1);
       }
       int bitmap = nano.Electron_vidNestedWPBitmapHEEP()[iel];
       pico.out_el_ecal().push_back(EcalDriven(bitmap));
@@ -203,7 +248,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
       isSignal = IsSignal(nano, iel, isZgamma);
       id = idElectron_noIso(bitmap,3);
     }
-    pico.out_el_pt().push_back(pt);
+    pico.out_el_pt().push_back(scaleres_corr*pt);
     pico.out_el_energyErr().push_back(nano.Electron_energyErr()[iel]);
     pico.out_el_eta().push_back(eta);
     pico.out_el_etasc().push_back(etasc);
