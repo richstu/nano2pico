@@ -702,6 +702,7 @@ float fixedGridRhoFastjetCentral
 float fixedGridRhoFastjetCentralCalo
 float fixedGridRhoFastjetCentralChargedPileUp
 float fixedGridRhoFastjetCentralNeutral
+float Rho_fixedGridRhoFastjetAll
 
 ################ Trigger related ################
 int nTrigObj
