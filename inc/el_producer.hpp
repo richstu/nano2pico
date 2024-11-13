@@ -36,6 +36,7 @@ public:
                                   bool isZgamma, bool isFastsim);
 
   float ConvertMVA(float mva_mini);
+  bool HzzId_WP2022(float pt, float etasc, float hzzmvaid);
 
 private:
   std::string year;
@@ -48,7 +49,8 @@ private:
   TRandom3 rng_;
   float nanoaod_version;
 
-  bool IsSignal(nano_tree& nano, int nano_idx, bool isZgamma);
+  bool IsSignal(nano_tree& nano, int nano_idx, bool isZgamma, 
+                float scalres_corr=1.0f);
   bool idElectron_noIso(int bitmap, int level);
   bool EcalDriven(int bitmap);
 };

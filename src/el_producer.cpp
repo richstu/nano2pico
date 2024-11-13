@@ -65,8 +65,8 @@ ElectronProducer::ElectronProducer(string year_, bool isData_, float nanoaod_ver
 ElectronProducer::~ElectronProducer(){
 }
 
-bool ElectronProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma) {
-  float pt = nano.Electron_pt()[nano_idx];
+bool ElectronProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma, float scaleres_corr) {
+  float pt = nano.Electron_pt()[nano_idx]*scaleres_corr;
   float eta = nano.Electron_eta()[nano_idx];
   float etasc = nano.Electron_deltaEtaSC()[nano_idx] + nano.Electron_eta()[nano_idx];
   float dz = nano.Electron_dz()[nano_idx];
@@ -81,15 +81,7 @@ bool ElectronProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma) {
       return nano.Electron_mvaFall17V2Iso_WPL()[nano_idx];
     }
     else if (year=="2022"||year=="2022EE"||year=="2023"||year=="2023BPix") {
-       // got these values from : https://twiki.cern.ch/twiki/bin/viewauth/CMS/MultivariateElectronIdentificationRun2#HZZ_MVA_training_details_and_wor
-       //early Run 3 HZZ SF is approved applying the 2018 WP
-       // 2.0 / (1.0 + exp(-2.0 * response)) - 1)
-       return ((pt < 10. && fabs(etasc) < 0.800 && nano.Electron_mvaHZZIso()[nano_idx] > ConvertMVA(1.49603193295)) || \
-         (pt < 10. && fabs(etasc) >= 0.800 && fabs(etasc) < 1.479 && nano.Electron_mvaHZZIso()[nano_idx] > ConvertMVA(1.52414154008)) || \
-         (pt < 10. && fabs(etasc) >= 1.479 && nano.Electron_mvaHZZIso()[nano_idx] > ConvertMVA(1.77694249574))|| \
-         (pt >= 10. && fabs(etasc) < 0.800 && nano.Electron_mvaHZZIso()[nano_idx] > ConvertMVA(0.199463934736)) || \
-         (pt >= 10. && fabs(etasc) >= 0.800 && fabs(etasc) < 1.479 && nano.Electron_mvaHZZIso()[nano_idx] > ConvertMVA(0.076063564084))|| \
-         (pt >= 10. && fabs(etasc) >= 1.479 && nano.Electron_mvaHZZIso()[nano_idx] > ConvertMVA(-0.572118857519)));
+       return HzzId_WP2022(pt, etasc, nano.Electron_mvaHZZIso()[nano_idx]);
     }
     else {
       std::cout << "WARNING: year value not found in cases. Defaulting Electron MVA to WP90" << std::endl;
@@ -157,11 +149,9 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
     bool id = false;
     float scaleres_corr = 1.0f;
     if(isZgamma) { // For Zgamma productions
-      if (pt <= ZgElectronPtCut) continue;
       if (fabs(etasc) > ElectronEtaCut) continue;
       if (fabs(dz) > dzCut)  continue;
       if (fabs(dxy) > dxyCut) continue; 
-      isSignal = IsSignal(nano, iel, isZgamma);
       float scale_syst_up = 1.0f;
       float scale_syst_dn = 1.0f;
       float smearing_syst_up = 1.0f;
@@ -203,6 +193,8 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
           scale_syst_dn = (1.0f-scale_unc);
         }
       }
+      if (scaleres_corr*pt <= ZgElectronPtCut) continue;
+      isSignal = IsSignal(nano, iel, isZgamma, scaleres_corr);
 
       pico.out_el_sip3d().push_back(nano.Electron_sip3d()[iel]);
       pico.out_el_phidx().push_back(Electron_photonIdx[iel]);
@@ -221,11 +213,13 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
         pico.out_el_idLoose().push_back(nano.Electron_mvaFall17V2Iso_WPL()[iel]);
       }
       else if (year=="2022"||year=="2022EE"||year=="2023"||year=="2023BPix") {
+        bool hzz_wp2022 = HzzId_WP2022(scaleres_corr*pt,etasc,
+                                       nano.Electron_mvaHZZIso()[iel]);
         pico.out_el_idmva().push_back(nano.Electron_mvaIso()[iel]);
         pico.out_el_idmvaHZZ().push_back(nano.Electron_mvaHZZIso()[iel]);
         pico.out_el_id80().push_back(nano.Electron_mvaIso_WP80()[iel]);
         pico.out_el_id90().push_back(nano.Electron_mvaIso_WP90()[iel]);
-        pico.out_el_idLoose().push_back(nano.Electron_mvaIso_WP90()[iel]);
+        pico.out_el_idLoose().push_back(hzz_wp2022);
         pico.out_el_fsrphotonidx().push_back(nano.Electron_fsrPhotonIdx()[iel]);
       }
       else {
@@ -323,8 +317,35 @@ bool ElectronProducer::idElectron_noIso(int bitmap, int level){
 }
 
 float ElectronProducer::ConvertMVA(float mva_mini) {
+  // 2.0 / (1.0 + exp(-2.0 * response)) - 1)
   float mva_nano = 2.0 / (1.0 + exp(-2.0 * mva_mini)) - 1;
   return mva_nano;
+}
+
+bool ElectronProducer::HzzId_WP2022(float pt, float etasc, float hzzmvaid) {
+  //2022 WPs for 2018 ID training taken from https://indico.cern.ch/event/1429005/contributions/6039535/attachments/2891374/5077286/240712_H4lrun3_Approval.pdf
+  if (pt < 10.0f) {
+    if (fabs(etasc) < 0.8f) {
+     return (hzzmvaid > ConvertMVA(1.6339));
+    }
+    else if (fabs(etasc) < 1.479f) {
+      return (hzzmvaid > ConvertMVA(1.5499));
+    }
+    else {
+      return (hzzmvaid > ConvertMVA(2.0629));
+    }
+  }
+  else {
+    if (fabs(etasc) < 0.8f) {
+      return (hzzmvaid > ConvertMVA(0.3685));
+    }
+    else if (fabs(etasc) < 1.479f) {
+      return (hzzmvaid > ConvertMVA(0.2662));
+    }
+    else {
+      return (hzzmvaid > ConvertMVA(-0.5444));
+    }
+  }
 }
 
 bool ElectronProducer::EcalDriven(int bitmap){
