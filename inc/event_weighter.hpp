@@ -46,10 +46,13 @@ private:
   std::unique_ptr<correction::CorrectionSet> cs_pileup_;
   std::unique_ptr<correction::CorrectionSet> cs_btag_;
   std::unique_ptr<correction::CorrectionSet> cs_btag_mceff_;
-  correction::Correction::Ref map_electron_;
   correction::Correction::Ref map_photon_id_;
   correction::Correction::Ref map_photon_csev_;
   correction::Correction::Ref map_photon_csev_mceff_;
+  correction::Correction::Ref map_electron_id_pass_;
+  correction::Correction::Ref map_electron_id_pass_unc_;
+  correction::Correction::Ref map_electron_id_fail_;
+  correction::Correction::Ref map_electron_id_fail_unc_;
   correction::Correction::Ref map_muon_id_pass_;
   correction::Correction::Ref map_muon_id_pass_unc_;
   correction::Correction::Ref map_muon_id_fail_;
