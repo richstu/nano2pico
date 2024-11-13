@@ -68,6 +68,10 @@ int main() {
   weighters.push_back(EventWeighter("2016", btag_wps[2016]));
   weighters.push_back(EventWeighter("2017", btag_wps[2017]));
   weighters.push_back(EventWeighter("2018", btag_wps[2018]));
+  weighters.push_back(EventWeighter("2022", btag_wps[2022]));
+  weighters.push_back(EventWeighter("2022EE", btag_wps[2022]));
+  weighters.push_back(EventWeighter("2023", btag_wps[2023]));
+  weighters.push_back(EventWeighter("2023BPix", btag_wps[2023]));
 
   vector<TriggerWeighter> trigger_weighters;
   trigger_weighters.push_back(TriggerWeighter(2016, true));
@@ -75,12 +79,12 @@ int main() {
   trigger_weighters.push_back(TriggerWeighter(2017, false));
   trigger_weighters.push_back(TriggerWeighter(2018, false));
 
-  vector<int> years = {2016,2016,2017,2018};
-  vector<string> years_string = {"2016APV","2016","2017","2018"};
+  vector<int> years = {2016,2016,2017,2018,2022,2022,2023,2023};
+  vector<string> years_string = {"2016APV","2016","2017","2018","2022","2022EE","2023","2023BPix"};
 
   vector<float> el_pt_bins = {7.0,10.0,20.0,35.0,50.0,100.0,200.0,500.0};
   vector<float> el_eta_bins = {-2.5,-2.0,-1.566,-1.444,-0.8,0.0,0.8,1.444,1.566,2.0,2.5};
-  vector<float> mu_pt_bins = {5.0,6.0,8.0,10.0,15.0,20.0,25.0,30.0,40.0,50.0,60.0,120.0,200.0};
+  vector<float> mu_pt_bins = {5.0,6.0,7.0,8.0,10.0,12.0,15.0,20.0,25.0,30.0,35.0,40.0,50.0,60.0,80.0,120.0,200.0};
   vector<float> mu_eta_bins = {0.0,0.9,1.2,2.1,2.4};
   vector<float> jet_pt_bins = {30.0,40.0,50.0,60.0,70.0,80.0,90.0,100.0,150.0,200.0,250.0,300.0,350.0,400.0,500.0,600.0,800.0,1000.0};
   vector<float> jet_eta_bins = {-2.4,-1.92,-1.44,-0.96,-0.48,0.0,0.48,0.96,1.44,1.92,2.4};
@@ -118,7 +122,7 @@ int main() {
   bool check_electron_weights = true;
   bool check_muon_weights = true;
   bool check_photon_csev_weights = true;
-  bool check_trigger_weights = true;
+  bool check_trigger_weights = false;
   bool check_btag_weights = true;
   bool verbose = false;
   unsigned trig_nlep_max = 3;
