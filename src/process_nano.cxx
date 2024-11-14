@@ -295,7 +295,7 @@ int main(int argc, char *argv[]){
   PhotonWeighter photon_weighter(year, isZgamma || isHiggsino);
   // UL scale factors
   EventWeighter event_weighter(year_string, btag_df_wpts[year_string]);
-  TriggerWeighter trigger_weighter(year, isAPV);
+  TriggerWeighter trigger_weighter(year_string);
   //cout<<"Is APV: "<<isAPV<<endl;
 
   // Other tools
