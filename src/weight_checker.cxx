@@ -95,6 +95,9 @@ int main() {
   vector<float> jet_flav_bins = {1,4,5};
   //vector<float> ph_pt_bins = {};
   //vector<float> ph_eta_bins = {};
+  vector<float> photon_eta_bins = {-2.4,-2.0,-1.5,-0.8,0.0,0.8,1.5,2.0,2.4};
+  vector<float> photon_phi_bins = {-3.1416,-1.2,-0.8,3.1416};
+  vector<float> photon_pt_bins = {15.0,20.0,35.0,50.0,100.0,200.0,500.0};
   vector<float> photon_r9_bins = {0.0,0.94,2.0};
   vector<bool> photon_ebee_bins = {true, false};
   vector<bool> photon_eveto_bins = {true, false};
@@ -125,8 +128,8 @@ int main() {
 
   bool check_electron_weights = true;
   bool check_muon_weights = true;
-  bool check_photon_csev_weights = true;
-  bool check_trigger_weights = true;
+  bool check_photon_weights = true;
+  bool check_trigger_weights = false;
   bool check_btag_weights = true;
   bool verbose = false;
   unsigned trig_nlep_max = 3;
@@ -242,47 +245,59 @@ int main() {
       }
     }
 
-    if (check_photon_csev_weights) {
+    if (check_photon_weights) {
       cout << endl;
-      cout << "Photon CSEV weights" << endl;
-      for (unsigned ir9 = 0; ir9 < (photon_r9_bins.size()-1); ir9++) {
-        for (bool photon_iseb : photon_ebee_bins) {
-          for (bool eveto : photon_eveto_bins) {
-            pico.out_photon_pt().clear();
-            pico.out_photon_pt().push_back(20.0);
-            pico.out_photon_idmva().clear();
-            pico.out_photon_idmva().push_back(0.9);
-            pico.out_photon_isScEtaEB().clear();
-            pico.out_photon_isScEtaEB().push_back(photon_iseb);
-            pico.out_photon_isScEtaEE().clear();
-            pico.out_photon_isScEtaEE().push_back(!photon_iseb);
-            pico.out_photon_drmin().clear();
-            pico.out_photon_drmin().push_back(1.0);
-            pico.out_photon_elveto().clear();
-            pico.out_photon_elveto().push_back(eveto);
-            pico.out_photon_pflavor().clear();
-            pico.out_photon_pflavor().push_back(1);
-            pico.out_photon_r9().clear();
-            pico.out_photon_r9().push_back((photon_r9_bins[ir9]+photon_r9_bins[ir9+1])/2.0);
-            float w_photon_csev;
-            vector<float> sys_photon_csev;
-            sys_photon_csev.resize(2,1.0);
-            weighters[iyear].PhotonCSEVSF(pico, w_photon_csev, sys_photon_csev);
-            bool found_bad = sf_is_bad(w_photon_csev) ||
-                             sf_is_bad(sys_photon_csev[0]) ||
-                             sf_is_bad(sys_photon_csev[1]);
-            if (verbose || found_bad) {
-              cout << "r9: " << photon_r9_bins[ir9] << "--" << photon_r9_bins[ir9+1];
-              cout << ", EB: " << photon_iseb << ", veto: " << eveto;
-              cout << ", sf = " << w_photon_csev << ", up = " << sys_photon_csev[0];
-              cout << ", dn = " << sys_photon_csev[1] << endl;
-            }
-            if (found_bad) {
-              cout << "!!! Found bad SF" << endl;
-              string temp;
-              cin >> temp;
-              if (temp != "c")
-                return 1;
+      cout << "Photon weights" << endl;
+      for (unsigned ipt = 0; ipt < (photon_pt_bins.size()-1); ipt++) {
+        for (unsigned ieta = 0; ieta < (photon_eta_bins.size()-1); ieta++) {
+          for (unsigned iphi = 0; iphi < (photon_phi_bins.size()-1); iphi++) {
+            for (unsigned ir9 = 0; ir9 < (photon_r9_bins.size()-1); ir9++) {
+              for (bool eveto : photon_eveto_bins) {
+                for (bool issig : {true, false}) {
+                  float mean_eta = (photon_eta_bins[ieta]+photon_eta_bins[ieta+1])/2.0;
+                  pico.out_photon_pt().clear();
+                  pico.out_photon_pt().push_back((photon_pt_bins[ipt]+photon_pt_bins[ipt+1])/2.0);
+                  pico.out_photon_phi().clear();
+                  pico.out_photon_phi().push_back((photon_phi_bins[iphi]+photon_phi_bins[iphi+1])/2.0);
+                  pico.out_photon_eta().clear();
+                  pico.out_photon_eta().push_back(mean_eta);
+                  pico.out_photon_idmva().clear();
+                  pico.out_photon_idmva().push_back(0.9);
+                  pico.out_photon_sig().clear();
+                  pico.out_photon_sig().push_back(issig);
+                  pico.out_photon_isScEtaEB().clear();
+                  pico.out_photon_isScEtaEB().push_back(fabs(mean_eta)<1.5);
+                  pico.out_photon_isScEtaEE().clear();
+                  pico.out_photon_isScEtaEE().push_back(fabs(mean_eta)>1.5);
+                  pico.out_photon_drmin().clear();
+                  pico.out_photon_drmin().push_back(1.0);
+                  pico.out_photon_elveto().clear();
+                  pico.out_photon_elveto().push_back(eveto);
+                  pico.out_photon_pflavor().clear();
+                  pico.out_photon_pflavor().push_back(1);
+                  pico.out_photon_r9().clear();
+                  pico.out_photon_r9().push_back((photon_r9_bins[ir9]+photon_r9_bins[ir9+1])/2.0);
+                  weighters[iyear].PhotonSF(pico);
+                  bool found_bad = sf_is_bad(pico.out_w_photon()) ||
+                                   sf_is_bad(pico.out_sys_photon()[0]) ||
+                                   sf_is_bad(pico.out_sys_photon()[1]);
+                  if (verbose || found_bad) {
+                    cout << "  r9: " << photon_r9_bins[ir9] << "--" << photon_r9_bins[ir9+1];
+                    cout << "  pt: " << photon_pt_bins[ipt] << "--" << photon_pt_bins[ipt+1];
+                    cout << "  eta: " << photon_eta_bins[ieta] << "--" << photon_eta_bins[ieta+1];
+                    cout << "  veto: " << eveto;
+                    cout << ", sf = " << pico.out_w_photon() << ", up = " << pico.out_sys_photon()[0];
+                    cout << ", dn = " << pico.out_sys_photon()[1] << endl;
+                  }
+                  if (found_bad) {
+                    cout << "!!! Found bad SF" << endl;
+                    string temp;
+                    cin >> temp;
+                    if (temp != "c")
+                      return 1;
+                  }
+                }
+              }
             }
           }
         }

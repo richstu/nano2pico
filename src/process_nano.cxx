@@ -479,8 +479,6 @@ int main(int argc, char *argv[]){
     if (debug) cout<<"INFO:: Calculating weights"<<endl;
     float w_lep(1.), w_fs_lep(1.);
     float w_photon(1.);
-    float w_photon_id(1.);
-    float w_photon_csev(1.);
     vector<float> sys_lep(2,1.), sys_fs_lep(2,1.);
     vector<float> sys_photon(2,1.);
 
@@ -506,17 +504,13 @@ int main(int argc, char *argv[]){
         event_weighter.MuonSF(pico);
         event_weighter.PileupSF(pico);
         event_weighter.bTaggingSF(pico);
-        event_weighter.PhotonIDSF(pico, w_photon_id);
-        event_weighter.PhotonCSEVSF(pico, w_photon_csev, sys_photon);
+        event_weighter.PhotonSF(pico);
         pico.out_sys_lep().resize(2,1.); 
         pico.out_sys_photon().resize(2, 1.); 
         pico.out_sys_prefire().resize(2, 1.); 
         pico.out_w_lep()          = pico.out_w_el() * pico.out_w_mu();
         pico.out_sys_lep()[0]     = pico.out_sys_el()[0]*pico.out_sys_mu()[0]; 
         pico.out_sys_lep()[1]     = pico.out_sys_el()[1]*pico.out_sys_mu()[1]; 
-        pico.out_w_photon()       = w_photon_id * w_photon_csev;
-        pico.out_sys_photon()[0]  = sys_photon[0];
-        pico.out_sys_photon()[1]  = sys_photon[1];
         pico.out_sys_fs_bchig().resize(2,1.); 
         pico.out_sys_fs_udsghig().resize(2,1.); 
         pico.out_sys_fs_lep().resize(2,1.);

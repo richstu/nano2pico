@@ -18,9 +18,7 @@ public:
 
   void ElectronSF(pico_tree &pico);
 
-  void PhotonIDSF(pico_tree &pico, float &w_photon_id);
-
-  void PhotonCSEVSF(pico_tree &pico, float &w_photon_csev, std::vector<float> &sys_photon_csev);
+  void PhotonSF(pico_tree &pico);
 
   void MuonSF(pico_tree &pico);
 
@@ -48,7 +46,8 @@ private:
   std::unique_ptr<correction::CorrectionSet> cs_btag_mceff_;
   correction::Correction::Ref map_photon_id_;
   correction::Correction::Ref map_photon_csev_;
-  correction::Correction::Ref map_photon_csev_mceff_;
+  correction::Correction::Ref map_photon_mceff_;
+  correction::Correction::Ref map_photon_mcunc_;
   correction::Correction::Ref map_electron_id_pass_;
   correction::Correction::Ref map_electron_id_pass_unc_;
   correction::Correction::Ref map_electron_id_fail_;
