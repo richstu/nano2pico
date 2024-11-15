@@ -254,6 +254,8 @@ int main(int argc, char *argv[]){
       rocco_file = "data/RoccoR2017.txt";
     else if (year==2018)
       rocco_file = "data/RoccoR2018.txt";
+    else
+      cout<<"WARNING: No rochester corrections for year."<<endl;
   }
   else {
     if (year==2016 && isAPV)
@@ -264,6 +266,8 @@ int main(int argc, char *argv[]){
       rocco_file = "data/zgamma/2017_UL/RoccoR2017UL.txt";
     else if (year==2018)
       rocco_file = "data/zgamma/2018_UL/RoccoR2018UL.txt";
+    else
+      cout<<"WARNING: No rochester corrections for year."<<endl;
   }
 
   //Initialize object producers
