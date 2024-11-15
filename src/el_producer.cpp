@@ -243,6 +243,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
       id = idElectron_noIso(bitmap,3);
     }
     pico.out_el_pt().push_back(scaleres_corr*pt);
+    pico.out_el_pt_raw().push_back(pt);
     pico.out_el_energyErr().push_back(nano.Electron_energyErr()[iel]);
     pico.out_el_eta().push_back(eta);
     pico.out_el_etasc().push_back(etasc);

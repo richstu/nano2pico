@@ -282,7 +282,6 @@ int main(int argc, char *argv[]){
   BBGammaGammaVarProducer bbgammagamma_producer(year);
 
   //Initialize scale factor tools
-  std::cout<<"For years past 2018, currently using 2018 weights in Prefire, BTag, Lepton, Photon, and event by default. Remove this message only when this has been fixed."<<endl;
   const string ctr = "central";
   const vector<string> updn = {"up","down"};
   PrefireWeighter prefire_weighter(year, true);

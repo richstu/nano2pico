@@ -225,6 +225,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
     }
     
     pico.out_photon_pt()    .insert(pico.out_photon_pt()    .begin()+shift, pt);
+    pico.out_photon_pt_raw().insert(pico.out_photon_pt_raw().begin()+shift, raw_pt);
     pico.out_photon_eta()   .insert(pico.out_photon_eta()   .begin()+shift, eta);
     pico.out_photon_phi()   .insert(pico.out_photon_phi()   .begin()+shift, phi);
     pico.out_photon_r9()    .insert(pico.out_photon_r9()    .begin()+shift, nano.Photon_r9()[iph]);

@@ -269,6 +269,7 @@ vector<float> mu_corrected_ptErr
 int nel
 int nvel
 vector<float> el_pt
+vector<float> el_pt_raw
 vector<float> el_eta
 vector<float> el_etasc
 vector<float> el_phi
@@ -326,6 +327,7 @@ float ll_refit_minnll
 int nphoton
 int photon_idx_hig019014
 vector<float> photon_pt
+vector<float> photon_pt_raw
 vector<float> photon_eta
 vector<float> photon_phi
 vector<float> photon_ecorr
@@ -636,6 +638,8 @@ vector<float> sys_bchig
 vector<float> sys_udsghig
 vector<float> sys_fs_bchig
 vector<float> sys_fs_udsghig
+vector<float> sys_bchig_uncorr
+vector<float> sys_udsghig_uncorr
 
 vector<float> sys_trig
 vector<float> sys_isr
