@@ -1,6 +1,7 @@
 #ifndef H_TRIGGER_WEIGHTER
 #define H_TRIGGER_WEIGHTER
 
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -19,10 +20,9 @@ public:
   /*!\brief creates a TriggerWeighter object and loads in the JSON files needed
     for a particular year
   
-    \param[in] year - 2016, 2017, and 2018 currently supported
-    \param[in] preVFP - for 2016 indicates if data is before HIPM APV mitigation
+    \param[in] year  year of data taking
    */
-  TriggerWeighter(int year, bool preVFP);
+  TriggerWeighter(std::string year);
 
   /*!\brief returns MC-data scale factor for event in the format {value, systup, systdown}
      where the variations are obtained by taking value*syst(up|down)
@@ -101,12 +101,30 @@ private:
   std::unique_ptr<correction::CorrectionSet> cs_mulo_;
   std::unique_ptr<correction::CorrectionSet> cs_muup_;
   std::unique_ptr<correction::CorrectionSet> cs_musi_;
-  correction::Correction::Ref map_dielectron_lowerleg_;
-  correction::Correction::Ref map_dielectron_upperleg_;
-  correction::Correction::Ref map_single_electron_;
-  correction::Correction::Ref map_dimuon_lowerleg_;
-  correction::Correction::Ref map_dimuon_upperleg_;
-  correction::Correction::Ref map_single_muon_;
+  correction::Correction::Ref map_diel_lower_dataeff_; 
+  correction::Correction::Ref map_diel_lower_dataunc_;
+  correction::Correction::Ref map_diel_lower_mceff_; 
+  correction::Correction::Ref map_diel_lower_mcunc_; 
+  correction::Correction::Ref map_diel_upper_dataeff_; 
+  correction::Correction::Ref map_diel_upper_dataunc_; 
+  correction::Correction::Ref map_diel_upper_mceff_; 
+  correction::Correction::Ref map_diel_upper_mcunc_; 
+  correction::Correction::Ref map_singleel_dataeff_; 
+  correction::Correction::Ref map_singleel_dataunc_; 
+  correction::Correction::Ref map_singleel_mceff_; 
+  correction::Correction::Ref map_singleel_mcunc_; 
+  correction::Correction::Ref map_dimu_lower_dataeff_; 
+  correction::Correction::Ref map_dimu_lower_dataunc_; 
+  correction::Correction::Ref map_dimu_lower_mceff_; 
+  correction::Correction::Ref map_dimu_lower_mcunc_; 
+  correction::Correction::Ref map_dimu_upper_dataeff_; 
+  correction::Correction::Ref map_dimu_upper_dataunc_; 
+  correction::Correction::Ref map_dimu_upper_mceff_; 
+  correction::Correction::Ref map_dimu_upper_mcunc_; 
+  correction::Correction::Ref map_singlemu_dataeff_; 
+  correction::Correction::Ref map_singlemu_dataunc_; 
+  correction::Correction::Ref map_singlemu_mceff_; 
+  correction::Correction::Ref map_singlemu_mcunc_; 
 };
 
 #endif

@@ -871,7 +871,7 @@ int EventTools::GetEventType(){
       if(Contains(name, "HT600toInf")){ bin = 0;
       }
     }
-  }else if(Contains(name, "ttH") && !Contains(name,"HToZG")){ sample = 9;
+  }else if(Contains(name, "ttH") && !Contains(name,"HToZG") && !Contains(name,"HtoZG")){ sample = 9;
     if(Contains(name, "ttHJetToGG")){       category = 0; bin = 0;
     }else if(Contains(name, "HToZZ")){      category = 1; bin = 0;
     }else if(Contains(name, "HToWW")){      category = 2; bin = 0;
@@ -885,7 +885,7 @@ int EventTools::GetEventType(){
   }else if(Contains(name, "TTTT")){ sample = 11;
     if(Contains(name, "TTTT_Tune")){ category = 0; bin = 0;
     }
-  }else if((Contains(name, "WH_") || Contains(name,"WplusH") || Contains(name,"WminusH") ) && !Contains(name,"TChiWH") && !Contains(name,"HToZG")){ sample = 12;
+  }else if((Contains(name, "WH_") || Contains(name,"WplusH") || Contains(name,"WminusH") ) && !Contains(name,"TChiWH") && !Contains(name,"HToZG") && !Contains(name,"HtoZG")){ sample = 12;
     if(Contains(name, "HToGG")){           category = 0; bin = 0;
     }else if(Contains(name, "HToZZ")){     category = 1; bin = 0;
     }else if(Contains(name, "HToWW")){     category = 2; bin = 0;
@@ -893,7 +893,7 @@ int EventTools::GetEventType(){
     }else if(Contains(name, "HToBB")){     category = 4; bin = 0; //previously category 0
     }else if(Contains(name, "HToMuMu")){   category = 5; bin = 0;
     }
-  }else if(Contains(name, "ZH") && !Contains(name,"HToZG") && !Contains(name, "T5qqqqZH")){ sample = 13;
+  }else if(Contains(name, "ZH") && !Contains(name,"HToZG") && !Contains(name,"HtoZG") && !Contains(name, "T5qqqqZH")){ sample = 13;
     if(Contains(name, "HToGG")){           category = 0; bin = 0;
     }else if(Contains(name, "HToZZ")){     category = 1; bin = 0;
     }else if(Contains(name, "HToWW")){     category = 2; bin = 0;
@@ -948,7 +948,7 @@ int EventTools::GetEventType(){
     }
   }else if(Contains(name, "WZZ")){ sample = 26; category = 0; bin = 0;
   }else if(Contains(name, "ZZZ")){ sample = 27; category = 0; bin = 0;
-  }else if(Contains(name, "GluGluH") && !Contains(name,"HToZG")){ sample = 28;
+  }else if(Contains(name, "GluGluH") && !Contains(name,"HToZG") && !Contains(name,"HtoZG")){ sample = 28;
     if(Contains(name, "HToGG")){           category = 0; bin = 0;
     }else if(Contains(name, "HToZZ")){     category = 1; bin = 0;
     }else if(Contains(name, "HToWW")){     category = 2; bin = 0;
@@ -956,7 +956,7 @@ int EventTools::GetEventType(){
     }else if(Contains(name, "HToBB")){     category = 4; bin = 0;
     }else if(Contains(name, "HToMuMu")){   category = 5; bin = 0;
     }
-  }else if(Contains(name, "VBFH") && !Contains(name,"HToZG")){ sample = 29;
+  }else if(Contains(name, "VBFH") && !Contains(name,"HToZG") && !Contains(name,"HtoZG")){ sample = 29;
     if(Contains(name, "HToGG")){           category = 0; bin = 0;
     }else if(Contains(name, "HToZZ")){     category = 1; bin = 0;
     }else if(Contains(name, "HToWW")){     category = 2; bin = 0;
@@ -973,7 +973,7 @@ int EventTools::GetEventType(){
   }else if(Contains(name, "RPV")){    sample = 105; category = 0; bin = 0;
   }else if(Contains(name, "TChiHH")){ sample = 106; category = 0; bin = 0;
   }else if(Contains(name, "T5qqqqZH")){ sample = 107; category = 0; bin = 0;
-  }else if(Contains(name, "HToZG")) { sample = 200; bin = 0;
+  }else if(Contains(name, "HToZG")||Contains(name,"HtoZG")) { sample = 200; bin = 0;
     if(Contains(name,"GluGluH"))      category = 0; 
     else if(Contains(name,"VBF"))     category = 1; 
     else if(Contains(name,"WplusH"))  category = 2; 

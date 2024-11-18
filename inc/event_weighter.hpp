@@ -18,9 +18,7 @@ public:
 
   void ElectronSF(pico_tree &pico);
 
-  void PhotonIDSF(pico_tree &pico, float &w_photon_id);
-
-  void PhotonCSEVSF(pico_tree &pico, float &w_photon_csev, std::vector<float> &sys_photon_csev);
+  void PhotonSF(pico_tree &pico);
 
   void MuonSF(pico_tree &pico);
 
@@ -33,34 +31,31 @@ private:
   std::string in_file_photon_;
   std::string in_file_photon_mceff_;
   std::string in_file_muon_;
-  std::string in_file_muon_lowpt_reco_;
-  std::string in_file_muon_lowpt_id_;
-  std::string in_file_muon_mceff_;
   std::string in_file_pu_;
   std::string in_file_btag_;
   std::string in_file_btag_mceff_;
   std::string key_;
   std::string puName_;
+  std::string year_;
   std::unique_ptr<correction::CorrectionSet> cs_electron_;
   std::unique_ptr<correction::CorrectionSet> cs_photon_;
   std::unique_ptr<correction::CorrectionSet> cs_photon_mceff_;
-  std::unique_ptr<correction::CorrectionSet> cs_muon_lowpt_reco_;
-  std::unique_ptr<correction::CorrectionSet> cs_muon_lowpt_id_;
-  std::unique_ptr<correction::CorrectionSet> cs_muon_mceff_;
   std::unique_ptr<correction::CorrectionSet> cs_muon_;
   std::unique_ptr<correction::CorrectionSet> cs_pileup_;
   std::unique_ptr<correction::CorrectionSet> cs_btag_;
   std::unique_ptr<correction::CorrectionSet> cs_btag_mceff_;
-  correction::Correction::Ref map_electron_;
   correction::Correction::Ref map_photon_id_;
   correction::Correction::Ref map_photon_csev_;
-  correction::Correction::Ref map_photon_csev_mceff_;
-  correction::Correction::Ref map_muon_looseid_;
-  correction::Correction::Ref map_muon_highptid_;
-  correction::Correction::Ref map_muon_iso_;
-  correction::Correction::Ref map_muon_lowpt_reco_;
-  correction::Correction::Ref map_muon_lowpt_id_;
-  correction::Correction::Ref map_muon_mceff_;
+  correction::Correction::Ref map_photon_mceff_;
+  correction::Correction::Ref map_photon_mcunc_;
+  correction::Correction::Ref map_electron_id_pass_;
+  correction::Correction::Ref map_electron_id_pass_unc_;
+  correction::Correction::Ref map_electron_id_fail_;
+  correction::Correction::Ref map_electron_id_fail_unc_;
+  correction::Correction::Ref map_muon_id_pass_;
+  correction::Correction::Ref map_muon_id_pass_unc_;
+  correction::Correction::Ref map_muon_id_fail_;
+  correction::Correction::Ref map_muon_id_fail_unc_;
   correction::Correction::Ref map_pileup_;
   correction::Correction::Ref map_btag_;
   correction::Correction::Ref map_udsgtag_;

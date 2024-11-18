@@ -27,7 +27,7 @@ unsigned max(unsigned a, unsigned b) {
 }
 
 bool sf_is_bad(float value) {
-  return isnan(value) || isinf(value) || (fabs(value)>25.0);
+  return isnan(value) || isinf(value) || (fabs(value)>12.0);
 }
 
 void incr_vector(vector<unsigned>& vec, unsigned max) {
@@ -68,25 +68,36 @@ int main() {
   weighters.push_back(EventWeighter("2016", btag_wps[2016]));
   weighters.push_back(EventWeighter("2017", btag_wps[2017]));
   weighters.push_back(EventWeighter("2018", btag_wps[2018]));
+  weighters.push_back(EventWeighter("2022", btag_wps[2022]));
+  weighters.push_back(EventWeighter("2022EE", btag_wps[2022]));
+  weighters.push_back(EventWeighter("2023", btag_wps[2023]));
+  weighters.push_back(EventWeighter("2023BPix", btag_wps[2023]));
 
   vector<TriggerWeighter> trigger_weighters;
-  trigger_weighters.push_back(TriggerWeighter(2016, true));
-  trigger_weighters.push_back(TriggerWeighter(2016, false));
-  trigger_weighters.push_back(TriggerWeighter(2017, false));
-  trigger_weighters.push_back(TriggerWeighter(2018, false));
+  trigger_weighters.push_back(TriggerWeighter("2016APV"));
+  trigger_weighters.push_back(TriggerWeighter("2016"));
+  trigger_weighters.push_back(TriggerWeighter("2017"));
+  trigger_weighters.push_back(TriggerWeighter("2018"));
+  trigger_weighters.push_back(TriggerWeighter("2022"));
+  trigger_weighters.push_back(TriggerWeighter("2022EE"));
+  trigger_weighters.push_back(TriggerWeighter("2023"));
+  trigger_weighters.push_back(TriggerWeighter("2023BPix"));
 
-  vector<int> years = {2016,2016,2017,2018};
-  vector<string> years_string = {"2016APV","2016","2017","2018"};
+  vector<int> years = {2016,2016,2017,2018,2022,2022,2023,2023};
+  vector<string> years_string = {"2016APV","2016","2017","2018","2022","2022EE","2023","2023BPix"};
 
   vector<float> el_pt_bins = {7.0,10.0,20.0,35.0,50.0,100.0,200.0,500.0};
   vector<float> el_eta_bins = {-2.5,-2.0,-1.566,-1.444,-0.8,0.0,0.8,1.444,1.566,2.0,2.5};
-  vector<float> mu_pt_bins = {5.0,6.0,8.0,10.0,15.0,20.0,25.0,30.0,40.0,50.0,60.0,120.0,200.0};
+  vector<float> mu_pt_bins = {5.0,6.0,7.0,8.0,10.0,12.0,15.0,20.0,25.0,30.0,35.0,40.0,50.0,60.0,80.0,120.0,200.0};
   vector<float> mu_eta_bins = {0.0,0.9,1.2,2.1,2.4};
   vector<float> jet_pt_bins = {30.0,40.0,50.0,60.0,70.0,80.0,90.0,100.0,150.0,200.0,250.0,300.0,350.0,400.0,500.0,600.0,800.0,1000.0};
   vector<float> jet_eta_bins = {-2.4,-1.92,-1.44,-0.96,-0.48,0.0,0.48,0.96,1.44,1.92,2.4};
   vector<float> jet_flav_bins = {1,4,5};
   //vector<float> ph_pt_bins = {};
   //vector<float> ph_eta_bins = {};
+  vector<float> photon_eta_bins = {-2.4,-2.0,-1.5,-0.8,0.0,0.8,1.5,2.0,2.4};
+  vector<float> photon_phi_bins = {-3.1416,-1.2,-0.8,3.1416};
+  vector<float> photon_pt_bins = {15.0,20.0,35.0,50.0,100.0,200.0,500.0};
   vector<float> photon_r9_bins = {0.0,0.94,2.0};
   vector<bool> photon_ebee_bins = {true, false};
   vector<bool> photon_eveto_bins = {true, false};
@@ -105,7 +116,7 @@ int main() {
                                    23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,
                                    31.0,32.0,33.0,34.0,35.0,38.0,40.0,45.0,
                                    50.0,80.0,100.0,120.0,200.0,500.0};
-  vector<float> trig_el_eta_bins = {0.0,0.8,1.4442,1.566,2.5};
+  vector<float> trig_el_eta_bins = {-2.5,-2.0,-1.566,-1.4442,-0.8,0.0,0.8,1.4442,1.566,2.0,2.5};
   vector<float> trig_mu_pt_bins = {5.0,7.75,8.0,8.1,8.25,8.5,10.0,15.0,16.75,
                                    17.0,17.1,17.25,18.0,20.0,23.0,23.75,24.0,
                                    24.25,24.5,25.0,26.0,26.75,27.0,27.25,27.5,
@@ -117,13 +128,14 @@ int main() {
 
   bool check_electron_weights = true;
   bool check_muon_weights = true;
-  bool check_photon_csev_weights = true;
-  bool check_trigger_weights = true;
+  bool check_photon_weights = true;
+  bool check_trigger_weights = false;
   bool check_btag_weights = true;
   bool verbose = false;
   unsigned trig_nlep_max = 3;
   unsigned trig_nlep_min = 2;
-  bool do_all_trig = false; //consider events not passing baseline
+  bool do_all_trig = true; //consider events not passing baseline
+  bool auto_continue = true;
 
   for (unsigned iyear = 0; iyear < weighters.size(); iyear++) {
 
@@ -233,47 +245,59 @@ int main() {
       }
     }
 
-    if (check_photon_csev_weights) {
+    if (check_photon_weights) {
       cout << endl;
-      cout << "Photon CSEV weights" << endl;
-      for (unsigned ir9 = 0; ir9 < (photon_r9_bins.size()-1); ir9++) {
-        for (bool photon_iseb : photon_ebee_bins) {
-          for (bool eveto : photon_eveto_bins) {
-            pico.out_photon_pt().clear();
-            pico.out_photon_pt().push_back(20.0);
-            pico.out_photon_idmva().clear();
-            pico.out_photon_idmva().push_back(0.9);
-            pico.out_photon_isScEtaEB().clear();
-            pico.out_photon_isScEtaEB().push_back(photon_iseb);
-            pico.out_photon_isScEtaEE().clear();
-            pico.out_photon_isScEtaEE().push_back(!photon_iseb);
-            pico.out_photon_drmin().clear();
-            pico.out_photon_drmin().push_back(1.0);
-            pico.out_photon_elveto().clear();
-            pico.out_photon_elveto().push_back(eveto);
-            pico.out_photon_pflavor().clear();
-            pico.out_photon_pflavor().push_back(1);
-            pico.out_photon_r9().clear();
-            pico.out_photon_r9().push_back((photon_r9_bins[ir9]+photon_r9_bins[ir9+1])/2.0);
-            float w_photon_csev;
-            vector<float> sys_photon_csev;
-            sys_photon_csev.resize(2,1.0);
-            weighters[iyear].PhotonCSEVSF(pico, w_photon_csev, sys_photon_csev);
-            bool found_bad = sf_is_bad(w_photon_csev) ||
-                             sf_is_bad(sys_photon_csev[0]) ||
-                             sf_is_bad(sys_photon_csev[1]);
-            if (verbose || found_bad) {
-              cout << "r9: " << photon_r9_bins[ir9] << "--" << photon_r9_bins[ir9+1];
-              cout << ", EB: " << photon_iseb << ", veto: " << eveto;
-              cout << ", sf = " << w_photon_csev << ", up = " << sys_photon_csev[0];
-              cout << ", dn = " << sys_photon_csev[1] << endl;
-            }
-            if (found_bad) {
-              cout << "!!! Found bad SF" << endl;
-              string temp;
-              cin >> temp;
-              if (temp != "c")
-                return 1;
+      cout << "Photon weights" << endl;
+      for (unsigned ipt = 0; ipt < (photon_pt_bins.size()-1); ipt++) {
+        for (unsigned ieta = 0; ieta < (photon_eta_bins.size()-1); ieta++) {
+          for (unsigned iphi = 0; iphi < (photon_phi_bins.size()-1); iphi++) {
+            for (unsigned ir9 = 0; ir9 < (photon_r9_bins.size()-1); ir9++) {
+              for (bool eveto : photon_eveto_bins) {
+                for (bool issig : {true, false}) {
+                  float mean_eta = (photon_eta_bins[ieta]+photon_eta_bins[ieta+1])/2.0;
+                  pico.out_photon_pt().clear();
+                  pico.out_photon_pt().push_back((photon_pt_bins[ipt]+photon_pt_bins[ipt+1])/2.0);
+                  pico.out_photon_phi().clear();
+                  pico.out_photon_phi().push_back((photon_phi_bins[iphi]+photon_phi_bins[iphi+1])/2.0);
+                  pico.out_photon_eta().clear();
+                  pico.out_photon_eta().push_back(mean_eta);
+                  pico.out_photon_idmva().clear();
+                  pico.out_photon_idmva().push_back(0.9);
+                  pico.out_photon_sig().clear();
+                  pico.out_photon_sig().push_back(issig);
+                  pico.out_photon_isScEtaEB().clear();
+                  pico.out_photon_isScEtaEB().push_back(fabs(mean_eta)<1.5);
+                  pico.out_photon_isScEtaEE().clear();
+                  pico.out_photon_isScEtaEE().push_back(fabs(mean_eta)>1.5);
+                  pico.out_photon_drmin().clear();
+                  pico.out_photon_drmin().push_back(1.0);
+                  pico.out_photon_elveto().clear();
+                  pico.out_photon_elveto().push_back(eveto);
+                  pico.out_photon_pflavor().clear();
+                  pico.out_photon_pflavor().push_back(1);
+                  pico.out_photon_r9().clear();
+                  pico.out_photon_r9().push_back((photon_r9_bins[ir9]+photon_r9_bins[ir9+1])/2.0);
+                  weighters[iyear].PhotonSF(pico);
+                  bool found_bad = sf_is_bad(pico.out_w_photon()) ||
+                                   sf_is_bad(pico.out_sys_photon()[0]) ||
+                                   sf_is_bad(pico.out_sys_photon()[1]);
+                  if (verbose || found_bad) {
+                    cout << "  r9: " << photon_r9_bins[ir9] << "--" << photon_r9_bins[ir9+1];
+                    cout << "  pt: " << photon_pt_bins[ipt] << "--" << photon_pt_bins[ipt+1];
+                    cout << "  eta: " << photon_eta_bins[ieta] << "--" << photon_eta_bins[ieta+1];
+                    cout << "  veto: " << eveto;
+                    cout << ", sf = " << pico.out_w_photon() << ", up = " << pico.out_sys_photon()[0];
+                    cout << ", dn = " << pico.out_sys_photon()[1] << endl;
+                  }
+                  if (found_bad) {
+                    cout << "!!! Found bad SF" << endl;
+                    string temp;
+                    cin >> temp;
+                    if (temp != "c")
+                      return 1;
+                  }
+                }
+              }
             }
           }
         }
@@ -378,7 +402,7 @@ int main() {
                       cout << "trig_double_mu: " << trig_decision[3] << endl;
                       cout << "sf = " << sfs[0] << ", up = " << sfs[1] << ", dn = " << sfs[2] << endl;
                     }
-                    if (found_bad && (trig_in_sr || do_all_trig)) {
+                    if (found_bad && (trig_in_sr || do_all_trig) && !auto_continue) {
                       cout << "!!! Found bad SF" << endl;
                       string temp;
                       cin >> temp;

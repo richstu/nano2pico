@@ -1,6 +1,8 @@
 #ifndef H_JET_PRODUCER
 #define H_JET_PRODUCER
 
+#include <string>
+
 #include "correction.hpp"
 #include "hig_producer.hpp"
 #include "met_producer.hpp"
@@ -14,9 +16,10 @@
 class JetMetProducer{
 public:
 
-  explicit JetMetProducer(int year, float nanoaod_version, float min_jet_pt, 
-                          float max_jet_eta, bool isData, bool preVFP, 
-                          bool is_preUL, bool verbose=false);
+  explicit JetMetProducer(int year, std::string year_string, 
+                          float nanoaod_version, float min_jet_pt, 
+                          float max_jet_eta, bool isData, bool is_preUL, 
+                          bool verbose=false);
   ~JetMetProducer();
 
   void SetVerbose(bool verbose_){ verbose = verbose_; };
@@ -47,6 +50,7 @@ private:
                            std::vector<float> &jes_dn_factor);
 
   int year;
+  std::string year_string;
   float nanoaod_version;
   bool verbose;
   float min_jet_pt;

@@ -15,50 +15,112 @@
 #include <utility>
 #include <vector>
 
+using std::cout;
+using std::endl;
+using std::string;
+using std::vector;
 
-TriggerWeighter::TriggerWeighter(int year, bool preVFP) {
-  std::string in_file_path;
-  std::string in_file_ello;
-  std::string in_file_elup;
-  std::string in_file_elsi;
-  std::string in_file_mulo;
-  std::string in_file_muup;
-  std::string in_file_musi;
-  if (year==2016 && preVFP) {
+float bound(float value, float upper, float lower) {
+  if (value>upper)
+    return upper;
+  if (value<lower)
+    return lower;
+  return value;
+}
+
+TriggerWeighter::TriggerWeighter(string year) {
+  string in_file_path;
+  string in_file_ello;
+  string in_file_elup;
+  string in_file_elsi;
+  string in_file_mulo;
+  string in_file_muup;
+  string in_file_musi;
+  if (year=="2016APV") {
     in_file_path = "data/zgamma/2016preVFP_UL/";
-    in_file_ello = "trigeff_ele12";
-    in_file_elup = "trigeff_ele23";
-    in_file_elsi = "trigeff_ele27";
-    in_file_mulo = "trigeff_mu8";
-    in_file_muup = "trigeff_mu17";
-    in_file_musi = "trigeff_mu24";
+    in_file_ello = "hzg_eltrig12_2016APV_efficiencies";
+    in_file_elup = "hzg_eltrig23_2016APV_efficiencies";
+    in_file_elsi = "hzg_eltrig27_2016APV_efficiencies";
+    in_file_mulo = "hzg_mutrig8_2016APV_efficiencies";
+    in_file_muup = "hzg_mutrig17_2016APV_efficiencies";
+    in_file_musi = "hzg_mutrig24_2016APV_efficiencies";
   } 
-  else if (year==2016 && !preVFP) {
+  else if (year=="2016") {
     in_file_path = "data/zgamma/2016postVFP_UL/";
-    in_file_ello = "trigeff_ele12";
-    in_file_elup = "trigeff_ele23";
-    in_file_elsi = "trigeff_ele27";
-    in_file_mulo = "trigeff_mu8";
-    in_file_muup = "trigeff_mu17";
-    in_file_musi = "trigeff_mu24";
+    in_file_ello = "hzg_eltrig12_2016_efficiencies";
+    in_file_elup = "hzg_eltrig23_2016_efficiencies";
+    in_file_elsi = "hzg_eltrig27_2016_efficiencies";
+    in_file_mulo = "hzg_mutrig8_2016_efficiencies";
+    in_file_muup = "hzg_mutrig17_2016_efficiencies";
+    in_file_musi = "hzg_mutrig24_2016_efficiencies";
   } 
-  else if (year==2017) {
+  else if (year=="2017") {
     in_file_path = "data/zgamma/2017_UL/";
-    in_file_ello = "trigeff_ele12";
-    in_file_elup = "trigeff_ele23";
-    in_file_elsi = "trigeff_ele32";
-    in_file_mulo = "trigeff_mu8";
-    in_file_muup = "trigeff_mu17";
-    in_file_musi = "trigeff_mu27";
+    in_file_ello = "hzg_eltrig12_2017_efficiencies";
+    in_file_elup = "hzg_eltrig23_2017_efficiencies";
+    in_file_elsi = "hzg_eltrig32_2017_efficiencies";
+    in_file_mulo = "hzg_mutrig8_2017_efficiencies";
+    in_file_muup = "hzg_mutrig17_2017_efficiencies";
+    in_file_musi = "hzg_mutrig27_2017_efficiencies";
   } 
-  else { //2018
+  else if (year=="2018") {
     in_file_path = "data/zgamma/2018_UL/";
-    in_file_ello = "trigeff_ele12";
-    in_file_elup = "trigeff_ele23";
-    in_file_elsi = "trigeff_ele32";
-    in_file_mulo = "trigeff_mu8";
-    in_file_muup = "trigeff_mu17";
-    in_file_musi = "trigeff_mu24";
+    in_file_ello = "hzg_eltrig12_2018_efficiencies";
+    in_file_elup = "hzg_eltrig23_2018_efficiencies";
+    in_file_elsi = "hzg_eltrig32_2018_efficiencies";
+    in_file_mulo = "hzg_mutrig8_2018_efficiencies";
+    in_file_muup = "hzg_mutrig17_2018_efficiencies";
+    in_file_musi = "hzg_mutrig24_2018_efficiencies";
+  }
+  else if (year=="2022") {
+    cout << "WARNING: No electron trigger weights, defaulting to 2018" << endl;
+    in_file_path = "";
+    in_file_ello = "data/zgamma/2018_UL/hzg_eltrig12_2018_efficiencies";
+    in_file_elup = "data/zgamma/2018_UL/hzg_eltrig23_2018_efficiencies";
+    in_file_elsi = "data/zgamma/2018_UL/hzg_eltrig32_2018_efficiencies";
+    in_file_mulo = "data/zgamma/2022/hzg_mutrig8_2022_efficiencies";
+    in_file_muup = "data/zgamma/2022/hzg_mutrig17_2022_efficiencies";
+    in_file_musi = "data/zgamma/2022/hzg_mutrig24_2022_efficiencies";
+  }
+  else if (year=="2022EE") {
+    cout << "WARNING: No electron trigger weights, defaulting to 2018" << endl;
+    in_file_path = "";
+    in_file_ello = "data/zgamma/2018_UL/hzg_eltrig12_2018_efficiencies";
+    in_file_elup = "data/zgamma/2018_UL/hzg_eltrig23_2018_efficiencies";
+    in_file_elsi = "data/zgamma/2018_UL/hzg_eltrig32_2018_efficiencies";
+    in_file_mulo = "data/zgamma/2022EE/hzg_mutrig8_2022EE_efficiencies";
+    in_file_muup = "data/zgamma/2022EE/hzg_mutrig17_2022EE_efficiencies";
+    in_file_musi = "data/zgamma/2022EE/hzg_mutrig24_2022EE_efficiencies";
+  }
+  else if (year=="2023") {
+    cout << "WARNING: No electron trigger weights, defaulting to 2018" << endl;
+    in_file_path = "";
+    in_file_ello = "data/zgamma/2018_UL/hzg_eltrig12_2018_efficiencies";
+    in_file_elup = "data/zgamma/2018_UL/hzg_eltrig23_2018_efficiencies";
+    in_file_elsi = "data/zgamma/2018_UL/hzg_eltrig32_2018_efficiencies";
+    in_file_mulo = "data/zgamma/2023/hzg_mutrig8_2023_efficiencies";
+    in_file_muup = "data/zgamma/2023/hzg_mutrig17_2023_efficiencies";
+    in_file_musi = "data/zgamma/2023/hzg_mutrig24_2023_efficiencies";
+  }
+  else if (year=="2023BPix") {
+    cout << "WARNING: No electron trigger weights, defaulting to 2018" << endl;
+    in_file_path = "";
+    in_file_ello = "data/zgamma/2018_UL/hzg_eltrig12_2018_efficiencies";
+    in_file_elup = "data/zgamma/2018_UL/hzg_eltrig23_2018_efficiencies";
+    in_file_elsi = "data/zgamma/2018_UL/hzg_eltrig32_2018_efficiencies";
+    in_file_mulo = "data/zgamma/2023BPix/hzg_mutrig8_2023BPix_efficiencies";
+    in_file_muup = "data/zgamma/2023BPix/hzg_mutrig17_2023BPix_efficiencies";
+    in_file_musi = "data/zgamma/2023BPix/hzg_mutrig24_2023BPix_efficiencies";
+  }
+  else { //2018
+    cout << "WARNING: No trigger weights, defaulting to 2018" << endl;
+    in_file_path = "data/zgamma/2018_UL/";
+    in_file_ello = "hzg_eltrig12_2018_efficiencies";
+    in_file_elup = "hzg_eltrig23_2018_efficiencies";
+    in_file_elsi = "hzg_eltrig32_2018_efficiencies";
+    in_file_mulo = "hzg_mutrig8_2018_efficiencies";
+    in_file_muup = "hzg_mutrig17_2018_efficiencies";
+    in_file_musi = "hzg_mutrig24_2018_efficiencies";
   } 
   cs_ello_ = correction::CorrectionSet::from_file(in_file_path+in_file_ello+".json");
   cs_elup_ = correction::CorrectionSet::from_file(in_file_path+in_file_elup+".json");
@@ -66,23 +128,41 @@ TriggerWeighter::TriggerWeighter(int year, bool preVFP) {
   cs_mulo_ = correction::CorrectionSet::from_file(in_file_path+in_file_mulo+".json");
   cs_muup_ = correction::CorrectionSet::from_file(in_file_path+in_file_muup+".json");
   cs_musi_ = correction::CorrectionSet::from_file(in_file_path+in_file_musi+".json");
-  map_dielectron_lowerleg_ = cs_ello_->at(in_file_ello);
-  map_dielectron_upperleg_ = cs_elup_->at(in_file_elup);
-  map_single_electron_ = cs_elsi_->at(in_file_elsi);
-  map_dimuon_lowerleg_ = cs_mulo_->at(in_file_mulo);
-  map_dimuon_upperleg_ = cs_muup_->at(in_file_muup);
-  map_single_muon_ = cs_musi_->at(in_file_musi);
+  map_diel_lower_dataeff_ = cs_ello_->at("effdata");
+  map_diel_lower_dataunc_ = cs_elup_->at("systdata");
+  map_diel_lower_mceff_ = cs_ello_->at("effmc");
+  map_diel_lower_mcunc_ = cs_ello_->at("systmc");
+  map_diel_upper_dataeff_ = cs_elup_->at("effdata");
+  map_diel_upper_dataunc_ = cs_elup_->at("systdata");
+  map_diel_upper_mceff_ = cs_elup_->at("effmc");
+  map_diel_upper_mcunc_ = cs_elup_->at("systmc");
+  map_singleel_dataeff_ = cs_elsi_->at("effdata");
+  map_singleel_dataunc_ = cs_elsi_->at("systdata");
+  map_singleel_mceff_ = cs_elsi_->at("effmc");
+  map_singleel_mcunc_ = cs_elsi_->at("systmc");
+  map_dimu_lower_dataeff_ = cs_mulo_->at("effdata");
+  map_dimu_lower_dataunc_ = cs_muup_->at("systdata");
+  map_dimu_lower_mceff_ = cs_mulo_->at("effmc");
+  map_dimu_lower_mcunc_ = cs_mulo_->at("systmc");
+  map_dimu_upper_dataeff_ = cs_muup_->at("effdata");
+  map_dimu_upper_dataunc_ = cs_muup_->at("systdata");
+  map_dimu_upper_mceff_ = cs_muup_->at("effmc");
+  map_dimu_upper_mcunc_ = cs_muup_->at("systmc");
+  map_singlemu_dataeff_ = cs_musi_->at("effdata");
+  map_singlemu_dataunc_ = cs_musi_->at("systdata");
+  map_singlemu_mceff_ = cs_musi_->at("effmc");
+  map_singlemu_mcunc_ = cs_musi_->at("systmc");
 }
 
 
-std::vector<float> TriggerWeighter::GetSF(pico_tree &pico) {
+vector<float> TriggerWeighter::GetSF(pico_tree &pico) {
   //this is just a wrapper around the other GetSF that extracts relevant info
   //from pico tree
 
-  std::vector<float> electron_pt;
-  std::vector<float> electron_eta;
-  std::vector<float> muon_pt;
-  std::vector<float> muon_eta;
+  vector<float> electron_pt;
+  vector<float> electron_eta;
+  vector<float> muon_pt;
+  vector<float> muon_eta;
   for (unsigned int iel = 0; iel < pico.out_el_sig().size(); iel++) {
     if (pico.out_el_sig()[iel]) {
       electron_pt.push_back(pico.out_el_pt()[iel]);
@@ -102,9 +182,9 @@ std::vector<float> TriggerWeighter::GetSF(pico_tree &pico) {
 }
 
 
-std::vector<float> TriggerWeighter::GetSF(std::vector<float> electron_pt, 
-    std::vector<float> muon_pt, std::vector<float> electron_eta, 
-    std::vector<float> muon_eta, bool pass_singleel, bool pass_singlemu, 
+vector<float> TriggerWeighter::GetSF(std::vector<float> electron_pt, 
+    vector<float> muon_pt, std::vector<float> electron_eta, 
+    vector<float> muon_eta, bool pass_singleel, bool pass_singlemu, 
     bool pass_diel, bool pass_dimu) {
   //note that this only weights leptons that pass the signal criteria
   //i.e. trigger efficiencies will remain uncorrected for leptons failing
@@ -113,40 +193,44 @@ std::vector<float> TriggerWeighter::GetSF(std::vector<float> electron_pt,
   if (muon_pt.size()==0 && electron_pt.size()==0) return {1.0,1.0,1.0};
 
   //get data/mc probability/uncertainty from appropriate functions
-  std::vector<float> data_prob = GetTotalProbability(electron_pt, muon_pt, 
+  vector<float> data_prob = GetTotalProbability(electron_pt, muon_pt, 
     electron_eta, muon_eta, pass_singleel, pass_singlemu, pass_diel, 
     pass_dimu, true);
-  std::vector<float> mc_prob = GetTotalProbability(electron_pt, muon_pt, 
+  vector<float> mc_prob = GetTotalProbability(electron_pt, muon_pt, 
     electron_eta, muon_eta, pass_singleel, pass_singlemu, pass_diel, 
     pass_dimu, false);
 
   //calculate SFs
   if (mc_prob[0] < 0.001f) mc_prob[0] = 0.0;
-  float sf = 1.0;
-  float unc = 0.0;
-  propagate_uncertainty_ratio(data_prob[0], data_prob[1], mc_prob[0], mc_prob[1], sf, unc);
+  float sf = 1.0f;
+  float unc = 0.0f;
+  propagate_uncertainty_ratio(data_prob[0], data_prob[1], mc_prob[0], 
+                              mc_prob[1], sf, unc);
+  bool pass_trig = (pass_singleel || pass_singlemu || pass_diel || pass_dimu);
   float sf_up = sf+unc;
-  float sf_dn = fmax(sf-unc,0);
-
-  ////deal with signal leptons with low probabilities
-  //if (mc_prob[0]<0.001f || data_prob[0]<0.001f) sf = 1.0;
-  //if (mc_prob[1]<0.001f || data_prob[1]<0.001f) sf_up = 1.0;
-  //if (mc_prob[2]<0.001f || data_prob[2]<0.001f) sf_dn = 1.0;
+  float sf_dn = sf-unc;
+  if (!pass_trig) {
+    sf_up = sf-unc;
+    sf_dn = sf+unc;
+  }
+  sf = bound(sf,5.0,0.0);
+  sf_up = bound(sf_up,5.0,0.0);
+  sf_dn = bound(sf_dn,5.0,0.0);
 
   return {sf, sf_up, sf_dn};
 }
 
 
-std::vector<float> TriggerWeighter::GetTotalProbability(
-    std::vector<float> electron_pt, std::vector<float> muon_pt, 
-    std::vector<float> electron_eta, std::vector<float> muon_eta, 
+vector<float> TriggerWeighter::GetTotalProbability(
+    vector<float> electron_pt, vector<float> muon_pt, 
+    vector<float> electron_eta, vector<float> muon_eta, 
     bool pass_singleel, bool pass_singlemu, bool pass_diel, bool pass_dimu, 
     bool is_data) {
 
   //get lepton probability/uncertainty from appropriate functions
-  std::vector<float> electron_prob = GetFlavorProbability(electron_pt, electron_eta,
+  vector<float> electron_prob = GetFlavorProbability(electron_pt, electron_eta,
     pass_singleel, pass_diel, is_data, true);
-  std::vector<float> muon_prob = GetFlavorProbability(muon_pt, muon_eta,
+  vector<float> muon_prob = GetFlavorProbability(muon_pt, muon_eta,
     pass_singlemu, pass_dimu, is_data, false);
 
   //calculate probability and uncertainty
@@ -161,8 +245,8 @@ std::vector<float> TriggerWeighter::GetTotalProbability(
 }
 
 
-std::vector<float> TriggerWeighter::GetFlavorProbability(
-    std::vector<float> lepton_pt, std::vector<float> lepton_eta, 
+vector<float> TriggerWeighter::GetFlavorProbability(
+    vector<float> lepton_pt, vector<float> lepton_eta, 
     bool pass_singlelep, bool pass_dilep, bool is_data, bool is_electron) {
 
   //The algorithm for calculating probability is somewhat cumbersome due to the
@@ -180,7 +264,7 @@ std::vector<float> TriggerWeighter::GetFlavorProbability(
   if (lepton_pt.size()==0)
     return {0.0, 0.0};
 
-  std::vector<LeptonHLTStatus> lepton_status;
+  vector<LeptonHLTStatus> lepton_status;
   float tot_prob = 0.0;
   float tot_unc = 0.0;
   for (unsigned int ilep = 0; ilep < lepton_pt.size(); ilep++) 
@@ -214,7 +298,7 @@ std::vector<float> TriggerWeighter::GetFlavorProbability(
 
         //probability to fail all is 1 - probability to pass dilep lower leg
         if (lepton_status[ilep]==LeptonHLTStatus::fail_all) {
-          std::vector<float> prob_lower = GetLeptonProbability(lepton_pt[ilep],
+          vector<float> prob_lower = GetLeptonProbability(lepton_pt[ilep],
               lepton_eta[ilep],is_data,is_electron,
               LeptonHLTStatus::pass_lowerdilep);
           lep_prob = 1.0-prob_lower[0];
@@ -223,10 +307,10 @@ std::vector<float> TriggerWeighter::GetFlavorProbability(
 
         //probability to pass only lower leg is prob(lower leg)-prob(upper leg)
         else if (lepton_status[ilep]==LeptonHLTStatus::pass_lowerdilep) {
-          std::vector<float> prob_lower = GetLeptonProbability(lepton_pt[ilep],
+          vector<float> prob_lower = GetLeptonProbability(lepton_pt[ilep],
               lepton_eta[ilep],is_data,is_electron,
               LeptonHLTStatus::pass_lowerdilep);
-          std::vector<float> prob_upper = GetLeptonProbability(lepton_pt[ilep],
+          vector<float> prob_upper = GetLeptonProbability(lepton_pt[ilep],
               lepton_eta[ilep],is_data,is_electron,
               LeptonHLTStatus::pass_upperdilep);
           lep_prob = prob_lower[0]-prob_upper[0];
@@ -236,10 +320,10 @@ std::vector<float> TriggerWeighter::GetFlavorProbability(
         //probability to pass upper leg but fail single lep is 
         //prob(upper leg)-prob(single lep)
         else if (lepton_status[ilep]==LeptonHLTStatus::pass_upperdilep) {
-          std::vector<float> prob_upper = GetLeptonProbability(lepton_pt[ilep],
+          vector<float> prob_upper = GetLeptonProbability(lepton_pt[ilep],
               lepton_eta[ilep],is_data,is_electron,
               LeptonHLTStatus::pass_upperdilep);
-          std::vector<float> prob_single = GetLeptonProbability(lepton_pt[ilep],
+          vector<float> prob_single = GetLeptonProbability(lepton_pt[ilep],
               lepton_eta[ilep],is_data,is_electron,
               LeptonHLTStatus::pass_singlelep);
           lep_prob = prob_upper[0]-prob_single[0];
@@ -248,7 +332,7 @@ std::vector<float> TriggerWeighter::GetFlavorProbability(
 
         //probability to pass single lep trigger
         else {
-          std::vector<float> prob_single = GetLeptonProbability(lepton_pt[ilep],
+          vector<float> prob_single = GetLeptonProbability(lepton_pt[ilep],
               lepton_eta[ilep],is_data,is_electron,
               LeptonHLTStatus::pass_singlelep);
           lep_prob = prob_single[0];
@@ -294,43 +378,82 @@ std::vector<float> TriggerWeighter::GetFlavorProbability(
 }
 
 
-std::vector<float> TriggerWeighter::GetLeptonProbability(float lepton_pt, float lepton_eta,
+vector<float> TriggerWeighter::GetLeptonProbability(float lepton_pt, float lepton_eta,
     bool is_data, bool is_electron, LeptonHLTStatus trigger_leg) {
 
   //select map and key based on arguments
   correction::Correction::Ref* prob_map;
+  correction::Correction::Ref* unc_map;
   if (is_electron) {
     if (trigger_leg == LeptonHLTStatus::pass_lowerdilep) {
-      prob_map = &map_dielectron_lowerleg_;
+      if (is_data) {
+        prob_map = &map_diel_lower_dataeff_;
+        unc_map = &map_diel_lower_dataunc_;
+      }
+      else {
+        prob_map = &map_diel_lower_mceff_;
+        unc_map = &map_diel_lower_mcunc_;
+      }
     }
     else if (trigger_leg == LeptonHLTStatus::pass_upperdilep) {
-      prob_map = &map_dielectron_upperleg_;
+      if (is_data) {
+        prob_map = &map_diel_upper_dataeff_;
+        unc_map = &map_diel_upper_dataunc_;
+      }
+      else {
+        prob_map = &map_diel_upper_mceff_;
+        unc_map = &map_diel_upper_mcunc_;
+      }
     }
     else {
-      prob_map = &map_single_electron_;
+      if (is_data) {
+        prob_map = &map_singleel_dataeff_;
+        unc_map = &map_singleel_dataunc_;
+      }
+      else {
+        prob_map = &map_singleel_mceff_;
+        unc_map = &map_singleel_mcunc_;
+      }
     }
   }
   else {
     if (trigger_leg == LeptonHLTStatus::pass_lowerdilep) {
-      prob_map = &map_dimuon_lowerleg_;
+      if (is_data) {
+        prob_map = &map_dimu_lower_dataeff_;
+        unc_map = &map_dimu_lower_dataunc_;
+      }
+      else {
+        prob_map = &map_dimu_lower_mceff_;
+        unc_map = &map_dimu_lower_mcunc_;
+      }
     }
     else if (trigger_leg == LeptonHLTStatus::pass_upperdilep) {
-      prob_map = &map_dimuon_upperleg_;
+      if (is_data) {
+        prob_map = &map_dimu_upper_dataeff_;
+        unc_map = &map_dimu_upper_dataunc_;
+      }
+      else {
+        prob_map = &map_dimu_upper_mceff_;
+        unc_map = &map_dimu_upper_mcunc_;
+      }
     }
     else {
-      prob_map = &map_single_muon_;
+      if (is_data) {
+        prob_map = &map_singlemu_dataeff_;
+        unc_map = &map_singlemu_dataunc_;
+      }
+      else {
+        prob_map = &map_singlemu_mceff_;
+        unc_map = &map_singlemu_mcunc_;
+      }
     }
   }
-  std::string eff_name = "effdata";
-  std::string unc_name = "systdata";
-  if (!is_data) {
-    eff_name = "effmc";
-    unc_name = "systmc";
-  }
+  float map_eta = lepton_eta;
+  if (!is_electron) map_eta = fabs(lepton_eta);
 
   //evaluate
-  float prob = (*prob_map)->evaluate({eff_name, std::abs(lepton_eta), lepton_pt});
-  float uncr = (*prob_map)->evaluate({unc_name, std::abs(lepton_eta), lepton_pt});
+  float prob = (*prob_map)->evaluate({lepton_pt, map_eta});
+  float uncr = (*unc_map)->evaluate({lepton_pt, map_eta});
   return {prob, uncr};
 }
 

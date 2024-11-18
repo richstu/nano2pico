@@ -88,6 +88,7 @@ int main(int argc, char *argv[]){
       else if (regex_search(in_file, std::regex("RunIIFall17"))) year = 2017;
       else if (regex_search(in_file, std::regex("RunIIAutumn18"))) year = 2018;
       else if (regex_search(in_file, std::regex("Run3Summer22"))) year = 2022;
+      else if (regex_search(in_file, std::regex("Run3Summer23"))) year = 2023;
     }
   } else { // Data
     if (Contains(in_file, "HIPM")) isAPV = true;
@@ -253,6 +254,8 @@ int main(int argc, char *argv[]){
       rocco_file = "data/RoccoR2017.txt";
     else if (year==2018)
       rocco_file = "data/RoccoR2018.txt";
+    else
+      cout<<"WARNING: No rochester corrections for year."<<endl;
   }
   else {
     if (year==2016 && isAPV)
@@ -263,17 +266,19 @@ int main(int argc, char *argv[]){
       rocco_file = "data/zgamma/2017_UL/RoccoR2017UL.txt";
     else if (year==2018)
       rocco_file = "data/zgamma/2018_UL/RoccoR2018UL.txt";
+    else
+      cout<<"WARNING: No rochester corrections for year."<<endl;
   }
 
   //Initialize object producers
   GenParticleProducer mc_producer(year, nanoaod_version);
-  ElectronProducer el_producer(year, isData, isAPV, nanoaod_version);
+  ElectronProducer el_producer(year_string, isData, nanoaod_version);
   MuonProducer mu_producer(year, isData, nanoaod_version, rocco_file);
   DileptonProducer dilep_producer(year);
   IsoTrackProducer tk_producer(year);
-  PhotonProducer photon_producer(year, isData, isAPV, nanoaod_version);
-  JetMetProducer jetmet_producer(year, nanoaod_version, min_jet_pt, max_jet_eta, 
-                                 isData, isAPV, is_preUL);
+  PhotonProducer photon_producer(year_string, isData, nanoaod_version);
+  JetMetProducer jetmet_producer(year, year_string, nanoaod_version, min_jet_pt, max_jet_eta, 
+                                 isData, is_preUL);
   HigVarProducer hig_producer(year);
   ZGammaVarProducer zgamma_producer(year);
   GammaGammaVarProducer gammagamma_producer(year);
@@ -281,7 +286,6 @@ int main(int argc, char *argv[]){
   BBGammaGammaVarProducer bbgammagamma_producer(year);
 
   //Initialize scale factor tools
-  std::cout<<"For years past 2018, currently using 2018 weights in Prefire, BTag, Lepton, Photon, and event by default. Remove this message only when this has been fixed."<<endl;
   const string ctr = "central";
   const vector<string> updn = {"up","down"};
   PrefireWeighter prefire_weighter(year, true);
@@ -294,7 +298,7 @@ int main(int argc, char *argv[]){
   PhotonWeighter photon_weighter(year, isZgamma || isHiggsino);
   // UL scale factors
   EventWeighter event_weighter(year_string, btag_df_wpts[year_string]);
-  TriggerWeighter trigger_weighter(year, isAPV);
+  TriggerWeighter trigger_weighter(year_string);
   //cout<<"Is APV: "<<isAPV<<endl;
 
   // Other tools
@@ -478,8 +482,6 @@ int main(int argc, char *argv[]){
     if (debug) cout<<"INFO:: Calculating weights"<<endl;
     float w_lep(1.), w_fs_lep(1.);
     float w_photon(1.);
-    float w_photon_id(1.);
-    float w_photon_csev(1.);
     vector<float> sys_lep(2,1.), sys_fs_lep(2,1.);
     vector<float> sys_photon(2,1.);
 
@@ -505,17 +507,13 @@ int main(int argc, char *argv[]){
         event_weighter.MuonSF(pico);
         event_weighter.PileupSF(pico);
         event_weighter.bTaggingSF(pico);
-        event_weighter.PhotonIDSF(pico, w_photon_id);
-        event_weighter.PhotonCSEVSF(pico, w_photon_csev, sys_photon);
+        event_weighter.PhotonSF(pico);
         pico.out_sys_lep().resize(2,1.); 
         pico.out_sys_photon().resize(2, 1.); 
         pico.out_sys_prefire().resize(2, 1.); 
         pico.out_w_lep()          = pico.out_w_el() * pico.out_w_mu();
         pico.out_sys_lep()[0]     = pico.out_sys_el()[0]*pico.out_sys_mu()[0]; 
         pico.out_sys_lep()[1]     = pico.out_sys_el()[1]*pico.out_sys_mu()[1]; 
-        pico.out_w_photon()       = w_photon_id * w_photon_csev;
-        pico.out_sys_photon()[0]  = sys_photon[0];
-        pico.out_sys_photon()[1]  = sys_photon[1];
         pico.out_sys_fs_bchig().resize(2,1.); 
         pico.out_sys_fs_udsghig().resize(2,1.); 
         pico.out_sys_fs_lep().resize(2,1.);

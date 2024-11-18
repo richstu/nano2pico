@@ -15,12 +15,14 @@
 
 using namespace std;
 
-JetMetProducer::JetMetProducer(int year_, float nanoaod_version_, 
+JetMetProducer::JetMetProducer(int year_, string year_string_, 
+                               float nanoaod_version_, 
                                float min_jet_pt_, float max_jet_eta_, 
-                               bool isData_, bool preVFP, bool is_preUL_, 
+                               bool isData_, bool is_preUL_, 
                                bool verbose_) : 
     met_producer(MetProducer(year_, isData_, is_preUL_)) {
   year = year_;
+  year_string = year_string_;
   isData = isData_;
   is_preUL = is_preUL_;
   verbose = verbose_;
@@ -28,7 +30,7 @@ JetMetProducer::JetMetProducer(int year_, float nanoaod_version_,
   max_jet_eta = max_jet_eta_;
   nanoaod_version = nanoaod_version_;
   rng_ = TRandom3(4357);
-  if (year==2016 && preVFP) {
+  if (year_string=="2016APV") {
     cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2016preVFP_UL/jet_jerc_2016apv.json");
     //despite strange name, this map does have JES variations and should be evaluated w.r.t. corrected jet pt
     map_jes_ = cs_jerc_->at("Summer19UL16APV_V7_MC_Total_AK4PFchs");
@@ -36,34 +38,62 @@ JetMetProducer::JetMetProducer(int year_, float nanoaod_version_,
     map_jermc_ = cs_jerc_->at("Summer20UL16APV_JRV3_MC_PtResolution_AK4PFchs");
     map_jec_ = cs_jerc_->compound().at("Summer19UL16APV_V7_MC_L1L2L3Res_AK4PFchs");
   }
-  else if (year==2016) {
+  else if (year_string=="2016") {
     cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2016postVFP_UL/jet_jerc_2016.json");
     map_jes_ = cs_jerc_->at("Summer19UL16_V7_MC_Total_AK4PFchs");
     map_jersf_ = cs_jerc_->at("Summer20UL16_JRV3_MC_ScaleFactor_AK4PFchs");
     map_jermc_ = cs_jerc_->at("Summer20UL16_JRV3_MC_PtResolution_AK4PFchs");
     map_jec_ = cs_jerc_->compound().at("Summer19UL16_V7_MC_L1L2L3Res_AK4PFchs");
   }
-  else if (year==2017) {
+  else if (year_string=="2017") {
     cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2017_UL/jet_jerc_2017.json");
     map_jes_ = cs_jerc_->at("Summer19UL17_V5_MC_Total_AK4PFchs");
     map_jersf_ = cs_jerc_->at("Summer19UL17_JRV2_MC_ScaleFactor_AK4PFchs");
     map_jermc_ = cs_jerc_->at("Summer19UL17_JRV2_MC_PtResolution_AK4PFchs");
     map_jec_ = cs_jerc_->compound().at("Summer19UL17_V5_MC_L1L2L3Res_AK4PFchs");
   }
-  else if (year==2018) {
+  else if (year_string=="2018") {
     cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2018_UL/jet_jerc_2018.json");
     map_jes_ = cs_jerc_->at("Summer19UL18_V5_MC_Total_AK4PFchs");
     map_jersf_ = cs_jerc_->at("Summer19UL18_JRV2_MC_ScaleFactor_AK4PFchs");
     map_jermc_ = cs_jerc_->at("Summer19UL18_JRV2_MC_PtResolution_AK4PFchs");
     map_jec_ = cs_jerc_->compound().at("Summer19UL18_V5_MC_L1L2L3Res_AK4PFchs");
   }
+  else if (year_string=="2022") {
+    cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2022/jet_jerc_2022.json");
+    map_jes_ = cs_jerc_->at("Summer22_22Sep2023_V2_MC_Total_AK4PFPuppi");
+    map_jersf_ = cs_jerc_->at("Summer22_22Sep2023_JRV1_MC_ScaleFactor_AK4PFPuppi");
+    map_jermc_ = cs_jerc_->at("Summer22_22Sep2023_JRV1_MC_PtResolution_AK4PFPuppi");
+    map_jec_ = cs_jerc_->compound().at("Summer22_22Sep2023_V2_MC_L1L2L3Res_AK4PFPuppi");
+  }
+  else if (year_string=="2022EE") {
+    cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2022EE/jet_jerc_2022EE.json");
+    map_jes_ = cs_jerc_->at("Summer22EE_22Sep2023_V2_MC_Total_AK4PFPuppi");
+    map_jersf_ = cs_jerc_->at("Summer22EE_22Sep2023_JRV1_MC_ScaleFactor_AK4PFPuppi");
+    map_jermc_ = cs_jerc_->at("Summer22EE_22Sep2023_JRV1_MC_PtResolution_AK4PFPuppi");
+    map_jec_ = cs_jerc_->compound().at("Summer22EE_22Sep2023_V2_MC_L1L2L3Res_AK4PFPuppi");
+  }
+  else if (year_string=="2023") {
+    cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2023/jet_jerc_2023.json");
+    map_jes_ = cs_jerc_->at("Summer23Prompt23_V1_MC_Total_AK4PFPuppi");
+    //are these right? there are also RunCv123 values
+    map_jersf_ = cs_jerc_->at("Summer23Prompt23_RunCv1234_JRV1_MC_ScaleFactor_AK4PFPuppi");
+    map_jermc_ = cs_jerc_->at("Summer23Prompt23_RunCv1234_JRV1_MC_PtResolution_AK4PFPuppi");
+    map_jec_ = cs_jerc_->compound().at("Summer23Prompt23_V1_MC_L1L2L3Res_AK4PFPuppi");
+  }
+  else if (year_string=="2023BPix") {
+    cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2023BPix/jet_jerc_2023BPix.json");
+    map_jes_ = cs_jerc_->at("Summer23BPixPrompt23_V1_MC_Total_AK4PFPuppi");
+    map_jersf_ = cs_jerc_->at("Summer23BPixPrompt23_RunD_JRV1_MC_ScaleFactor_AK4PFPuppi");
+    map_jermc_ = cs_jerc_->at("Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi");
+    map_jec_ = cs_jerc_->compound().at("Summer23BPixPrompt23_V1_MC_L1L2L3Res_AK4PFPuppi");
+  }
   else {
-    std::cout << "WARNING: No dedicated JES/JER uncertainties, defaulting to 2018" << std::endl;
-    cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2018_UL/jet_jerc_2018.json");
-    map_jes_ = cs_jerc_->at("Summer19UL18_V5_MC_Total_AK4PFchs");
-    map_jersf_ = cs_jerc_->at("Summer19UL18_JRV2_MC_ScaleFactor_AK4PFchs");
-    map_jermc_ = cs_jerc_->at("Summer19UL18_JRV2_MC_PtResolution_AK4PFchs");
-    map_jec_ = cs_jerc_->compound().at("Summer19UL18_V5_MC_L1L2L3Res_AK4PFchs");
+    std::cout << "WARNING: No dedicated JES/JER uncertainties, defaulting to 2023BPix" << std::endl;
+    map_jes_ = cs_jerc_->at("Summer23BPixPrompt23_V1_MC_Total_AK4PFPuppi");
+    map_jersf_ = cs_jerc_->at("Summer23BPixPrompt23_RunD_JRV1_MC_ScaleFactor_AK4PFPuppi");
+    map_jermc_ = cs_jerc_->at("Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi");
+    map_jec_ = cs_jerc_->compound().at("Summer23BPixPrompt23_V1_MC_L1L2L3Res_AK4PFPuppi");
   }
   in_file_jetveto_ = "data/zgamma/2022/jetvetomaps.json";
   cs_jetveto_ = correction::CorrectionSet::from_file(in_file_jetveto_);
@@ -125,9 +155,17 @@ void JetMetProducer::GetJetUncertainties(nano_tree &nano, pico_tree &pico,
       //Get JECs and correct nominal pt for CorrT1METJets
       float jec = 1.0/(1.0-jet_type_rawfactor[ijet]);
       if (jet_type==1) {
-        jec = map_jec_->evaluate({
-              nano.CorrT1METJet_area()[ijet],jet_type_eta[ijet],
-              jet_type_pt[ijet],nano.fixedGridRhoFastjetAll()});
+        if (year_string == "2023BPix") {
+          jec = map_jec_->evaluate({
+                nano.CorrT1METJet_area()[ijet],jet_type_eta[ijet],
+                jet_type_phi[ijet],jet_type_pt[ijet],
+                nano.fixedGridRhoFastjetAll()});
+        }
+        else {
+          jec = map_jec_->evaluate({
+                nano.CorrT1METJet_area()[ijet],jet_type_eta[ijet],
+                jet_type_pt[ijet],nano.fixedGridRhoFastjetAll()});
+        }
         jet_type_pt[ijet] = jet_type_pt[ijet]*jec;
       }
       float jet_raw_pt = jet_type_pt[ijet]/jec;
@@ -137,16 +175,38 @@ void JetMetProducer::GetJetUncertainties(nano_tree &nano, pico_tree &pico,
 
       //calculate JER (smearing) factors
       //https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution#Smearing_procedures
-      float sigmajer = map_jermc_->evaluate({jet_type_eta[ijet],jet_type_pt[ijet],
-                                             nano.fixedGridRhoFastjetAll()});
-      float sjer_nom = map_jersf_->evaluate({jet_type_eta[ijet],"nom"});
-      float sjer_up = map_jersf_->evaluate({jet_type_eta[ijet],"up"});
-      float sjer_dn = map_jersf_->evaluate({jet_type_eta[ijet],"down"});
+      //JSONS found at
+      //https://gitlab.cern.ch/cms-nanoAOD/jsonpog-integration/-/tree/master/POG/JME
+      float rho = 0.0f;
+      if (year < 2022)
+        rho = nano.fixedGridRhoFastjetAll();
+      else
+        rho = nano.Rho_fixedGridRhoFastjetAll();
+
+      float sigmajer = map_jermc_->evaluate({jet_type_eta[ijet],
+                                             jet_type_pt[ijet],rho});
+      float sjer_nom = 1.0f;
+      float sjer_up = 1.0f;
+      float sjer_dn = 1.0f;
+      if (year < 2022) {
+        sjer_nom = map_jersf_->evaluate({jet_type_eta[ijet],"nom"});
+        sjer_up = map_jersf_->evaluate({jet_type_eta[ijet],"up"});
+        sjer_dn = map_jersf_->evaluate({jet_type_eta[ijet],"down"});
+      }
+      else {
+        sjer_nom = map_jersf_->evaluate({jet_type_eta[ijet],jet_type_pt[ijet],
+                                         "nom"});
+        sjer_up = map_jersf_->evaluate({jet_type_eta[ijet],jet_type_pt[ijet],
+                                        "up"});
+        sjer_dn = map_jersf_->evaluate({jet_type_eta[ijet],jet_type_pt[ijet],
+                                        "down"});
+      }
       float indiv_jer_nm(1.0), indiv_jer_up(1.0), indiv_jer_dn(1.0);
 
       bool found_genjet = false;
       for (int igen(0); igen<nano.nGenJet(); ++igen) {
-        float dr = dR(jet_type_eta[ijet], nano.GenJet_eta()[igen], jet_type_phi[ijet], nano.GenJet_phi()[ijet]);
+        float dr = dR(jet_type_eta[ijet], nano.GenJet_eta()[igen], 
+                      jet_type_phi[ijet], nano.GenJet_phi()[ijet]);
         float dpt = jet_type_pt[ijet]-nano.GenJet_pt()[igen];
         if (dr < 0.2f && fabs(dpt) < 3.0f*sigmajer*jet_type_pt[ijet]) {
           found_genjet = true;
@@ -158,9 +218,23 @@ void JetMetProducer::GetJetUncertainties(nano_tree &nano, pico_tree &pico,
       }
 
       if (!found_genjet) {
-        indiv_jer_nm = 1.0+rng_.Gaus(0,sigmajer)*sqrt(std::max(sjer_nom*sjer_nom-1.0,0.0));
-        indiv_jer_up = 1.0+rng_.Gaus(0,sigmajer)*sqrt(std::max(sjer_up*sjer_up-1.0,0.0));
-        indiv_jer_dn = 1.0+rng_.Gaus(0,sigmajer)*sqrt(std::max(sjer_dn*sjer_dn-1.0,0.0));
+        float rand = rng_.Gaus(0,sigmajer);
+        indiv_jer_nm = 1.0+rand*sqrt(std::max(sjer_nom*sjer_nom-1.0,0.0));
+        indiv_jer_up = 1.0+rand*sqrt(std::max(sjer_up*sjer_up-1.0,0.0));
+        indiv_jer_dn = 1.0+rand*sqrt(std::max(sjer_dn*sjer_dn-1.0,0.0));
+      }
+
+      //turn off smearing for non-gen-jets with pT<50 and 2.5<|eta|<3 in 2017 and onward
+      //this fixes an issue with PU jets in the horn region
+      //roughly modified strategy 2 from VBF SUSY: 
+      //https://indico.cern.ch/event/1046356/contributions/4397877/attachments/2259227/3834282/BrendaFabelaEnriquez_VBFSUSY_METstudies_JERCMeeting_June7_2021.pdf#page=7
+      if (year>=2017) {
+        if (!found_genjet && fabs(jet_type_eta[ijet])>2.5f && 
+            fabs(jet_type_eta[ijet])<3.0f && jet_type_pt[ijet]<50.0f) {
+          indiv_jer_nm = 1.0;
+          indiv_jer_up = 1.0;
+          indiv_jer_dn = 1.0;
+        }
       }
 
       //Following NanoAOD-tools, JES uncertainties are evaluated post-smearing
@@ -544,14 +618,16 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
         pico.out_jet_met_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], MET_phi));
         pico.out_jet_puid().push_back(nano.Jet_puId()[ijet]);
         pico.out_jet_puid_disc().push_back(nano.Jet_puIdDisc()[ijet]);
-        pico.out_sys_jet_pt_jesup().push_back(Jet_pt[ijet]*jes_up_factor[ijet]);
-        pico.out_sys_jet_pt_jesdn().push_back(Jet_pt[ijet]*jes_dn_factor[ijet]);
-        pico.out_sys_jet_pt_jerup().push_back(Jet_pt[ijet]*jer_up_factor[ijet]/jer_nm_factor[ijet]);
-        pico.out_sys_jet_pt_jerdn().push_back(Jet_pt[ijet]*jer_dn_factor[ijet]/jer_nm_factor[ijet]);
-        pico.out_sys_jet_m_jesup().push_back(Jet_mass[ijet]*jes_up_factor[ijet]);
-        pico.out_sys_jet_m_jesdn().push_back(Jet_mass[ijet]*jes_dn_factor[ijet]);
-        pico.out_sys_jet_m_jerup().push_back(Jet_mass[ijet]*jer_up_factor[ijet]/jer_nm_factor[ijet]);
-        pico.out_sys_jet_m_jerdn().push_back(Jet_mass[ijet]*jer_dn_factor[ijet]/jer_nm_factor[ijet]);
+        if (!isData) {
+          pico.out_sys_jet_pt_jesup().push_back(Jet_pt[ijet]*jes_up_factor[ijet]);
+          pico.out_sys_jet_pt_jesdn().push_back(Jet_pt[ijet]*jes_dn_factor[ijet]);
+          pico.out_sys_jet_pt_jerup().push_back(Jet_pt[ijet]*jer_up_factor[ijet]/jer_nm_factor[ijet]);
+          pico.out_sys_jet_pt_jerdn().push_back(Jet_pt[ijet]*jer_dn_factor[ijet]/jer_nm_factor[ijet]);
+          pico.out_sys_jet_m_jesup().push_back(Jet_mass[ijet]*jes_up_factor[ijet]);
+          pico.out_sys_jet_m_jesdn().push_back(Jet_mass[ijet]*jes_dn_factor[ijet]);
+          pico.out_sys_jet_m_jerup().push_back(Jet_mass[ijet]*jer_up_factor[ijet]/jer_nm_factor[ijet]);
+          pico.out_sys_jet_m_jerdn().push_back(Jet_mass[ijet]*jer_dn_factor[ijet]/jer_nm_factor[ijet]);
+        }
         break;
       case 2022:
       case 2023:
@@ -576,14 +652,16 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
         pico.out_jet_met_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], MET_phi));
         //pico.out_jet_puid().push_back(nano.Jet_puId()[ijet]);
         //pico.out_jet_puid_disc().push_back(nano.Jet_puIdDisc()[ijet]);
-        pico.out_sys_jet_pt_jesup().push_back(Jet_pt[ijet]*jes_up_factor[ijet]);
-        pico.out_sys_jet_pt_jesdn().push_back(Jet_pt[ijet]*jes_dn_factor[ijet]);
-        pico.out_sys_jet_pt_jerup().push_back(Jet_pt[ijet]*jer_up_factor[ijet]/jer_nm_factor[ijet]);
-        pico.out_sys_jet_pt_jerdn().push_back(Jet_pt[ijet]*jer_dn_factor[ijet]/jer_nm_factor[ijet]);
-        pico.out_sys_jet_m_jesup().push_back(Jet_mass[ijet]*jes_up_factor[ijet]);
-        pico.out_sys_jet_m_jesdn().push_back(Jet_mass[ijet]*jes_dn_factor[ijet]);
-        pico.out_sys_jet_m_jerup().push_back(Jet_mass[ijet]*jer_up_factor[ijet]/jer_nm_factor[ijet]);
-        pico.out_sys_jet_m_jerdn().push_back(Jet_mass[ijet]*jer_dn_factor[ijet]/jer_nm_factor[ijet]);
+        if (!isData) {
+          pico.out_sys_jet_pt_jesup().push_back(Jet_pt[ijet]*jes_up_factor[ijet]);
+          pico.out_sys_jet_pt_jesdn().push_back(Jet_pt[ijet]*jes_dn_factor[ijet]);
+          pico.out_sys_jet_pt_jerup().push_back(Jet_pt[ijet]*jer_up_factor[ijet]/jer_nm_factor[ijet]);
+          pico.out_sys_jet_pt_jerdn().push_back(Jet_pt[ijet]*jer_dn_factor[ijet]/jer_nm_factor[ijet]);
+          pico.out_sys_jet_m_jesup().push_back(Jet_mass[ijet]*jes_up_factor[ijet]);
+          pico.out_sys_jet_m_jesdn().push_back(Jet_mass[ijet]*jes_dn_factor[ijet]);
+          pico.out_sys_jet_m_jerup().push_back(Jet_mass[ijet]*jer_up_factor[ijet]/jer_nm_factor[ijet]);
+          pico.out_sys_jet_m_jerdn().push_back(Jet_mass[ijet]*jer_dn_factor[ijet]/jer_nm_factor[ijet]);
+        }
         break;
       default:
         std::cout<<"Need code for new year in getZGammaJetBr in jetmet_producer.cpp"<<endl;
