@@ -399,7 +399,7 @@ namespace xsec{
 
     if(file.Contains("LLAJJ"))                      xsec = 0.1084;  // from XSDB
     if(file.Contains("WWG_Tune"))                   xsec = 0.2147;  // from XSDB Note: One W forced to l nu. Also possible bug for lvlv
-    if(file.Contains("WZG_Tune"))                   xsec = 0.07876// 0.04345 previously, this was preUL value. XSDB Note: W forced to l nu
+    if(file.Contains("WZG_Tune"))                   xsec = 0.07876; // 0.04345 previously, this was preUL value. XSDB Note: W forced to l nu
     if(file.Contains("ZZGTo4L_Tune"))               xsec = 0.02202; // from XSDB
 
     if(file.Contains("GluGluHToWWTo2L2Nu"))      xsec = HToWW * WToLNu * WToLNu * 48.58;
