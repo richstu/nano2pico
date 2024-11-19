@@ -92,12 +92,18 @@ EventTools::EventTools(const string &name_, int year_, bool isData_, float nanoa
     isZZ = true; //ZZ or ZZG
 
   //Sets variables for overlap removal
+  //DY
+  if(Contains(name,"DYJetsToLL_M-50") || Contains(name,"DYto2L-2Jets_MLL-50_TuneCP5")
+    || Contains(name,"DYJetsToLL_M-50")){ has_photon_in_sample = false; overlap_removal_key = "DYlowpt";}
+  if(Contains(name,"ZGToLLG_01J_5f_lowMLL_lowGPt")){ has_photon_in_sample = true;  overlap_removal_key = "DYlowpt";}
+  if(Contains(name,"ZGToLLG_01J_5f_TuneCP5") || Contains(name,"DYGto2LG-1Jets_MLL-50")){       has_photon_in_sample = true;  overlap_removal_key = "DY";} 
+
   //TTbar samples
   if(Contains(name,"TTTo2L2Nu") || Contains(name,"TTtoLNu2Q") || Contains(name,"TTJets") || Contains(name,"TTTo2L2Nu")){has_photon_in_sample = false; overlap_removal_key = "TT";}
   if(Contains(name,"TTGJets") || Contains(name,"TTG-1Jets")){       has_photon_in_sample = true; overlap_removal_key = "TT";}
 
   //WJets -- Dont currently have samples for Run 3 so dont apply overlap removal?
-  if(Contains(name,"WJetsToLNu")){    has_photon_in_sample=false; overlap_removal_key = "WJ";}
+  if(Contains(name,"WJetsToLNu") || Contains(name,"WtoLNu-2Jets")){    has_photon_in_sample=false; overlap_removal_key = "WJ";}
   if(Contains(name,"WGToLNuG_01J")){  has_photon_in_sample=true; overlap_removal_key = "WJ";}
   
   //WW
@@ -119,13 +125,16 @@ EventTools::EventTools(const string &name_, int year_, bool isData_, float nanoa
   if(Contains(name, "ZZG")){has_photon_in_sample=true; overlap_removal_key = "ZZ";}
 
   //EWK ZG
-  if(Contains(name,"EWKZ2Jets")){has_photon_in_sample=false; overlap_removal_key = "EWKZ";}
+  if(Contains(name,"EWKZ2Jets") || Contains(name,"VBFto2L_MLL-50_TuneCP5")){has_photon_in_sample=false; overlap_removal_key = "EWKZ";}
   if(Contains(name, "ZGamma2JToGamma2L2J_EWK") || Contains(name,"ZG2JtoG2L2J_EWK")){has_photon_in_sample=true; overlap_removal_key = "EWKZ";}
 
   //Use the map to set the proper values for overlap removal
   //Will still use some values for overlap removal in case this is incorrect, but will set use_event via the bypass_overlap_removal flag
-  if(overlap_removal_map.count(overlap_removal_key)==0){ bypass_overlap_removal = true; 
-  } else { overlap_pt = overlap_removal_map[overlap_removal_key][0]; overlap_isocone = overlap_removal_map[overlap_removal_key][1]; }
+  if(overlap_removal_map.count(overlap_removal_key)==0){ bypass_overlap_removal = true; std::cout << "Using default values for overlap removal" << std::endl;
+  } else { 
+    overlap_pt = overlap_removal_map[overlap_removal_key][0]; overlap_isocone = overlap_removal_map[overlap_removal_key][1];
+    std::cout << "Using the following key for overlap removal: " << overlap_removal_key << std::endl;
+  }
 
 
   if(Contains(name, "EGamma")) // replaced SingleElectron and DoubleEG starting in 2018
