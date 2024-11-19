@@ -57,7 +57,6 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
       pico.out_llphoton_iph().push_back(igamma);
       pico.out_llphoton_ill().push_back(ill);
 
-
       if(sig_jet_nano_idx.size() > 1) {
         TLorentzVector j1, j2, dijet;
         j1.SetPtEtaPhiM(nano.Jet_pt()[sig_jet_nano_idx[0]], nano.Jet_eta()[sig_jet_nano_idx[0]], nano.Jet_phi()[sig_jet_nano_idx[0]], nano.Jet_mass()[sig_jet_nano_idx[0]]);
@@ -71,7 +70,13 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
         pico.out_photon_jet1_dr().push_back(photon.DeltaR(j1));
         pico.out_photon_jet2_dr().push_back(photon.DeltaR(j2));
         pico.out_photon_zeppenfeld().push_back(abs(photon.Eta() - (j1.Eta() + j2.Eta())/2));
-
+      } else if (sig_jet_nano_idx.size() > 0) {
+	TLorentzVector j1;
+        j1.SetPtEtaPhiM(nano.Jet_pt()[sig_jet_nano_idx[0]], nano.Jet_eta()[sig_jet_nano_idx[0]], nano.Jet_phi()[sig_jet_nano_idx[0]], nano.Jet_mass()[sig_jet_nano_idx[0]]);
+	pico.out_llphoton_dijet_dphi().push_back(llg.DeltaPhi(j1));
+	pico.out_llphoton_dijet_balance().push_back((dilep+photon+j1).Pt()/(dilep.Pt()+photon.Pt()+j1.Pt()));
+	pico.out_llphoton_dijet_dr().push_back(llg.DeltaR(j1));
+	pico.out_photon_jet1_dr().push_back(photon.DeltaR(j1));
       }
 
       TVector3 g_pT = photon.Vect();
@@ -322,6 +327,12 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
         pico.out_llphoton_refit_dijet_balance() = (ll_refit+photon+j1+j2).Pt()/(ll_refit.Pt()+photon.Pt()+j1.Pt()+j2.Pt());
         pico.out_llphoton_refit_dijet_dr()      = llg_refit.DeltaR(dijet);
 
+      } else if (sig_jet_nano_idx.size() > 0) {
+	TLorentzVector j1;
+	j1.SetPtEtaPhiM(nano.Jet_pt()[sig_jet_nano_idx[0]], nano.Jet_eta()[sig_jet_nano_idx[0]], nano.Jet_phi()[sig_jet_nano_idx[0]], nano.Jet_mass()[sig_jet_nano_idx[0]]);
+	pico.out_llphoton_refit_dijet_dphi()    = llg_refit.DeltaPhi(j1);
+	pico.out_llphoton_refit_dijet_balance() = (ll_refit+j1).Pt()/(ll_refit.Pt()+photon.Pt()+j1.Pt());
+	pico.out_llphoton_refit_dijet_dr()      = llg_refit.DeltaR(j1);
       }
 
 
