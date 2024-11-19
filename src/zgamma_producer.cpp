@@ -525,7 +525,7 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
   if(pico.out_photon_pt().at(pico.out_llphoton_iph().at(0))/pico.out_llphoton_m().at(0) >=15.0f/110.f){baseBit+= 0b00000001000;}
   if(pico.out_ll_m().at(pico.out_llphoton_ill().at(0))+pico.out_llphoton_m().at(0) > 185.f){baseBit+= 0b00000000100;}
   if (pico.out_llphoton_m().at(0)>=100.f && pico.out_llphoton_m().at(0)<=180.f){baseBit+= 0b00000000010;}
-  if(pico.out_llphoton_m().at(0)<=122.f || pico.out_llphoton_m().at(0)>=128.f){baseBit+= 0b00000000001;}
+  if(pico.out_llphoton_m().at(0)<=120.f || pico.out_llphoton_m().at(0)>=130.f){baseBit+= 0b00000000001;}
   pico.out_zg_cutBitMap() = baseBit;
   //End Bitmap for zgamma cut flow
             
@@ -572,7 +572,7 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
     //Category selections
     float mll = pico.out_ll_m().at(pico.out_llphoton_ill().at(0));
     float ptom_llgamma = pico.out_llphoton_pt().at(0)/pico.out_llphoton_m().at(0);
-    if(mll > 85.f && mll < 95.f && ptom_llgamma > 0.4){categoryBit+=0b00000001;}
+    if(mll > 85.f && mll < 95.f && ptom_llgamma > 0.4f){categoryBit+=0b00000001;}
   }
 
   //"Untagged" aka events that pass baseline but arent put into a category

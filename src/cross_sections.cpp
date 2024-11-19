@@ -352,8 +352,8 @@ namespace xsec{
         if(file.Contains("WWZ_Tune"))                   xsec = 0.354;    // 
         if(file.Contains("WWZ_4F_Tune"))                xsec = 0.354;    // 
         if(file.Contains("WWZJetsTo4L2Nu_4F_Tune"))     xsec = 0.354 * WToLNu * WToLNu * ZToLL;    // 
-        if(file.Contains("WZZ_Tune"))                   xsec = 0.0916;    // 
-        if(file.Contains("ZZZ_Tune"))                   xsec = 0.0371; // 
+        if(file.Contains("WZZ_Tune"))                   xsec = 0.05709;    // previously 0.0916, changed to reflect XSDB
+        if(file.Contains("ZZZ_Tune"))                   xsec = 0.01476; // previously 0.0371, changed to reflect XSDB 
 
     } else if (year >= 2022) {
         //below from XSDB
@@ -399,7 +399,7 @@ namespace xsec{
 
     if(file.Contains("LLAJJ"))                      xsec = 0.1084;  // from XSDB
     if(file.Contains("WWG_Tune"))                   xsec = 0.2147;  // from XSDB Note: One W forced to l nu. Also possible bug for lvlv
-    if(file.Contains("WZG_Tune"))                   xsec = 0.04345; // from XSDB Note: W forced to l nu
+    if(file.Contains("WZG_Tune"))                   xsec = 0.07876// 0.04345 previously, this was preUL value. XSDB Note: W forced to l nu
     if(file.Contains("ZZGTo4L_Tune"))               xsec = 0.02202; // from XSDB
 
     if(file.Contains("GluGluHToWWTo2L2Nu"))      xsec = HToWW * WToLNu * WToLNu * 48.58;
@@ -419,8 +419,8 @@ namespace xsec{
 
     float xs_ggh = 48.58;
     float xs_vbf = 3.782;
-    float xs_wmh = 0.527;
-    float xs_wph = 0.831;
+    float xs_wmh = 0.5328;
+    float xs_wph = 0.8400;
     float xs_z_h = 0.8839;
     float xs_tth = 0.5071;
     if (year >= 2022) {
@@ -484,30 +484,29 @@ namespace xsec{
         if(file.Contains("GluGluHtoZG"))          xsec = HToZG * ZToLL * xs_ggh ;
         if(file.Contains("VBFHToZG"))             xsec = HToZG * ZToLL * xs_vbf ;
         if(file.Contains("VBFHtoZG"))             xsec = HToZG * ZToLL * xs_vbf ;
-        if(file.Contains("WplusH_HToZG"))         xsec = HToZG * 0.8400 ; // CERNYellowReportPageAt13TeV mH=125. WplusH, WminusH, ZH, ttH samples do not require decay of Z to leptons
-        if(file.Contains("WminusH_HToZG"))        xsec = HToZG * 0.5328 ; // CERNYellowReportPageAt13TeV mH=125. New samples are requested with this decay incorporated
-        if(file.Contains("ZH_HToZG"))             xsec = HToZG * 0.8839; // Add ZToLL when updated samples are available
-        if(file.Contains("ZH_ZToAll_HToZG"))      xsec = HToZG * 0.8839;
-        if(file.Contains("ttHToZG"))              xsec = HToZG * 0.5071;
+        if(file.Contains("WplusH_HToZG"))         xsec = HToZG * xs_wph ; // CERNYellowReportPageAt13TeV mH=125.
+        if(file.Contains("WminusH_HToZG"))        xsec = HToZG * xs_wmh ; // CERNYellowReportPageAt13TeV mH=125.
+        if(file.Contains("ZH_HToZG"))             xsec = HToZG * xs_z_h;
+        if(file.Contains("ZH_ZToAll_HToZG"))      xsec = HToZG * xs_z_h;
+        if(file.Contains("ttHToZG"))              xsec = HToZG * xs_tth;
 
-        if(file.Contains("WplusH_HToZG_WToAll_ZToLL"))  xsec = HToZG * 0.8400 * ZToLL ; //Currently H to ZZ, do not use 2024-03-07
-        if(file.Contains("WminusH_HToZG_WToAll_ZToLL")) xsec = HToZG * 0.5328 * ZToLL ; //Currently H to ZZ, do not use 2024-03-07
-        if(file.Contains("ZH_HToZG_ZToAll_ZToLL"))      xsec = HToZG * 0.8839 * ZToLL * ZToQQ;
-        if(file.Contains("ttHToZG_ZToLL"))              xsec = HToZG * 0.5071 * ZToLL ;
+        if(file.Contains("WplusH_HToZG_WToAll_ZToLL"))  xsec = HToZG * xs_wph * ZToLL ;
+        if(file.Contains("WminusH_HToZG_WToAll_ZToLL")) xsec = HToZG * xs_wmh * ZToLL ;
+        if(file.Contains("ZH_HToZG_ZToAll_ZToLL"))      xsec = HToZG * xs_z_h * ZToLL ; //correct samples now 2024-11-19
+        if(file.Contains("ttHToZG_ZToLL"))              xsec = HToZG * xs_tth * ZToLL ;
     } else {
         if(file.Contains("GluGluHtoZG"))          xsec = HToZG * ZToLL * xs_ggh ;
         if(file.Contains("VBFHtoZG"))             xsec = HToZG * ZToLL * xs_vbf ;
-        if(file.Contains("WplusH_HtoZG"))         xsec = HToZG * 0.8889 ; // CERNYellowReportPageAt13TeV mH=125. WplusH, WminusH, ZH, ttH samples do not require decay of Z to leptons
-        if(file.Contains("WminusH_HtoZG"))        xsec = HToZG * 0.5677 ; // CERNYellowReportPageAt13TeV mH=125. New samples are requested with this decay incorporated
-        if(file.Contains("ZH_HtoZG"))             xsec = HToZG * 0.9439; // Add ZToLL when updated samples are available
-        if(file.Contains("ZH_ZtoAll_HtoZGto2LG")) xsec = HToZG * 0.9439; //Are these two identical?
-        if(file.Contains("ttHToZG"))              xsec = HToZG * 0.5700;
+        if(file.Contains("WplusH_HtoZG"))         xsec = HToZG * xs_wph ;
+        if(file.Contains("WminusH_HtoZG"))        xsec = HToZG * xs_wmh ;
+        if(file.Contains("ZH_HtoZG"))             xsec = HToZG * xs_z_h;
+        if(file.Contains("ZH_ZtoAll_HtoZGto2LG")) xsec = HToZG * xs_z_h * ZToLL;
+        if(file.Contains("ttHToZG"))              xsec = HToZG * xs_tth;
 
-        if(file.Contains("WplusH_HToZG_WToAll_ZToLL"))  xsec = HToZG * 0.8889 * ZToLL ; //Currently H to ZZ, do not use 2024-03-07
-        if(file.Contains("WminusH_HToZG_WToAll_ZToLL")) xsec = HToZG * 0.5677 * ZToLL ; //Currently H to ZZ, do not use 2024-03-07
-        if(file.Contains("ZH_HToZG_ZToAll_ZToLL"))      xsec = HToZG * 0.9439 * ZToLL * ZToQQ;
+        if(file.Contains("WplusH_HtoZG_WtoAll_Zto2L"))  xsec = HToZG * xs_wph * ZToLL ;
+        if(file.Contains("WminusH_HtoZG_WtoAll_Zto2L")) xsec = HToZG * xs_wmh * ZToLL ;
 
-        if(file.Contains("ttHtoZG_Zto2L"))              xsec = HToZG * 0.5700 * ZToLL ;
+        if(file.Contains("ttHtoZG_Zto2L"))              xsec = HToZG * xs_tth * ZToLL ;
 
     }
 
@@ -517,31 +516,31 @@ namespace xsec{
     if(file.Contains("GluGluHtoZG_Zto2L_M-120"))          xsec = H120ToZG * ZToLL * 52.22;
     if(file.Contains("VBFHToZG_ZToLL_M-120"))             xsec = H120ToZG * ZToLL * 3.935 ;
     if(file.Contains("VBFHtoZG_Zto2L_M-120"))             xsec = H120ToZG * ZToLL * 3.935 ;
-    if(file.Contains("WplusH_HToZG_WToAll_M-120"))        xsec = H120ToZG * 0.9558 ; // WplusH, WminusH, ZH, ttH samples do not require decay of Z to leptons
+    if(file.Contains("WplusH_HToZG_WToAll_ZToLL_M-120"))  xsec = H120ToZG * ZToLL * 0.9558 ;
     if(file.Contains("WplusH_HtoZG_WtoAll_M-120"))        xsec = H120ToZG * 0.9558 ; 
     if(file.Contains("WplusH_HtoZG_WtoAll_Zto2L_M-120"))  xsec = H120ToZG * ZToLL * 0.9558 ; 
-    if(file.Contains("WminusH_HToZG_WToAll_M-120"))       xsec = H120ToZG * 0.6092 ; // New samples are requested with this decay incorporated
+    if(file.Contains("WminusH_HToZG_WToAll_ZToLL_M-120")) xsec = H120ToZG * ZToLL * 0.6092 ;
     if(file.Contains("WminusH_HtoZG_WtoAll_M-120"))       xsec = H120ToZG * 0.6092 ; 
     if(file.Contains("WminusH_HtoZG_WtoAll_Zto2L_M-120")) xsec = H120ToZG * ZToLL * 0.6092 ; 
-    if(file.Contains("ZH_HToZG_ZToAll_M-120"))            xsec = H120ToZG * 0.9939 ; // Add ZToLL when updated samples are available
+    if(file.Contains("ZH_HToZG_ZToAll_ZToLL_M-120"))      xsec = H120ToZG * ZToLL * 0.9939 ;
     if(file.Contains("ZH_HtoZG_ZtoAll_M-120"))            xsec = H120ToZG * 0.9939 ; 
-    if(file.Contains("ZH_ZtoAll_HtoZGto2LG_M-120"))       xsec = H120ToZG * 0.9939 ; 
-    if(file.Contains("ttHToZG_M120"))                     xsec = H120ToZG * 0.5697 ;
+    if(file.Contains("ZH_ZtoAll_HtoZGto2LG_M-120"))       xsec = H120ToZG * ZToLL * 0.9939 ; 
+    if(file.Contains("ttHToZG_ZToLL_M-120"))              xsec = H120ToZG * ZToLL * 0.5697 ;
 
     if(file.Contains("GluGluHToZG_ZToLL_M-130"))          xsec = H130ToZG * ZToLL * 45.31;
     if(file.Contains("GluGluHtoZG_Zto2L_M-130"))          xsec = H130ToZG * ZToLL * 45.31;
     if(file.Contains("VBFHToZG_ZToLL_M-130"))             xsec = H130ToZG * ZToLL * 3.637 ;
     if(file.Contains("VBFHtoZG_Zto2L_M-130"))             xsec = H130ToZG * ZToLL * 3.637 ;
-    if(file.Contains("WplusH_HToZG_WToAll_M-130"))        xsec = H130ToZG * 0.7414 ; // WplusH, WminusH, ZH, ttH samples do not require decay of Z to leptons
+    if(file.Contains("WplusH_HToZG_WToAll_ZToLL_M-130"))  xsec = H130ToZG * ZToLL * 0.7414 ;
     if(file.Contains("WplusH_HtoZG_WtoAll_M-130"))        xsec = H130ToZG * 0.7414 ; 
-    if(file.Contains("WplusH_HtoZG_WtoAll_Zto2L_M-130"))  xsec = H130ToZG * ZToLL* 0.7414 ; 
-    if(file.Contains("WminusH_HToZG_WToAll_M-130"))       xsec = H130ToZG * 0.4676 ; // New samples are requested with this decay incorporated
+    if(file.Contains("WplusH_HtoZG_WtoAll_Zto2L_M-130"))  xsec = H130ToZG * ZToLL * 0.7414 ; 
+    if(file.Contains("WminusH_HToZG_WToAll_ZToLL_M-130")) xsec = H130ToZG * ZToLL * 0.4676 ; // New samples are requested with this decay incorporated
     if(file.Contains("WminusH_HtoZG_WtoAll_M-130"))       xsec = H130ToZG * 0.4676 ; 
     if(file.Contains("WminusH_HtoZG_WtoAll_Zto2L_M-130")) xsec = H130ToZG * ZToLL * 0.4676 ; 
-    if(file.Contains("ZH_HToZG_ZToAll_M-130"))            xsec = H130ToZG * 0.7899 ; // Add ZToLL when updated samples are available
-    if(file.Contains("ZH_HtoZG_ZtoAll_M-130"))            xsec = H130ToZG * 0.7899 ; 
+    if(file.Contains("ZH_HToZG_ZToAll_ZToLL_M-130"))      xsec = H130ToZG * ZToLL * 0.7899 ; // Add ZToLL when updated samples are available
+    if(file.Contains("ZH_HtoZG_ZtoAll_ZToLL_M-130"))      xsec = H130ToZG * ZToLL * 0.7899 ; 
     if(file.Contains("ZH_ZtoAll_HtoZGto2LG_M-130"))       xsec = H130ToZG * 0.7899 ; 
-    if(file.Contains("ttHToZG_M130"))                     xsec = H130ToZG * 0.4539 ;
+    if(file.Contains("ttHToZG_ZToLL_M-130"))              xsec = H130ToZG * ZToLL * 0.4539 ;
 
     // With cmssw GenXSecAnalyzer (pb)
     if(file.Contains("ST_tWAto2L2Nu_5f_TuneCP5_13TeV-madgraph-pythia8")) xsec = 0.1523;
