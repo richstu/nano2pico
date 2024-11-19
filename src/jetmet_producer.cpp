@@ -478,6 +478,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
     // jetid applied to only full sim and data
     bool pass_jetid = true;
     if (!isFastsim) if (Jet_jetId[ijet] <1) pass_jetid = false;
+    bool in_jet_horn_eta_veto = nano.Jet_pt()[ijet] < 40.0f && fabs(nano.Jet_eta()[ijet]) > 2.5f && fabs(nano.Jet_eta()[ijet]) < 3.0f;
 
     bool isvetojet = false;
 
@@ -506,7 +507,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
     }
 
     //don't include pt in isgood until later in order to save systematics
-    bool isgood = !islep && !isphoton && (fabs(nano.Jet_eta()[ijet]) <= max_jet_eta) && pass_jetid && !isvetojet;
+    bool isgood = !islep && !isphoton && (fabs(nano.Jet_eta()[ijet]) <= max_jet_eta) && pass_jetid && !isvetojet && !in_jet_horn_eta_veto;
     //sys_jetvar convention: [0] JER up, [1] JER down, [2] JEC up, [3] JEC down
     //for now, only save sys_ variables
     if (isSignal && (nanoaod_version+0.01)<9) {

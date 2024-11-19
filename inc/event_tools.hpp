@@ -36,6 +36,10 @@ private:
   bool isZZ;
   bool isFastSim;
   bool isData;
+  bool bypass_overlap_removal;
+  bool has_photon_in_sample;
+  float overlap_isocone;
+  float overlap_pt;
   float nanoaod_version;
   int dataset;
 };

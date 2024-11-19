@@ -57,6 +57,7 @@ float dijet_dphi
 float dijet_deta
 
 int zg_cutBitMap
+int zg_categorizationBitMap
 int nllphoton
 vector<float> llphoton_pt
 vector<float> llphoton_eta

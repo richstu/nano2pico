@@ -8,7 +8,6 @@ keep npv
 keep rho
 
 keep jet_*
-drop jet_deep*
 drop jet_m?t_dphi
 drop jet_h?d
 drop *fjet*
@@ -42,3 +41,5 @@ keep weight
 
 keep HLT*
 keep trig_*
+
+keep zg_*

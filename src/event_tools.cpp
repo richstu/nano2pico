@@ -3,7 +3,8 @@
 #include "hig_trig_eff.hpp"
 #include "TMath.h"
 #include <bitset>
-
+#include <vector>
+#include <unordered_map>
 using namespace std;
 
 EventTools::EventTools(const string &name_, int year_, bool isData_, float nanoaod_version_):
@@ -21,8 +22,40 @@ EventTools::EventTools(const string &name_, int year_, bool isData_, float nanoa
   isZZ(false),
   isFastSim(false),
   isData(isData_),
+  bypass_overlap_removal(false),
+  has_photon_in_sample(false),
+  overlap_isocone(0.05),
+  overlap_pt(10.0),
   nanoaod_version(nanoaod_version_),
   dataset(-1){
+  
+  //pT,eta,isocone
+  std::string overlap_removal_key = "";
+  std::unordered_map<std::string,std::vector<float>> overlap_removal_map;
+  if(year<2020){
+    overlap_removal_map = {
+      {"DY",      {15.0, 0.05}},
+      {"DYlowpt", {9.0,  0.05}},
+      {"EWKZ",    {10.0, 0.05}}, //From Run card, "When ptgmin=0, all the other parameters are ignored" Will set ptg=10, miniso 0.05, and eta=999
+      {"TT",      {10.0, 0.05}},
+      {"ST",      {10.0, 0.05}},
+      {"WJ",      {15.0, 0.05}},
+      {"WW",      {20.0, 0.05}},
+      {"WZ",      {20.0, 0.05}},
+      {"ZZ",      {10.0, 0.05}}
+    };
+  } else {
+    overlap_removal_map = {
+      {"DY",   {10.0, 0.05}}, //999
+      {"EWKZ", {10.0, 0.05}}, //From Run card, "When ptgmin=0, all the other parameters are ignored" Will set ptg=10, miniso 0.05, and eta=999
+      {"TT",   {10.0, 0.05}}, //999
+      {"ST",   {10.0, 0.05}}, //From Run card, "When ptgmin=0, all the other parameters are ignored" Will set ptg=10, miniso 0.05, and eta=999
+      {"WJ",   {10.0, 0.05}},
+      //{"WW", {}}, //WWG Not found at UCSB or on DAS
+      {"WZ",   {20.0, 0.05}} //Untar and look
+      //{"ZZ", {}} //Not found at UCSB or on DAS
+    };
+  }
 
   if(Contains(name, "TTJets_") && Contains(name, "genMET-") && Contains(name, "madgraphMLM")) 
     isTTJets_LO_MET = true;
@@ -42,7 +75,6 @@ EventTools::EventTools(const string &name_, int year_, bool isData_, float nanoa
   if(Contains(name, "Fast"))
     isFastSim = true;
 
-
   //These four variables control the generator settings of the overlap removal variable in MC
   if(Contains(name, "WJetsToLNu") || Contains(name,"WGToLNuG_01J"))
     isWJ = true;
@@ -58,6 +90,43 @@ EventTools::EventTools(const string &name_, int year_, bool isData_, float nanoa
 
   if(Contains(name, "ZZ") && !Contains(name,"WZZ") && !Contains(name,"ZZZ") && !Contains(name,"HToZZ") && !Contains(name,"TChiHH"))
     isZZ = true; //ZZ or ZZG
+
+  //Sets variables for overlap removal
+  //TTbar samples
+  if(Contains(name,"TTTo2L2Nu") || Contains(name,"TTtoLNu2Q") || Contains(name,"TTJets") || Contains(name,"TTTo2L2Nu")){has_photon_in_sample = false; overlap_removal_key = "TT";}
+  if(Contains(name,"TTGJets") || Contains(name,"TTG-1Jets")){       has_photon_in_sample = true; overlap_removal_key = "TT";}
+
+  //WJets -- Dont currently have samples for Run 3 so dont apply overlap removal?
+  if(Contains(name,"WJetsToLNu")){    has_photon_in_sample=false; overlap_removal_key = "WJ";}
+  if(Contains(name,"WGToLNuG_01J")){  has_photon_in_sample=true; overlap_removal_key = "WJ";}
+  
+  //WW
+  if(Contains(name, "WW") && !Contains(name,"WWG") && !Contains(name,"WWW") && !Contains(name,"WWZ") && !Contains(name,"HToWW") && !Contains(name,"TChiHH")){
+    has_photon_in_sample=false; overlap_removal_key = "WW";
+  }
+  if(Contains(name, "WWG")){ has_photon_in_sample=true; overlap_removal_key = "WW"; }
+
+  //WZ
+  if(Contains(name, "WZ") && !Contains(name,"WZG") && !Contains(name,"WWZ") && !Contains(name,"WZZ") && !Contains(name,"TChiHH")){
+    has_photon_in_sample=false; overlap_removal_key = "WZ";
+  }
+  if(Contains(name, "WZG")){has_photon_in_sample=true; overlap_removal_key = "WZ";}
+
+  //ZZ
+  if(Contains(name, "ZZ") && !Contains(name,"ZZG") && !Contains(name,"WZZ") && !Contains(name,"ZZZ") && !Contains(name,"HToZZ") && !Contains(name,"TChiHH")){
+    has_photon_in_sample=false; overlap_removal_key = "ZZ";
+  }
+  if(Contains(name, "ZZG")){has_photon_in_sample=true; overlap_removal_key = "ZZ";}
+
+  //EWK ZG
+  if(Contains(name,"EWKZ2Jets")){has_photon_in_sample=false; overlap_removal_key = "EWKZ";}
+  if(Contains(name, "ZGamma2JToGamma2L2J_EWK") || Contains(name,"ZG2JtoG2L2J_EWK")){has_photon_in_sample=true; overlap_removal_key = "EWKZ";}
+
+  //Use the map to set the proper values for overlap removal
+  //Will still use some values for overlap removal in case this is incorrect, but will set use_event via the bypass_overlap_removal flag
+  if(overlap_removal_map.count(overlap_removal_key)==0){ bypass_overlap_removal = true; 
+  } else { overlap_pt = overlap_removal_map[overlap_removal_key][0]; overlap_isocone = overlap_removal_map[overlap_removal_key][1]; }
+
 
   if(Contains(name, "EGamma")) // replaced SingleElectron and DoubleEG starting in 2018
     dataset = Dataset::EGamma;
@@ -137,19 +206,11 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
       }
     }
   }
-  //Need to include the new overlap removal by including the newer values for ZGtoLLG_lowMll_lowGPt
-  float ptmin = 9.0;
-  float isocone = 0.05;
-  if(isZZ || isTTJets_LO_Incl || Contains(name,"TTGJets") || isEWKZ){
-    ptmin = 10.0;
-  }
-  if(isWZ || isWW){
-    ptmin = 20.0;
-  }
-  if(isWJ){
-    ptmin = 15.0;
-  }
-
+    
+  //Here we still have the old method for overlap removal
+  //For the working overlap removal the information has been moved to the constructor
+  float ptmin = overlap_pt;
+  float isocone = overlap_isocone;
   float ptmin_old = 15.0;
   float etamax_old = 2.6;
   float isocone_old = 0.05;
@@ -262,27 +323,24 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
 
     } //GenPart_pdgId==22
   } //loop over GenParts
-  //This bit of code uses the overlap removal variable to then select whether an event should be kept or not. 
+
   //If the event contains should and does (does not) contain a generator photon then is_overlap_old = false, is_overlap = false, use_event = true (is_overlap_old=true, is_overlap=true, use_event=false)
   //If the event contains should not and does not (does) contain a generator photon then is_overlap_old = true, is_overlap = false, use_event = true (is_overlap_old=false, is_overlap=true, use_event=false)
-  if( Contains(name,"ZZG") && found_higgs ){ //remove Higgs decays from ZZG sample
-    pico.out_is_overlap() = true; pico.out_use_event() = false;
-  } else if( (Contains(name, "TTGJets") ) || (isWZ && Contains(name, "WZG")) 
-             || (isZZ && Contains(name, "ZZG")) || Contains(name,"ZGToLLG") 
-             || (isWJ && Contains(name,"WGToLNuG_01J")) 
-             || (isEWKZ && Contains(name,"ZGamma2JToGamma2L2J_EWK")) ){
-    pico.out_use_event() = pico.out_is_overlap();
-  } else if( isTTJets_LO_Incl || Contains(name, "TTTo2L2Nu") || isWJ || isEWKZ
-             || (Contains(name, "DY") && !Contains(name, "DYG")) ){ //no WW due to bug in WWG
-    pico.out_use_event() = !pico.out_is_overlap();
-  } else if( isWZ && !found_hadronic_w ){ //WZG only generated with W->lnu
-    pico.out_use_event() = !pico.out_is_overlap();
-  } else if( isZZ && ntrulep==4 ){ //ZZ only generated with ZZ->4l
-    pico.out_use_event() = !pico.out_is_overlap();
+  //This one line, with the addition of the has_photon_in_sample variable should properly set the use_event variable;
+  if(bypass_overlap_removal){
+    pico.out_use_event() = true;
   } else {
+    pico.out_use_event() = pico.out_is_overlap()==has_photon_in_sample;
+  }
+
+  //This code handles the exceptions to the overlap removal 
+  if( Contains(name,"ZZG") && found_higgs ){ //remove Higgs decays from ZZG sample
+    pico.out_is_overlap() = true;  pico.out_use_event() = false;
+  }  else if( isWZ && !has_photon_in_sample  && found_hadronic_w ){ //WZG only generated with W->lnu
+    pico.out_is_overlap()=false;   pico.out_use_event() = true;
+  } else if( isZZ && ntrulep!=4 ){ //ZZ only generated with ZZ->4l
     pico.out_is_overlap() = false; pico.out_use_event() = true;
   }
-  //Note: removed overlap removal for WW and WWG since WWG sample may have bug
 
   if(isDYJets_LO  && nano.LHE_HT()>70.0f) 
     pico.out_stitch_htmet() = pico.out_stitch_ht() = pico.out_stitch() = false;

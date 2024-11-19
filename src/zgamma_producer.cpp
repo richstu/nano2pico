@@ -31,8 +31,10 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
   }
   pico.out_nllphoton() = 0;
   int baseBit = 0b00000000000;//If 0, no selections applied. Placed here to get 0 for cases where no dilep or photon
+  int categoryBit = 0b00000000;
   if (pico.out_ll_pt().size() == 0 || pico.out_nphoton() == 0){
     pico.out_zg_cutBitMap() = baseBit;
+    pico.out_zg_categorizationBitMap() = categoryBit;
     return;
   }
 
@@ -508,9 +510,6 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
   // Bit 8 nphoton>=1, Bit 9 photon_id80, Bit 10 m_ll cut, Bit 11 m_lly cut, Bit 12 15/110, Bit 13 is 1 if outside m_lly signal region
   //New:
   //Read from left. Bit 1 n_ll>=2, Bit 2 n_ee>=2, Bit 3 n_mumu>=2, Bit 4 passes triggers Bit 5 passes lep pT cut, Bit 6 nphoton>=1, Bit 7 m_ll cut, Bit 8 15/110 ratio cut, bit 9 m_lly+mll cut, Bit 10 m_lly cut, Bit 11 signal blinding window
-
-
-
   if (pico.out_nel()>=2 && pico.out_ll_lepid().at(0)==11){
     baseBit += 0b11000000000; 
     if(pico.out_trig_single_el() || pico.out_trig_double_el()){baseBit +=0b00010000000;}
@@ -527,9 +526,61 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
   if(pico.out_ll_m().at(pico.out_llphoton_ill().at(0))+pico.out_llphoton_m().at(0) > 185.f){baseBit+= 0b00000000100;}
   if (pico.out_llphoton_m().at(0)>=100.f && pico.out_llphoton_m().at(0)<=180.f){baseBit+= 0b00000000010;}
   if(pico.out_llphoton_m().at(0)<=122.f || pico.out_llphoton_m().at(0)>=128.f){baseBit+= 0b00000000001;}
-
   pico.out_zg_cutBitMap() = baseBit;
-//End Bitmap for zgamma cut flow
+  //End Bitmap for zgamma cut flow
+            
+  //Category bitmap - checks if the event matches one of the categories and their baselines
+  //Bit 0: ggF, bit 1: VBF, bit 2: ttH leptonic, bit 3: VH 3l, bit 4: ttH hadronic, bit 5: ZH ptmiss, bit 6: untagged, bit 7: category specific baseline selection
+  //ggF
+  if(pico.out_nlep()==2 && pico.out_njet()<=1 && pico.out_met()<90.f){ categoryBit += 0b10000000; } 
+  if(pico.out_nlep()==2 && pico.out_njet()>=2 && pico.out_nbdfm()==0){ categoryBit += 0b01000000; } //VBF
+  
+  //ttH leptonic
+  if((pico.out_nlep()==3 && pico.out_njet()>=3 && pico.out_nbdfm()>=1) || (pico.out_nlep()>=4 && pico.out_nbdfm() >= 1)){
+    categoryBit+=0b00100000; 
+
+    float mll = pico.out_ll_m().at(pico.out_llphoton_ill().at(0));
+    bool pass_miniso = check_miniso(pico,0.1);
+    //Category selections
+    if(pass_miniso && mll > 85.f && mll < 95.f){categoryBit+=0b00000001;}
+  }
+
+  //VH 3l
+  if(pico.out_nlep()>=3 && pico.out_nbdfm()==0){
+    categoryBit += 0b00010000;
+
+    //Category selections
+    float ptom_llgamma = pico.out_llphoton_pt().at(0)/pico.out_llphoton_m().at(0);
+    float mll = pico.out_ll_m().at(pico.out_llphoton_ill().at(0));
+    bool pass_miniso = check_miniso(pico,0.15);
+    if(pass_miniso && pico.out_met() > 30.0f && ptom_llgamma > 0.3f && mll > 85.f && mll < 95.f){categoryBit+=0b00000001;}
+  }
+
+  //ttH hadronic
+  if(pico.out_nlep()==2 && pico.out_njet()>=5 && pico.out_nbdfm()>=1){ 
+    categoryBit += 0b00001000;
+
+    //Category selections
+    float mll = pico.out_ll_m().at(pico.out_llphoton_ill().at(0));
+    if(mll > 85.f && mll < 95.f){categoryBit+=0b00000001;}
+  }
+
+  //ZH ptmiss
+  if(pico.out_nlep()==2 && pico.out_njet()<=1 && pico.out_met()>90.f){ 
+    categoryBit += 0b00000100;
+
+    //Category selections
+    float mll = pico.out_ll_m().at(pico.out_llphoton_ill().at(0));
+    float ptom_llgamma = pico.out_llphoton_pt().at(0)/pico.out_llphoton_m().at(0);
+    if(mll > 85.f && mll < 95.f && ptom_llgamma > 0.4){categoryBit+=0b00000001;}
+  }
+
+  //"Untagged" aka events that pass baseline but arent put into a category
+  if(categoryBit==0b00000000){categoryBit = 0b00000010;};
+
+  //set categorization BitMap in picos
+  pico.out_zg_categorizationBitMap() = categoryBit;
+  //End of category bitmap
 
   return;
 }
