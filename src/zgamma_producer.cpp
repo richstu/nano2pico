@@ -448,21 +448,21 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
   pico.out_trig_el_pt() = false;
   pico.out_trig_mu_pt() = false;
   if (year==2016) {
-    if(pico.out_nel() > 1){
-      if(pico.out_trig_double_el() && pico.out_el_pt().at(0)>25.f && pico.out_el_pt().at(1)>15.f){
+    if(pico.out_el_pt().size() > 1){
+      if((pico.out_trig_double_el() && pico.out_el_pt().at(0)>25.f && pico.out_el_pt().at(1)>15.f) || (pico.out_trig_single_el() && pico.out_el_pt().at(0)>30.f)){
         pico.out_trig_el_pt() = true;
       }
-    } else if(pico.out_nel() > 0){
+    } else if(pico.out_el_pt().size() > 0){
       if(pico.out_trig_single_el() && pico.out_el_pt().at(0)>30.f){
         pico.out_trig_el_pt() = true;
       }
     }
   
-    if(pico.out_nmu() > 1){
-      if(pico.out_trig_double_mu() && pico.out_mu_pt().at(0)>20.f && pico.out_mu_pt().at(1)>10.f){
+    if(pico.out_mu_pt().size() > 1){
+      if((pico.out_trig_double_mu() && pico.out_mu_pt().at(0)>20.f && pico.out_mu_pt().at(1)>10.f) || (pico.out_trig_single_mu() && pico.out_mu_pt().at(0)>25.f)){
         pico.out_trig_mu_pt() = true;
       } 
-    }else if(pico.out_nmu() > 0){ 
+    }else if(pico.out_mu_pt().size() > 0){ 
       if(pico.out_trig_single_mu() && pico.out_mu_pt().at(0)>25.f){
         pico.out_trig_mu_pt() = true;
       }
@@ -470,21 +470,21 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
   }
   
   if (year==2017) {
-    if(pico.out_nel() > 1){
-      if(pico.out_trig_double_el() && pico.out_el_pt().at(0)>25.f && pico.out_el_pt().at(1)>15.f){
+    if(pico.out_el_pt().size() > 1){
+      if((pico.out_trig_double_el() && pico.out_el_pt().at(0)>25.f && pico.out_el_pt().at(1)>15.f) || (pico.out_trig_single_el() && pico.out_el_pt().at(0)>35.f)){
         pico.out_trig_el_pt() = true;
       }
-    } else if(pico.out_nel() > 0){
+    } else if(pico.out_el_pt().size() > 0){
       if(pico.out_trig_single_el() && pico.out_el_pt().at(0)>35.f){
         pico.out_trig_el_pt() = true;
       }
     }
   
-    if(pico.out_nmu() > 1){
-      if(pico.out_trig_double_mu() && pico.out_mu_pt().at(0)>20.f && pico.out_mu_pt().at(1)>10.f){
+    if(pico.out_mu_pt().size() > 1){
+      if((pico.out_trig_double_mu() && pico.out_mu_pt().at(0)>20.f && pico.out_mu_pt().at(1)>10.f) || (pico.out_trig_single_mu() && pico.out_mu_pt().at(0)>28.f)){
         pico.out_trig_mu_pt() = true;
       } 
-    }else if(pico.out_nmu() > 0){ 
+    }else if(pico.out_mu_pt().size() > 0){ 
       if(pico.out_trig_single_mu() && pico.out_mu_pt().at(0)>28.f){
         pico.out_trig_mu_pt() = true;
       }
@@ -492,21 +492,21 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
   }
 
   if (year==2018 || year==2022 || year==2023) {
-    if(pico.out_nel() > 1){
-      if(pico.out_trig_double_el() && pico.out_el_pt().at(0)>25.f && pico.out_el_pt().at(1)>15.f){
+    if(pico.out_el_pt().size() > 1){
+      if((pico.out_trig_double_el() && pico.out_el_pt().at(0)>25.f && pico.out_el_pt().at(1)>15.f) || (pico.out_trig_single_el() && pico.out_el_pt().at(0)>35.f)){
         pico.out_trig_el_pt() = true;
       }
-    } else if(pico.out_nel() > 0){
+    } else if(pico.out_el_pt().size() > 0){
       if(pico.out_trig_single_el() && pico.out_el_pt().at(0)>35.f){
         pico.out_trig_el_pt() = true;
       }
     }
   
-    if(pico.out_nmu() > 1){
-      if(pico.out_trig_double_mu() && pico.out_mu_pt().at(0)>20.f && pico.out_mu_pt().at(1)>10.f){
+    if(pico.out_mu_pt().size() > 1){
+      if((pico.out_trig_double_mu() && pico.out_mu_pt().at(0)>20.f && pico.out_mu_pt().at(1)>10.f) || (pico.out_trig_single_mu() && pico.out_mu_pt().at(0)>25.f)){
         pico.out_trig_mu_pt() = true;
       } 
-    }else if(pico.out_nmu() > 0){ 
+    }else if(pico.out_mu_pt().size() > 0){ 
       if(pico.out_trig_single_mu() && pico.out_mu_pt().at(0)>25.f){
         pico.out_trig_mu_pt() = true;
       }
