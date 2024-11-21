@@ -106,7 +106,7 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
   int categoryBit = 0b00000000;
 
 
-  if(pico.out_ll_pt().size()!=0 && pico.out_nphoton()==0){//Quick hacky fix to allow bitmaps for cases without a photon (unskimmed picos). Please move bitmap tools to a separate file for future productions
+  if(pico.out_ll_pt().size()!=0 && pico.out_nphoton()==0){//Quick hacky fix to allow bitmaps for cases without a photon (unskimmed picos). Please consolidate bitmap tools to a separate file for future productions
     if(pico.out_nel()>=2 && pico.out_ll_lepid().at(0)==11){
       baseBit += 0b110000000000;
       if(pico.out_trig_single_el() || pico.out_trig_double_el()){baseBit +=0b000100000000;}
@@ -126,9 +126,6 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
     pico.out_zg_categorizationBitMap() = categoryBit;
     return;
   }
-
-
-
 
 
 
