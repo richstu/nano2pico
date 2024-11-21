@@ -450,6 +450,11 @@ int main(int argc, char *argv[]){
         }
       }
     } 
+
+    if (debug) cout<<"INFO:: Writing filters"<<endl;
+    // N.B. Jets: pico.out_pass_jets() and pico.out_pass_fsjets() filled in jetmet_producer
+    event_tools.WriteDataQualityFilters(nano, pico, sig_jet_nano_idx, min_jet_pt, isFastsim, is_preUL);
+
     if (debug) cout<<"INFO:: Writing analysis specific variables"<<endl;
     // might need as input sig_el_nano_idx, sig_mu_nano_idx, sig_ph_nano_idx
     if(isZgamma)
@@ -464,9 +469,7 @@ int main(int argc, char *argv[]){
     hig_producer.WriteHigVars(pico, false, isSignal, sys_higvars, nanoaod_version);
     hig_producer.WriteHigVars(pico, true, isSignal, sys_higvars, nanoaod_version);
 
-    if (debug) cout<<"INFO:: Writing filters and triggers"<<endl;
-    // N.B. Jets: pico.out_pass_jets() and pico.out_pass_fsjets() filled in jetmet_producer
-    event_tools.WriteDataQualityFilters(nano, pico, sig_jet_nano_idx, min_jet_pt, isFastsim, is_preUL);
+    if (debug) cout<<"INFO:: Writing triggers"<<endl;
 
     if (isHiggsino) event_tools.WriteTriggerEfficiency(pico);
     if (isZgamma && !isData) {
