@@ -478,8 +478,8 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
     // jetid applied to only full sim and data
     bool pass_jetid = true;
     if (!isFastsim) if (Jet_jetId[ijet] <1) pass_jetid = false;
-    bool in_jet_horn_eta_veto = nano.Jet_pt()[ijet] < 40.0f && fabs(nano.Jet_eta()[ijet]) > 2.5f && fabs(nano.Jet_eta()[ijet]) < 3.0f;
-
+    bool in_jet_horn_eta_veto = nano.Jet_pt()[ijet] < 40.0f && fabs(nano.Jet_eta()[ijet]) > 2.5f && fabs(nano.Jet_eta()[ijet]) < 3.0f && year>=2017;
+    
     bool isvetojet = false;
 
     float veto = 0; 

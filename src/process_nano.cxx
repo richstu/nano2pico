@@ -304,6 +304,7 @@ int main(int argc, char *argv[]){
   // Other tools
   EventTools event_tools(in_path, year, isData, nanoaod_version);
   int event_type = event_tools.GetEventType();
+  bool isDY = event_type/100 == 62 ? isZgamma : false;
 
   ISRTools isr_tools(in_path, year, nanoaod_version, isData);
 
@@ -407,7 +408,7 @@ int main(int argc, char *argv[]){
 
     if (debug) cout<<"INFO:: Writing gen particles"<<endl;
 
-    if (!isData) mc_producer.WriteGenParticles(nano, pico);
+    if (!isData) mc_producer.WriteGenParticles(nano, pico, isDY);
     isr_tools.WriteISRSystemPt(nano, pico);
 
     if (debug) cout<<"INFO:: Writing jets, MET and ISR vars"<<endl;
