@@ -65,6 +65,7 @@ int main(int argc, char *argv[]){
   else if (Contains(input_paths[0], "RunIIFall17")) year = 2017;
   else if (Contains(input_paths[0], "RunIIAutumn18")) year = 2017;
   else if (Contains(input_paths[0], "Run3Summer22")) year = 2022;
+  else if (Contains(input_paths[0], "Run3Summer23")) year = 2023;
 
   bool is_zgamma = Contains(output_path, "zgamma");
   //if (Contains(input_paths[0], "RunIISummer20")) {
