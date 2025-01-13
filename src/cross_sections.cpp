@@ -361,6 +361,17 @@ namespace xsec{
         if(file.Contains("WtoLNu-2Jets_TuneCP5_13p6TeV")) xsec = 67710.0;
         if(file.Contains("DYJetsToLL_M-50_TuneCP5"))      xsec = 5558.0;
         if(file.Contains("DYto2L-2Jets_MLL-50_TuneCP5"))  xsec = 6688.0;
+
+        if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-10to100_TuneCP5_13p6TeV"))  xsec = 126.6;
+        if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-100to200_TuneCP5_13p6TeV")) xsec = 0.3493;
+        if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-200to400_TuneCP5_13p6TeV")) xsec = 0.04311;
+        if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-400to600_TuneCP5_13p6TeV")) xsec = 0.003133;
+        if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-600_TuneCP5_13p6TeV"))      xsec = 0.0006528;
+    
+        if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-10to50_TuneCP5_13p6TeV"))   xsec = 124;
+        if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-50to100_TuneCP5_13p6TeV"))  xsec = 2.088;
+        if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-200_TuneCP5_13p6TeV"))      xsec = 0.04723;
+    
         //tt
         if(file.Contains("TTto2L2Nu_TuneCP5_13p6TeV"))    xsec = 762.1*WToLNu*WToLNu;
         if(file.Contains("TTtoLNu2Q_TuneCP5CR1_13p6TeV")) xsec = 762.1*2.0*WToLNu*WToQQ;
