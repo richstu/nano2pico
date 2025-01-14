@@ -320,6 +320,23 @@ Calculated in [dilep_producer](src/dilep_producer.cpp) and [zgamma_producer](src
 * `nllphoton` - number of Higgs to Z gamma candidates
 * `llphoton_*` - Higgs candidate variables
 
+The `zg_cutBitmap` branch consists of 12 bits, corresponding to the following requirements:
+
+* _00000000000 - The event has a reconstructed Z decaying to either muons or electrons
+* 0_0000000000 - The event has a reconstructed Z decaying to electrons
+* 00_000000000 - The event has a reconstructed Z decaying to muons
+* 000_00000000 - The leptons in the event pass the single or dilepton trigger bits for their year
+* 0000_0000000 - The leptons in the event pass the pT cuts associated with the passed trigger
+* 00000_000000 - `nphoton>=1`
+* 000000_00000 - `80<=ll_m<=100` using dilepton object with mass closest to 91.1876 GeV
+* 0000000_0000 - `photon_pt[0]/llphoton_m[0]>15.0/110`
+* 00000000_000 - `ll_m+llphoton_m[0]>185` using dilepton object with mass closest 91.1876 GeV
+* 000000000_00 - `100<=llphoton_m[0]<=180`
+* 0000000000_0 - Passes event quality filters `pass`
+* 00000000000_ -`llphoton_m[0]<=120 || llphoton_m[0]>=130` Signal blinding bit
+
+For one wanting all events which pass the baseline selections, require the following: `use_event && (zg_cutBitMap==0b110111111110 || zg_cutBitMap==0b110111111111 || zg_cutBitMap==0b101111111110 || zg_cutBitMap==0b101111111111)`
+
 #### Higgsino (HH->bbgammagamma+MET) candidates
 
 * `nphotonphoton` -  number of diphoton Higgs candidates
