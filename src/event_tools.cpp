@@ -93,7 +93,8 @@ EventTools::EventTools(const string &name_, int year_, bool isData_, float nanoa
 
   //Sets variables for overlap removal
   //DY
-  if(Contains(name,"DYJetsToLL_M-50") || Contains(name,"DYJetsToLL_M-50")){ has_photon_in_sample = false; overlap_removal_key = "DYlowpt";}
+  if((Contains(name,"DYJetsToLL_M-50") || Contains(name,"DYJetsToLL_M-50")) && year<2022){ has_photon_in_sample = false; overlap_removal_key = "DYlowpt";}
+  if((Contains(name,"DYJetsToLL_M-50") || Contains(name,"DYJetsToLL_M-50")) && year>=2022){ has_photon_in_sample = false; overlap_removal_key = "DY";}
   if(Contains(name,"DYto2L-2Jets_MLL-50_TuneCP5")){ has_photon_in_sample = false; overlap_removal_key = "DY";}
   if(Contains(name,"ZGToLLG_01J_5f_lowMLL_lowGPt")){ has_photon_in_sample = true;  overlap_removal_key = "DYlowpt";}
   if(Contains(name,"ZGToLLG_01J_5f_TuneCP5") || Contains(name,"DYGto2LG-1Jets_MLL-50")){       has_photon_in_sample = true;  overlap_removal_key = "DY";} 
@@ -332,7 +333,7 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
 
     } //GenPart_pdgId==22
   } //loop over GenParts
-   
+
   //If the event contains should and does (does not) contain a generator photon then is_overlap_old = false, is_overlap = false, use_event = true (is_overlap_old=true, is_overlap=true, use_event=false)
   //If the event contains should not and does not (does) contain a generator photon then is_overlap_old = true, is_overlap = false, use_event = true (is_overlap_old=false, is_overlap=true, use_event=false)
   //This one line, with the addition of the has_photon_in_sample variable should properly set the use_event variable;
