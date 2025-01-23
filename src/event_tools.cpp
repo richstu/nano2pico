@@ -224,6 +224,9 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
   float ptmin_old = 15.0;
   float etamax_old = 2.6;
   float isocone_old = 0.05;
+
+  float ph_pt = 0;//avoiding floating point errors
+  float comp_pt = 0;//avoiding floating point errors
   if(isWW || isZZ || isTTJets_LO_Incl || Contains(name,"TTGJets")){
     ptmin_old = 10.0;
     etamax_old= 99.0;
@@ -258,24 +261,24 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
 
     if( nano.GenPart_pdgId().at(mc_idx) == 22 ){ // photons 
       TVector3 compPart,genPhoton;
-
       if( (mc_statusFlags[0] || mc_statusFlags[8]) ){  // Which are isPrompt or fromHardProcess
-        genPhoton.SetPtEtaPhi(nano.GenPart_pt().at(mc_idx), 
+        ph_pt = nano.GenPart_pt().at(mc_idx);
+        genPhoton.SetPtEtaPhi(ph_pt, 
                             nano.GenPart_eta().at(mc_idx), 
                             nano.GenPart_phi().at(mc_idx));
-
-        if( genPhoton.Pt() > ptmin){
+        if(ph_pt > ptmin){
           //check if another generator particle nearby
           bool found_other_particles = false;
           for (int mc_idx_2 = 0; mc_idx_2 < nano.nGenPart(); mc_idx_2++) {
             bitset<15> mc_statusFlags2(GenPart_statusFlags.at(mc_idx_2));
-            compPart.SetPtEtaPhi(nano.GenPart_pt().at(mc_idx_2), 
+            comp_pt = nano.GenPart_pt().at(mc_idx_2);
+            compPart.SetPtEtaPhi(comp_pt, 
                                  nano.GenPart_eta().at(mc_idx_2), 
                                  nano.GenPart_phi().at(mc_idx_2)); 
             
 
             //isPrompt and fromHardProcess already applied
-            if ( (compPart.Pt() > 5.0f) && (genPhoton.DeltaR(compPart) < isocone) && (mc_idx != mc_idx_2) && (mc_statusFlags2[8]) && (nano.GenPart_pdgId().at(mc_idx_2) != 22 )  ) {
+            if (  (comp_pt > 5.0f) && (genPhoton.DeltaR(compPart) < isocone) && (mc_idx != mc_idx_2) && (mc_statusFlags2[8]) && (nano.GenPart_pdgId().at(mc_idx_2) != 22 )  ) {
               found_other_particles = true;
               //Basically saying that a photon is not isolated so this is not SM Zgamma sample!
             }
