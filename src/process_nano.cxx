@@ -335,7 +335,6 @@ int main(int argc, char *argv[]){
     if (entry%2000==0 || entry == nentries-1) {
       cout<<"Processing event: "<<entry<<endl;
     }
-
     //skip events that are data but not in the golden json
     if (isData) {
       if(!inJSON(VVRunLumi, nano.run(), nano.luminosityBlock())) continue; 
@@ -369,6 +368,7 @@ int main(int argc, char *argv[]){
     // N.B. Order in which producers are called matters! E.g. jets are not counted if overlapping 
     // with signal lepton, thus jets must be processed only after leptons have been selected.
     //-----------------------------------------------------------------------------------------------
+
     if (debug) cout<<"INFO:: Writing leptons, photons and tracks"<<endl;
     vector<int> jet_islep_nano_idx = vector<int>();
     vector<int> jet_isvlep_nano_idx = vector<int>();
@@ -512,6 +512,7 @@ int main(int argc, char *argv[]){
         event_weighter.PileupSF(pico);
         event_weighter.bTaggingSF(pico);
         event_weighter.PhotonSF(pico);
+
         pico.out_sys_lep().resize(2,1.); 
         pico.out_sys_photon().resize(2, 1.); 
         pico.out_sys_prefire().resize(2, 1.); 
@@ -550,6 +551,7 @@ int main(int argc, char *argv[]){
             pico.out_sys_fs_udsghig()[i] = btag_weighter.EventWeight(pico, op_all, ctr, ctr, ctr, updn[i]);
           }
         }
+
         lep_weighter.FullSim(pico, w_lep, sys_lep);
         pico.out_w_lep() = w_lep;
         pico.out_sys_lep() = sys_lep;
