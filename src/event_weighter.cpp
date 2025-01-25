@@ -230,6 +230,7 @@ void EventWeighter::PhotonSF(pico_tree &pico){
     string wpstring = "wp80";
     if (pt<20.0f)
       wpstring = "wp80Below20";
+
     float id_sf = 1.0;
     float id_sfup = 1.0;
     float id_sfdn = 1.0;
