@@ -336,6 +336,7 @@ int main(int argc, char *argv[]){
       cout<<"Processing event: "<<entry<<endl;
     }
     //skip events that are data but not in the golden json
+
     if (isData) {
       if(!inJSON(VVRunLumi, nano.run(), nano.luminosityBlock())) continue; 
     }
