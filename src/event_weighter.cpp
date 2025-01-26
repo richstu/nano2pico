@@ -218,6 +218,7 @@ void EventWeighter::PhotonSF(pico_tree &pico){
     float eta = pico.out_photon_eta().at(iph);
     float phi = pico.out_photon_phi().at(iph);
     float r9 = pico.out_photon_r9().at(iph);
+    if(r9<0) r9=0;//soft fix
     string category = "";
     if (pico.out_photon_isScEtaEB().at(iph))
       category += "EB";
