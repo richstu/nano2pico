@@ -16,7 +16,7 @@ void IsoTrackProducer::WriteIsoTracks(nano_tree &nano, pico_tree &pico,
                                       vector<int> &sig_el_nano_idx, vector<int> &sig_mu_nano_idx, bool isFastsim, bool is_preUL){
   float MET_pt, MET_phi;
   getMETWithJEC(nano, year, isFastsim, MET_pt, MET_phi, is_preUL);
-  
+
   pico.out_ntk() = 0;
   // N.B. Objects that end up in the slimmedElecrtons or slimmedMuons collections are not stored 
   // as IsoTrack in Nano so we have to loop over all three collections
@@ -39,7 +39,7 @@ void IsoTrackProducer::WriteIsoTracks(nano_tree &nano, pico_tree &pico,
              nano.Electron_dxy()[iel], nano.Electron_dz()[iel],
              GetMT(MET_pt, MET_phi,  nano.Electron_pt()[iel], nano.Electron_phi()[iel]));
   }
-  
+
   // collect relevant Muons
   for (int imu(0); imu < nano.nMuon(); imu++) {
     if (nano.Muon_isPFcand()[imu]==0) continue;
@@ -62,7 +62,7 @@ bool IsoTrackProducer::IsGoodTk(pico_tree &pico, bool isNanoElectron, bool isNan
   // abs(dxy) < 0.2 && 
   // abs(dz) < 0.1 && 
   // ((pfIsolationDR03().chargedHadronIso < 5 && pt < 25) || pfIsolationDR03().chargedHadronIso/pt < 0.2)
-  
+
   pdgid = abs(pdgid);
 
   if (pdgid!=11 && pdgid!=13 && pdgid!=211) return false; 
