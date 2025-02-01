@@ -62,6 +62,8 @@ def get_cuts(skim_name):
 
   if(skim_name=='higqcd'):  cuts = '&&'.join([njet_or_fjet_cut, 'nvlep==0', 'ntk==0', 'low_dphi_met'])
 
+  if(skim_name=='hig1photon'): cuts = '&&'.join([njet_or_fjet_cut,'nphoton==1', 'photon_pt[0]>100','met>200'])
+  
   # Loosen up just enough to do systematics - to be updated when needed
   sys_nbcut = 'max(nbt,Max$(sys_nbt))>=2'
   sys_njcut = '(njet==4||sys_njet[0]==4||sys_njet[1]==4||sys_njet[2]==4||sys_njet[3]==4||njet==5||sys_njet[0]==5||sys_njet[1]==5||sys_njet[2]==5||sys_njet[3]==5)'
