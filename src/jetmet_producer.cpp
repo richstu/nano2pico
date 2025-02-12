@@ -452,7 +452,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
       pico.out_sys_ht().resize(4,0.0);
       sys_jet_met_dphi.resize(4,vector<float>({}));
       sys_higvars.resize(4, HiggsConstructionVariables());
-      pico.out_sys_low_dphi_met().resize(4,false);
+pico.out_sys_low_dphi_met().resize(4,false);
     }
   }
   else if (!isData) { 
@@ -474,32 +474,41 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
     // check overlap with veto leptons
     bool isvlep = find(jet_isvlep_nano_idx.begin(), jet_isvlep_nano_idx.end(), ijet) != jet_isvlep_nano_idx.end();
     // N.B. photon collection is not filled for Higgsino analysis, so there is no overlap removal!
-    bool isphoton = find(jet_isphoton_nano_idx.begin(), jet_isphoton_nano_idx.end(), ijet) != jet_isphoton_nano_idx.end();
+    bool isphoton = find(jet_isphoton_nano_idx.begin(), jet_isphoton_nano_idx.end(), ijet) != jet_isphoton_nano_idx.end(); 
     // jetid applied to only full sim and data
-    bool pass_jetid = true;
-    if (!isFastsim) if (Jet_jetId[ijet] <1) pass_jetid = false;
-    bool in_jet_horn_eta_veto = nano.Jet_pt()[ijet] < 40.0f && fabs(nano.Jet_eta()[ijet]) > 2.5f && fabs(nano.Jet_eta()[ijet]) < 3.0f && year>=2017;
-    
+    //bool pass_jetid = true;
+    bool pass_jetidFix = false; //recipe here https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetID13p6TeV#Recommendations_for_the_13_6_AN1
+    //if (!isFastsim) if (Jet_jetId[ijet] <1) pass_jetid = false;
+    if (isFastsim) pass_jetidFix = true;
+    if(fabs(nano.Jet_eta()[ijet])<=2.7f){
+      pass_jetidFix = Jet_jetId[ijet] & (0b10);
+    } else if (fabs(nano.Jet_eta()[ijet])>2.7f && fabs(nano.Jet_eta()[ijet]<=3.0f)){
+      pass_jetidFix = (Jet_jetId[ijet] & (0b10)) && (nano.Jet_neHEF()[ijet] < 0.99f);
+    } else if (fabs(nano.Jet_eta()[ijet])>3.0f){
+      pass_jetidFix = (Jet_jetId[ijet] & (0b10)) && (nano.Jet_neEmEF()[ijet] < 0.4f);
+    }
+
+    bool in_jet_horn_eta_veto = nano.Jet_pt()[ijet] < 40.0f && fabs(nano.Jet_eta()[ijet]) > 2.5f && fabs(nano.Jet_eta()[ijet]) < 3.0f && year>=2017; 
     bool isvetojet = false;
 
     float veto = 0; 
     float vetoEE = 0;
     float phicorr;
-    if(nano.Jet_phi().at(ijet)>3.1415926f){ //a dumb addition because sometimes jet phi is slightly larger than pi
+    if(nano.Jet_phi()[ijet]>3.1415926f){ //a dumb addition because sometimes jet phi is slightly larger than pi
       phicorr = 3.1415926;
-    } else if (nano.Jet_phi().at(ijet)<-3.1415926f){
+    } else if (nano.Jet_phi()[ijet]<-3.1415926f){
       phicorr = -3.1415926;
     } else {
-      phicorr = nano.Jet_phi().at(ijet);
+      phicorr = nano.Jet_phi()[ijet];
     }
     if (fabs(nano.Jet_eta()[ijet])<5.191f) {
       if (year==2022 && is2022preEE==true){
         map_jetveto_ = cs_jetveto_->at("Winter22Run3_RunCD_V1");
-        veto = map_jetveto_->evaluate({"jetvetomap", nano.Jet_eta().at(ijet),phicorr});
+        veto = map_jetveto_->evaluate({"jetvetomap", nano.Jet_eta()[ijet],phicorr});
       } else if (year==2022 && is2022preEE==false){
         map_jetveto_ = cs_jetveto_->at("Winter22Run3_RunE_V1");
-        veto = map_jetveto_->evaluate({"jetvetomap", nano.Jet_eta().at(ijet),phicorr});
-        vetoEE = map_jetveto_->evaluate({"jetvetomap_eep", nano.Jet_eta().at(ijet),phicorr});
+        veto = map_jetveto_->evaluate({"jetvetomap", nano.Jet_eta()[ijet],phicorr});
+        vetoEE = map_jetveto_->evaluate({"jetvetomap_eep", nano.Jet_eta()[ijet],phicorr});
       }
     }
     if(veto != 0.0 || vetoEE != 0.0) {
@@ -507,7 +516,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
     }
 
     //don't include pt in isgood until later in order to save systematics
-    bool isgood = !islep && !isphoton && (fabs(nano.Jet_eta()[ijet]) <= max_jet_eta) && pass_jetid && !isvetojet && !in_jet_horn_eta_veto;
+    bool isgood = !islep && !isphoton && (fabs(nano.Jet_eta()[ijet]) <= max_jet_eta) && pass_jetidFix && !isvetojet && !in_jet_horn_eta_veto;
     //sys_jetvar convention: [0] JER up, [1] JER down, [2] JEC up, [3] JEC down
     //for now, only save sys_ variables
     if (isSignal && (nanoaod_version+0.01)<9) {

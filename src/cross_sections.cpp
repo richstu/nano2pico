@@ -561,6 +561,7 @@ namespace xsec{
     if(file.Contains("TbarWplusto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8")) xsec = 36.05 * WToLNu * WToLNu;
     if(file.Contains("TbarWplustoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8")) xsec = 36.05 * 2.0 * WToLNu * WToQQ;
     if(file.Contains("ZG2JtoG2L2J_EWK_MLL-50_MJJ-120_TuneCP5_withDipoleRecoil_13p6TeV_madgraph-pythia8")) xsec = 0.1142;
+    if(file.Contains("ZG2JtoG2L2J_EWK_MLL-50_MJJ-120_TuneCP5") && !(file.Contains("withDipoleRecoil"))) xsec = 0.1136;
     if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-10to50_TuneCP5_13p6TeV_amcatnloFXFX-pythia8")) xsec = 124.4;
     if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-50to100_TuneCP5_13p6TeV_amcatnloFXFX-pythia8")) xsec = 2.092;
     if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-100to200_TuneCP5_13p6TeV_amcatnloFXFX-pythia8")) xsec = 0.3477;
