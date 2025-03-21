@@ -33,7 +33,6 @@ public:
                                const std::vector<float> &btag_df_wpts, 
                                bool isFastsim, 
                                bool isSignal,
-                               bool is2022preEE,
                                std::vector<HiggsConstructionVariables> &sys_higvars);
   void WriteFatJets(nano_tree &nano, pico_tree &pico);
   void WriteSubJets(nano_tree &nano, pico_tree &pico);

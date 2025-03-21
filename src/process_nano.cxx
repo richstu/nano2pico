@@ -416,8 +416,7 @@ int main(int argc, char *argv[]){
     vector<HiggsConstructionVariables> sys_higvars;
     vector<int> sig_jet_nano_idx = jetmet_producer.WriteJetMet(nano, pico, 
         jet_islep_nano_idx, jet_isvlep_nano_idx, jet_isphoton_nano_idx,
-        btag_wpts[year_string], btag_df_wpts[year_string], isFastsim, isSignal, 
-        is2022preEE, sys_higvars);
+        btag_wpts[year_string], btag_df_wpts[year_string], isFastsim, isSignal, sys_higvars);
     jetmet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year_string][1], isFastsim); // usually w.r.t. medium WP
     jetmet_producer.WriteFatJets(nano, pico); // jetmet_producer.SetVerbose(nano.nSubJet()>0);
     jetmet_producer.WriteSubJets(nano, pico);
