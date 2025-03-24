@@ -1,5 +1,6 @@
 #include "event_weighter.hpp"
 
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <numeric>
@@ -357,10 +358,10 @@ void EventWeighter::MuonSF(pico_tree &pico){
 
 // Pileup Scale Factors
 void EventWeighter::PileupSF(pico_tree &pico){
-  pico.out_w_pu() = map_pileup_->evaluate({float(pico.out_npu_tru_mean()), "nominal"});
+  pico.out_w_pu() = min(map_pileup_->evaluate({float(pico.out_npu_tru()), "nominal"}),10.0);
   pico.out_sys_pu().resize(2, 1.);
-  pico.out_sys_pu()[0] = (map_pileup_->evaluate({float(pico.out_npu_tru_mean()), "up"}));
-  pico.out_sys_pu()[1] = (map_pileup_->evaluate({float(pico.out_npu_tru_mean()), "down"}));
+  pico.out_sys_pu()[0] = min(map_pileup_->evaluate({float(pico.out_npu_tru()), "up"}),10.0);
+  pico.out_sys_pu()[1] = min(map_pileup_->evaluate({float(pico.out_npu_tru()), "down"}),10.0);
 }
 
 // b-tagging Scale Factors

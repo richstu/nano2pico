@@ -134,10 +134,10 @@ int main(int argc, char *argv[]){
   else if (year == 2016 && !isAPV)         year_string = "2016";
   else if (year == 2017)                   year_string = "2017";
   else if (year == 2018)                   year_string = "2018";
-  else if (year == 2022 && is2022preEE)    year_string = "2022";
-  else if (year == 2022 && !is2022preEE)   year_string = "2022EE";
-  else if (year == 2023 && is2023preBPix)  year_string = "2023";
-  else if (year == 2023 && !is2023preBPix) year_string = "2023BPix";
+  else if (year == 2022 && !is2022preEE)   year_string = "2022";
+  else if (year == 2022 && is2022preEE)    year_string = "2022EE";
+  else if (year == 2023 && !is2023preBPix) year_string = "2023";
+  else if (year == 2023 && is2023preBPix)  year_string = "2023BPix";
   else {
     cout << "ERROR: unknown year";
     exit(1);
