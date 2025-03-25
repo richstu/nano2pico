@@ -132,6 +132,10 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
         }
       }
     }
+    else if (nanoaod_version > 11.95) {
+      pico.out_mu_pt().push_back(nano.Muon_bsConstrainedPt()[imu]);
+      pico.out_mu_ptErr().push_back(nano.Muon_bsConstrainedPtErr()[imu]);
+    }
     else {
       pico.out_mu_pt().push_back(pt);
       pico.out_mu_ptErr().push_back(nano.Muon_ptErr()[imu]);

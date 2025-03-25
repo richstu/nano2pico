@@ -42,22 +42,44 @@ ElectronProducer::ElectronProducer(string year_, bool isData_, float nanoaod_ver
   }
   else if (year=="2022") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2022/electronSS.json");
-    map_scale_ = cs_scale_syst_->at("2022Re-recoBCD_ScaleJSON");
-    map_smearing_ = cs_scale_syst_->at("2022Re-recoBCD_SmearingJSON");
+        "data/zgamma/2022/electronSS_EtDependent.json");
+    map_scale_ = cs_scale_syst_->compound().at(
+        "EGMScale_Compound_Ele_2022preEE");
+    map_smearing_ = cs_scale_syst_->at(
+        "EGMSmearAndSyst_ElePTsplit_2022preEE");
   }
   else if (year=="2022EE") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2022EE/electronSS.json");
-    map_scale_ = cs_scale_syst_->at("2022Re-recoE+PromptFG_ScaleJSON");
-    map_smearing_ = cs_scale_syst_->at("2022Re-recoE+PromptFG_SmearingJSON");
+        "data/zgamma/2022EE/electronSS_EtDependent.json");
+    map_scale_ = cs_scale_syst_->compound().at(
+        "EGMScale_Compound_Ele_2022postEE");
+    map_smearing_ = cs_scale_syst_->at(
+        "EGMSmearAndSyst_ElePTsplit_2022postEE");
+  }
+  else if (year=="2023") {
+    cs_scale_syst_ = correction::CorrectionSet::from_file(
+        "data/zgamma/2023/electronSS_EtDependent.json");
+    map_scale_ = cs_scale_syst_->compound().at(
+        "EGMScale_Compound_Ele_2023preBPIX");
+    map_smearing_ = cs_scale_syst_->at(
+        "EGMSmearAndSyst_ElePTsplit_2023preBPIX");
+  }
+  else if (year=="2023BPix") {
+    cs_scale_syst_ = correction::CorrectionSet::from_file(
+        "data/zgamma/2023BPix/electronSS_EtDependent.json");
+    map_scale_ = cs_scale_syst_->compound().at(
+        "EGMScale_Compound_Ele_2023postBPIX");
+    map_smearing_ = cs_scale_syst_->at(
+        "EGMSmearAndSyst_ElePTsplit_2023postBPIX");
   }
   else {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2022EE/electronSS.json");
-    map_scale_ = cs_scale_syst_->at("2022Re-recoE+PromptFG_ScaleJSON");
-    map_smearing_ = cs_scale_syst_->at("2022Re-recoE+PromptFG_SmearingJSON");
-    std::cout << "WARNING: No dedicated EGM scale/smearing JSONs, defaulting to 2022EE" << std::endl;
+        "data/zgamma/2023BPix/electronSS_EtDependent.json");
+    map_scale_ = cs_scale_syst_->compound().at(
+        "EGMScale_Compound_Ele_2023postBPIX");
+    map_smearing_ = cs_scale_syst_->at(
+        "EGMSmearAndSyst_ElePTsplit_2023postBPIX");
+    std::cout << "WARNING: No dedicated EGM scale/smearing JSONs, defaulting to 2023BPix" << std::endl;
   }
   nanoaod_version = nanoaod_version_;
 }
@@ -167,24 +189,23 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
         smearing_syst_up = 1.0f+nano.Electron_dEsigmaUp()[iel];
         smearing_syst_dn = 1.0f+nano.Electron_dEsigmaDown()[iel];
       }
-      else if (year=="2022"||year=="2022EE") {
-        //TODO add 2023(BPix) when available
+      else if ((year=="2022"||year=="2022EE"||year=="2023"||year=="2023BPix")
+               && pt>20) {
         float run = static_cast<float>(nano.run());
+        float r9 = fmin(fmax(nano.Electron_r9()[iel],0.0),1.0);
+        float seedGain = static_cast<float>(nano.Electron_seedGain()[iel]);
         if (isData) {
           //scale corrections applied to data
-          scaleres_corr = map_scale_->evaluate({"total_correction",
-              nano.Electron_seedGain()[iel],run,etasc,
-              nano.Electron_r9()[iel],pt});
+          scaleres_corr = map_scale_->evaluate({"scale",run,etasc,r9,
+              fabs(etasc),pt,seedGain});
         }
         else {
           //smearing corrections applied to MC, syst.s also calculated
-          float rho = map_smearing_->evaluate({"rho",etasc,
-              nano.Electron_r9()[iel]});
-          float err_rho = map_smearing_->evaluate({"err_rho",etasc,
-              nano.Electron_r9()[iel]});
-          float scale_unc = map_scale_->evaluate({"total_uncertainty",
-              nano.Electron_seedGain()[iel],run,etasc,
-              nano.Electron_r9()[iel],pt});
+          float rho = map_smearing_->evaluate({"smear",pt,r9,fabs(etasc)});
+          float err_rho = map_smearing_->evaluate({"esmear",pt,r9,
+                                                   fabs(etasc)});
+          float scale_unc = map_smearing_->evaluate({"escale",pt,r9,
+                                                     fabs(etasc)});
           float rand = rng_.Gaus();
           scaleres_corr = 1.0f+rand*rho;
           smearing_syst_up = 1.0f+rand*(rho+err_rho);
