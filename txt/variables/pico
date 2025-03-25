@@ -179,7 +179,7 @@ vector<bool>  jet_isgood
 vector<bool>  jet_isgood_min
 vector<bool>  jet_isvetomap
 vector<bool>  jet_isvetohem
-vector<int>  jet_id
+vector<int>   jet_id
 vector<int>   jet_hflavor
 vector<int>   jet_pflavor
 vector<int>   jet_genjet_idx

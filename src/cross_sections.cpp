@@ -13,6 +13,22 @@ namespace xsec{
     float HToZZ(0.02641), ZToQQ(0.69911), ZToNuNu(0.2);
     float WToLNu(0.3258), HToWW(0.2152), WToQQ(0.6742);
 
+    float xs_ggh = 48.58;
+    float xs_vbf = 3.782;
+    float xs_wmh = 0.5328;
+    float xs_wph = 0.8400;
+    float xs_z_h = 0.8839;
+    float xs_tth = 0.5071;
+    if (year >= 2022) {
+      //13.6 TeV interrim XS values from https://twiki.cern.ch/twiki/bin/view/LHCPhysics/LHCHWG136TeVxsec_extrap
+      xs_ggh = 52.23;
+      xs_vbf = 4.078;
+      xs_wmh = 0.5677;
+      xs_wph = 0.8889;
+      xs_z_h = 0.9439;
+      xs_tth = 0.5700;
+    }
+
     if (year == 2016) {
         //  Cross-section taken from https://twiki.cern.ch/twiki/bin/view/LHCPhysics/TtbarNNLO
         // Alternative option: https://twiki.cern.ch/twiki/bin/view/Sandbox/FullNNLOcrossSections#Top_cross_section_for_13_TeV
@@ -85,7 +101,7 @@ namespace xsec{
 
         if(file.Contains("DYJetsToLL_M-10to50_TuneCUETP8M1")) xsec = 18610*1.23;
         if(file.Contains("DYJetsToLL_M-50_TuneCUETP8M1"))     xsec = 4895*1.23;
-        if(file.Contains("DYJetsToLL_M-50_TuneCP5"))          xsec = 6077.22;
+        if(file.Contains("DYJetsToLL_M-50_TuneCP5"))          xsec = 6077.22; // https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat13TeV
 
         if(file.Contains("DYJetsToLL_M-50_HT-70to100_TuneCUETP8M1"))    xsec = 175.3*1.23;
         if(file.Contains("DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1"))   xsec = 139.4*1.23;
@@ -346,26 +362,32 @@ namespace xsec{
     }
 
     if (year < 2022) {
-        // From https://arxiv.org/pdf/2006.11191.pdf Using Measured XSec for WWW,WWZ, and WZZ. For ZZZ used SM prediction
-        if(file.Contains("WWW_4F_Tune"))                xsec = 0.509; // 
-        if(file.Contains("WWW_4F_DiLeptonFilter_Tune")) xsec = 0.509 * ((WToLNu*WToLNu*WToLNu) + (WToLNu*WToLNu*WToQQ*3.0)); // 
-        if(file.Contains("WWZ_Tune"))                   xsec = 0.354;    // 
-        if(file.Contains("WWZ_4F_Tune"))                xsec = 0.354;    // 
-        if(file.Contains("WWZJetsTo4L2Nu_4F_Tune"))     xsec = 0.354 * WToLNu * WToLNu * ZToLL;    // 
-        if(file.Contains("WZZ_Tune"))                   xsec = 0.05709;    // previously 0.0916, changed to reflect XSDB
-        if(file.Contains("ZZZ_Tune"))                   xsec = 0.01476; // previously 0.0371, changed to reflect XSDB 
+        // From https://arxiv.org/pdf/2006.11191.pdf, using values from https://twiki.cern.ch/twiki/bin/view/LHCPhysics/HiggsXSBR and xsdb combined
+        if(file.Contains("WWW_4F_Tune"))                xsec = 0.2158 + HToWW*(xs_wph+xs_wmh); // xsdb value (LO)+ (pp->VH)*BR(H->VV)
+        if(file.Contains("WWW_4F_DiLeptonFilter_Tune")) xsec = (0.2158 + HToWW*(xs_wph+xs_wmh)) * ((WToLNu*WToLNu*WToLNu) + (WToLNu*WToLNu*WToQQ*3.0));
+        if(file.Contains("WWZ_Tune"))                   xsec = 0.1676 + HToWW*(xs_z_h);
+        if(file.Contains("WWZ_4F_Tune"))                xsec = 0.1676 + HToWW*(xs_z_h);
+        if(file.Contains("WWZJetsTo4L2Nu_4F_Tune"))     xsec = (0.1676 + HToWW*(xs_z_h)) * WToLNu * WToLNu * ZToLL; 
+        if(file.Contains("WZZ_Tune"))                   xsec = 0.05709 + HToZZ*(xs_wph+xs_wmh);
+        if(file.Contains("ZZZ_Tune"))                   xsec = 0.01476 + HToZZ*(xs_z_h);
 
     } else if (year >= 2022) {
         //below from XSDB
         //single boson
         if(file.Contains("WtoLNu-2Jets_TuneCP5_13p6TeV")) xsec = 67710.0;
+        if(file.Contains("WGtoLNuG-1Jets_PTG-10to100_TuneCP5_13p6TeV"))         xsec = 662.2;
+        if(file.Contains("WGtoLNuG-1Jets_PTG-100to200_TuneCP5"))                xsec = 2.221;
+        if(file.Contains("WGtoLNuG-1Jets_PTG-200to400_TuneCP5"))                xsec = 0.2908;
+        if(file.Contains("WGtoLNuG-1Jets_PTG-400to600_TuneCP5_13p6TeV"))        xsec = 0.02231;
+        if(file.Contains("WGtoLNuG-1Jets_PTG-600_TuneCP5_13p6TeV"))             xsec = 0.004907;
+
         if(file.Contains("DYJetsToLL_M-50_TuneCP5"))      xsec = 5558.0;
         if(file.Contains("DYto2L-2Jets_MLL-50_TuneCP5"))  xsec = 6688.0;
 
         if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-10to100_TuneCP5_13p6TeV"))  xsec = 126.6;
         if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-100to200_TuneCP5_13p6TeV")) xsec = 0.3493;
-        if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-200to400_TuneCP5_13p6TeV")) xsec = 0.04311;
-        if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-400to600_TuneCP5_13p6TeV")) xsec = 0.003133;
+        if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-200to400_TuneCP5_13p6TeV")) xsec = 0.04331;
+        if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-400to600_TuneCP5_13p6TeV")) xsec = 0.00313;
         if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-600_TuneCP5_13p6TeV"))      xsec = 0.0006528;
     
         if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-10to50_TuneCP5_13p6TeV"))   xsec = 124;
@@ -375,6 +397,10 @@ namespace xsec{
         //tt
         if(file.Contains("TTto2L2Nu_TuneCP5_13p6TeV"))    xsec = 762.1*WToLNu*WToLNu;
         if(file.Contains("TTtoLNu2Q_TuneCP5CR1_13p6TeV")) xsec = 762.1*2.0*WToLNu*WToQQ;
+
+        if(file.Contains("TTG-1Jets_PTG-10to100_TuneCP5_13p6TeV"))             xsec = 4.216;
+        if(file.Contains("TTG-1Jets_PTG-100to200_TuneCP5_13p6TeV"))            xsec = 0.4114;
+        if(file.Contains("TTG-1Jets_PTG-200_TuneCP5_13p6TeV"))                 xsec = 0.1284;
         //ST
         if(file.Contains("TBbartoLplusNuBbar-s-channel")) xsec = 2.278;
         //diboson
@@ -383,10 +409,10 @@ namespace xsec{
         if(file.Contains("WZGtoLNuZG"))                   xsec = 0.08425;
         if(file.Contains("ZZ_Tune"))                      xsec = 12.75;
         //triboson
-        if(file.Contains("WWW_4F"))                       xsec = 0.2328;
-        if(file.Contains("WWZ_4F"))                       xsec = 0.1851;
-        if(file.Contains("WZZ_Tune"))                     xsec = 0.06206;
-        if(file.Contains("ZZZ_Tune"))                     xsec = 0.01591;
+        if(file.Contains("WWW_4F"))                       xsec = 0.2328 + (xs_wph+xs_wmh)*HToWW; // xsdb value (LO)+ (pp->VH)*BR(H->VV)
+        if(file.Contains("WWZ_4F"))                       xsec = 0.1851 + (xs_z_h)*HToZZ;
+        if(file.Contains("WZZ_Tune"))                     xsec = 0.06206 + (xs_wph+xs_wmh)*HToZZ;
+        if(file.Contains("ZZZ_Tune"))                     xsec = 0.01591 + (xs_z_h)*HToZZ;
     }
 
     if(file.Contains("ttHTobb_M125")) xsec = 0.2934;
@@ -427,22 +453,6 @@ namespace xsec{
 
     if(file.Contains("GluGluHToWWTo2L2Nu") && file.Contains("jhugen727"))   xsec = HToWW * WToLNu * WToLNu * 21.47;
     if(file.Contains("VBFHToWWTo2L2Nu")    && file.Contains("jhugen727"))   xsec = HToWW * WToLNu * WToLNu * 3.892;
-
-    float xs_ggh = 48.58;
-    float xs_vbf = 3.782;
-    float xs_wmh = 0.5328;
-    float xs_wph = 0.8400;
-    float xs_z_h = 0.8839;
-    float xs_tth = 0.5071;
-    if (year >= 2022) {
-      //13.6 TeV interrim XS values from https://twiki.cern.ch/twiki/bin/view/LHCPhysics/LHCHWG136TeVxsec_extrap
-      xs_ggh = 52.23;
-      xs_vbf = 4.078;
-      xs_wmh = 0.5677;
-      xs_wph = 0.8889;
-      xs_z_h = 0.9439;
-      xs_tth = 0.5700;
-    }
     
     if(file.Contains("GluGluHToTauTau"))      xsec = HToTT * xs_ggh;
     if(file.Contains("VBFHToTauTau"))         xsec = HToTT * xs_vbf;

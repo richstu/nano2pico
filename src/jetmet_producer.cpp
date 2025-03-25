@@ -4,7 +4,6 @@
 #include <cmath>
 #include <iomanip> 
 #include <iostream>
-#include <fstream>
 #include <vector>
 
 #include "TLorentzVector.h"
@@ -469,7 +468,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
       pico.out_sys_ht().resize(4,0.0);
       sys_jet_met_dphi.resize(4,vector<float>({}));
       sys_higvars.resize(4, HiggsConstructionVariables());
-pico.out_sys_low_dphi_met().resize(4,false);
+      pico.out_sys_low_dphi_met().resize(4,false);
     }
   }
   else if (!isData) { 
@@ -510,15 +509,15 @@ pico.out_sys_low_dphi_met().resize(4,false);
     bool in_jet_horn_eta_veto = (year >=2017 && nano.Jet_pt()[ijet] < 40.0f && fabs(nano.Jet_eta()[ijet]) > 2.5f && fabs(nano.Jet_eta()[ijet]) < 3.0f); 
     bool isgood_min = !islep && !isphoton && (fabs(nano.Jet_eta()[ijet]) <= max_jet_eta) && pass_jetidFix && !in_jet_horn_eta_veto;//For studying jetmaps and HEM vetos.
 
-    //2018 HEM veto
+    //2018 HEM veto. JetMET POG gives tighter selection than ours except 15 GeV cut. Apply our selection, with lower pT cut for veto events.
     bool isvetohem  = false;
-    if(year==2018 && isgood_min && nano.Jet_eta()[ijet]>-3.2f && nano.Jet_eta()[ijet]<-1.3f && nano.Jet_phi()[ijet]>-1.57f && nano.Jet_phi()[ijet]<-0.87f){
+    if(year==2018 && isgood_min && nano.Jet_pt()[ijet]>15.0f && nano.Jet_eta()[ijet]>-3.2f && nano.Jet_eta()[ijet]<-1.3f && nano.Jet_phi()[ijet]>-1.57f && nano.Jet_phi()[ijet]<-0.87f){
       if(isData && nano.run()>=319077) isvetohem = true;
       else if(!isData && (nano.event()%10000>3564)) isvetohem = true;//same approximate portion of MC as to match the data percentage. 
       pico.out_ishemvetoevt()=isvetohem;
     }
 
-    //Run 3 jet veto maps
+    //Run 3 jet veto maps. JetMET POG gives tighter selection than ours except 15 GeV cut. Apply our selection, with lower pT cut for veto events.
     bool isvetomap = false;
     float veto = 0.0f; 
     float phicorr;
@@ -526,7 +525,7 @@ pico.out_sys_low_dphi_met().resize(4,false);
     else if (nano.Jet_phi()[ijet]<-3.1415926f) phicorr = -3.1415926f;
     else phicorr = nano.Jet_phi()[ijet];
 
-    if (year>=2022 && fabs(nano.Jet_eta()[ijet])<5.191f) veto = map_jetveto_->evaluate({"jetvetomap", nano.Jet_eta()[ijet],phicorr});
+    if (year>=2022 && nano.Jet_pt()[ijet]>15.0f && fabs(nano.Jet_eta()[ijet])<5.191f) veto = map_jetveto_->evaluate({"jetvetomap", nano.Jet_eta()[ijet],phicorr});
     if(veto!=0.0 && isgood_min) {
       isvetomap = true;
       pico.out_ismapvetoevt()=true;
@@ -539,8 +538,7 @@ pico.out_sys_low_dphi_met().resize(4,false);
     if (isSignal && (nanoaod_version+0.01)<9) {
       if (nano.Jet_pt_jerUp()[ijet] > min_jet_pt) {
         if (isgood) {
-          
-pico.out_sys_njet()[0]++;
+          pico.out_sys_njet()[0]++;
           pico.out_sys_ht()[0] += nano.Jet_pt_jerUp()[ijet];
           if (nano.Jet_btagDeepB()[ijet] > btag_wpts[0]) pico.out_sys_nbl()[0]++; 
           if (nano.Jet_btagDeepB()[ijet] > btag_wpts[1]) pico.out_sys_nbm()[0]++; 
