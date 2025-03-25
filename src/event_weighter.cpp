@@ -621,9 +621,11 @@ void EventWeighter::bTaggingSF(pico_tree &pico){
   float sf_tot_dn_uncorr_bc = 1.0;
   float sf_tot_up_uncorr_udsg = 1.0;
   float sf_tot_dn_uncorr_udsg = 1.0;
+  float sf_tot_wpm = 1.0;
   for (unsigned ijet = 0; ijet < pico.out_jet_pt().size(); ijet++) {
 
-    if(pico.out_jet_isgood().at(ijet) && abs(pico.out_jet_eta().at(ijet)) < 2.4f){
+    if(pico.out_jet_isgood().at(ijet) 
+       && abs(pico.out_jet_eta().at(ijet)) < 2.4f){
 
       //get true flavor
       int jet_flavor = abs(pico.out_jet_hflavor().at(ijet));
@@ -645,25 +647,27 @@ void EventWeighter::bTaggingSF(pico_tree &pico){
       //Then use prob(data)/prob(MC) to get final SFs
       float cat_data_eff(1.0), cat_data_eff_up(1.0), cat_data_eff_dn(1.0);
       float cat_data_eff_up_uncorr(1.0), cat_data_eff_dn_uncorr(1.0);
-      float cat_mc_eff(1.0), cat_mc_eff_up(1.0), cat_mc_eff_dn(1.0);
+      float cat_mc_eff(1.0);
+      //float cat_mc_eff_up(1.0), cat_mc_eff_dn(1.0);
+      float cat_mc_eff_wpm(1.0), cat_data_eff_wpm(1.0);
       float t_sf = (*btag_map)->evaluate({"central", "T", 
           jet_flavor, abseta, pt});
       float t_mc_eff = cs_btag_mceff_->at((mc_string+"tight_MCeff").c_str())
           ->evaluate({"effmc", eta, pt});
-      float t_mc_syst = cs_btag_mceff_->at((mc_string+"tight_MCeff").c_str())
-          ->evaluate({"systmc", eta, pt});
+      //float t_mc_syst = cs_btag_mceff_->at((mc_string+"tight_MCeff").c_str())
+      //    ->evaluate({"systmc", eta, pt});
       float m_sf = (*btag_map)->evaluate({"central", "M", 
           jet_flavor, abseta, pt});
       float m_mc_eff = cs_btag_mceff_->at((mc_string+"medium_MCeff").c_str())
           ->evaluate({"effmc", eta, pt});
-      float m_mc_syst = cs_btag_mceff_->at((mc_string+"medium_MCeff").c_str())
-          ->evaluate({"systmc", eta, pt});
+      //float m_mc_syst = cs_btag_mceff_->at((mc_string+"medium_MCeff").c_str())
+      //    ->evaluate({"systmc", eta, pt});
       float l_sf = (*btag_map)->evaluate({"central", "L", 
           jet_flavor, abseta, pt});
       float l_mc_eff = cs_btag_mceff_->at((mc_string+"loose_MCeff").c_str())
           ->evaluate({"effmc", eta, pt});
-      float l_mc_syst = cs_btag_mceff_->at((mc_string+"loose_MCeff").c_str())
-          ->evaluate({"systmc", eta, pt});
+      //float l_mc_syst = cs_btag_mceff_->at((mc_string+"loose_MCeff").c_str())
+      //    ->evaluate({"systmc", eta, pt});
       float t_sf_up(t_sf), t_sf_dn(t_sf);
       float t_sf_up_uncorr(t_sf), t_sf_dn_uncorr(t_sf);
       float m_sf_up(m_sf), m_sf_dn(m_sf);
@@ -711,10 +715,11 @@ void EventWeighter::bTaggingSF(pico_tree &pico){
         l_sf_dn_uncorr = (*btag_map)->evaluate({"down_uncorrelated", "L", 
           jet_flavor, abseta, pt});
       }
+      //currently, do not propoagate MC stats (negligible WRT SFs)
       if (pico.out_jet_deepflav().at(ijet) > btag_wp_tight_) { 
         cat_mc_eff = t_mc_eff;
-        cat_mc_eff_up = t_mc_eff+t_mc_syst;
-        cat_mc_eff_dn = t_mc_eff+t_mc_syst;
+        //cat_mc_eff_up = t_mc_eff+t_mc_syst;
+        //cat_mc_eff_dn = t_mc_eff-t_mc_syst;
         cat_data_eff = t_mc_eff*t_sf;
         cat_data_eff_up = t_mc_eff*t_sf_up;
         cat_data_eff_dn = t_mc_eff*t_sf_dn;
@@ -724,28 +729,32 @@ void EventWeighter::bTaggingSF(pico_tree &pico){
       }
       else if (pico.out_jet_deepflav().at(ijet) > btag_wp_medium_) {
         cat_mc_eff = m_mc_eff-t_mc_eff;
-        cat_mc_eff_up = m_mc_eff+m_mc_syst-t_mc_eff-t_mc_syst;
-        cat_mc_eff_dn = m_mc_eff-m_mc_syst-t_mc_eff+t_mc_syst;
+        //cat_mc_eff_up = m_mc_eff+m_mc_syst-t_mc_eff-t_mc_syst;
+        //cat_mc_eff_dn = m_mc_eff-m_mc_syst-t_mc_eff+t_mc_syst;
         cat_data_eff = m_mc_eff*m_sf-t_mc_eff*t_sf;
         cat_data_eff_up = m_mc_eff*m_sf_up-t_mc_eff*t_sf_up;
         cat_data_eff_dn = m_mc_eff*m_sf_dn-t_mc_eff*t_sf_dn;
-        cat_data_eff_up_uncorr = m_mc_eff*m_sf_up_uncorr-t_mc_eff*t_sf_up_uncorr;
-        cat_data_eff_dn_uncorr = m_mc_eff*m_sf_dn_uncorr-t_mc_eff*t_sf_dn_uncorr;
+        cat_data_eff_up_uncorr = (m_mc_eff*m_sf_up_uncorr-t_mc_eff
+                                  *t_sf_up_uncorr);
+        cat_data_eff_dn_uncorr = (m_mc_eff*m_sf_dn_uncorr-t_mc_eff
+                                  *t_sf_dn_uncorr);
       }
       else if (pico.out_jet_deepflav().at(ijet) > btag_wp_loose_) {
         cat_mc_eff = l_mc_eff-m_mc_eff;
-        cat_mc_eff_up = l_mc_eff+l_mc_syst-m_mc_eff-m_mc_syst;
-        cat_mc_eff_dn = l_mc_eff-l_mc_syst-m_mc_eff+m_mc_syst;
+        //cat_mc_eff_up = l_mc_eff+l_mc_syst-m_mc_eff-m_mc_syst;
+        //cat_mc_eff_dn = l_mc_eff-l_mc_syst-m_mc_eff+m_mc_syst;
         cat_data_eff = l_mc_eff*l_sf-m_mc_eff*m_sf;
         cat_data_eff_up = l_mc_eff*l_sf_up-m_mc_eff*m_sf_up;
         cat_data_eff_dn = l_mc_eff*l_sf_dn-m_mc_eff*m_sf_dn;
-        cat_data_eff_up_uncorr = l_mc_eff*l_sf_up_uncorr-m_mc_eff*m_sf_up_uncorr;
-        cat_data_eff_dn_uncorr = l_mc_eff*l_sf_dn_uncorr-m_mc_eff*m_sf_dn_uncorr;
+        cat_data_eff_up_uncorr = (l_mc_eff*l_sf_up_uncorr
+                                  -m_mc_eff*m_sf_up_uncorr);
+        cat_data_eff_dn_uncorr = (l_mc_eff*l_sf_dn_uncorr
+                                  -m_mc_eff*m_sf_dn_uncorr);
       }
       else {
         cat_mc_eff = 1.0-l_mc_eff;
-        cat_mc_eff_up = 1.0-(l_mc_eff+l_mc_syst);
-        cat_mc_eff_dn = 1.0-(l_mc_eff-l_mc_syst);
+        //cat_mc_eff_up = 1.0-(l_mc_eff+l_mc_syst);
+        //cat_mc_eff_dn = 1.0-(l_mc_eff-l_mc_syst);
         cat_data_eff = 1.0-l_mc_eff*l_sf;
         cat_data_eff_up = 1.0-l_mc_eff*l_sf_up;
         cat_data_eff_dn = 1.0-l_mc_eff*l_sf_dn;
@@ -753,18 +762,44 @@ void EventWeighter::bTaggingSF(pico_tree &pico){
         cat_data_eff_dn_uncorr = 1.0-l_mc_eff*l_sf_dn_uncorr;
       }
 
+      //currently we overwrite the systematic efficiencies (eff_*) with the
+      //the single WP versions. These should be commented out to return to the
+      //multi-WP versions
+      if (pico.out_jet_deepflav().at(ijet) > btag_wp_medium_) {
+        cat_mc_eff_wpm = m_mc_eff;
+        //cat_mc_eff_up = m_mc_eff+m_mc_syst;
+        //cat_mc_eff_dn = m_mc_eff-m_mc_syst;
+        cat_data_eff_wpm = m_mc_eff*m_sf;
+        cat_data_eff_up = m_mc_eff*m_sf_up;
+        cat_data_eff_dn = m_mc_eff*m_sf_dn;
+        cat_data_eff_up_uncorr = m_mc_eff*m_sf_up_uncorr;
+        cat_data_eff_dn_uncorr = m_mc_eff*m_sf_dn_uncorr;
+      }
+      else {
+        cat_mc_eff_wpm = 1.0-m_mc_eff;
+        //cat_mc_eff_up = 1.0-(m_mc_eff+m_mc_syst);
+        //cat_mc_eff_dn = 1.0-(m_mc_eff-m_mc_syst);
+        cat_data_eff_wpm = 1.0-(m_mc_eff*m_sf);
+        cat_data_eff_up = 1.0-(m_mc_eff*m_sf_up);
+        cat_data_eff_dn = 1.0-(m_mc_eff*m_sf_dn);
+        cat_data_eff_up_uncorr = 1.0-(m_mc_eff*m_sf_up_uncorr);
+        cat_data_eff_dn_uncorr = 1.0-(m_mc_eff*m_sf_dn_uncorr);
+      }
+
       //total SF is product of per-jet SFs
       float sf_nm = cat_data_eff/cat_mc_eff;
-      float sf_up = cat_data_eff_up/cat_mc_eff;
-      float sf_dn = cat_data_eff_dn/cat_mc_eff;
-      float sf_up_uncorr = cat_data_eff_up_uncorr/cat_mc_eff_dn;
-      float sf_dn_uncorr = cat_data_eff_dn_uncorr/cat_mc_eff_up;
+      float sf_nm_wpm = cat_data_eff_wpm/cat_mc_eff_wpm;
+      float sf_up = cat_data_eff_up/cat_mc_eff_wpm;
+      float sf_dn = cat_data_eff_dn/cat_mc_eff_wpm;
+      float sf_up_uncorr = cat_data_eff_up_uncorr/cat_mc_eff_wpm;
+      float sf_dn_uncorr = cat_data_eff_dn_uncorr/cat_mc_eff_wpm;
       if (isinf(sf_nm)||isnan(sf_nm)) sf_nm = 1.0;
       if (isinf(sf_up)||isnan(sf_up)) sf_up = 1.0;
       if (isinf(sf_dn)||isnan(sf_dn)) sf_dn = 1.0;
       if (isinf(sf_up_uncorr)||isnan(sf_up_uncorr)) sf_up_uncorr = 1.0;
       if (isinf(sf_dn_uncorr)||isnan(sf_dn_uncorr)) sf_dn_uncorr = 1.0;
       sf_tot_nm *= sf_nm;
+      sf_tot_wpm *= sf_nm_wpm;
       if (jet_flavor != 0) { //bottom and charm
         sf_tot_up_bc *= sf_up;
         sf_tot_dn_bc *= sf_dn;
@@ -789,6 +824,7 @@ void EventWeighter::bTaggingSF(pico_tree &pico){
   } //loop over jets
 
   pico.out_w_bhig_df() = sf_tot_nm;
+  pico.out_w_btag_df() = sf_tot_wpm;
   pico.out_sys_bchig().resize(2,1.); 
   pico.out_sys_udsghig().resize(2,1.); 
   pico.out_sys_bchig_uncorr().resize(2,1.); 

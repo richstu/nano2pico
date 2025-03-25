@@ -524,7 +524,6 @@ int main(int argc, char *argv[]){
         pico.out_sys_fs_udsghig().resize(2,1.); 
         pico.out_sys_fs_lep().resize(2,1.);
         pico.out_w_btag()    = 1.; 
-        pico.out_w_btag_df() = 1.; 
         pico.out_w_bhig()    = 1.; 
         pico.out_w_fs_lep()  = 1.;
         if (year >= 2022) {
