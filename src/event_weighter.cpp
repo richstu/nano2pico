@@ -19,111 +19,158 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
   string photon_csevmapname = "Photon-CSEV-SF";
   string btag_lightname = "deepJet_incl";
   if (year=="2016APV") {
-    in_file_electron_        = "data/zgamma/2016preVFP_UL/hzg_elid_2016APV_scalefactors.json";
-    in_file_photon_          = "data/zgamma/2016preVFP_UL/photon.json";
-    in_file_photon_mceff_    = "data/zgamma/2016preVFP_UL/photon_wp80mceff_2016APV.json";
-    in_file_muon_            = "data/zgamma/2016postVFP_UL/muid_2016_2016APV.json";
-    in_file_pu_              = "data/zgamma/2016preVFP_UL/puWeights.json";
-    in_file_btag_            = "data/zgamma/2016preVFP_UL/btagging.json";
-    in_file_btag_mceff_      = "data/zgamma/2016preVFP_UL/btag_mceff.json";
-    key_                     = "2016preVFP";
-    puName_                  = "Collisions16_UltraLegacy_goldenJSON";
-    photon_idmapname         = "UL-Photon-ID-SF";
-    photon_csevmapname       = "UL-Photon-CSEV-SF";
+    in_file_electron_         = "data/zgamma/2016preVFP_UL/hzg_elid_2016APV_scalefactors.json";
+    in_file_photon_           = "data/zgamma/2016preVFP_UL/photon.json";
+    in_file_photon_low_       = "data/zgamma/2016preVFP_UL/hzg_phidel_2016APV_scalefactors.json";
+    in_file_photon_mceff_     = "data/zgamma/2016preVFP_UL/photon_wp80mceff_2016APV.json";
+    in_file_muon_             = "data/zgamma/2016postVFP_UL/muid_2016_2016APV.json";
+    in_file_pu_               = "data/zgamma/2016preVFP_UL/puWeights.json";
+    in_file_btag_             = "data/zgamma/2016preVFP_UL/btagging.json";
+    in_file_btag_mceff_       = "data/zgamma/2016preVFP_UL/btag_mceff.json";
+    in_file_electron_iso0p10_ = "data/zgamma/2016preVFP_UL/hzg_eliso0p1_2016APV_efficiencies.json";
+    in_file_electron_iso0p15_ = "data/zgamma/2016preVFP_UL/hzg_eliso0p15_2016APV_efficiencies.json";
+    in_file_muon_iso0p10_     = "data/zgamma/2016preVFP_UL/hzg_muiso0p1_2016APV_efficiencies.json";
+    in_file_muon_iso0p15_     = "data/zgamma/2016preVFP_UL/hzg_muiso0p15_2016APV_efficiencies.json";
+    key_                      = "2016preVFP";
+    puName_                   = "Collisions16_UltraLegacy_goldenJSON";
+    photon_idmapname          = "UL-Photon-ID-SF";
+    photon_csevmapname        = "UL-Photon-CSEV-SF";
   } else if (year=="2016") {
-    in_file_electron_        = "data/zgamma/2016postVFP_UL/hzg_elid_2016_scalefactors.json";
-    in_file_photon_          = "data/zgamma/2016postVFP_UL/photon.json";
-    in_file_photon_mceff_    = "data/zgamma/2016postVFP_UL/photon_wp80mceff_2016.json";
-    in_file_muon_            = "data/zgamma/2016postVFP_UL/muid_2016_2016APV.json";
-    in_file_pu_              = "data/zgamma/2016postVFP_UL/puWeights.json";
-    in_file_btag_            = "data/zgamma/2016postVFP_UL/btagging.json";
-    in_file_btag_mceff_      = "data/zgamma/2016postVFP_UL/btag_mceff.json";
-    key_                     = "2016postVFP";
-    puName_                  = "Collisions16_UltraLegacy_goldenJSON";
-    photon_idmapname         = "UL-Photon-ID-SF";
-    photon_csevmapname       = "UL-Photon-CSEV-SF";
+    in_file_electron_         = "data/zgamma/2016postVFP_UL/hzg_elid_2016_scalefactors.json";
+    in_file_photon_           = "data/zgamma/2016postVFP_UL/photon.json";
+    in_file_photon_low_       = "data/zgamma/2016postVFP_UL/hzg_phidvalidate_2016_scalefactors.json";
+    in_file_photon_mceff_     = "data/zgamma/2016postVFP_UL/photon_wp80mceff_2016.json";
+    in_file_muon_             = "data/zgamma/2016postVFP_UL/muid_2016_2016APV.json";
+    in_file_pu_               = "data/zgamma/2016postVFP_UL/puWeights.json";
+    in_file_btag_             = "data/zgamma/2016postVFP_UL/btagging.json";
+    in_file_btag_mceff_       = "data/zgamma/2016postVFP_UL/btag_mceff.json";
+    in_file_electron_iso0p10_ = "data/zgamma/2016postVFP_UL/hzg_eliso0p1_2016_efficiencies.json";
+    in_file_electron_iso0p15_ = "data/zgamma/2016postVFP_UL/hzg_eliso0p15_2016_efficiencies.json";
+    in_file_muon_iso0p10_     = "data/zgamma/2016postVFP_UL/hzg_muiso0p1_2016_efficiencies.json";
+    in_file_muon_iso0p15_     = "data/zgamma/2016postVFP_UL/hzg_muiso0p15_2016_efficiencies.json";
+    key_                      = "2016postVFP";
+    puName_                   = "Collisions16_UltraLegacy_goldenJSON";
+    photon_idmapname          = "UL-Photon-ID-SF";
+    photon_csevmapname        = "UL-Photon-CSEV-SF";
   } else if (year=="2017") {
-    in_file_electron_        = "data/zgamma/2017_UL/hzg_elid_2017_scalefactors.json";
-    in_file_photon_          = "data/zgamma/2017_UL/photon.json";
-    in_file_photon_mceff_    = "data/zgamma/2017_UL/photon_wp80mceff_2017.json";
-    in_file_muon_            = "data/zgamma/2017_UL/muid_2017.json";
-    in_file_pu_              = "data/zgamma/2017_UL/puWeights.json";
-    in_file_btag_            = "data/zgamma/2017_UL/btagging.json";
-    in_file_btag_mceff_      = "data/zgamma/2017_UL/btag_mceff.json";
-    key_                     = "2017";
-    puName_                  = "Collisions17_UltraLegacy_goldenJSON";
-    photon_idmapname         = "UL-Photon-ID-SF";
-    photon_csevmapname       = "UL-Photon-CSEV-SF";
+    in_file_electron_         = "data/zgamma/2017_UL/hzg_elid_2017_scalefactors.json";
+    in_file_photon_           = "data/zgamma/2017_UL/photon.json";
+    in_file_photon_low_       = "data/zgamma/2017_UL/hzg_phidvalidate_2017_scalefactors.json";
+    in_file_photon_mceff_     = "data/zgamma/2017_UL/photon_wp80mceff_2017.json";
+    in_file_muon_             = "data/zgamma/2017_UL/muid_2017.json";
+    in_file_pu_               = "data/zgamma/2017_UL/puWeights.json";
+    in_file_btag_             = "data/zgamma/2017_UL/btagging.json";
+    in_file_btag_mceff_       = "data/zgamma/2017_UL/btag_mceff.json";
+    in_file_electron_iso0p10_ = "data/zgamma/2017_UL/hzg_eliso0p1_2017_efficiencies.json";
+    in_file_electron_iso0p15_ = "data/zgamma/2017_UL/hzg_eliso0p15_2017_efficiencies.json";
+    in_file_muon_iso0p10_     = "data/zgamma/2017_UL/hzg_muiso0p1_2017_efficiencies.json";
+    in_file_muon_iso0p15_     = "data/zgamma/2017_UL/hzg_muiso0p15_2017_efficiencies.json";
+    key_                      = "2017";
+    puName_                   = "Collisions17_UltraLegacy_goldenJSON";
+    photon_idmapname          = "UL-Photon-ID-SF";
+    photon_csevmapname        = "UL-Photon-CSEV-SF";
   } else if (year=="2018") {
-    in_file_electron_        = "data/zgamma/2018_UL/hzg_elid_2018_scalefactors.json";
-    in_file_photon_          = "data/zgamma/2018_UL/photon.json";
-    in_file_photon_mceff_    = "data/zgamma/2018_UL/photon_wp80mceff_2018.json";
-    in_file_muon_            = "data/zgamma/2018_UL/muid_2018.json";
-    in_file_pu_              = "data/zgamma/2018_UL/puWeights.json";
-    in_file_btag_            = "data/zgamma/2018_UL/btagging.json";
-    in_file_btag_mceff_      = "data/zgamma/2018_UL/btag_mceff.json";
-    key_                     = "2018";
-    puName_                  = "Collisions18_UltraLegacy_goldenJSON";
-    photon_idmapname         = "UL-Photon-ID-SF";
-    photon_csevmapname       = "UL-Photon-CSEV-SF";
+    in_file_electron_         = "data/zgamma/2018_UL/hzg_elid_2018_scalefactors.json";
+    in_file_photon_           = "data/zgamma/2018_UL/photon.json";
+    in_file_photon_low_       = "data/zgamma/2018_UL/hzg_phidvalidate_2018_scalefactors.json";
+    in_file_photon_mceff_     = "data/zgamma/2018_UL/photon_wp80mceff_2018.json";
+    in_file_muon_             = "data/zgamma/2018_UL/muid_2018.json";
+    in_file_pu_               = "data/zgamma/2018_UL/puWeights.json";
+    in_file_btag_             = "data/zgamma/2018_UL/btagging.json";
+    in_file_btag_mceff_       = "data/zgamma/2018_UL/btag_mceff.json";
+    in_file_electron_iso0p10_ = "data/zgamma/2018_UL/hzg_eliso0p1_2018_efficiencies.json";
+    in_file_electron_iso0p15_ = "data/zgamma/2018_UL/hzg_eliso0p15_2018_efficiencies.json";
+    in_file_muon_iso0p10_     = "data/zgamma/2018_UL/hzg_muiso0p1_2018_efficiencies.json";
+    in_file_muon_iso0p15_     = "data/zgamma/2018_UL/hzg_muiso0p15_2018_efficiencies.json";
+    key_                      = "2018";
+    puName_                   = "Collisions18_UltraLegacy_goldenJSON";
+    photon_idmapname          = "UL-Photon-ID-SF";
+    photon_csevmapname        = "UL-Photon-CSEV-SF";
   } else if (year=="2022"){
-    cout<<"WARNING: No electron ID SFs available for year, defaulting to 2018."<<endl;
-    in_file_electron_        = "data/zgamma/2018_UL/hzg_elid_2018_scalefactors.json";
-    in_file_photon_          = "data/zgamma/2022/photon.json";
-    in_file_photon_mceff_    = "data/zgamma/2022/photon_wp80mceff_2022.json";
-    in_file_muon_            = "data/zgamma/2022/muid_2022.json";
-    in_file_pu_              = "data/zgamma/2022/puWeights.json";
-    in_file_btag_            = "data/zgamma/2022/btagging.json";
-    in_file_btag_mceff_      = "data/zgamma/2022/btag_mceff.json";
-    key_                     = "2022Re-recoBCD";
-    puName_                  = "Collisions2022_355100_357900_eraBCD_GoldenJson";
-    btag_lightname           = "deepJet_light";
+    in_file_electron_         = "data/zgamma/2022/hzg_elid_2022_scalefactors.json";
+    in_file_photon_           = "data/zgamma/2022/photon.json";
+    in_file_photon_low_       = "data/zgamma/2022/hzg_phidvalidate_2022_scalefactors.json";
+    in_file_photon_mceff_     = "data/zgamma/2022/photon_wp80mceff_2022.json";
+    in_file_muon_             = "data/zgamma/2022/muid_2022.json";
+    in_file_pu_               = "data/zgamma/2022/puWeights.json";
+    in_file_btag_             = "data/zgamma/2022/btagging.json";
+    in_file_btag_mceff_       = "data/zgamma/2022/btag_mceff.json";
+    in_file_electron_iso0p10_ = "data/zgamma/2022/hzg_eliso0p1_2022_efficiencies.json";
+    in_file_electron_iso0p15_ = "data/zgamma/2022/hzg_eliso0p15_2022_efficiencies.json";
+    in_file_muon_iso0p10_     = "data/zgamma/2022/hzg_muiso0p1_2022_efficiencies.json";
+    in_file_muon_iso0p15_     = "data/zgamma/2022/hzg_muiso0p15_2022_efficiencies.json";
+    key_                      = "2022Re-recoBCD";
+    puName_                   = "Collisions2022_355100_357900_eraBCD_GoldenJson";
+    btag_lightname            = "deepJet_light";
   } else if (year=="2022EE"){
-    cout<<"WARNING: No electron ID SFs available for year, defaulting to 2018."<<endl;
-    in_file_electron_        = "data/zgamma/2018_UL/hzg_elid_2018_scalefactors.json";
-    in_file_photon_          = "data/zgamma/2022EE/photon.json";
-    in_file_photon_mceff_    = "data/zgamma/2022EE/photon_wp80mceff_2022EE.json";
-    in_file_muon_            = "data/zgamma/2022EE/muid_2022EE.json";
-    in_file_pu_              = "data/zgamma/2022EE/puWeights.json";
-    in_file_btag_            = "data/zgamma/2022EE/btagging.json";
-    in_file_btag_mceff_      = "data/zgamma/2022EE/btag_mceff.json";
-    key_                     = "2022Re-recoE+PromptFG";
-    puName_                  = "Collisions2022_359022_362760_eraEFG_GoldenJson";
-    btag_lightname           = "deepJet_light";
+    in_file_electron_         = "data/zgamma/2022EE/hzg_elid_2022EE_scalefactors.json";
+    in_file_photon_           = "data/zgamma/2022EE/photon.json";
+    in_file_photon_low_       = "data/zgamma/2022EE/hzg_phidvalidate_2022EE_scalefactors.json";
+    in_file_photon_mceff_     = "data/zgamma/2022EE/photon_wp80mceff_2022EE.json";
+    in_file_muon_             = "data/zgamma/2022EE/muid_2022EE.json";
+    in_file_pu_               = "data/zgamma/2022EE/puWeights.json";
+    in_file_btag_             = "data/zgamma/2022EE/btagging.json";
+    in_file_btag_mceff_       = "data/zgamma/2022EE/btag_mceff.json";
+    in_file_electron_iso0p10_ = "data/zgamma/2022EE/hzg_eliso0p1_2022EE_efficiencies.json";
+    in_file_electron_iso0p15_ = "data/zgamma/2022EE/hzg_eliso0p15_2022EE_efficiencies.json";
+    in_file_muon_iso0p10_     = "data/zgamma/2022EE/hzg_muiso0p1_2022EE_efficiencies.json";
+    in_file_muon_iso0p15_     = "data/zgamma/2022EE/hzg_muiso0p15_2022EE_efficiencies.json";
+    key_                      = "2022Re-recoE+PromptFG";
+    puName_                   = "Collisions2022_359022_362760_eraEFG_GoldenJson";
+    btag_lightname            = "deepJet_light";
   } else if (year=="2023"){
-    cout<<"WARNING: No electron ID SFs available for year, defaulting to 2018."<<endl;
-    in_file_electron_        = "data/zgamma/2018_UL/hzg_elid_2018_scalefactors.json";
-    in_file_photon_          = "data/zgamma/2023/photon.json";
-    in_file_photon_mceff_    = "data/zgamma/2023/photon_wp80mceff_2023.json";
-    in_file_muon_            = "data/zgamma/2023/hzg_muid_2023_scalefactors.json";
-    in_file_pu_              = "data/zgamma/2023/puWeights.json";
-    in_file_btag_            = "data/zgamma/2023/btagging.json";
-    in_file_btag_mceff_      = "data/zgamma/2023/btag_mceff.json";
-    key_                     = "2023PromptC";
-    puName_                  = "Collisions2023_366403_369802_eraBC_GoldenJson";
-    btag_lightname           = "deepJet_light";
+    in_file_electron_         = "data/zgamma/2023/hzg_elid_2023_scalefactors.json";
+    in_file_photon_           = "data/zgamma/2023/photon.json";
+    in_file_photon_low_       = "data/zgamma/2022EE/hzg_phidvalidate_2022EE_scalefactors.json";
+    in_file_photon_mceff_     = "data/zgamma/2023/photon_wp80mceff_2023.json";
+    in_file_muon_             = "data/zgamma/2023/hzg_muid_2023_scalefactors.json";
+    in_file_pu_               = "data/zgamma/2023/puWeights.json";
+    in_file_btag_             = "data/zgamma/2023/btagging.json";
+    in_file_btag_mceff_       = "data/zgamma/2023/btag_mceff.json";
+    in_file_electron_iso0p10_ = "data/zgamma/2023/hzg_eliso0p1_2023_efficiencies.json";
+    in_file_electron_iso0p15_ = "data/zgamma/2023/hzg_eliso0p15_2023_efficiencies.json";
+    in_file_muon_iso0p10_     = "data/zgamma/2023/hzg_muiso0p1_2023_efficiencies.json";
+    in_file_muon_iso0p15_     = "data/zgamma/2023/hzg_muiso0p15_2023_efficiencies.json";
+    key_                      = "2023PromptC";
+    puName_                   = "Collisions2023_366403_369802_eraBC_GoldenJson";
+    btag_lightname            = "deepJet_light";
   } else if (year=="2023BPix"){
-    cout<<"WARNING: No electron ID SFs available for year, defaulting to 2018."<<endl;
-    in_file_electron_        = "data/zgamma/2018_UL/hzg_elid_2018_scalefactors.json";
-    in_file_photon_          = "data/zgamma/2023BPix/photon.json";
-    in_file_photon_mceff_    = "data/zgamma/2023BPix/photon_wp80mceff_2023BPix.json";
-    in_file_muon_            = "data/zgamma/2023BPix/hzg_muid_2023BPix_scalefactors.json";
-    in_file_pu_              = "data/zgamma/2023BPix/puWeights.json";
-    in_file_btag_            = "data/zgamma/2023BPix/btagging.json";
-    in_file_btag_mceff_      = "data/zgamma/2023BPix/btag_mceff.json";
-    key_                     = "2023PromptD";
-    puName_                  = "Collisions2023_369803_370790_eraD_GoldenJson";
-    btag_lightname           = "deepJet_light";
+    in_file_electron_         = "data/zgamma/2023BPix/hzg_elid_2023BPix_scalefactors.json";
+    in_file_photon_           = "data/zgamma/2023BPix/photon.json";
+    in_file_photon_low_       = "data/zgamma/2022EE/hzg_phidvalidate_2022EE_scalefactors.json";
+    in_file_photon_mceff_     = "data/zgamma/2023BPix/photon_wp80mceff_2023BPix.json";
+    in_file_muon_             = "data/zgamma/2023BPix/hzg_muid_2023BPix_scalefactors.json";
+    in_file_pu_               = "data/zgamma/2023BPix/puWeights.json";
+    in_file_btag_             = "data/zgamma/2023BPix/btagging.json";
+    in_file_btag_mceff_       = "data/zgamma/2023BPix/btag_mceff.json";
+    in_file_electron_iso0p10_ = "data/zgamma/2023BPix/hzg_eliso0p1_2023BPix_efficiencies.json";
+    in_file_electron_iso0p15_ = "data/zgamma/2023BPix/hzg_eliso0p15_2023BPix_efficiencies.json";
+    in_file_muon_iso0p10_     = "data/zgamma/2023BPix/hzg_muiso0p1_2023BPix_efficiencies.json";
+    in_file_muon_iso0p15_     = "data/zgamma/2023BPix/hzg_muiso0p15_2023BPix_efficiencies.json";
+    key_                      = "2023PromptD";
+    puName_                   = "Collisions2023_369803_370790_eraD_GoldenJson";
+    btag_lightname            = "deepJet_light";
+    cs_electron_bpixhole_     = correction::CorrectionSet::from_file(
+        "data/zgamma/2023BPix/hzg_elid_2023BPixHole_scalefactors.json");
+    cs_el_hole_iso0p10_       = correction::CorrectionSet::from_file(
+        "data/zgamma/2023BPix/hzg_eliso0p1_2023BPixHole_efficiencies.json");
+    cs_el_hole_iso0p15_       = correction::CorrectionSet::from_file(
+        "data/zgamma/2023BPix/hzg_eliso0p15_2023BPixHole_efficiencies.json");
   } else {
     cout<<"Year has not been implemented in event_weighter"<<endl;
   }
   cs_electron_              = correction::CorrectionSet::from_file(in_file_electron_);
   cs_photon_                = correction::CorrectionSet::from_file(in_file_photon_);
+  cs_photon_low_            = correction::CorrectionSet::from_file(in_file_photon_low_);
   cs_photon_mceff_          = correction::CorrectionSet::from_file(in_file_photon_mceff_);
   cs_muon_                  = correction::CorrectionSet::from_file(in_file_muon_);
   cs_pileup_                = correction::CorrectionSet::from_file(in_file_pu_);
   cs_btag_                  = correction::CorrectionSet::from_file(in_file_btag_);
   cs_btag_mceff_            = correction::CorrectionSet::from_file(in_file_btag_mceff_);
+  cs_el_iso0p10_            = correction::CorrectionSet::from_file(in_file_electron_iso0p10_);
+  cs_el_iso0p15_            = correction::CorrectionSet::from_file(in_file_electron_iso0p15_);
+  cs_mu_iso0p10_            = correction::CorrectionSet::from_file(in_file_muon_iso0p10_);
+  cs_mu_iso0p15_            = correction::CorrectionSet::from_file(in_file_muon_iso0p15_);
   map_photon_id_            = cs_photon_->at(photon_idmapname);
   map_photon_csev_          = cs_photon_->at(photon_csevmapname);
   map_photon_mceff_         = cs_photon_mceff_->at("effmc");
@@ -132,6 +179,16 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
   map_electron_id_pass_unc_ = cs_electron_->at("unc_pass");
   map_electron_id_fail_     = cs_electron_->at("sf_fail");
   map_electron_id_fail_unc_ = cs_electron_->at("unc_fail");
+  map_photon_id_low_pass_     = cs_photon_low_->at("sf_pass");
+  map_photon_id_low_pass_unc_ = cs_photon_low_->at("unc_pass");
+  post_bpix_                = false;
+  if (year == "2023BPix") {
+    map_electron_hole_id_pass_     = cs_electron_bpixhole_->at("sf_pass");
+    map_electron_hole_id_pass_unc_ = cs_electron_bpixhole_->at("unc_pass");
+    map_electron_hole_id_fail_     = cs_electron_bpixhole_->at("sf_fail");
+    map_electron_hole_id_fail_unc_ = cs_electron_bpixhole_->at("unc_fail");
+    post_bpix_                     = true;
+  }
   map_muon_id_pass_         = cs_muon_->at("sf_pass");
   map_muon_id_pass_unc_     = cs_muon_->at("unc_pass");
   map_muon_id_fail_         = cs_muon_->at("sf_fail");
@@ -162,6 +219,7 @@ void EventWeighter::ElectronSF(pico_tree &pico){
       bool pass_id = false;
       float reco_pt = -999;
       float reco_eta = -999;
+      float reco_phi = -999;
       float min_dr = 999;
       for(unsigned iel = 0; iel < pico.out_el_sig().size(); ++iel){
         if (pico.out_el_sig().at(iel)) {
@@ -170,6 +228,7 @@ void EventWeighter::ElectronSF(pico_tree &pico){
           if (dr < 0.4f && dr < min_dr) {
             reco_pt = pico.out_el_pt().at(iel);
             reco_eta = pico.out_el_eta().at(iel);
+            reco_phi = pico.out_el_phi().at(iel);
             min_dr = dr;
             pass_id = true;
           }
@@ -178,22 +237,36 @@ void EventWeighter::ElectronSF(pico_tree &pico){
       if (reco_pt < 0) {
         reco_pt = pico.out_mc_pt().at(imc);
         reco_eta = pico.out_mc_eta().at(imc);
+        reco_phi = pico.out_mc_phi().at(imc);
       }
       float sf = 1.0;
+      float unc = 1.0;
       float sf_up = 1.0;
       float sf_dn = 1.0;
+      bool in_bpix_region = (reco_eta > -1.566 && reco_eta < 0.0
+                             && reco_phi > -1.2 && reco_phi < -0.8);
       if (pass_id) {
-        sf = map_electron_id_pass_->evaluate({reco_pt,reco_eta});
-        float unc = map_electron_id_pass_unc_->evaluate({reco_pt,reco_eta});
-        sf_up = sf+unc;
-        sf_dn = sf-unc;
+        if (post_bpix_ && in_bpix_region) {
+          sf = map_electron_hole_id_pass_->evaluate({reco_pt,reco_eta});
+          unc = map_electron_hole_id_pass_unc_->evaluate({reco_pt,reco_eta});
+        }
+        else {
+          sf = map_electron_id_pass_->evaluate({reco_pt,reco_eta});
+          unc = map_electron_id_pass_unc_->evaluate({reco_pt,reco_eta});
+        }
       }
       else {
-        sf = map_electron_id_fail_->evaluate({reco_pt,reco_eta});
-        float unc = map_electron_id_fail_unc_->evaluate({reco_pt,reco_eta});
-        sf_up = sf+unc;
-        sf_dn = sf-unc;
+        if (post_bpix_ && in_bpix_region) {
+          sf = map_electron_hole_id_pass_->evaluate({reco_pt,reco_eta});
+          unc = map_electron_hole_id_pass_unc_->evaluate({reco_pt,reco_eta});
+        }
+        else {
+          sf = map_electron_id_fail_->evaluate({reco_pt,reco_eta});
+          unc = map_electron_id_fail_unc_->evaluate({reco_pt,reco_eta});
+        }
       }
+      sf_up = sf+unc;
+      sf_dn = sf-unc;
       sf_tot *= sf;
       sf_tot_up *= sf_up;
       sf_tot_dn *= fmax(sf_dn,0.0);
@@ -205,6 +278,102 @@ void EventWeighter::ElectronSF(pico_tree &pico){
   pico.out_sys_el()[1] = sf_tot_dn;
 }
 
+// note: call after ElectronSF
+void EventWeighter::ElectronMinisoSF(pico_tree &pico){
+  float sf_tot = 1.0;
+  float sf_tot_up = 1.0;
+  float sf_tot_dn = 1.0;
+  for (unsigned iel = 0; iel < pico.out_el_pt().size(); iel++) {
+    if (!pico.out_el_sig().at(iel)) continue;
+    float pt = pico.out_el_pt().at(iel);
+    float eta = pico.out_el_eta().at(iel);
+    float phi = pico.out_el_phi().at(iel);
+    float miniso = pico.out_el_miniso().at(iel);
+    float sf = 1.0;
+    float sf_up = 1.0;
+    float sf_dn = 1.0;
+    bool in_bpix_region = (eta > -1.566 && eta < 0.0
+                           && phi > -1.2 && phi < -0.8);
+    float data_eff_0p10 = 1.0;
+    float simu_eff_0p10 = 1.0;
+    float data_eff_0p15 = 1.0;
+    float simu_eff_0p15 = 1.0;
+    float data_unc_0p10 = 1.0;
+    float simu_unc_0p10 = 1.0;
+    float data_unc_0p15 = 1.0;
+    float simu_unc_0p15 = 1.0;
+    if (post_bpix_ && in_bpix_region) {
+      data_eff_0p10 = cs_el_hole_iso0p10_->at("effdata")->evaluate({pt,eta});
+      simu_eff_0p10 = cs_el_hole_iso0p10_->at("effmc")->evaluate({pt,eta});
+      data_eff_0p15 = cs_el_hole_iso0p15_->at("effdata")->evaluate({pt,eta});
+      simu_eff_0p15 = cs_el_hole_iso0p15_->at("effmc")->evaluate({pt,eta});
+      data_unc_0p10 = cs_el_hole_iso0p10_->at("systdata")->evaluate({pt,eta});
+      simu_unc_0p10 = cs_el_hole_iso0p10_->at("systmc")->evaluate({pt,eta});
+      data_unc_0p15 = cs_el_hole_iso0p15_->at("systdata")->evaluate({pt,eta});
+      simu_unc_0p15 = cs_el_hole_iso0p15_->at("systmc")->evaluate({pt,eta});
+    }
+    else {
+      data_eff_0p10 = cs_el_iso0p10_->at("effdata")->evaluate({pt,eta});
+      simu_eff_0p10 = cs_el_iso0p10_->at("effmc")->evaluate({pt,eta});
+      data_eff_0p15 = cs_el_iso0p15_->at("effdata")->evaluate({pt,eta});
+      simu_eff_0p15 = cs_el_iso0p15_->at("effmc")->evaluate({pt,eta});
+      data_unc_0p10 = cs_el_iso0p10_->at("systdata")->evaluate({pt,eta});
+      simu_unc_0p10 = cs_el_iso0p10_->at("systmc")->evaluate({pt,eta});
+      data_unc_0p15 = cs_el_iso0p15_->at("systdata")->evaluate({pt,eta});
+      simu_unc_0p15 = cs_el_iso0p15_->at("systmc")->evaluate({pt,eta});
+    }
+    float data_eff = 1.0;
+    float data_eff_up = 1.0;
+    float data_eff_dn = 1.0;
+    float simu_eff = 1.0;
+    float simu_eff_up = 1.0;
+    float simu_eff_dn = 1.0;
+    if (miniso < 0.1) {
+      data_eff = data_eff_0p10;
+      simu_eff = simu_eff_0p10;
+      data_eff_up = (data_eff_0p10+data_unc_0p10);
+      data_eff_dn = (data_eff_0p10-data_unc_0p10);
+      simu_eff_up = (simu_eff_0p10+simu_unc_0p10);
+      simu_eff_dn = (simu_eff_0p10-simu_unc_0p10);
+    }
+    else if (miniso < 0.15) {
+      data_eff = (data_eff_0p15-data_eff_0p10);
+      data_eff_up = ((data_eff_0p15+data_unc_0p15)
+                    -(data_eff_0p10+data_unc_0p10));
+      data_eff_dn = ((data_eff_0p15-data_unc_0p15)
+                    -(data_eff_0p10-data_unc_0p10));
+      simu_eff = (simu_eff_0p15-simu_eff_0p10);
+      simu_eff_up = ((simu_eff_0p15+simu_unc_0p15)
+                    -(simu_eff_0p10+simu_unc_0p10));
+      simu_eff_dn = ((simu_eff_0p15-simu_unc_0p15)
+                    -(simu_eff_0p10-simu_unc_0p10));
+    }
+    else {
+      data_eff = (1.0-data_eff_0p15);
+      data_eff_up = (1.0-(data_eff_0p15+data_unc_0p15));
+      data_eff_dn = (1.0-(data_eff_0p15-data_unc_0p15));
+      simu_eff = (1.0-simu_eff_0p15);
+      simu_eff_up = (1.0-(simu_eff_0p15+simu_unc_0p15));
+      simu_eff_dn = (1.0-(simu_eff_0p15-simu_unc_0p15));
+    }
+    data_eff = max(data_eff, 0.0f);
+    data_eff_up = max(data_eff_up, 0.0f);
+    data_eff_dn = max(data_eff_dn, 0.0f);
+    simu_eff = max(simu_eff, 0.0f);
+    simu_eff_up = max(simu_eff_up, 0.0f);
+    simu_eff_dn = max(simu_eff_dn, 0.0f);
+    sf = data_eff/simu_eff;
+    sf_up = data_eff_up/simu_eff_dn;
+    sf_dn = data_eff_dn/simu_eff_up;
+    sf_tot *= sf;
+    sf_tot_up *= sf_up;
+    sf_tot_dn *= sf_dn;
+  }
+  pico.out_w_el() *= sf_tot;
+  pico.out_sys_el()[0] *= sf_tot_up;
+  pico.out_sys_el()[1] *= sf_tot_dn;
+}
+
 // Photon Total Scale Factors
 void EventWeighter::PhotonSF(pico_tree &pico){
   double sf_tot = 1.0;
@@ -213,9 +382,8 @@ void EventWeighter::PhotonSF(pico_tree &pico){
   //loop over reco photons since ~100% reco efficiency, only pt/eta cuts 
   //between NanoAOD and pico
   for (unsigned iph = 0; iph < pico.out_photon_pt().size(); iph++) {
-    float pt = pico.out_photon_pt().at(iph);
     if (pico.out_photon_drmin().at(iph) < 0.3f) continue;
-    if (!(year_ == "2023" || year_ == "2023BPix") && pt < 20.0f) continue;
+    float pt = pico.out_photon_pt().at(iph);
     float eta = pico.out_photon_eta().at(iph);
     float phi = pico.out_photon_phi().at(iph);
     float r9 = pico.out_photon_r9().at(iph);
@@ -229,23 +397,6 @@ void EventWeighter::PhotonSF(pico_tree &pico){
       category += "HighR9";
     else
       category += "LowR9";
-    string wpstring = "wp80";
-    if (pt<20.0f)
-      wpstring = "wp80Below20";
-
-    float id_sf = 1.0;
-    float id_sfup = 1.0;
-    float id_sfdn = 1.0;
-    if (year_=="2023"||year_=="2023BPix") {
-      id_sf = map_photon_id_->evaluate({key_, "sf", wpstring, eta, pt, phi});
-      id_sfup = map_photon_id_->evaluate({key_, "sfup", wpstring, eta, pt, phi});
-      id_sfdn = map_photon_id_->evaluate({key_, "sfdown", wpstring, eta, pt, phi});
-    }
-    else {
-      id_sf = map_photon_id_->evaluate({key_, "sf", wpstring, eta, pt});
-      id_sfup = map_photon_id_->evaluate({key_, "sfup", wpstring, eta, pt});
-      id_sfdn = map_photon_id_->evaluate({key_, "sfdown", wpstring, eta, pt});
-    }
     float ev_sf(1.0), ev_sfup(1.0), ev_sfdn(1.0);
     if (year_=="2016APV" || year_=="2016" 
         || year_=="2017" || year_=="2018") {
@@ -258,6 +409,28 @@ void EventWeighter::PhotonSF(pico_tree &pico){
       ev_sf = map_photon_csev_->evaluate({key_, "sf", "MVA80", eta, r9});
       ev_sfup = map_photon_csev_->evaluate({key_, "sfup", "MVA80", eta, r9});
       ev_sfdn = map_photon_csev_->evaluate({key_, "sfdown", "MVA80", eta, r9});
+    }
+    string wpstring = "wp80";
+    if (pt<20.0f)
+      wpstring = "wp80Below20";
+    float id_sf = 1.0;
+    float id_sfup = 1.0;
+    float id_sfdn = 1.0;
+    if (!(year_ == "2023" || year_ == "2023BPix") && pt < 20.0f) {
+      id_sf = (map_photon_id_low_pass_->evaluate({pt, eta}));
+      float id_unc = map_photon_id_low_pass_unc_->evaluate({pt, eta});
+      id_sfup = id_sf+id_unc;
+      id_sfdn = id_sf-id_unc;
+    }
+    else if (year_=="2023"||year_=="2023BPix") {
+      id_sf = map_photon_id_->evaluate({key_, "sf", wpstring, eta, pt, phi});
+      id_sfup = map_photon_id_->evaluate({key_, "sfup", wpstring, eta, pt, phi});
+      id_sfdn = map_photon_id_->evaluate({key_, "sfdown", wpstring, eta, pt, phi});
+    }
+    else {
+      id_sf = map_photon_id_->evaluate({key_, "sf", wpstring, eta, pt});
+      id_sfup = map_photon_id_->evaluate({key_, "sfup", wpstring, eta, pt});
+      id_sfdn = map_photon_id_->evaluate({key_, "sfdown", wpstring, eta, pt});
     }
     float pass_sf = id_sf*ev_sf;
     float unc_up = hypotf(id_sfup-id_sf,ev_sfup-ev_sf);
@@ -354,6 +527,79 @@ void EventWeighter::MuonSF(pico_tree &pico){
   pico.out_sys_mu().resize(2,1.); 
   pico.out_sys_mu()[0] = sf_tot_up;
   pico.out_sys_mu()[1] = sf_tot_dn;
+}
+
+// note: call after MuonSF
+void EventWeighter::MuonMinisoSF(pico_tree &pico){
+  float sf_tot = 1.0;
+  float sf_tot_up = 1.0;
+  float sf_tot_dn = 1.0;
+  for (unsigned imu = 0; imu < pico.out_mu_pt().size(); imu++) {
+    if (!pico.out_mu_sig().at(imu)) continue;
+    float pt = pico.out_mu_pt().at(imu);
+    float eta = pico.out_mu_eta().at(imu);
+    float miniso = pico.out_mu_miniso().at(imu);
+    float sf = 1.0;
+    float sf_up = 1.0;
+    float sf_dn = 1.0;
+    float data_eff_0p10 = cs_mu_iso0p10_->at("effdata")->evaluate({pt,eta});
+    float simu_eff_0p10 = cs_mu_iso0p10_->at("effmc")->evaluate({pt,eta});
+    float data_eff_0p15 = cs_mu_iso0p15_->at("effdata")->evaluate({pt,eta});
+    float simu_eff_0p15 = cs_mu_iso0p15_->at("effmc")->evaluate({pt,eta});
+    float data_unc_0p10 = cs_mu_iso0p10_->at("systdata")->evaluate({pt,eta});
+    float simu_unc_0p10 = cs_mu_iso0p10_->at("systmc")->evaluate({pt,eta});
+    float data_unc_0p15 = cs_mu_iso0p15_->at("systdata")->evaluate({pt,eta});
+    float simu_unc_0p15 = cs_mu_iso0p15_->at("systmc")->evaluate({pt,eta});
+    float data_eff = 1.0;
+    float data_eff_up = 1.0;
+    float data_eff_dn = 1.0;
+    float simu_eff = 1.0;
+    float simu_eff_up = 1.0;
+    float simu_eff_dn = 1.0;
+    if (miniso < 0.1) {
+      data_eff = data_eff_0p10;
+      simu_eff = simu_eff_0p10;
+      data_eff_up = (data_eff_0p10+data_unc_0p10);
+      data_eff_dn = (data_eff_0p10-data_unc_0p10);
+      simu_eff_up = (simu_eff_0p10+simu_unc_0p10);
+      simu_eff_dn = (simu_eff_0p10-simu_unc_0p10);
+    }
+    else if (miniso < 0.15) {
+      data_eff = (data_eff_0p15-data_eff_0p10);
+      data_eff_up = ((data_eff_0p15+data_unc_0p15)
+                    -(data_eff_0p10+data_unc_0p10));
+      data_eff_dn = ((data_eff_0p15-data_unc_0p15)
+                    -(data_eff_0p10-data_unc_0p10));
+      simu_eff = (simu_eff_0p15-simu_eff_0p10);
+      simu_eff_up = ((simu_eff_0p15+simu_unc_0p15)
+                    -(simu_eff_0p10+simu_unc_0p10));
+      simu_eff_dn = ((simu_eff_0p15-simu_unc_0p15)
+                    -(simu_eff_0p10-simu_unc_0p10));
+    }
+    else {
+      data_eff = (1.0-data_eff_0p15);
+      data_eff_up = (1.0-(data_eff_0p15+data_unc_0p15));
+      data_eff_dn = (1.0-(data_eff_0p15-data_unc_0p15));
+      simu_eff = (1.0-simu_eff_0p15);
+      simu_eff_up = (1.0-(simu_eff_0p15+simu_unc_0p15));
+      simu_eff_dn = (1.0-(simu_eff_0p15-simu_unc_0p15));
+    }
+    data_eff = max(data_eff, 0.0f);
+    data_eff_up = max(data_eff_up, 0.0f);
+    data_eff_dn = max(data_eff_dn, 0.0f);
+    simu_eff = max(simu_eff, 0.0f);
+    simu_eff_up = max(simu_eff_up, 0.0f);
+    simu_eff_dn = max(simu_eff_dn, 0.0f);
+    sf = data_eff/simu_eff;
+    sf_up = data_eff_up/simu_eff_dn;
+    sf_dn = data_eff_dn/simu_eff_up;
+    sf_tot *= sf;
+    sf_tot_up *= sf_up;
+    sf_tot_dn *= sf_dn;
+  }
+  pico.out_w_mu() *= sf_tot;
+  pico.out_sys_mu()[0] *= sf_tot_up;
+  pico.out_sys_mu()[1] *= sf_tot_dn;
 }
 
 // Pileup Scale Factors

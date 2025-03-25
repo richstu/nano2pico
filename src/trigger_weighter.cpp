@@ -73,44 +73,46 @@ TriggerWeighter::TriggerWeighter(string year) {
     in_file_musi = "hzg_mutrig24_2018_efficiencies";
   }
   else if (year=="2022") {
-    cout << "WARNING: No electron trigger weights, defaulting to 2018" << endl;
-    in_file_path = "";
-    in_file_ello = "data/zgamma/2018_UL/hzg_eltrig12_2018_efficiencies";
-    in_file_elup = "data/zgamma/2018_UL/hzg_eltrig23_2018_efficiencies";
-    in_file_elsi = "data/zgamma/2018_UL/hzg_eltrig32_2018_efficiencies";
-    in_file_mulo = "data/zgamma/2022/hzg_mutrig8_2022_efficiencies";
-    in_file_muup = "data/zgamma/2022/hzg_mutrig17_2022_efficiencies";
-    in_file_musi = "data/zgamma/2022/hzg_mutrig24_2022_efficiencies";
+    in_file_path = "data/zgamma/2022/";
+    in_file_ello = "hzg_eltrig12_2022_efficiencies";
+    in_file_elup = "hzg_eltrig23_2022_efficiencies";
+    in_file_elsi = "hzg_eltrig30_2022_efficiencies";
+    in_file_mulo = "hzg_mutrig8_2022_efficiencies";
+    in_file_muup = "hzg_mutrig17_2022_efficiencies";
+    in_file_musi = "hzg_mutrig24_2022_efficiencies";
   }
   else if (year=="2022EE") {
-    cout << "WARNING: No electron trigger weights, defaulting to 2018" << endl;
-    in_file_path = "";
-    in_file_ello = "data/zgamma/2018_UL/hzg_eltrig12_2018_efficiencies";
-    in_file_elup = "data/zgamma/2018_UL/hzg_eltrig23_2018_efficiencies";
-    in_file_elsi = "data/zgamma/2018_UL/hzg_eltrig32_2018_efficiencies";
-    in_file_mulo = "data/zgamma/2022EE/hzg_mutrig8_2022EE_efficiencies";
-    in_file_muup = "data/zgamma/2022EE/hzg_mutrig17_2022EE_efficiencies";
-    in_file_musi = "data/zgamma/2022EE/hzg_mutrig24_2022EE_efficiencies";
+    in_file_path = "data/zgamma/2022EE/";
+    in_file_ello = "hzg_eltrig12_2022EE_efficiencies";
+    in_file_elup = "hzg_eltrig23_2022EE_efficiencies";
+    in_file_elsi = "hzg_eltrig30_2022EE_efficiencies";
+    in_file_mulo = "hzg_mutrig8_2022EE_efficiencies";
+    in_file_muup = "hzg_mutrig17_2022EE_efficiencies";
+    in_file_musi = "hzg_mutrig24_2022EE_efficiencies";
   }
   else if (year=="2023") {
-    cout << "WARNING: No electron trigger weights, defaulting to 2018" << endl;
-    in_file_path = "";
-    in_file_ello = "data/zgamma/2018_UL/hzg_eltrig12_2018_efficiencies";
-    in_file_elup = "data/zgamma/2018_UL/hzg_eltrig23_2018_efficiencies";
-    in_file_elsi = "data/zgamma/2018_UL/hzg_eltrig32_2018_efficiencies";
-    in_file_mulo = "data/zgamma/2023/hzg_mutrig8_2023_efficiencies";
-    in_file_muup = "data/zgamma/2023/hzg_mutrig17_2023_efficiencies";
-    in_file_musi = "data/zgamma/2023/hzg_mutrig24_2023_efficiencies";
+    in_file_path = "data/zgamma/2023/";
+    in_file_ello = "hzg_eltrig12_2023_efficiencies";
+    in_file_elup = "hzg_eltrig23_2023_efficiencies";
+    in_file_elsi = "hzg_eltrig30_2023_efficiencies";
+    in_file_mulo = "hzg_mutrig8_2023_efficiencies";
+    in_file_muup = "hzg_mutrig17_2023_efficiencies";
+    in_file_musi = "hzg_mutrig24_2023_efficiencies";
   }
   else if (year=="2023BPix") {
-    cout << "WARNING: No electron trigger weights, defaulting to 2018" << endl;
-    in_file_path = "";
-    in_file_ello = "data/zgamma/2018_UL/hzg_eltrig12_2018_efficiencies";
-    in_file_elup = "data/zgamma/2018_UL/hzg_eltrig23_2018_efficiencies";
-    in_file_elsi = "data/zgamma/2018_UL/hzg_eltrig32_2018_efficiencies";
-    in_file_mulo = "data/zgamma/2023BPix/hzg_mutrig8_2023BPix_efficiencies";
-    in_file_muup = "data/zgamma/2023BPix/hzg_mutrig17_2023BPix_efficiencies";
-    in_file_musi = "data/zgamma/2023BPix/hzg_mutrig24_2023BPix_efficiencies";
+    in_file_path = "data/zgamma/2023BPix/";
+    in_file_ello = "hzg_eltrig12_2023BPix_efficiencies";
+    in_file_elup = "hzg_eltrig23_2023BPix_efficiencies";
+    in_file_elsi = "hzg_eltrig30_2023BPix_efficiencies";
+    in_file_mulo = "hzg_mutrig8_2023BPix_efficiencies";
+    in_file_muup = "hzg_mutrig17_2023BPix_efficiencies";
+    in_file_musi = "hzg_mutrig24_2023BPix_efficiencies";
+    cs_ello_hole_ = correction::CorrectionSet::from_file(in_file_path
+        +"hzg_eltrig12_2023BPixHole_efficiencies.json");
+    cs_elup_hole_ = correction::CorrectionSet::from_file(in_file_path
+        +"hzg_eltrig23_2023BPixHole_efficiencies.json");
+    cs_elsi_hole_ = correction::CorrectionSet::from_file(in_file_path
+        +"hzg_eltrig30_2023BPixHole_efficiencies.json");
   }
   else { //2018
     cout << "WARNING: No trigger weights, defaulting to 2018" << endl;
@@ -122,14 +124,21 @@ TriggerWeighter::TriggerWeighter(string year) {
     in_file_muup = "hzg_mutrig17_2018_efficiencies";
     in_file_musi = "hzg_mutrig24_2018_efficiencies";
   } 
-  cs_ello_ = correction::CorrectionSet::from_file(in_file_path+in_file_ello+".json");
-  cs_elup_ = correction::CorrectionSet::from_file(in_file_path+in_file_elup+".json");
-  cs_elsi_ = correction::CorrectionSet::from_file(in_file_path+in_file_elsi+".json");
-  cs_mulo_ = correction::CorrectionSet::from_file(in_file_path+in_file_mulo+".json");
-  cs_muup_ = correction::CorrectionSet::from_file(in_file_path+in_file_muup+".json");
-  cs_musi_ = correction::CorrectionSet::from_file(in_file_path+in_file_musi+".json");
+  post_bpix_ = false;
+  cs_ello_ = correction::CorrectionSet::from_file(in_file_path+in_file_ello
+                                                  +".json");
+  cs_elup_ = correction::CorrectionSet::from_file(in_file_path+in_file_elup
+                                                  +".json");
+  cs_elsi_ = correction::CorrectionSet::from_file(in_file_path+in_file_elsi
+                                                  +".json");
+  cs_mulo_ = correction::CorrectionSet::from_file(in_file_path+in_file_mulo
+                                                  +".json");
+  cs_muup_ = correction::CorrectionSet::from_file(in_file_path+in_file_muup
+                                                  +".json");
+  cs_musi_ = correction::CorrectionSet::from_file(in_file_path+in_file_musi
+                                                  +".json");
   map_diel_lower_dataeff_ = cs_ello_->at("effdata");
-  map_diel_lower_dataunc_ = cs_elup_->at("systdata");
+  map_diel_lower_dataunc_ = cs_ello_->at("systdata");
   map_diel_lower_mceff_ = cs_ello_->at("effmc");
   map_diel_lower_mcunc_ = cs_ello_->at("systmc");
   map_diel_upper_dataeff_ = cs_elup_->at("effdata");
@@ -141,7 +150,7 @@ TriggerWeighter::TriggerWeighter(string year) {
   map_singleel_mceff_ = cs_elsi_->at("effmc");
   map_singleel_mcunc_ = cs_elsi_->at("systmc");
   map_dimu_lower_dataeff_ = cs_mulo_->at("effdata");
-  map_dimu_lower_dataunc_ = cs_muup_->at("systdata");
+  map_dimu_lower_dataunc_ = cs_mulo_->at("systdata");
   map_dimu_lower_mceff_ = cs_mulo_->at("effmc");
   map_dimu_lower_mcunc_ = cs_mulo_->at("systmc");
   map_dimu_upper_dataeff_ = cs_muup_->at("effdata");
@@ -152,6 +161,21 @@ TriggerWeighter::TriggerWeighter(string year) {
   map_singlemu_dataunc_ = cs_musi_->at("systdata");
   map_singlemu_mceff_ = cs_musi_->at("effmc");
   map_singlemu_mcunc_ = cs_musi_->at("systmc");
+  if (year == "2023BPix") {
+    map_hole_diel_lower_dataeff_ = cs_ello_hole_->at("effdata");
+    map_hole_diel_lower_dataunc_ = cs_ello_hole_->at("systdata");
+    map_hole_diel_lower_mceff_   = cs_ello_hole_->at("effmc");
+    map_hole_diel_lower_mcunc_   = cs_ello_hole_->at("systmc");
+    map_hole_diel_upper_dataeff_ = cs_elup_hole_->at("effdata");
+    map_hole_diel_upper_dataunc_ = cs_elup_hole_->at("systdata");
+    map_hole_diel_upper_mceff_   = cs_elup_hole_->at("effmc");
+    map_hole_diel_upper_mcunc_   = cs_elup_hole_->at("systmc");
+    map_hole_singleel_dataeff_   = cs_elsi_hole_->at("effdata");
+    map_hole_singleel_dataunc_   = cs_elsi_hole_->at("systdata");
+    map_hole_singleel_mceff_     = cs_elsi_hole_->at("effmc");
+    map_hole_singleel_mcunc_     = cs_elsi_hole_->at("systmc");
+    post_bpix_ = true;
+  }
 }
 
 
@@ -161,12 +185,14 @@ vector<float> TriggerWeighter::GetSF(pico_tree &pico) {
 
   vector<float> electron_pt;
   vector<float> electron_eta;
+  vector<float> electron_phi;
   vector<float> muon_pt;
   vector<float> muon_eta;
   for (unsigned int iel = 0; iel < pico.out_el_sig().size(); iel++) {
     if (pico.out_el_sig()[iel]) {
       electron_pt.push_back(pico.out_el_pt()[iel]);
       electron_eta.push_back(pico.out_el_eta()[iel]);
+      electron_phi.push_back(pico.out_el_phi()[iel]);
     }
   }
   for (unsigned int imu = 0; imu < pico.out_mu_sig().size(); imu++) {
@@ -176,7 +202,7 @@ vector<float> TriggerWeighter::GetSF(pico_tree &pico) {
     }
   }
 
-  return GetSF(electron_pt, muon_pt, electron_eta, muon_eta, 
+  return GetSF(electron_pt, muon_pt, electron_eta, muon_eta, electron_phi,
       pico.out_trig_single_el(), pico.out_trig_single_mu(), 
       pico.out_trig_double_el(), pico.out_trig_double_mu());
 }
@@ -184,7 +210,8 @@ vector<float> TriggerWeighter::GetSF(pico_tree &pico) {
 
 vector<float> TriggerWeighter::GetSF(std::vector<float> electron_pt, 
     vector<float> muon_pt, std::vector<float> electron_eta, 
-    vector<float> muon_eta, bool pass_singleel, bool pass_singlemu, 
+    std::vector<float> muon_eta, std::vector<float> electron_phi,
+    bool pass_singleel, bool pass_singlemu, 
     bool pass_diel, bool pass_dimu) {
   //note that this only weights leptons that pass the signal criteria
   //i.e. trigger efficiencies will remain uncorrected for leptons failing
@@ -194,11 +221,12 @@ vector<float> TriggerWeighter::GetSF(std::vector<float> electron_pt,
 
   //get data/mc probability/uncertainty from appropriate functions
   vector<float> data_prob = GetTotalProbability(electron_pt, muon_pt, 
-    electron_eta, muon_eta, pass_singleel, pass_singlemu, pass_diel, 
+    electron_eta, muon_eta, electron_phi, pass_singleel, pass_singlemu, 
+    pass_diel, 
     pass_dimu, true);
   vector<float> mc_prob = GetTotalProbability(electron_pt, muon_pt, 
-    electron_eta, muon_eta, pass_singleel, pass_singlemu, pass_diel, 
-    pass_dimu, false);
+    electron_eta, muon_eta, electron_phi, pass_singleel, pass_singlemu, 
+    pass_diel, pass_dimu, false);
 
   //calculate SFs
   if (mc_prob[0] < 0.001f) mc_prob[0] = 0.0;
@@ -224,13 +252,15 @@ vector<float> TriggerWeighter::GetSF(std::vector<float> electron_pt,
 vector<float> TriggerWeighter::GetTotalProbability(
     vector<float> electron_pt, vector<float> muon_pt, 
     vector<float> electron_eta, vector<float> muon_eta, 
+    vector<float> electron_phi,
     bool pass_singleel, bool pass_singlemu, bool pass_diel, bool pass_dimu, 
     bool is_data) {
 
   //get lepton probability/uncertainty from appropriate functions
+  vector<float> muon_phi(muon_pt.size(), 0.0);
   vector<float> electron_prob = GetFlavorProbability(electron_pt, electron_eta,
-    pass_singleel, pass_diel, is_data, true);
-  vector<float> muon_prob = GetFlavorProbability(muon_pt, muon_eta,
+    electron_phi, pass_singleel, pass_diel, is_data, true);
+  vector<float> muon_prob = GetFlavorProbability(muon_pt, muon_eta, muon_phi,
     pass_singlemu, pass_dimu, is_data, false);
 
   //calculate probability and uncertainty
@@ -247,7 +277,8 @@ vector<float> TriggerWeighter::GetTotalProbability(
 
 vector<float> TriggerWeighter::GetFlavorProbability(
     vector<float> lepton_pt, vector<float> lepton_eta, 
-    bool pass_singlelep, bool pass_dilep, bool is_data, bool is_electron) {
+    vector<float> lepton_phi, bool pass_singlelep, 
+    bool pass_dilep, bool is_data, bool is_electron) {
 
   //The algorithm for calculating probability is somewhat cumbersome due to the
   //correlation between different triggers. The idea is to loop over every
@@ -299,7 +330,7 @@ vector<float> TriggerWeighter::GetFlavorProbability(
         //probability to fail all is 1 - probability to pass dilep lower leg
         if (lepton_status[ilep]==LeptonHLTStatus::fail_all) {
           vector<float> prob_lower = GetLeptonProbability(lepton_pt[ilep],
-              lepton_eta[ilep],is_data,is_electron,
+              lepton_eta[ilep],lepton_phi[ilep],is_data,is_electron,
               LeptonHLTStatus::pass_lowerdilep);
           lep_prob = 1.0-prob_lower[0];
           lep_unc = prob_lower[1];
@@ -308,10 +339,10 @@ vector<float> TriggerWeighter::GetFlavorProbability(
         //probability to pass only lower leg is prob(lower leg)-prob(upper leg)
         else if (lepton_status[ilep]==LeptonHLTStatus::pass_lowerdilep) {
           vector<float> prob_lower = GetLeptonProbability(lepton_pt[ilep],
-              lepton_eta[ilep],is_data,is_electron,
+              lepton_eta[ilep],lepton_phi[ilep],is_data,is_electron,
               LeptonHLTStatus::pass_lowerdilep);
           vector<float> prob_upper = GetLeptonProbability(lepton_pt[ilep],
-              lepton_eta[ilep],is_data,is_electron,
+              lepton_eta[ilep],lepton_phi[ilep],is_data,is_electron,
               LeptonHLTStatus::pass_upperdilep);
           lep_prob = prob_lower[0]-prob_upper[0];
           lep_unc = hypotf(prob_lower[1], prob_upper[1]);
@@ -321,10 +352,10 @@ vector<float> TriggerWeighter::GetFlavorProbability(
         //prob(upper leg)-prob(single lep)
         else if (lepton_status[ilep]==LeptonHLTStatus::pass_upperdilep) {
           vector<float> prob_upper = GetLeptonProbability(lepton_pt[ilep],
-              lepton_eta[ilep],is_data,is_electron,
+              lepton_eta[ilep],lepton_phi[ilep],is_data,is_electron,
               LeptonHLTStatus::pass_upperdilep);
           vector<float> prob_single = GetLeptonProbability(lepton_pt[ilep],
-              lepton_eta[ilep],is_data,is_electron,
+              lepton_eta[ilep],lepton_phi[ilep],is_data,is_electron,
               LeptonHLTStatus::pass_singlelep);
           lep_prob = prob_upper[0]-prob_single[0];
           lep_unc = hypotf(prob_upper[1], prob_single[1]);
@@ -333,7 +364,7 @@ vector<float> TriggerWeighter::GetFlavorProbability(
         //probability to pass single lep trigger
         else {
           vector<float> prob_single = GetLeptonProbability(lepton_pt[ilep],
-              lepton_eta[ilep],is_data,is_electron,
+              lepton_eta[ilep],lepton_phi[ilep],is_data,is_electron,
               LeptonHLTStatus::pass_singlelep);
           lep_prob = prob_single[0];
           lep_unc = prob_single[1];
@@ -378,41 +409,80 @@ vector<float> TriggerWeighter::GetFlavorProbability(
 }
 
 
-vector<float> TriggerWeighter::GetLeptonProbability(float lepton_pt, float lepton_eta,
-    bool is_data, bool is_electron, LeptonHLTStatus trigger_leg) {
+vector<float> TriggerWeighter::GetLeptonProbability(float lepton_pt, 
+    float lepton_eta, float lepton_phi, bool is_data, bool is_electron, 
+    LeptonHLTStatus trigger_leg) {
 
   //select map and key based on arguments
   correction::Correction::Ref* prob_map;
   correction::Correction::Ref* unc_map;
   if (is_electron) {
+    bool in_bpix_region = (lepton_eta > -1.566 && lepton_eta < 0.0 
+                           && lepton_phi > -1.2 && lepton_phi < -0.8);
     if (trigger_leg == LeptonHLTStatus::pass_lowerdilep) {
       if (is_data) {
-        prob_map = &map_diel_lower_dataeff_;
-        unc_map = &map_diel_lower_dataunc_;
+        if (in_bpix_region && post_bpix_) {
+          prob_map = &map_hole_diel_lower_dataeff_;
+          unc_map = &map_hole_diel_lower_dataunc_;
+        }
+        else {
+          prob_map = &map_diel_lower_dataeff_;
+          unc_map = &map_diel_lower_dataunc_;
+        }
       }
       else {
-        prob_map = &map_diel_lower_mceff_;
-        unc_map = &map_diel_lower_mcunc_;
+        if (in_bpix_region && post_bpix_) {
+          prob_map = &map_hole_diel_lower_mceff_;
+          unc_map = &map_hole_diel_lower_mcunc_;
+        }
+        else {
+          prob_map = &map_diel_lower_mceff_;
+          unc_map = &map_diel_lower_mcunc_;
+        }
       }
     }
     else if (trigger_leg == LeptonHLTStatus::pass_upperdilep) {
       if (is_data) {
-        prob_map = &map_diel_upper_dataeff_;
-        unc_map = &map_diel_upper_dataunc_;
+        if (in_bpix_region && post_bpix_) {
+          prob_map = &map_hole_diel_upper_dataeff_;
+          unc_map = &map_hole_diel_upper_dataunc_;
+        }
+        else {
+          prob_map = &map_diel_upper_dataeff_;
+          unc_map = &map_diel_upper_dataunc_;
+        }
       }
       else {
-        prob_map = &map_diel_upper_mceff_;
-        unc_map = &map_diel_upper_mcunc_;
+        if (in_bpix_region && post_bpix_) {
+          prob_map = &map_hole_diel_upper_mceff_;
+          unc_map = &map_hole_diel_upper_mcunc_;
+        }
+        else {
+          prob_map = &map_diel_upper_mceff_;
+          unc_map = &map_diel_upper_mcunc_;
+        }
       }
     }
     else {
       if (is_data) {
-        prob_map = &map_singleel_dataeff_;
-        unc_map = &map_singleel_dataunc_;
+        if (in_bpix_region && post_bpix_) {
+          prob_map = &map_hole_singleel_dataeff_;
+          unc_map = &map_hole_singleel_dataunc_;
+        }
+        else {
+          prob_map = &map_singleel_dataeff_;
+          unc_map = &map_singleel_dataunc_;
+        }
       }
       else {
-        prob_map = &map_singleel_mceff_;
-        unc_map = &map_singleel_mcunc_;
+        if (in_bpix_region && post_bpix_) {
+          prob_map = &map_hole_singleel_mceff_;
+          unc_map = &map_hole_singleel_mcunc_;
+        }
+        else {
+          prob_map = &map_singleel_mceff_;
+          unc_map = &map_singleel_mcunc_;
+        }
       }
     }
   }

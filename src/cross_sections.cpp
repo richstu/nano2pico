@@ -523,7 +523,7 @@ namespace xsec{
         if(file.Contains("WminusH_HtoZG"))        xsec = HToZG * xs_wmh / HToZG_onshellfrac;
         if(file.Contains("ZH_HtoZG"))             xsec = HToZG * xs_z_h / HToZG_onshellfrac;
         if(file.Contains("ZH_ZtoAll_HtoZGto2LG")) xsec = HToZG * xs_z_h * ZToLL / HToZG_onshellfrac;
-        if(file.Contains("ttHToZG"))              xsec = HToZG * xs_tth / HToZG_onshellfraac;
+        if(file.Contains("ttHToZG"))              xsec = HToZG * xs_tth / HToZG_onshellfrac;
 
         if(file.Contains("WplusH_HtoZG_WtoAll_Zto2L"))  xsec = HToZG * xs_wph * ZToLL / HToZG_onshellfrac;
         if(file.Contains("WminusH_HtoZG_WtoAll_Zto2L")) xsec = HToZG * xs_wmh * ZToLL / HToZG_onshellfrac;

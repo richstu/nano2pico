@@ -57,7 +57,6 @@ void Initialize(corrections_tree& wgt_sums);
 void GetOptions(int argc, char *argv[]);
 
 int main(int argc, char *argv[]){
-  // gErrorIgnoreLevel=6000; // Turns off ROOT errors due to missing branches       
   GetOptions(argc, argv);
 
   if(in_file=="" || in_dir=="" || out_dir == "") {
@@ -110,7 +109,8 @@ int main(int argc, char *argv[]){
         is2022preEE = true;
       }
     } else {
-      if (!Contains(in_file, "Summer2022EE")){
+      if (!Contains(in_file, "Summer2022EE") && 
+          !Contains(in_file, "Summer22EE")){
         is2022preEE = true;
       }
     }
@@ -134,14 +134,15 @@ int main(int argc, char *argv[]){
   else if (year == 2016 && !isAPV)         year_string = "2016";
   else if (year == 2017)                   year_string = "2017";
   else if (year == 2018)                   year_string = "2018";
-  else if (year == 2022 && !is2022preEE)   year_string = "2022";
-  else if (year == 2022 && is2022preEE)    year_string = "2022EE";
-  else if (year == 2023 && !is2023preBPix) year_string = "2023";
-  else if (year == 2023 && is2023preBPix)  year_string = "2023BPix";
+  else if (year == 2022 && is2022preEE)    year_string = "2022";
+  else if (year == 2022 && !is2022preEE)   year_string = "2022EE";
+  else if (year == 2023 && is2023preBPix)  year_string = "2023";
+  else if (year == 2023 && !is2023preBPix) year_string = "2023BPix";
   else {
     cout << "ERROR: unknown year";
     exit(1);
   }
+  cout << "Processing nano with settings for " << year_string << endl;
 
   //if (Contains(in_file, "RunIISummer20")) { 
   //  is_preUL = false;
@@ -254,8 +255,8 @@ int main(int argc, char *argv[]){
       rocco_file = "data/RoccoR2017.txt";
     else if (year==2018)
       rocco_file = "data/RoccoR2018.txt";
-    else
-      cout<<"WARNING: No rochester corrections for year."<<endl;
+    //else
+    //  cout<<"INFO: No rochester corrections for year."<<endl;
   }
   else {
     if (year==2016 && isAPV)
@@ -266,8 +267,8 @@ int main(int argc, char *argv[]){
       rocco_file = "data/zgamma/2017_UL/RoccoR2017UL.txt";
     else if (year==2018)
       rocco_file = "data/zgamma/2018_UL/RoccoR2018UL.txt";
-    else
-      cout<<"WARNING: No rochester corrections for year."<<endl;
+    //else
+    //  cout<<"INFO: No rochester corrections for year."<<endl;
   }
 
   //Initialize object producers
@@ -309,6 +310,7 @@ int main(int argc, char *argv[]){
   ISRTools isr_tools(in_path, year, nanoaod_version, isData);
 
   // Initialize trees
+  gErrorIgnoreLevel=6000; // Turns off ROOT errors due to missing branches
   nano_tree nano(in_path, nanoaod_version);
   //nano_tree nano(in_path, 9);
   size_t nentries(nent_test>0 ? nent_test : nano.GetEntries());
@@ -322,6 +324,7 @@ int main(int argc, char *argv[]){
   // cout << "Calculating weights based on " << year << " scale factors." << endl;
 
   pico_tree pico("", out_path);
+  gErrorIgnoreLevel=-1;
   cout << "Writing output to: " << out_path << endl;
 
   corrections_tree wgt_sums("", wgt_sums_path);
