@@ -2,6 +2,7 @@
 int run
 int lumiblock
 Long64_t event
+
 int type
 bool stitch
 bool stitch_ht
@@ -154,6 +155,9 @@ int nbdfl
 int nbdfm
 int nbdft
 
+bool ismapvetoevt
+bool ishemvetoevt
+
 vector<float> jet_pt
 vector<float> jet_eta
 vector<float> jet_phi
@@ -172,7 +176,10 @@ vector<bool>  jet_islep
 vector<bool>  jet_isvlep
 vector<bool>  jet_isphoton
 vector<bool>  jet_isgood
-vector<bool>  jet_id
+vector<bool>  jet_isgood_min
+vector<bool>  jet_isvetomap
+vector<bool>  jet_isvetohem
+vector<int>   jet_id
 vector<int>   jet_hflavor
 vector<int>   jet_pflavor
 vector<int>   jet_genjet_idx

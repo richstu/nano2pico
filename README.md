@@ -20,15 +20,39 @@ source set_env.sh
 
 You can then compile via `scons` or `compile.sh`.
 
-## Productions
+## Changelog
 
-Variables stored in the pico can be seen in [variables/pico](variables/pico). For an overview of the available branches, see the dedicated section at the bottom of this README.
+Changelog for `htozgamma_lassen_v0` to `htozgamma_pinnacles_v0`
+Feature updates:
+* baseline selection bitmap in working state. Does not include `use_event`
+* categorization bitmap in working state
+* scale/smearing corrections for electrons, photons in 2022(EE)
+* 2022, 2023 electrons now use HZZ mva, with correct WP
+* updates to electron, muon, photon, trigger weights and weighting scripts for 2016APV-2023BPix
+* added b-tagging weights, jet/met scale/resolution corrections and uncertainties for 2022-2023BPix
+* jet horn veto fix: [details](https://indico.cern.ch/event/1484999/contributions/6334792/attachments/2999306/5284969/2025_01_22_hzg_objectsdq.pdf)
+* rochester corrected muon pT now default
+* DY sample now preserves all truth photons
+* fill certain dijet related branches when only one jet, for VBF BDT purposes
+* overlap removal rework
 
-To see the sizes and number of files in all available productions do:
+Minor modifications+bug fixes:
+* missing cross-sections added
+* fixed floating point issues in `wgt_sums` root files
+* photons manually ordered by pT
+* jet isphoton bug where if `Photon_jetIdx` had entry, `dR(photon, otherjets)` would not be checked
+* Generic floating point comparison fixes
+* Added libraries for RooFit and lRooFitCore in makefile
 
-~~~~bash
-  ./scripts/count_root_files.py -f /net/cms29/cms29r0/pico/NanoAODv5/
-~~~~
+`htozgamma_pinnacles_v0_patch` applies bug fixes to:
+* `merge_corrections.cxx` now works for 2023
+* 2022-2023BPix DYG cross sections added for alternate binning schemes
+* 2022-2023BPix DYG overlap removal naming fix and floating point bug fix
+* overlap removal floating point bugs
+
+`htozgamma_pinnacles_v0_patch_1`:
+(Obsolete, no production associated with this patch)
+
 
 ## How does nano2pico work?
 
