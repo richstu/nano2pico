@@ -507,7 +507,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
     }
 
     bool in_jet_horn_eta_veto = (year >=2017 && nano.Jet_pt()[ijet] < 40.0f && fabs(nano.Jet_eta()[ijet]) > 2.5f && fabs(nano.Jet_eta()[ijet]) < 3.0f); 
-    bool isgood_min = !islep && !isphoton && (fabs(nano.Jet_eta()[ijet]) <= max_jet_eta) && pass_jetidFix && !in_jet_horn_eta_veto;//For studying jetmaps and HEM vetos.
+    bool isgood_min = !islep && !isphoton && (fabs(nano.Jet_eta()[ijet]) <= max_jet_eta) && pass_jetidFix;//For studying jetmaps and HEM vetos. Don't include eta veto yet in order to remove anomalous met events.
 
     //2018 HEM veto. JetMET POG gives tighter selection than ours except 15 GeV cut. Apply our selection, with lower pT cut for veto events.
     bool isvetohem  = false;
@@ -532,6 +532,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
     }
 
     //don't include pt in isgood until later in order to save systematics
+    isgood_min = isgood_min && !in_jet_horn_eta_veto;
     bool isgood = !islep && !isphoton && (fabs(nano.Jet_eta()[ijet]) <= max_jet_eta) && pass_jetidFix && !isvetomap && !in_jet_horn_eta_veto && !isvetohem;
     //sys_jetvar convention: [0] JER up, [1] JER down, [2] JEC up, [3] JEC down
     //for now, only save sys_ variables
