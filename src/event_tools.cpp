@@ -797,9 +797,15 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
   }
   else if (isHiggsino) {
     // this assumes that we process either all the datasets or at least an ordered subset starting with the DoubleEG 
-    if (dataset==Dataset::DoubleEG                                 && doubleeg_trigs) return true;
-    else if (dataset==Dataset::EGamma                              && doubleeg_trigs) return true;
-    else if (dataset==Dataset::MET                    && met_trigs && !doubleeg_trigs) return true;
+    //if (dataset==Dataset::DoubleEG                                 && doubleeg_trigs) return true;
+    //else if (dataset==Dataset::EGamma                              && doubleeg_trigs) return true;
+    //else if (dataset==Dataset::MET                    && met_trigs && !doubleeg_trigs) return true;
+    //else return false;
+    if (dataset==Dataset::MET                                                                && met_trigs) return true;
+    else if (year==2018 && dataset==Dataset::EGamma                         && egamma_trigs && !met_trigs) return true;
+    else if ((year==2016 || year==2017) && dataset==Dataset::SingleElectron && egamma_trigs && !met_trigs) return true;
+    else if (dataset==Dataset::SingleMuon                    && muon_trigs  && egamma_trigs && !met_trigs)  return true;
+    else if (dataset==Dataset::JetHT         && jetht_trigs && !muon_trigs && !egamma_trigs && !met_trigs) return true;
     else return false;
   }  
   else {
