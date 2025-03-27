@@ -43,8 +43,8 @@ private:
   bool isData;
   std::unique_ptr<correction::CorrectionSet> cs_scale_syst_;
   correction::Correction::Ref map_scale_syst_; //run2, just has uncertainties
-  correction::Correction::Ref map_scale_; //run3 has scale correction and uncertainty
-  correction::Correction::Ref map_smearing_; //run3 has smearing correction and uncertainty
+  correction::CompoundCorrection::Ref map_scale_; //run3 scale
+  correction::Correction::Ref map_smearing_; //run3 smearing
   std::string str_scale_syst_;
   TRandom3 rng_;
   float nanoaod_version;

@@ -12,7 +12,8 @@
 
 using namespace std;
 
-PhotonProducer::PhotonProducer(string year_, bool isData_, float nanoaod_version_){
+PhotonProducer::PhotonProducer(string year_, bool isData_, 
+                               float nanoaod_version_){
   year = year_;
   isData = isData_;
   nanoaod_version = nanoaod_version_;
@@ -42,22 +43,44 @@ PhotonProducer::PhotonProducer(string year_, bool isData_, float nanoaod_version
   }
   else if (year=="2022") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2022/photonSS.json");
-    map_scale_ = cs_scale_syst_->at("2022Re-recoBCD_ScaleJSON");
-    map_smearing_ = cs_scale_syst_->at("2022Re-recoBCD_SmearingJSON");
+        "data/zgamma/2022/photonSS_EtDependent.json");
+    map_scale_ = cs_scale_syst_->compound().at(
+        "EGMScale_Compound_Pho_2022preEE");
+    map_smearing_ = cs_scale_syst_->at(
+        "EGMSmearAndSyst_PhoPTsplit_2022preEE");
   }
   else if (year=="2022EE") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2022EE/photonSS.json");
-    map_scale_ = cs_scale_syst_->at("2022Re-recoE+PromptFG_ScaleJSON");
-    map_smearing_ = cs_scale_syst_->at("2022Re-recoE+PromptFG_SmearingJSON");
+        "data/zgamma/2022EE/photonSS_EtDependent.json");
+    map_scale_ = cs_scale_syst_->compound().at(
+        "EGMScale_Compound_Pho_2022postEE");
+    map_smearing_ = cs_scale_syst_->at(
+        "EGMSmearAndSyst_PhoPTsplit_2022postEE");
+  }
+  else if (year=="2023") {
+    cs_scale_syst_ = correction::CorrectionSet::from_file(
+        "data/zgamma/2023/photonSS_EtDependent.json");
+    map_scale_ = cs_scale_syst_->compound().at(
+        "EGMScale_Compound_Pho_2023preBPIX");
+    map_smearing_ = cs_scale_syst_->at(
+        "EGMSmearAndSyst_PhoPTsplit_2023preBPIX");
+  }
+  else if (year=="2023BPix") {
+    cs_scale_syst_ = correction::CorrectionSet::from_file(
+        "data/zgamma/2023BPix/photonSS_EtDependent.json");
+    map_scale_ = cs_scale_syst_->compound().at(
+        "EGMScale_Compound_Pho_2023postBPIX");
+    map_smearing_ = cs_scale_syst_->at(
+        "EGMSmearAndSyst_PhoPTsplit_2023postBPIX");
   }
   else {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2022EE/photonSS.json");
-    map_scale_ = cs_scale_syst_->at("2022Re-recoE+PromptFG_ScaleJSON");
-    map_smearing_ = cs_scale_syst_->at("2022Re-recoE+PromptFG_SmearingJSON");
-    std::cout << "WARNING: No dedicated EGM scale/smearing JSONs, defaulting to 2022EE" << std::endl;
+        "data/zgamma/2023BPix/photonSS_EtDependent.json");
+    map_scale_ = cs_scale_syst_->compound().at(
+        "EGMScale_Compound_Pho_2023postBPIX");
+    map_smearing_ = cs_scale_syst_->at(
+        "EGMSmearAndSyst_PhoPTsplit_2023postBPIX");
+    std::cout << "WARNING: No dedicated EGM scale/smearing JSONs, defaulting to 2023BPix" << std::endl;
   }
 }
 
@@ -106,24 +129,21 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
       smearing_syst_up = 1.0f+nano.Photon_dEsigmaUp()[iph];
       smearing_syst_dn = 1.0f+nano.Photon_dEsigmaDown()[iph];
     }
-    else if (year=="2022"||year=="2022EE") {
-      //TODO add 2023(BPix) when available
+    else if ((year=="2022"||year=="2022EE"||year=="2023"||year=="2023BPix") 
+             && pt>20) {
       float run = static_cast<float>(nano.run());
+      float r9 = fmin(fmax(nano.Photon_r9()[iph],0.0),1.0);
+      float seedGain = static_cast<float>(nano.Photon_seedGain()[iph]);
       if (isData) {
         //scale corrections applied to data
-        scaleres_corr = map_scale_->evaluate({"total_correction",
-            nano.Photon_seedGain()[iph],run,eta,
-            nano.Photon_r9()[iph],pt});
+        scaleres_corr = map_scale_->evaluate({"scale",run,eta,r9,fabs(eta),pt,
+            seedGain});
       }
       else {
         //smearing corrections applied to MC, syst.s also calculated
-        float rho = map_smearing_->evaluate({"rho",eta,
-            nano.Photon_r9()[iph]});
-        float err_rho = map_smearing_->evaluate({"err_rho",eta,
-            nano.Photon_r9()[iph]});
-        float scale_unc = map_scale_->evaluate({"total_uncertainty",
-            nano.Photon_seedGain()[iph],run,eta,
-            nano.Photon_r9()[iph],pt});
+        float rho = map_smearing_->evaluate({"smear",pt,r9,fabs(eta)});
+        float err_rho = map_smearing_->evaluate({"esmear",pt,r9,fabs(eta)});
+        float scale_unc = map_smearing_->evaluate({"escale",pt,r9,fabs(eta)});
         float rand = rng_.Gaus();
         scaleres_corr = 1.0f+rand*rho;
         smearing_syst_up = 1.0f+rand*(rho+err_rho);

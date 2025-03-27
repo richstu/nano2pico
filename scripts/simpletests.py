@@ -99,7 +99,8 @@ input_files = [
                '/net/cms11/cms11r0/pico/NanoAODv12/nano/2023/data/Muon1__Run2023C__22Sep2023_v1-v1__50000__a927c73e-4a29-4630-8814-7151d5d98cb9.root',
                '/net/cms11/cms11r0/pico/NanoAODv12/nano/2023/mc/GluGluHtoZG_Zto2L_M-125_TuneCP5_13p6TeV_powheg-pythia8__Run3Summer23NanoAODv12__130X_mcRun3_2023_realistic_v15-v3__50000__00f0d80c-0a3a-4243-8b81-0321d5f9c36e.root',
                '/net/cms11/cms11r0/pico/NanoAODv12/nano/2023BPix/data/EGamma0__Run2023D__22Sep2023_v2-v1__40000__9b38e671-508e-43b8-8486-9b341bfc2cac.root',
-               '/net/cms11/cms11r0/pico/NanoAODv12/nano/2023BPix/mc/TTto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8__Run3Summer23BPixNanoAODv12__130X_mcRun3_2023_realistic_postBPix_v2-v3__2550000__844b724c-9c84-4ae3-8b91-04d6d1d84212.root']
+               '/net/cms11/cms11r0/pico/NanoAODv12/nano/2023BPix/mc/TTto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8__Run3Summer23BPixNanoAODv12__130X_mcRun3_2023_realistic_postBPix_v2-v3__2550000__844b724c-9c84-4ae3-8b91-04d6d1d84212.root'
+               ]
 
 #input_files = ['/net/cms17/cms17r0/pico/NanoAODv9/nano/2017/signal/GluGluHToZG_ZToLL_M-125_TuneCP5_13TeV-powheg-pythia8__RunIISummer20UL17NanoAODv9__106X_mc2017_realistic_v9-v1__70000__93B37B9F-16D5-6F4F-B920-3B9C682CA8A8.root']
 

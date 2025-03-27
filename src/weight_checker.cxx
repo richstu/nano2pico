@@ -21,13 +21,15 @@ using std::map;
 using std::string;
 using std::vector;
 
+const float sf_big_threshold = 12.0;
+
 unsigned max(unsigned a, unsigned b) {
   if (a>b) return a;
   return b;
 }
 
 bool sf_is_bad(float value) {
-  return isnan(value) || isinf(value) || (fabs(value)>12.0);
+  return isnan(value) || isinf(value) || (fabs(value)>sf_big_threshold);
 }
 
 void incr_vector(vector<unsigned>& vec, unsigned max) {
@@ -86,8 +88,9 @@ int main() {
   vector<int> years = {2016,2016,2017,2018,2022,2022,2023,2023};
   vector<string> years_string = {"2016APV","2016","2017","2018","2022","2022EE","2023","2023BPix"};
 
-  vector<float> el_pt_bins = {7.0,10.0,20.0,35.0,50.0,100.0,200.0,500.0};
+  vector<float> el_pt_bins = {7.0,15.0,20.0,35.0,50.0,100.0,500.0};
   vector<float> el_eta_bins = {-2.5,-2.0,-1.566,-1.444,-0.8,0.0,0.8,1.444,1.566,2.0,2.5};
+  vector<float> el_phi_bins = {-3.1416,-1.2,-0.8};
   vector<float> mu_pt_bins = {5.0,6.0,7.0,8.0,10.0,12.0,15.0,20.0,25.0,30.0,35.0,40.0,50.0,60.0,80.0,120.0,200.0};
   vector<float> mu_eta_bins = {0.0,0.9,1.2,2.1,2.4};
   vector<float> jet_pt_bins = {30.0,40.0,50.0,60.0,70.0,80.0,90.0,100.0,150.0,200.0,250.0,300.0,350.0,400.0,500.0,600.0,800.0,1000.0};
@@ -116,7 +119,9 @@ int main() {
                                    23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,
                                    31.0,32.0,33.0,34.0,35.0,38.0,40.0,45.0,
                                    50.0,80.0,100.0,120.0,200.0,500.0};
-  vector<float> trig_el_eta_bins = {-2.5,-2.0,-1.566,-1.4442,-0.8,0.0,0.8,1.4442,1.566,2.0,2.5};
+  vector<float> trig_el_eta_bins = {-2.5,-2.0,-1.566,-1.4442,-0.8,0.0,0.8,
+                                    1.4442,1.566,2.0,2.5};
+  vector<float> trig_el_phi_bins = {-3.1416,-1.2,-0.8};
   vector<float> trig_mu_pt_bins = {5.0,7.75,8.0,8.1,8.25,8.5,10.0,15.0,16.75,
                                    17.0,17.1,17.25,18.0,20.0,23.0,23.75,24.0,
                                    24.25,24.5,25.0,26.0,26.75,27.0,27.25,27.5,
@@ -129,7 +134,7 @@ int main() {
   bool check_electron_weights = true;
   bool check_muon_weights = true;
   bool check_photon_weights = true;
-  bool check_trigger_weights = false;
+  bool check_trigger_weights = true;
   bool check_btag_weights = true;
   bool verbose = false;
   unsigned trig_nlep_max = 3;
