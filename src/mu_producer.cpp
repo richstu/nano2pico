@@ -27,7 +27,7 @@ bool MuonProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma) {
     if (fabs(eta) > MuonEtaCut) return false;
     if (fabs(nano.Muon_dz()[nano_idx])>dzCut)  return false;
     if (fabs(nano.Muon_dxy()[nano_idx])>dxyCut) return false; 
-    if ((nano.Muon_looseId()[nano_idx] || (pt > MuonHighPt && nano.Muon_highPtId()[nano_idx])) && 
+    if (nano.Muon_looseId()[nano_idx] && 
          nano.Muon_pfRelIso03_all()[nano_idx] < MuonRelIsoCut &&
          nano.Muon_sip3d()[nano_idx] < MuonSip3dCut)
       return true;

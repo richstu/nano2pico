@@ -118,7 +118,7 @@ for input_file in input_files:
     #cmd = './run/process_nano.exe --in_file '+infile+' --in_dir '+indir+' --out_dir out/zgamma/'
     cmd = './run/process_nano.exe --in_file '+infile+' --in_dir '+indir+' --out_dir out/zgamma/ --nent 1000'
     print_and_run(cmd)
-  #merge corrections
+  ##merge corrections
   #for infile in infiles:
   #  cmd = './run/merge_corrections.exe out/zgamma/corrections/corr_'+infile
   #  cmd += ' out/zgamma/wgt_sums/wgt_sums_'+infile
