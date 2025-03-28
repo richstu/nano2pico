@@ -119,7 +119,7 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
   if(isTTJets_LO_Incl && !isFastSim) {
     if (nano.LHE_HTIncoming()>600.f) 
       pico.out_stitch_htmet() = pico.out_stitch_ht() = false;
-    if(year==2018 && nano.GenMET_pt()>80.f)
+    if(year==2018 && nano.GenMET_pt()>150.f)
       pico.out_stitch_htmet() = pico.out_stitch() = false;
     else if (nano.GenMET_pt()>150.f) 
       pico.out_stitch_htmet() = pico.out_stitch() = false;
@@ -804,7 +804,7 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
     if (dataset==Dataset::MET                                                                && met_trigs) return true;
     else if (year==2018 && dataset==Dataset::EGamma                         && egamma_trigs && !met_trigs) return true;
     else if ((year==2016 || year==2017) && dataset==Dataset::SingleElectron && egamma_trigs && !met_trigs) return true;
-    else if (dataset==Dataset::SingleMuon                    && muon_trigs  && egamma_trigs && !met_trigs)  return true;
+    else if (dataset==Dataset::SingleMuon                    && muon_trigs && !egamma_trigs && !met_trigs) return true;
     else if (dataset==Dataset::JetHT         && jetht_trigs && !muon_trigs && !egamma_trigs && !met_trigs) return true;
     else return false;
   }  
