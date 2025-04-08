@@ -20,40 +20,6 @@ source set_env.sh
 
 You can then compile via `scons` or `compile.sh`.
 
-## Changelog
-
-Changelog for `htozgamma_lassen_v0` to `htozgamma_pinnacles_v0`
-Feature updates:
-* baseline selection bitmap in working state. Does not include `use_event`
-* categorization bitmap in working state
-* scale/smearing corrections for electrons, photons in 2022(EE)
-* 2022, 2023 electrons now use HZZ mva, with correct WP
-* updates to electron, muon, photon, trigger weights and weighting scripts for 2016APV-2023BPix
-* added b-tagging weights, jet/met scale/resolution corrections and uncertainties for 2022-2023BPix
-* jet horn veto fix: [details](https://indico.cern.ch/event/1484999/contributions/6334792/attachments/2999306/5284969/2025_01_22_hzg_objectsdq.pdf)
-* rochester corrected muon pT now default
-* DY sample now preserves all truth photons
-* fill certain dijet related branches when only one jet, for VBF BDT purposes
-* overlap removal rework
-
-Minor modifications+bug fixes:
-* missing cross-sections added
-* fixed floating point issues in `wgt_sums` root files
-* photons manually ordered by pT
-* jet isphoton bug where if `Photon_jetIdx` had entry, `dR(photon, otherjets)` would not be checked
-* Generic floating point comparison fixes
-* Added libraries for RooFit and lRooFitCore in makefile
-
-`htozgamma_pinnacles_v0_patch` applies bug fixes to:
-* `merge_corrections.cxx` now works for 2023
-* 2022-2023BPix DYG cross sections added for alternate binning schemes
-* 2022-2023BPix DYG overlap removal naming fix and floating point bug fix
-* overlap removal floating point bugs
-
-`htozgamma_pinnacles_v0_patch_1`:
-(Obsolete, no production associated with this patch)
-
-
 ## How does nano2pico work?
 
 This package is used to do the Nano -> pico conversion in three steps in order to allow parallelizing the production at the sub-dataset level:
@@ -410,11 +376,11 @@ Previously calculated in many dedicated files, but for UL, now calculated in [ev
 * `w_el` - weights to correct electron ID efficiency
 * `w_mu` - weights to correct muon ID efficiency
 * `w_fs_lep` - weights to correct FastSim lepton ID efficiency
-* `w_photon` - weights to correct photon ID and electron veto efficiency _currently not correct_
-* `w_photon_id` - weights to correct photon ID efficiency _currently not correct_
+* `w_photon` - weights to correct photon ID and electron veto efficiency 
+* `w_photon_id` - weights to correct photon ID efficiency 
 * `w_photon_csev` - weights to correct photon electron-veto efficiency
 * `w_btag` - weight to correct _medium WP only_ of deepCSV b-jet ID efficiency
-* `w_btag_df` - weight to correct _medium WP only_ of deepFlavor b-jet ID efficiency
+* `w_btag_df` - weight to correct _medium WP only_ of deepFlavor b-jet ID efficiency. This is now default in HtoZgamma productions
 * `w_bhig` - weight to correct _all WPs_ of deepCSV b-jet ID efficiency
 * `w_bhig_df` - weight to correct _all WPs_ of deepFlavor b-jet ID efficiency. This should be used as the primary b-tag weight
 * `w_isr` - 1., except for TTJets 2016 and signal, SUSY ISR reweighting
@@ -716,3 +682,38 @@ Below are examples
 [In new code folder] ./scripts/produce_unit_test_cross_sections.py --output_log unit_test_cross_section.log
 ./scripts/validate_unit_test_cross_section.py --output_filename validate_unit_test_cross_section.log --golden_cross_section_log OLD_CODE/unit_test_cross_section.log --validate_cross_section_log NEW_CODE/unit_test_cross_section.log
 ~~~
+
+## Changelog
+
+Changelog for `htozgamma_lassen_v0` to `htozgamma_pinnacles_v0`
+Feature updates:
+* baseline selection bitmap in working state. Does not include `use_event`
+* categorization bitmap in working state
+* scale/smearing corrections for electrons, photons in 2022(EE)
+* 2022, 2023 electrons now use HZZ mva, with correct WP
+* updates to electron, muon, photon, trigger weights and weighting scripts for 2016APV-2023BPix
+* added b-tagging weights, jet/met scale/resolution corrections and uncertainties for 2022-2023BPix
+* jet horn veto fix: [details](https://indico.cern.ch/event/1484999/contributions/6334792/attachments/2999306/5284969/2025_01_22_hzg_objectsdq.pdf)
+* rochester corrected muon pT now default
+* DY sample now preserves all truth photons
+* fill certain dijet related branches when only one jet, for VBF BDT purposes
+* overlap removal rework
+
+Minor modifications+bug fixes:
+* missing cross-sections added
+* fixed floating point issues in `wgt_sums` root files
+* photons manually ordered by pT
+* jet isphoton bug where if `Photon_jetIdx` had entry, `dR(photon, otherjets)` would not be checked
+* Generic floating point comparison fixes
+* Added libraries for RooFit and lRooFitCore in makefile
+
+`htozgamma_pinnacles_v0_patch` applies bug fixes to:
+* `merge_corrections.cxx` now works for 2023
+* 2022-2023BPix DYG cross sections added for alternate binning schemes
+* 2022-2023BPix DYG overlap removal naming fix and floating point bug fix
+* overlap removal floating point bugs
+
+`htozgamma_pinnacles_v0_patch_1`:
+(Obsolete, no production associated with this patch)
+
+

@@ -27,7 +27,7 @@ bool MuonProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma) {
     if (fabs(eta) > MuonEtaCut) return false;
     if (fabs(nano.Muon_dz()[nano_idx])>dzCut)  return false;
     if (fabs(nano.Muon_dxy()[nano_idx])>dxyCut) return false; 
-    if ((nano.Muon_looseId()[nano_idx] || (pt > MuonHighPt && nano.Muon_highPtId()[nano_idx])) && 
+    if (nano.Muon_looseId()[nano_idx] && 
          nano.Muon_pfRelIso03_all()[nano_idx] < MuonRelIsoCut &&
          nano.Muon_sip3d()[nano_idx] < MuonSip3dCut)
       return true;
@@ -131,6 +131,10 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
           pico.out_mu_ptErr().push_back(pt*rc.kSmearMCerror(nano.Muon_charge()[imu],pt,eta,nano.Muon_phi()[imu],Muon_nTrackerLayers[imu],unif_rand));
         }
       }
+    }
+    else if (nanoaod_version > 11.95) {
+      pico.out_mu_pt().push_back(nano.Muon_bsConstrainedPt()[imu]);
+      pico.out_mu_ptErr().push_back(nano.Muon_bsConstrainedPtErr()[imu]);
     }
     else {
       pico.out_mu_pt().push_back(pt);

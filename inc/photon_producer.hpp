@@ -43,7 +43,7 @@ private:
   bool idPhoton(int bitmap, int level);
   std::unique_ptr<correction::CorrectionSet> cs_scale_syst_;
   correction::Correction::Ref map_scale_syst_;
-  correction::Correction::Ref map_scale_;
+  correction::CompoundCorrection::Ref map_scale_;
   correction::Correction::Ref map_smearing_;
   std::string str_scale_syst_;
 };
