@@ -49,23 +49,23 @@ int main(int argc, char *argv[]){
   if (Contains(filename, "SMS-TChiHH_HToAll")){
     double exsec(0.);
     int mglu = GetHiggsinoMass(filename);
-    xsec::higgsinoCrossSection(mglu, xsec, exsec);
+    xsec::higgsinoCrossSection(mglu, xsec, exsec, year);
     xsec = xsec / .5824/.5824; // Remove H to bb branch ratio
     exsec = exsec / .5824/.5824; // Remove H to bb branch ratio
   } else if (Contains(filename, "SMS-TChi")){
     double exsec(0.);
     int mglu = GetHiggsinoMass(filename);
-    xsec::higgsinoCrossSection(mglu, xsec, exsec);
+    xsec::higgsinoCrossSection(mglu, xsec, exsec, year);
   } else if (Contains(filename, "SMS-T5qqqqZH_HToBB")) {
     double exsec(0.);
     int mglu = GetGluinoMass(filename);
-    xsec::gluinoCrossSection(mglu, xsec, exsec);
+    xsec::gluinoCrossSection(mglu, xsec, exsec, year);
     xsec = xsec * .5824*.5824; // Add in H to bb branch ratio
     exsec = exsec * .5824*.5824; // Add in H to bb branch ratio
   } else if (Contains(filename, "SMS-T5qqqqZH-")) {
     double exsec(0.);
     int mglu = GetGluinoMass(filename);
-    xsec::gluinoCrossSection(mglu, xsec, exsec);
+    xsec::gluinoCrossSection(mglu, xsec, exsec, year);
   }else{
     xsec = xsec::crossSection(filename, year);  
   }
