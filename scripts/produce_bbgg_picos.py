@@ -168,17 +168,18 @@ def processMc(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, 
   mc_tag=PRODUCTION_NAME+'_'+YEAR+'_mc'
   # Add mc commands
   process_commands = [
-    #0 for specific datasets
-    #[notify_script+' "Start process nano '+mc_tag+'"',
-    #'./scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/mc/ --production '+PRODUCTION_NAME+' --dataset_list txt/datasets/'+NANOAOD_VERSION+'_bbgg_higgsino_'+YEAR+'_mc_dataset_paths --tag '+mc_tag,
-    #'auto_submit_jobs.py process_nano_cmds_'+mc_tag+'.json -c scripts/check_process_nano_job.py -f',
-    #notify_script+' "Finished process nano '+mc_tag+'"'], 
-    
-    #0 for all datasets inside mc folder
+    #0 STEP 0 FOR SPECIFIC DATASETS ##########################
     [notify_script+' "Start process nano '+mc_tag+'"',
-    './scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/mc/ --production '+PRODUCTION_NAME+' --tag '+mc_tag,
+    './scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/mc/ --production '+PRODUCTION_NAME+' --dataset_list txt/datasets/'+NANOAOD_VERSION+'_bbgg_higgsino_'+YEAR+'_mc_dataset_paths --tag '+mc_tag,
     'auto_submit_jobs.py process_nano_cmds_'+mc_tag+'.json -c scripts/check_process_nano_job.py -f',
     notify_script+' "Finished process nano '+mc_tag+'"'], 
+    
+    
+    #0 for all datasets inside mc folder
+    #[notify_script+' "Start process nano '+mc_tag+'"',
+    #'./scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/mc/ --production '+PRODUCTION_NAME+' --tag '+mc_tag,
+    #'auto_submit_jobs.py process_nano_cmds_'+mc_tag+'.json -c scripts/check_process_nano_job.py -f',
+    #notify_script+' "Finished process nano '+mc_tag+'"'], 
 
     #1
     [notify_script+' "Start merge corrections '+mc_tag+'"',
