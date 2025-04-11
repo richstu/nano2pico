@@ -16,6 +16,7 @@ def get_2d_mass_points(signal_chain, pdgId_1, pdgId_2):
       mass_points.add((mass_array_1[iVar], int(round(mass_array_2[iVar]/25)*25)))
     else:
       mass_points.add((int(round(mass_array_1[iVar]/25)*25), int(round(mass_array_2[iVar]/25)*25)))
+  print(mass_points)
   return sorted(mass_points)
 
 if __name__ == '__main__':
@@ -51,7 +52,7 @@ source_directory = "'''+source_directory+'''/"
 target_directory = "'''+target_directory+'''/"
 mass_points = '''+str(mass_points)+'''
 for mass_point in mass_points:
-  print("'''+os.getcwd()+'''/scripts/skim_file.py -m "+str(mass_point[0])+" -l "+str(mass_point[1])+" -i \\""+source_directory+"'''+args.dataset_filenames+'''\\" -o "+target_directory)
+  print("'''+os.getcwd()+'''/scripts/skim_file.py -m "+str(mass_point[0])+" -l "+str(mass_point[1])+" -i '"+source_directory+"'''+args.dataset_filenames+'''' -o "+target_directory)
 '''
   else:
     out_string = '''#!/bin/env python
@@ -75,7 +76,7 @@ mass_points = [127, 150, 175,
                ]
 
 for mass in mass_points:
-  print("'''+os.getcwd()+'''/scripts/skim_file.py -m "+str(mass)+" -i \\""+source_directory+"'''+args.dataset_filenames+'''\\" -o "+target_directory)
+  print("'''+os.getcwd()+'''/scripts/skim_file.py -m "+str(mass)+" -i '"+source_directory+"'''+args.dataset_filenames+'''' -o "+target_directory)
 '''
 
   with open(args.out_cmd_filename, 'w') as out_cmd_file:

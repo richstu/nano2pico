@@ -511,7 +511,7 @@ Generate a python file that prints the commands to be run in the batch (input fo
                                                  --out_cmd_filename cmds_split_2018_2D.py
 
 convert_cl_to_jobs_info.py cmds_split.py cmds_split.py.json
-auto_submit_jobs.py cmds_split.py.json -c jobscript_check.py -n cms1
+auto_submit_jobs.py cmds_split.py.json -c jobscript_check.py -n cms11
 ~~~~
 
 
@@ -528,9 +528,9 @@ model in the below commands are use for globbing files in the input directory.
                                                  --model "SMS-T5qqqqZH_HToBB-mN2"
 
 convert_cl_to_jobs_info.py split_gluino_2016.py split_gluino_2016.json
-auto_submit_jobs.py split_gluino_2016.json -c jobscript_check.py -n cms1
+auto_submit_jobs.py split_gluino_2016.json -c jobscript_check.py -n cms11
 convert_cl_to_jobs_info.py split_gluino_mN2_2016.py split_gluino_mN2_2016.json
-auto_submit_jobs.py split_gluino_mN2_2016.json -c jobscript_check.py -n cms1
+auto_submit_jobs.py split_gluino_mN2_2016.json -c jobscript_check.py -n cms11
 
 ./scripts/write_split_gluino_mass_points_cmds.py --in_dir /net/cms24/cms24r0/pico/NanoAODv7/nano/2017/SMS-T5qqqqZH_unsplit_fastSimJmeCorrection 
                                                  --out_cmd_filename split_gluino_2017.py 

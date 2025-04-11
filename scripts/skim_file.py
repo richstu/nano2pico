@@ -97,7 +97,7 @@ if __name__ == '__main__':
     #out_filename = out_filename.replace('SMS-TChiHH_HToBB_HToBB', 'SMS-TChiHH_mChi-'+str(mass)+'_mLSP-1')
     out_filename = out_filename.replace('SMS-TChiHH', 'SMS-TChiHH_mChi-'+str(mass)+'_mLSP-'+str(mass_lsp))
     out_file_path = os.path.join(args['output_dir'], out_filename)
-    treename = 'Events'
+    treename = "Events"
   elif args['skim_name'] !="":
     cut_string = get_cuts(args['skim_name'])
     out_filename = os.path.basename(os.path.realpath(file_paths_string))
@@ -106,10 +106,10 @@ if __name__ == '__main__':
   else:
     sys.exit("You have to specify either mass or cut string.")
   
-
   chain = ROOT.TChain(treename)
   chain.Add(file_paths_string)
   nent_total = chain.GetEntries()
+  print(nent_total, chain.GetNtrees())
   nent_skim = chain.GetEntries(cut_string)
   print('Found {} events satisfying the skim requirements.'.format(nent_skim))
 
