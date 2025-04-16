@@ -59,10 +59,10 @@ EventTools::EventTools(const string &name_, int year_, bool isData_, float nanoa
     isGJet = true;
 
   // add names for Run 3 samples
-  if(Contains(name, "TTtoLplusNu2Q-3Jets") || Contains(name, "TTtoLminusNu2Q-3Jets") && !Contains(name, "genMET-"))
+  if((Contains(name, "TTtoLplusNu2Q-3Jets") || Contains(name, "TTtoLminusNu2Q-3Jets")) && !Contains(name, "genMET-"))
     isTTJets_LO_Incl = true;
   
-  if(Contains(name, "TTtoLplusNu2Q-3Jets") || Contains(name, "TTtoLminusNu2Q-3Jets") && Contains(name, "genMET-"))
+  if((Contains(name, "TTtoLplusNu2Q-3Jets") || Contains(name, "TTtoLminusNu2Q-3Jets")) && Contains(name, "genMET-"))
     isTTJets_LO_MET = true;
 
   if(Contains(name, "WtoLNu-4Jets_Tune"))
