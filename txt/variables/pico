@@ -186,6 +186,8 @@ vector<bool>  jet_h2d
 vector<int>   jet_fjet_idx
 vector<int>   jet_h1_indices
 vector<int>   jet_h2_indices
+vector<int>   jet_h1_df_indices
+vector<int>   jet_h2_df_indices
 vector<int>   jet_ordered_pt_indices
 
 

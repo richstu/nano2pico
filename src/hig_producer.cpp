@@ -36,6 +36,16 @@ void HigVarProducer::WriteHigVars(pico_tree &pico, bool doDeepFlav, bool isSigna
       ordered_by_pt.push_back(make_pair(ijet, pico.out_jet_pt()[ijet])); //* new addition
     }
   }
+  
+  // ideally this should be in jetmet_producer.cpp but it will be moved once I understand what is going on in there
+  sort(ordered_by_pt.begin(), ordered_by_pt.end(), //* new addition
+        [](const pair<int, float> &a, const pair<int, float> &b) -> bool {
+          return a.second > b.second;
+        }); 
+  for (unsigned ijet(0); ijet<pico.out_jet_pt().size(); ijet++){
+    pico.out_jet_ordered_pt_indices().push_back(ordered_by_pt[ijet].first);
+  }
+ 
   // enough jets to make two higgses?
   if (ordered_by_discr.size()>=4) {
 
@@ -43,15 +53,7 @@ void HigVarProducer::WriteHigVars(pico_tree &pico, bool doDeepFlav, bool isSigna
           [](const pair<int, float> &a, const pair<int, float> &b) -> bool {
             return a.second > b.second;
           });
-    sort(ordered_by_pt.begin(), ordered_by_pt.end(), //* new addition
-          [](const pair<int, float> &a, const pair<int, float> &b) -> bool {
-            return a.second > b.second;
-          }); //* end of new addition
-    pico.out_jet_ordered_pt_indices().push_back(ordered_by_pt[0].first); //* new addition
-    pico.out_jet_ordered_pt_indices().push_back(ordered_by_pt[1].first); //* new addition
-    pico.out_jet_ordered_pt_indices().push_back(ordered_by_pt[2].first); //* new addition
-    pico.out_jet_ordered_pt_indices().push_back(ordered_by_pt[3].first); //* new addition
- 
+   
     vector<TLorentzVector> jets_lv;
     for (unsigned ijet(0); ijet<4; ijet++) {
       TLorentzVector lv;
@@ -103,17 +105,20 @@ void HigVarProducer::WriteHigVars(pico_tree &pico, bool doDeepFlav, bool isSigna
 
     if (!doDeepFlav){
       // set the jet h1d/h2d variables indicating that the jet was used in the hig pair with smallest dm
-      pico.out_jet_h1d()[ordered_by_discr[hcombs[icomb_min_dm][0]].first] = true;
-      pico.out_jet_h1d()[ordered_by_discr[hcombs[icomb_min_dm][1]].first] = true;
-      pico.out_jet_h2d()[ordered_by_discr[hcombs[icomb_min_dm][2]].first] = true;
-      pico.out_jet_h2d()[ordered_by_discr[hcombs[icomb_min_dm][3]].first] = true;
-
-    } else{ //* new addition (save indices for deepflav)
+      //pico.out_jet_h1d()[ordered_by_discr[hcombs[icomb_min_dm][0]].first] = true;
+      //pico.out_jet_h1d()[ordered_by_discr[hcombs[icomb_min_dm][1]].first] = true;
+      //pico.out_jet_h2d()[ordered_by_discr[hcombs[icomb_min_dm][2]].first] = true;
+      //pico.out_jet_h2d()[ordered_by_discr[hcombs[icomb_min_dm][3]].first] = true;
       pico.out_jet_h1_indices().push_back(ordered_by_discr[hcombs[icomb_min_dm][0]].first);
       pico.out_jet_h1_indices().push_back(ordered_by_discr[hcombs[icomb_min_dm][1]].first);
       pico.out_jet_h2_indices().push_back(ordered_by_discr[hcombs[icomb_min_dm][2]].first);
       pico.out_jet_h2_indices().push_back(ordered_by_discr[hcombs[icomb_min_dm][3]].first);
-    } //* end of new addition
+    } else{ //* new addition (save indices for deepflav)
+      pico.out_jet_h1_df_indices().push_back(ordered_by_discr[hcombs[icomb_min_dm][0]].first);
+      pico.out_jet_h1_df_indices().push_back(ordered_by_discr[hcombs[icomb_min_dm][1]].first);
+      pico.out_jet_h2_df_indices().push_back(ordered_by_discr[hcombs[icomb_min_dm][2]].first);
+      pico.out_jet_h2_df_indices().push_back(ordered_by_discr[hcombs[icomb_min_dm][3]].first);
+    }
 
   } //if at least 4 good jets
 
