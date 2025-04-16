@@ -105,10 +105,10 @@ void HigVarProducer::WriteHigVars(pico_tree &pico, bool doDeepFlav, bool isSigna
 
     if (!doDeepFlav){
       // set the jet h1d/h2d variables indicating that the jet was used in the hig pair with smallest dm
-      //pico.out_jet_h1d()[ordered_by_discr[hcombs[icomb_min_dm][0]].first] = true;
-      //pico.out_jet_h1d()[ordered_by_discr[hcombs[icomb_min_dm][1]].first] = true;
-      //pico.out_jet_h2d()[ordered_by_discr[hcombs[icomb_min_dm][2]].first] = true;
-      //pico.out_jet_h2d()[ordered_by_discr[hcombs[icomb_min_dm][3]].first] = true;
+      pico.out_jet_h1d()[ordered_by_discr[hcombs[icomb_min_dm][0]].first] = true;
+      pico.out_jet_h1d()[ordered_by_discr[hcombs[icomb_min_dm][1]].first] = true;
+      pico.out_jet_h2d()[ordered_by_discr[hcombs[icomb_min_dm][2]].first] = true;
+      pico.out_jet_h2d()[ordered_by_discr[hcombs[icomb_min_dm][3]].first] = true;
       pico.out_jet_h1_indices().push_back(ordered_by_discr[hcombs[icomb_min_dm][0]].first);
       pico.out_jet_h1_indices().push_back(ordered_by_discr[hcombs[icomb_min_dm][1]].first);
       pico.out_jet_h2_indices().push_back(ordered_by_discr[hcombs[icomb_min_dm][2]].first);
