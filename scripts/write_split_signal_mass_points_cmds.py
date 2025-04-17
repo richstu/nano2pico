@@ -9,6 +9,7 @@ def get_2d_mass_points(signal_chain, pdgId_1, pdgId_2):
   mass_array_1 = signal_chain.GetV1()
   mass_array_2 = signal_chain.GetV2()
   mass_points = set()
+  '''
   #print(number_variables, signal_chain.GetEntries())
   for iVar in range(number_variables):
     #print (mass_array_1[iVar], mass_array_2[iVar])
@@ -16,8 +17,37 @@ def get_2d_mass_points(signal_chain, pdgId_1, pdgId_2):
       mass_points.add((mass_array_1[iVar], int(round(mass_array_2[iVar]/25)*25)))
     else:
       mass_points.add((int(round(mass_array_1[iVar]/25)*25), int(round(mass_array_2[iVar]/25)*25)))
-  print(mass_points)
+  print(mass_points)'''
+
+  
+  # for 4b samples:
+  nlsp_min, nlsp_max, nlsp_step = 200, 1300, 100
+  lsp_min, lsp_max, lsp_step = 100, 1100, 100
+
+  cols = []        
+  cols.append([150,1])
+  for mx in range(nlsp_min, nlsp_max+1, nlsp_step):
+      cols.append([mx,1])
+      for my in range(lsp_min, lsp_max+1, lsp_step):
+          if mx - my < 127:
+              continue
+          cols.append([mx, my])
+      if mx>250:
+          cols.append([mx, mx-250])
+      if mx>150:
+          cols.append([mx, mx-150])
+  mpoints = cols
+
+  for point in mpoints:
+    mchi, mlsp = point[0], point[1]
+    mass_points.add((mchi, mlsp))
+
+
   return sorted(mass_points)
+
+
+
+
 
 if __name__ == '__main__':
 
