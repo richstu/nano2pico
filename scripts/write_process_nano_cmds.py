@@ -13,7 +13,7 @@ parser.add_argument("-d","--dataset_list", default="",
                     help="File with the list of dataset names as they appear in DAS or the list of filenames (with wildcards). If not specified will run on all files in input folder")
 parser.add_argument('-t', '--tag', default='',
                     help='Optionally specify a tag to be used to differentiate helper files for batch submission.')
-parser.add_argument("-l","--list_format", default="DAS", choices=["DAS","filename"],
+parser.add_argument("-l","--list_format", default="filename", choices=["DAS","filename"],
                     help="Sets whether the dataset list is in DAS format or filename format.")
 parser.add_argument("--data", action="store_true", help='For DAS data datasets')
 args = vars(parser.parse_args())
