@@ -417,8 +417,8 @@ namespace xsec{
     if(file.Contains("WplusH_HToGG_WToAll"))  xsec = HToGG * 0.831;
     if(file.Contains("ZH_HToGG_ZToAll"))      xsec = HToGG * 0.8839;
     if(file.Contains("ttHJetToGG"))           xsec = HToGG * 0.5071; 
-    if(file.Contains("bbHToGG"))              xsec = HToGG * 0.3924;
-    if(file.Contains("VHToGG"))               xsec = HToGG * 2.456; //https://xsecdb-xsdb-official.app.cern.ch/xsdb/?columns=67108863&currentPage=0&pageSize=10&searchQuery=process_name%3DVVHToGG_M125_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8
+    if(file.Contains("bbHToGG"))              xsec = HToGG * 0.3924; //0.5277 yellow pages
+    if(file.Contains("VHToGG"))               xsec = HToGG * 2.456;  //2.2569 from yellow pages summing wh and zh 
 
     if(file.Contains("GluGluHToMuMu"))        xsec = HToMM * 48.58 ;
     if(file.Contains("VBFHToMuMu"))           xsec = HToMM * 3.782 ;
