@@ -58,6 +58,20 @@ EventTools::EventTools(const string &name_, int year_, bool isData_, float nanoa
   if(Contains(name, "GJet_Pt") || Contains(name, "GJet_PT"))
     isGJet = true;
 
+  // add names for Run 3 samples
+  if((Contains(name, "TTtoLplusNu2Q-3Jets") || Contains(name, "TTtoLminusNu2Q-3Jets")) && !Contains(name, "genMET-"))
+    isTTJets_LO_Incl = true;
+  
+  if((Contains(name, "TTtoLplusNu2Q-3Jets") || Contains(name, "TTtoLminusNu2Q-3Jets")) && Contains(name, "genMET-"))
+    isTTJets_LO_MET = true;
+
+  if(Contains(name, "WtoLNu-4Jets_Tune"))
+    isWJets_LO = true;
+  
+  if(Contains(name, "DYto2L-4Jets_MLL-50_Tune"))
+    isDYJets_LO = true;
+
+
   //These four variables control the generator settings of the overlap removal variable in MC
   if(Contains(name, "WJetsToLNu") || Contains(name,"WGToLNuG_01J"))
     isWJ = true;
@@ -119,10 +133,10 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
   if(isTTJets_LO_Incl && !isFastSim) {
     if (nano.LHE_HTIncoming()>600.f) 
       pico.out_stitch_htmet() = pico.out_stitch_ht() = false;
-    if(year==2018 && nano.GenMET_pt()>80.f)
+    if(nano.GenMET_pt()>150.f) // all years have genMET-150 now
       pico.out_stitch_htmet() = pico.out_stitch() = false;
-    else if (nano.GenMET_pt()>150.f) 
-      pico.out_stitch_htmet() = pico.out_stitch() = false;
+   // else if (nano.GenMET_pt()>150.f) 
+   //   pico.out_stitch_htmet() = pico.out_stitch() = false;
   }
 
   if (isTTJets_LO_MET && nano.LHE_HTIncoming()>600.f && !isFastSim) 
@@ -375,8 +389,10 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
   if(isDYJets_LO  && nano.LHE_HT()>70.0f) 
     pico.out_stitch_htmet() = pico.out_stitch_ht() = pico.out_stitch() = false;
   
-  if(isWJets_LO  && nano.LHE_HT()>70.0f) 
+  if(year<=2018 && isWJets_LO  && nano.LHE_HT()>70.0f) 
     pico.out_stitch_htmet() = pico.out_stitch_ht() = pico.out_stitch() = false;
+  else if(year>=2022 && isWJets_LO && nano.LHE_HT()>40.0f)
+    pico.out_stitch_htmet() = pico.out_stitch_ht() = pico.out_stitch() = false; // Run 3 WJets samples have HT binning starting at 40GeV
   return;
 }
 
@@ -795,11 +811,17 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
     else if (dataset==Dataset::MuonEG && muoneg_trigs && !egamma_trigs && !doubleeg_trigs && !muon_trigs && !doublemuon_trigs) return true;
     else return false;
   }
-  else if (isHiggsino) {
+  else if (isHiggsino) { // bbgg and 4b triggers
     // this assumes that we process either all the datasets or at least an ordered subset starting with the DoubleEG 
-    if (dataset==Dataset::DoubleEG                                 && doubleeg_trigs) return true;
-    else if (dataset==Dataset::EGamma                              && doubleeg_trigs) return true;
-    else if (dataset==Dataset::MET                    && met_trigs && !doubleeg_trigs) return true;
+    if (dataset==Dataset::DoubleEG                              					  	         && doubleeg_trigs) return true;
+    else if (dataset==Dataset::EGamma                      	     					                 && doubleeg_trigs) return true;
+    else if ((year>=2018) && dataset==Dataset::EGamma               		  			   		   && egamma_trigs) return true;
+    else if ((year==2016||year==2017) && dataset==Dataset::SingleElectron 				    		   && egamma_trigs) return true;
+    else if ((year<=2018) && dataset==Dataset::MET 			 	          && met_trigs && !doubleeg_trigs && !egamma_trigs) return true;
+    else if ((year<=2018) && dataset==Dataset::JetHT 	    		  && jetht_trigs && !met_trigs && !doubleeg_trigs && !egamma_trigs) return true;
+    else if ((year>=2022) && dataset==Dataset::JetMET	   		 && (jetht_trigs || met_trigs) && !doubleeg_trigs && !egamma_trigs) return true;
+    else if ((year<=2018) && dataset==Dataset::SingleMuon  && muon_trigs && !jetht_trigs && !met_trigs && !doubleeg_trigs && !egamma_trigs) return true;
+    else if ((year>=2022) && dataset==Dataset::Muon	   && muon_trigs && !jetht_trigs && !met_trigs && !doubleeg_trigs && !egamma_trigs) return true;
     else return false;
   }  
   else {
