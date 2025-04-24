@@ -402,13 +402,30 @@ namespace xsec{
         if(file.Contains("TTG-1Jets_PTG-10to100_TuneCP5_13p6TeV"))             xsec = 4.216;
         if(file.Contains("TTG-1Jets_PTG-100to200_TuneCP5_13p6TeV"))            xsec = 0.4114;
         if(file.Contains("TTG-1Jets_PTG-200_TuneCP5_13p6TeV"))                 xsec = 0.1284;
+
+        if(file.Contains("TTLNu-1Jets_TuneCP5_13p6TeV"))                       xsec = 0.2505;
+        if(file.Contains("TTLL_MLL-50_TuneCP5_13p6TeV"))                       xsec = 0.08646;
+        if(file.Contains("TT_TuneCP5_13p6TeV_powheg-pythia8"))                 xsec = 762.3;
+
         //ST
         if(file.Contains("TBbartoLplusNuBbar-s-channel")) xsec = 2.278;
+        if(file.Contains("TBbarQ_t-channel_4FS_TuneCP5_13p6TeV"))              xsec = 123.8;
+        if(file.Contains("TbarBQ_t-channel_4FS_TuneCP5_13p6TeV"))              xsec = 75.47;
+        if(file.Contains("TGQB-4FS_TuneCP5_13p6TeV"))                          xsec = 3.873;
+        if(file.Contains("TbarBtoLminusNuB-s-channel-4FS_TuneCP5_13p6TeV"))    xsec = 1.43;
+
         //diboson
         if(file.Contains("WW_Tune"))                      xsec = 80.23;
         if(file.Contains("WZ_Tune"))                      xsec = 29.10;
         if(file.Contains("WZGtoLNuZG"))                   xsec = 0.08425;
         if(file.Contains("ZZ_Tune"))                      xsec = 12.75;
+        if(file.Contains("ZZto2L2Q_TuneCP5_13p6TeV"))     xsec = 6.788;
+        if(file.Contains("ZZto2L2Nu_TuneCP5_13p6TeV"))    xsec = 1.031;
+        if(file.Contains("ZZto4L_TuneCP5_13p6TeV"))       xsec = 1.39;
+        if(file.Contains("WWto2L2Nu_TuneCP5_13p6TeV"))    xsec = 11.79;
+        if(file.Contains("WZto2L2Q_TuneCP5_13p6TeV"))     xsec = 7.568;
+        if(file.Contains("WZto3LNu_TuneCP5_13p6TeV"))     xsec = 4.924;
+
         //triboson using method from https://arxiv.org/pdf/2006.11191.pdf, with values from https://twiki.cern.ch/twiki/bin/view/LHCPhysics/HiggsXSBR and xsdb combined
         if(file.Contains("WWW_4F"))                       xsec = 0.2328 + (xs_wph+xs_wmh)*HToWW; // xsdb value (LO)+ (pp->VH)*BR(H->VV)
         if(file.Contains("WWZ_4F"))                       xsec = 0.1851 + (xs_z_h)*HToZZ;
@@ -422,6 +439,7 @@ namespace xsec{
     // https://twiki.cern.ch/twiki/bin/viewauth/CMS/SummaryTable1G25ns
     if(file.Contains("ZGamma2JToGamma2L2J_EWK"))      xsec = 0.1145; // from XSDB
     //NOT FOUND ON XSDB if(file.Contains("ZG2JtoG2L2J_EWK_MLL-50_MJJ-120_TuneCP5_withDipoleRecoil_13p6TeV"))      xsec = ; // from XSDB
+    if(file.Contains("ZG2JtoG2L2J_EWK_MLL-50_MJJ-120_TuneCP5_13p6TeV"))   xsec = 0.1136;
 
     if(file.Contains("WJetsToLNu") && !file.Contains("ttWJetsToLNu"))     xsec = 66680.0;  // from XSDB
 
@@ -446,6 +464,8 @@ namespace xsec{
     if(file.Contains("WplusHToWWTo2L2Nu"))       xsec = HToWW * WToLNu * WToLNu * 0.831;
     if(file.Contains("ZHToWWTo2L2Nu"))           xsec = HToWW * WToLNu * WToLNu * 0.8839;
     if(file.Contains("ttHToWWTo2L2Nu"))          xsec = HToWW * WToLNu * WToLNu  * 0.5071;
+    if(file.Contains("GluGluHto2Wto2L2Nu_M-125_TuneCP5_13p6TeV"))  xsec = 23.12;
+    if(file.Contains("VBFHto2Wto2L2Nu_M-125_TuneCP5_13p6TeV"))     xsec = 4.201;
 
     if(file.Contains("HWminusJ_HToWWTo2L2Nu_WTo2L_M-125"))      xsec = HToWW * WToLNu * WToLNu * 0.177;
     if(file.Contains("HWplusJ_HToWWTo2L2Nu_WTo2L_M-125"))       xsec = HToWW * WToLNu * WToLNu * 0.282;
@@ -482,6 +502,9 @@ namespace xsec{
     if(file.Contains("ZH_HToMuMu"))           xsec = HToMM * xs_z_h ;
     if(file.Contains("ZHToMuMu"))             xsec = HToMM * xs_z_h ;
     if(file.Contains("ttHToMuMu"))            xsec = HToMM * xs_tth ;
+    if(file.Contains("VBFHto2Mu_M-125_TuneCP5_withDipoleRecoil_13p6TeV")) xsec = 4.18;
+    if(file.Contains("WplusH_Hto2Mu_WtoAll_M-125_TuneCP5_13p6TeV"))       xsec = 0.9227;
+    if(file.Contains("ZH_Hto2Mu_ZtoAll_M-125_TuneCP5_13p6TeV"))           xsec = 0.5478;
 
     if(file.Contains("GluGluHToZZTo2L2Nu"))   xsec = HToZZ * ZToLL * ZToNuNu * xs_ggh;
     if(file.Contains("GluGluHToZZTo2L2Q"))    xsec = HToZZ * ZToLL * ZToQQ * xs_ggh ;
@@ -491,6 +514,10 @@ namespace xsec{
     if(file.Contains("WminusH_Hto2Zto4L"))    xsec = HToZZ * ZToLL * ZToLL * xs_wmh;
     if(file.Contains("WplusH_Hto2Zto4L"))     xsec = HToZZ * ZToLL * ZToLL * xs_wph;
     if(file.Contains("ZHto2Zto4L"))           xsec = HToZZ * ZToLL * ZToLL * xs_z_h;
+    
+    if(file.Contains("VBFto2L_MLL-50_TuneCP5_13p6TeV")) xsec = 7.659;
+    if(file.Contains("ZH_ZtoAll_Hto2Wto2L2Nu_M-125_TuneCP5_13p6TeV_powheg-minlo")   xsec = 0.8428;
+    if(file.Contains("WminusH_Hto2Mu_WtoAll_M-125_TuneCP5_13p6TeV")   xsec = 0.5804;
 
     //Here the factor of 2 is to allow either Z boson to decay into two leptons
     if(file.Contains("VBF_HToZZTo2L2X"))              xsec = HToZZ * ZToLL * xs_vbf;
