@@ -32,7 +32,10 @@ public:
                                bool isSignal,
                                bool is2022preEE,
                                std::vector<HiggsConstructionVariables> &sys_higvars);
-  void WriteFatJets(nano_tree &nano, pico_tree &pico);
+  void WriteFatJets(nano_tree &nano, pico_tree &pico, 
+		    const std::vector<float> &ddb_wpts,
+		    const std::vector<float> &mdak8_wpts,
+		    const std::vector<float> &pnetmd_wpts);
   void WriteSubJets(nano_tree &nano, pico_tree &pico);
   void WriteJetSystemPt(nano_tree &nano, pico_tree &pico, 
                         std::vector<int> &sig_jet_nano_idx, 

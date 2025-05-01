@@ -250,6 +250,29 @@ int main(int argc, char *argv[]){
     {"2023BPix", vector<float>({0.0359, 0.1919, 0.6133})}
   };
 
+  // Double b-tagger working points
+  // 2016-2018 values taken from BTV-22-001 / AN-2021/005-v10
+  map<string, vector<float>> ddb_wpts{ // DeepDoubleX (mass-decorrelated) discriminator
+    {"2016APV", vector<float>({0.0256, 0.1180, 0.2739})},
+    {"2016", vector<float>({0.0270, 0.1213, 0.2786})},
+    {"2017", vector<float>({0.0404, 0.1566, 0.3154})},
+    {"2018", vector<float>({0.0399, 0.1566, 0.3140})}
+  };
+
+  map<string, vector<float>> mdak8_wpts{ // Mass-decorrelated DeepBoostedJet tagger Z/H->bb vs QCD
+    {"2016APV", vector<float>({0.7021, 0.8940, 0.9521})},
+    {"2016", vector<float>({0.6890, 0.8877, 0.9507})},
+    {"2017", vector<float>({0.7422, 0.9033, 0.9546})},
+    {"2018", vector<float>({0.7432, 0.9058, 0.9551})}
+  };
+
+  map<string, vector<float>> pnetmd_wpts{ // Mass-decorrelated ParticleNet tagger X->bb discriminant
+    {"2016APV", vector<float>({0.9088, 0.9737, 0.9883})},
+    {"2016", vector<float>({0.9137, 0.9735, 0.9883})},
+    {"2017", vector<float>({0.9105, 0.9714, 0.9870})},
+    {"2018", vector<float>({0.9172, 0.9734, 0.9880})}
+  };
+
   // Rochester corrections
   string rocco_file = "data/zgamma/2018_UL/RoccoR2018UL.txt";
   if (is_preUL) {
@@ -421,7 +444,7 @@ int main(int argc, char *argv[]){
         is2022preEE, sys_higvars);
 
     jetmet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year_string][1], isFastsim); // usually w.r.t. medium WP
-    jetmet_producer.WriteFatJets(nano, pico); // jetmet_producer.SetVerbose(nano.nSubJet()>0);
+    jetmet_producer.WriteFatJets(nano, pico, ddb_wpts[year_string], mdak8_wpts[year_string], pnetmd_wpts[year_string]); // jetmet_producer.SetVerbose(nano.nSubJet()>0);
     jetmet_producer.WriteSubJets(nano, pico);
     isr_tools.WriteISRJetMultiplicity(nano, pico);
 

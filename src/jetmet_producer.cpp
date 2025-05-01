@@ -664,8 +664,14 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
   return sig_jet_nano_idx;
 }
 
-void JetMetProducer::WriteFatJets(nano_tree &nano, pico_tree &pico){
-  pico.out_nfjet() = 0; 
+void JetMetProducer::WriteFatJets(nano_tree &nano, pico_tree &pico, 
+				const vector<float> &ddb_wpts, 
+				const vector<float> &mdak8_wpts, 
+				const vector<float> &pnetmd_wpts){
+  pico.out_nfjet() = 0;
+  pico.out_nddbl() = 0; pico.out_nddbm() = 0; pico.out_nddbt() = 0;
+  pico.out_nmdak8l() = 0; pico.out_nmdak8m() = 0; pico.out_nmdak8t() = 0;
+  pico.out_npnetmdl() = 0; pico.out_npnetmdm() = 0; pico.out_npnetmdt() = 0;
   vector<float> FatJet_btagDDBvL;
   vector<float> FatJet_particleNetWithMass_WvsQCD;
   vector<float> FatJet_particleNetWithMass_ZvsQCD;
@@ -683,6 +689,7 @@ void JetMetProducer::WriteFatJets(nano_tree &nano, pico_tree &pico){
     getFatJet_particleNetWithMass_ZvsQCD(nano, nanoaod_version, FatJet_particleNetWithMass_ZvsQCD);
     getFatJet_particleNetWithMass_TvsQCD(nano, nanoaod_version, FatJet_particleNetWithMass_TvsQCD);
     getFatJet_particleNet_mass(nano, nanoaod_version, FatJet_particleNet_mass);
+    getFatJet_particleNetMD_Xbb(nano, nanoaod_version, FatJet_particleNetMD_Xbb);
   }
 
   for(int ifjet(0); ifjet<nano.nFatJet(); ++ifjet){
@@ -692,27 +699,35 @@ void JetMetProducer::WriteFatJets(nano_tree &nano, pico_tree &pico){
                                        <<" m = "<<setw(10)<<nano.FatJet_mass()[ifjet]
                                        <<endl;
 
+    if (fabs(nano.FatJet_eta()[ifjet]) > 2.4) continue;
+
     pico.out_fjet_pt().push_back(nano.FatJet_pt()[ifjet]);
     pico.out_fjet_eta().push_back(nano.FatJet_eta()[ifjet]);
     pico.out_fjet_phi().push_back(nano.FatJet_phi()[ifjet]);
     pico.out_fjet_m().push_back(nano.FatJet_mass()[ifjet]);
     pico.out_fjet_msoftdrop().push_back(nano.FatJet_msoftdrop()[ifjet]);
     // Mass-decorrelated Deep Double B, H->bb vs QCD discriminator, endorsed by BTV
-    pico.out_fjet_deep_md_hbb_btv().push_back(FatJet_btagDDBvL[ifjet]);
+    pico.out_fjet_deep_md_hbb_btv().push_back(FatJet_btagDDBvL[ifjet]); // FatJet_btagDDBvL is a function in utilities.cpp
     pico.out_fjet_mva_hbb_btv().push_back(nano.FatJet_btagHbb()[ifjet]);
     if (nanoaod_version+0.01 < 11.9) {
       // Mass-decorrelated DeepAK8, H->bb vs QCD discriminator, endorsed by JME
-      pico.out_fjet_deep_md_hbb_jme().push_back(nano.FatJet_deepTagMD_HbbvsQCD()[ifjet]);
+      pico.out_fjet_deep_md_hbb_jme().push_back(nano.FatJet_deepTagMD_HbbvsQCD()[ifjet]); //Mass-decorrelated DeepBoostedJet tagger H->bb vs QCD
       pico.out_fjet_deep_md_tvsqcd().push_back(nano.FatJet_deepTagMD_TvsQCD()[ifjet]);
       pico.out_fjet_deep_tvsqcd().push_back(nano.FatJet_deepTag_TvsQCD()[ifjet]);
-      pico.out_fjet_pnet_md_xbb().push_back(nano.FatJet_particleNetMD_Xbb()[ifjet]);
-      pico.out_fjet_pnet_m().push_back(nano.FatJet_particleNet_mass()[ifjet]);
+      pico.out_fjet_deep_md_zhbb().push_back(nano.FatJet_deepTagMD_ZHbbvsQCD()[ifjet]); // Mass-decorrelated DeepBoostedJet tagger Z/H->bb vs QCD, recommended by btv-wiki.docs.cern.ch/ScaleFactors/     
+      pico.out_fjet_pnet_md_xbb_raw().push_back(nano.FatJet_particleNetMD_Xbb()[ifjet]); //Mass-decorrelated ParticleNet tagger raw X->bb score
+      pico.out_fjet_pnet_md_qcd_raw().push_back(nano.FatJet_particleNetMD_QCD()[ifjet]); //Mass-decorrelated ParticleNet tagger raw QCD score
+      pico.out_fjet_pnet_md_xbb().push_back(FatJet_particleNetMD_Xbb[ifjet]); //For X->bb vs QCD tagging, use Xbb/(Xbb+QCD)
     }
     if (nanoaod_version+0.01 > 9) {
       pico.out_fjet_pnet_wtag().push_back(FatJet_particleNetWithMass_WvsQCD[ifjet]);
       pico.out_fjet_pnet_ztag().push_back(FatJet_particleNetWithMass_ZvsQCD[ifjet]);
       pico.out_fjet_pnet_ttag().push_back(FatJet_particleNetWithMass_TvsQCD[ifjet]);
       pico.out_fjet_pnet_m().push_back(FatJet_particleNet_mass[ifjet]);
+    }
+    if (nanoaod_version+0.01 > 11.9) {
+      pico.out_fjet_pnet_hbb().push_back(nano.FatJet_particleNetWithMass_HbbvsQCD()[ifjet]); //ParticleNet tagger (w/mass) H(->bb) vs QCD discriminator
+      pico.out_fjet_pnet_xbb().push_back(nano.FatJet_particleNet_XbbVsQCD()[ifjet]); //ParticleNet X->bb vs. QCD score: Xbb/(Xbb+QCD)
     }
     pico.out_fjet_subjet_idx1().push_back(FatJet_subJetIdx1[ifjet]);
     pico.out_fjet_subjet_idx2().push_back(FatJet_subJetIdx2[ifjet]);
@@ -723,6 +738,21 @@ void JetMetProducer::WriteFatJets(nano_tree &nano, pico_tree &pico){
     }
 
     pico.out_nfjet()++;
+    // function to count number of loose/medium/tight AK8 jets for different taggers
+    if (pico.out_nfjet() < 2){ // only count two highest pt AK8 jets
+      if (FatJet_btagDDBvL[ifjet] > ddb_wpts[0]) pico.out_nddbl()++;
+      if (FatJet_btagDDBvL[ifjet] > ddb_wpts[1]) pico.out_nddbm()++;
+      if (FatJet_btagDDBvL[ifjet] > ddb_wpts[2]) pico.out_nddbt()++;
+      if ((nanoaod_version+0.01) < 11.9){
+        if (nano.FatJet_deepTagMD_ZHbbvsQCD()[ifjet] > mdak8_wpts[0]) pico.out_nmdak8l()++;
+        if (nano.FatJet_deepTagMD_ZHbbvsQCD()[ifjet] > mdak8_wpts[1]) pico.out_nmdak8m()++;
+        if (nano.FatJet_deepTagMD_ZHbbvsQCD()[ifjet] > mdak8_wpts[2]) pico.out_nmdak8t()++;
+        if (FatJet_particleNetMD_Xbb[ifjet] > pnetmd_wpts[0]) pico.out_npnetmdl()++;
+        if (FatJet_particleNetMD_Xbb[ifjet] > pnetmd_wpts[1]) pico.out_npnetmdm()++;
+        if (FatJet_particleNetMD_Xbb[ifjet] > pnetmd_wpts[2]) pico.out_npnetmdt()++;
+      }
+    }
+
   }
   if (verbose) cout<<"Done with fat jets"<<endl;
   return;

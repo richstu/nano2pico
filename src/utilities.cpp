@@ -312,6 +312,15 @@ void getFatJet_particleNet_mass(nano_tree & nano, float nanoaod_version,
   }
 }
 
+void getFatJet_particleNetMD_Xbb(nano_tree & nano, float nanoaod_version, 
+					   vector<float> & FatJet_particleNetMD_Xbb) {
+  FatJet_particleNetMD_Xbb.resize(nano.nFatJet());
+  for(int ijet(0); ijet<nano.nFatJet(); ++ijet){
+    if (nanoaod_version+0.01 < 11.9)
+      FatJet_particleNetMD_Xbb[ijet] = nano.FatJet_particleNetMD_Xbb()[ijet] / (nano.FatJet_particleNetMD_Xbb()[ijet] + nano.FatJet_particleNetMD_QCD()[ijet] );
+  }   
+}
+
 void getPhoton_electronIdx(nano_tree & nano, float nanoaod_version, vector<int> & Photon_electronIdx) {
   Photon_electronIdx.resize(nano.nPhoton());
   for(int iphoton(0); iphoton<nano.nPhoton(); ++iphoton){

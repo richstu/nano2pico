@@ -112,6 +112,7 @@ void getFatJet_particleNetWithMass_WvsQCD(nano_tree & nano, float nanoaod_versio
 void getFatJet_particleNetWithMass_ZvsQCD(nano_tree & nano, float nanoaod_version, std::vector<float> & FatJet_particleNetWithMass_ZvsQCD);
 void getFatJet_particleNetWithMass_TvsQCD(nano_tree & nano, float nanoaod_version, std::vector<float> & FatJet_particleNetWithMass_TvsQCD);
 void getFatJet_particleNet_mass(nano_tree & nano, float nanoaod_version, std::vector<float> & FatJet_particleNet_mass);
+void getFatJet_particleNetMD_Xbb(nano_tree & nano, float nanoaod_version, std::vector<float> & FatJet_particleNetMD_Xbb);
 void getPhoton_electronIdx(nano_tree & nano, float nanoaod_version, std::vector<int> & Photon_electronIdx);
 void getMuon_fsrPhotonIdx(nano_tree & nano, float nanoaod_version, std::vector<int> & Muon_fsrPhotonIdx);
 void getElectron_photonIdx(nano_tree & nano, float nanoaod_version, std::vector<int> & Electron_photonIdx);
