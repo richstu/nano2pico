@@ -39,7 +39,7 @@ EventTools::EventTools(const string &name_, int year_, bool isData_, float nanoa
 
   if(Contains(name, "WJetsToLNu_Tune")  && Contains(name,"madgraphMLM"))
     isWJets_LO = true;
-  if(Contains(name, "WJetsToLNu_Tune")) // Run 2 v9 samples are amcatnlo
+  if(Contains(name, "WJetsToLNu_Tune") && !Contains(name, "TTWJetsToLNu_Tune")) // Run 2 v9 samples are amcatnlo
     isWJets_LO = true;
 
   if(Contains(name, "DYJetsToLL_M-50_Tune")  && Contains(name,"madgraphMLM"))
