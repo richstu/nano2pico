@@ -202,6 +202,18 @@ vector<int>   genjet_pflavor
 ###################   AK8 Jets   ##################
 int nfjet
 
+int nddbl
+int nddbm
+int nddbt
+
+int nmdak8l
+int nmdak8m
+int nmdak8t
+
+int npnetmdl
+int npnetmdm
+int npnetmdt
+
 vector<float> fjet_pt
 vector<float> fjet_eta
 vector<float> fjet_phi
@@ -210,13 +222,18 @@ vector<float> fjet_msoftdrop
 vector<float> fjet_deep_md_hbb_btv
 vector<float> fjet_mva_hbb_btv
 vector<float> fjet_deep_md_hbb_jme
+vector<float> fjet_deep_md_zhbb
 vector<float> fjet_deep_md_tvsqcd
 vector<float> fjet_deep_tvsqcd
+vector<float> fjet_pnet_md_xbb_raw
+vector<float> fjet_pnet_md_qcd_raw
 vector<float> fjet_pnet_md_xbb
 vector<float> fjet_pnet_wtag
 vector<float> fjet_pnet_ztag
 vector<float> fjet_pnet_ttag
 vector<float> fjet_pnet_m
+vector<float> fjet_pnet_hbb
+vector<float> fjet_pnet_xbb
 vector<int>   fjet_subjet_idx1
 vector<int>   fjet_subjet_idx2
 
