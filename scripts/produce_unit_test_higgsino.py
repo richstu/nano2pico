@@ -28,7 +28,7 @@ def runCommand(command):
   return process.poll(), commandOutput[0]
 
 #def makeTestCommands(mc_nanoaod_directory, mc_nanoaod_filename, data_nanoaod_directory, data_nanoaod_filename, signal_nanoaod_directory, signal_nanoaod_filename, pico_directory, n_entries):
-def makeTestCommands(data_nanoaod_directory, data_nanoaod_filename, pico_directory):
+def makeTestCommands(nanoaod_directory, nanoaod_filename, pico_directory):
 
   higgsino_test_commands = [
     # mc commands
@@ -45,26 +45,23 @@ def makeTestCommands(data_nanoaod_directory, data_nanoaod_filename, pico_directo
     #"./scripts/slim_and_merge.py -s txt/slim_rules/higmc.txt -i "+pico_directory+"/mc/met150/pico_met150_"+mc_nanoaod_filename+" -o "+pico_directory+"/mc/merged_met150/merged_"+mc_nanoaod_filename,
 
     # data commands
-    "mkdir -p "+pico_directory+"/data/raw_pico",
-    "mkdir "+pico_directory+"/data/wgt_sums",
-    "./run/process_nano.exe -f "+data_nanoaod_filename+" -i "+data_nanoaod_directory+" -o "+pico_directory+"/data",
-    "mkdir "+pico_directory+"/data/met150",
-    "./scripts/skim_file.py -k met150 -i "+pico_directory+"/data/raw_pico/raw_pico_"+data_nanoaod_filename+" -o "+pico_directory+"/data/met150/",
-    "mkdir "+pico_directory+"/data/merged_met150",
-    "./scripts/slim_and_merge.py -s txt/slim_rules/higdata.txt -i "+pico_directory+"/data/met150/raw_pico_met150_"+data_nanoaod_filename+" -o "+pico_directory+"/data/merged_met150/merged_"+data_nanoaod_filename,
+    #"mkdir -p "+pico_directory+"/data/raw_pico",
+    #"mkdir "+pico_directory+"/data/wgt_sums",
+    #"./run/process_nano.exe -f "+data_nanoaod_filename+" -i "+data_nanoaod_directory+" -o "+pico_directory+"/data",
+    #"mkdir "+pico_directory+"/data/met150",
+    #"./scripts/skim_file.py -k met150 -i "+pico_directory+"/data/raw_pico/raw_pico_"+data_nanoaod_filename+" -o "+pico_directory+"/data/met150/",
+    #"mkdir "+pico_directory+"/data/merged_met150",
+    #"./scripts/slim_and_merge.py -s txt/slim_rules/higdata.txt -i "+pico_directory+"/data/met150/raw_pico_met150_"+data_nanoaod_filename+" -o "+pico_directory+"/data/merged_met150/merged_"+data_nanoaod_filename,
 
     # signal commands
-    #"mkdir -p "+pico_directory+"/signal/raw_pico",
-    #"mkdir "+pico_directory+"/signal/wgt_sums",
-    #"./run/process_nano.exe -f "+signal_nanoaod_filename+" -i "+signal_nanoaod_directory+" -o "+pico_directory+"/signal",
-    #"mkdir "+pico_directory+"/signal/corrections",
-    #"./run/merge_corrections.exe "+pico_directory+"/signal/corrections/"+signal_nanoaod_filename+" "+pico_directory+"/signal/wgt_sums/wgt_sums_"+signal_nanoaod_filename,
-    #"mkdir "+pico_directory+"/signal/unskimmed",
-    #"./run/apply_corrections.exe -f raw_pico_"+signal_nanoaod_filename+" -i "+pico_directory+"/signal/raw_pico/ -c "+signal_nanoaod_filename,
-    #"mkdir "+pico_directory+"/signal/met150",
-    #"./scripts/skim_file.py -k met150 -i "+pico_directory+"/signal/unskimmed/pico_"+signal_nanoaod_filename+" -o "+pico_directory+"/signal/met150/",
-    #"mkdir "+pico_directory+"/signal/merged_met150",
-    #"./scripts/slim_and_merge.py -s txt/slim_rules/higmc.txt -i "+pico_directory+"/signal/met150/pico_met150_"+signal_nanoaod_filename+" -o "+pico_directory+"/signal/merged_met150/merged_"+signal_nanoaod_filename,
+    "mkdir -p "+pico_directory+"/signal/raw_pico",
+    "mkdir "+pico_directory+"/signal/wgt_sums",
+    "./run/process_nano.exe -f "+nanoaod_filename+" -i "+nanoaod_directory+" -o "+pico_directory+"/signal",
+    "mkdir "+pico_directory+"/signal/corrections",
+    "./run/merge_corrections.exe "+pico_directory+"/signal/corrections/"+nanoaod_filename+" "+pico_directory+"/signal/wgt_sums/wgt_sums_"+nanoaod_filename,
+    "mkdir "+pico_directory+"/signal/unskimmed",
+    "./run/apply_corrections.exe -f raw_pico_"+nanoaod_filename+" -i "+pico_directory+"/signal/raw_pico/ -c "+nanoaod_filename,
+    "mkdir "+pico_directory+"/signal/met150",
   ]
   return higgsino_test_commands
 
@@ -83,8 +80,8 @@ if __name__ == "__main__":
   n_entries = 1000 # about 3 min for process_nano.exe (~550 Hz). Note for signal, nent is -1.
   higgsino_test_commands = []
   higgsino_test_commands.extend(makeTestCommands(#mc_nanoaod_directory="/net/cms11/cms11r0/pico/NanoAODv9/nano/2016/mc", mc_nanoaod_filename="QCD_Pt-40ToInf_DoubleEMEnriched_MGG-80ToInf_TuneCP5_13TeV-pythia8__RunIISummer20UL16NanoAODv9__106X_mcRun2_asymptotic_v17-v1__70000__F93E4917-0EB7-F344-A545-0DFF3A907AE4.root", 
-                                                 data_nanoaod_directory="/net/cms18/cms18r0/pico/NanoAODv9/nano/2016/mc", data_nanoaod_filename="SMS-TChiHH_mChi-1000_mLSP-0_HToGG_2D_TuneCP5_13TeV-madgraphMLM-pythia8__RunIISummer20UL16NanoAODv9-106X_mcRun2_asymptotic_v17-v1__privateProduction.root", 
-                                                 #signal_nanoaod_directory="/net/cms18/cms18r0/pico/NanoAODv9/nano/2016/mc", signal_nanoaod_filename="SMS-TChiHH_mChi-1000_mLSP-0_HToGG_2D_TuneCP5_13TeV-madgraphMLM-pythia8__RunIISummer20UL16NanoAODv9-106X_mcRun2_asymptotic_v17-v1__privateProduction.root",
+                                                 #data_nanoaod_directory="/net/cms18/cms18r0/pico/NanoAODv9/nano/2016/mc", data_nanoaod_filename="SMS-TChiHH_mChi-1000_mLSP-0_HToGG_2D_TuneCP5_13TeV-madgraphMLM-pythia8__RunIISummer20UL16NanoAODv9-106X_mcRun2_asymptotic_v17-v1__privateProduction.root", 
+                                                 nanoaod_directory="/net/cms11/cms11r0/pico/NanoAODv9/nano/2017/higgsino_signal_mc", nanoaod_filename="SMS-TChiHH_mChi-900_mLSP-700__TuneCP5_13TeV_madgraphMLM-pythia8__RunIISummer20UL17NanoAODv9__FSMiniUL17_NANOv9_FSUL17_106X_mc2017_realistic_v9-v2.root",
                                                  pico_directory=pico_directory))
   '''higgsino_test_commands.extend(makeTestCommands(mc_nanoaod_directory="/net/cms17/cms17r0/pico/NanoAODv7/nano/2017/mc", mc_nanoaod_filename="TTJets_SingleLeptFromT_TuneCP5_13TeV-madgraphMLM-pythia8__RunIIFall17NanoAODv7__PU2017_12Apr2018_Nano02Apr2020_102X_mc2017_realistic_v8-v1__100000__0ED19AF0-B248-8344-91D7-B241CE0729FA.root", 
                                                  data_nanoaod_directory="/net/cms17/cms17r0/pico/NanoAODv7/nano/2017/data", data_nanoaod_filename="MET__Run2017B__02Apr2020-v1__230000__00DCCA4E-F5F1-F84D-A6EC-2956ACAB6E02.root", 
@@ -95,7 +92,7 @@ if __name__ == "__main__":
                                                  signal_nanoaod_directory="/net/cms24/cms24r0/pico/NanoAODv7/nano/2018/SMS-TChiHH_2D_fastSimJmeCorrection", signal_nanoaod_filename="SMS-TChiHH_mChi-500_mLSP-0_HToBB_HToBB_TuneCP2_13TeV-madgraphMLM-pythia8__RunIIAutumn18NanoAODv7__PUFall18Fast_Nano02Apr2020_102X_upgrade2018_realistic_v21-v1.root",
                                                  pico_directory=pico_directory, n_entries=n_entries))
   '''
-  os.makedirs(pico_directory)
+  #os.makedirs(pico_directory)
   log_file = open(pico_directory+"/"+log_filename, 'w')
   for command in higgsino_test_commands:
     t0 = time.time()

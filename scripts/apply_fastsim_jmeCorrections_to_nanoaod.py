@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Applies fastsim jmeCorrections to NanoAOD using CMSSW
 # Example: python apply_fastsim_jmeCorrections_to_nanoaod.py -o FOLDER -y YEAR -i FILENAME...
 import os, sys
@@ -6,6 +6,7 @@ import argparse
 import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 from importlib import import_module
+
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
 from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetHelperRun2 import *
 
