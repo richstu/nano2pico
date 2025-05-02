@@ -24,6 +24,7 @@ void HigVarProducer::WriteHigVars(pico_tree &pico, bool doDeepFlav, bool isSigna
   // also saving their original index in the pico.out_jet* vectors
   vector<pair<int, float>>  ordered_by_discr;
   vector<pair<int, float>>  ordered_by_pt; //* new addition
+  
   for (unsigned ijet(0); ijet<pico.out_jet_pt().size(); ijet++) {
     if (pico.out_jet_isgood()[ijet]) {
       float discr = -999;
@@ -36,16 +37,18 @@ void HigVarProducer::WriteHigVars(pico_tree &pico, bool doDeepFlav, bool isSigna
       ordered_by_pt.push_back(make_pair(ijet, pico.out_jet_pt()[ijet])); //* new addition
     }
   }
-  
-  // ideally this should be in jetmet_producer.cpp but it will be moved once I understand what is going on in there
-  sort(ordered_by_pt.begin(), ordered_by_pt.end(), //* new addition
-        [](const pair<int, float> &a, const pair<int, float> &b) -> bool {
-          return a.second > b.second;
-        }); 
-  for (unsigned ijet(0); ijet<pico.out_jet_pt().size(); ijet++){
-    pico.out_jet_ordered_pt_indices().push_back(ordered_by_pt[ijet].first);
+
+  if (ordered_by_pt.size()>=1) {
+    // ideally this should be in jetmet_producer.cpp but it will be moved once I understand what is going on in there
+    sort(ordered_by_pt.begin(), ordered_by_pt.end(), //* new addition
+          [](const pair<int, float> &a, const pair<int, float> &b) -> bool {
+            return a.second > b.second;
+          }); 
+    for (unsigned ijet(0); ijet<pico.out_jet_pt().size(); ijet++){
+      pico.out_jet_ordered_pt_indices().push_back(ordered_by_pt[ijet].first);
+    }    
   }
- 
+
   // enough jets to make two higgses?
   if (ordered_by_discr.size()>=4) {
 
@@ -122,8 +125,8 @@ void HigVarProducer::WriteHigVars(pico_tree &pico, bool doDeepFlav, bool isSigna
 
   } //if at least 4 good jets
 
-  //make systematic variations. for now leave NanoAODv12
-  if (isSignal && !doDeepFlav && (nanoaod_version+0.01)<9) {
+  //make systematic variations. for now leave NanoAODv12 and NanoAODv9 (No JEC corrections for fastsim v9 signal -- Higgsino)
+  if (isSignal && !doDeepFlav && (nanoaod_version+0.01)<8) {
     pico.out_sys_hig_cand_dm().resize(4, -999.0);
     pico.out_sys_hig_cand_am().resize(4, -999.0);
     pico.out_sys_hig_cand_drmax().resize(4, -999.0);

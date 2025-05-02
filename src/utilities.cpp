@@ -243,8 +243,11 @@ void getJetWithJEC(nano_tree & nano, bool isFastsim, vector<float> & Jet_pt, vec
   Jet_mass.resize(nano.nJet());
   for(int ijet(0); ijet<nano.nJet(); ++ijet){
     if (isFastsim) {
-      Jet_pt[ijet] = nano.Jet_pt_nom()[ijet];
-      Jet_mass[ijet] = nano.Jet_mass_nom()[ijet];
+      //Don't have JEC corrections for NanoAODv9 so commenting out
+      //Jet_pt[ijet] = nano.Jet_pt_nom()[ijet];
+      //Jet_mass[ijet] = nano.Jet_mass_nom()[ijet];
+      Jet_pt[ijet] = nano.Jet_pt()[ijet];
+      Jet_mass[ijet] = nano.Jet_mass()[ijet];
     } else {
       Jet_pt[ijet] = nano.Jet_pt()[ijet];
       Jet_mass[ijet] = nano.Jet_mass()[ijet];

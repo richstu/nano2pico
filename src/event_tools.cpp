@@ -468,7 +468,9 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
     for (int ijet(0); ijet < nano.nJet(); ijet++) {
       if (counter >= 2) break;
       float jet_pt = nano.Jet_pt()[ijet];
-      if (isFastsim) jet_pt = nano.Jet_pt_nom()[ijet];
+      //Don't have JEC corrections for NanoAODv9 so commenting out the below line, replacing it:
+      //if (isFastsim) jet_pt = nano.Jet_pt_nom()[ijet];
+      if (isFastsim) jet_pt = nano.Jet_pt()[ijet];
       if (jet_pt>30 && fabs(nano.Jet_eta()[ijet])>2.4f && fabs(nano.Jet_eta()[ijet])<5.0f) {
         dphi = DeltaPhi(nano.Jet_phi()[ijet], pico.out_met_phi());
         if (nano.Jet_pt()[ijet]>250.0f && (dphi > 2.6f || dphi < 0.1f)) goodjet[counter] = false;

@@ -341,7 +341,7 @@ int main(int argc, char *argv[]){
     if (isData) {
       if(!inJSON(VVRunLumi, nano.run(), nano.luminosityBlock())) continue; 
     }
-
+    
     bool passed_trig = event_tools.SaveTriggerDecisions(nano, pico, isZgamma, isHiggsino);
     if (isData && !passed_trig) {
       continue;
@@ -360,7 +360,7 @@ int main(int argc, char *argv[]){
       pico.out_npu_tru() = nano.Pileup_nPU();
       pico.out_npu_tru_mean() = nano.Pileup_nTrueInt();
     }
-
+    
     //pileup energy density
     if (nanoaod_version >= 11 || nanoaod_version == 9.5)
       pico.out_rho() = nano.fixedGridRhoAll();
@@ -413,7 +413,7 @@ int main(int argc, char *argv[]){
     isr_tools.WriteISRSystemPt(nano, pico);
 
     if (debug) cout<<"INFO:: Writing jets, MET and ISR vars"<<endl;
-
+    
     vector<HiggsConstructionVariables> sys_higvars;
     vector<int> sig_jet_nano_idx = jetmet_producer.WriteJetMet(nano, pico, 
         jet_islep_nano_idx, jet_isvlep_nano_idx, jet_isphoton_nano_idx,
@@ -424,7 +424,7 @@ int main(int argc, char *argv[]){
     jetmet_producer.WriteFatJets(nano, pico); // jetmet_producer.SetVerbose(nano.nSubJet()>0);
     jetmet_producer.WriteSubJets(nano, pico);
     isr_tools.WriteISRJetMultiplicity(nano, pico);
-
+    
     // calculate mT only for single lepton events
     pico.out_mt() = -999; 
     if (pico.out_nlep()==1) {
@@ -461,7 +461,7 @@ int main(int argc, char *argv[]){
     if (isHiggsino) bb_producer.WriteBBVars(pico, /*doDeepFlav*/false);
     //if (isHiggsino) bb_producer.WriteBBVars(pico, /*doDeepFlav*/true);
     if (isHiggsino) bbgammagamma_producer.WriteBBGammaGammaVars(pico);
-
+    
     //save higgs variables using DeepCSV and DeepFlavor
     hig_producer.WriteHigVars(pico, false, isSignal, sys_higvars, nanoaod_version);
     hig_producer.WriteHigVars(pico, true, isSignal, sys_higvars, nanoaod_version);
@@ -601,7 +601,7 @@ int main(int argc, char *argv[]){
 
     isr_tools.WriteISRWeights(pico);
 
-
+    
     // do not include w_prefire, or anything that should not be renormalized! Will be set again in Step 3
     if (isZgamma) {
       pico.out_weight() = pico.out_w_lumi() *
@@ -615,6 +615,7 @@ int main(int argc, char *argv[]){
     // ----------------------------------------------------------------------------------------------
     //              *** Add up weights to save for renormalization step ***
     // ----------------------------------------------------------------------------------------------
+    
     if (debug) cout<<"INFO:: Writing sum of weights"<<endl;
     if (!isData) {
       wgt_sums.out_weight() += pico.out_weight();
@@ -644,6 +645,7 @@ int main(int argc, char *argv[]){
           wgt_sums.out_neff_pass_eltrigs() += nano.Generator_weight()>0 ? 1:-1;
         }
       }
+      
       wgt_sums.out_w_el()      += pico.out_w_el();
       wgt_sums.out_w_mu()      += pico.out_w_mu();
       wgt_sums.out_w_photon()  += pico.out_w_photon();
@@ -654,12 +656,12 @@ int main(int argc, char *argv[]){
       wgt_sums.out_w_isr()     += pico.out_w_isr();
       wgt_sums.out_w_pu()      += pico.out_w_pu();
       wgt_sums.out_w_trig()    += pico.out_w_trig();
-
+      
       for(size_t i = 0; i<2; ++i){
         wgt_sums.out_sys_el()[i]         += pico.out_sys_el()[i];
         wgt_sums.out_sys_mu()[i]         += pico.out_sys_mu()[i];
         wgt_sums.out_sys_photon()[i]     += pico.out_sys_photon()[i];
-        wgt_sums.out_sys_trig()[i]       += pico.out_sys_trig()[i];
+        //wgt_sums.out_sys_trig()[i]       += pico.out_sys_trig()[i]; //causing problems somehow for v9 signal Fastsim sample production without JEC corrections, commenting for now
         wgt_sums.out_sys_bchig()[i]      += pico.out_sys_bchig()[i];
         wgt_sums.out_sys_udsghig()[i]    += pico.out_sys_udsghig()[i];
         wgt_sums.out_sys_fs_bchig()[i]   += pico.out_sys_fs_bchig()[i];
@@ -667,7 +669,6 @@ int main(int argc, char *argv[]){
         wgt_sums.out_sys_isr()[i]        += pico.out_sys_isr()[i];
         wgt_sums.out_sys_pu()[i]         += pico.out_sys_pu()[i];
       }
-      
       for(size_t i = 0; i<pico.out_sys_murf().size(); ++i){ 
         wgt_sums.out_sys_murf()[i] += pico.out_sys_murf()[i];
       }
@@ -679,7 +680,6 @@ int main(int argc, char *argv[]){
     if (debug) cout<<"INFO:: Filling tree"<<endl;
     pico.Fill();
   } // loop over events
-
   wgt_sums.Fill();
   wgt_sums.Write();
   pico.Write();
