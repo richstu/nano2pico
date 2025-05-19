@@ -399,16 +399,26 @@ namespace xsec{
         if(file.Contains("TTto2L2Nu_TuneCP5_13p6TeV"))    xsec = 762.1*WToLNu*WToLNu;
         if(file.Contains("TTtoLNu2Q_TuneCP5CR1_13p6TeV")) xsec = 762.1*2.0*WToLNu*WToQQ;
 
+        if(file.Contains("TTLL_MLL-50_TuneCP5_13p6TeV_amcatnlo")) xsec = 0.08646; //XSDB
+        if(file.Contains("TTLNu-1Jets_TuneCP5_13p6TeV_amcatnloFXFX")) xsec = 0.2505; //XSDB
+
         if(file.Contains("TTG-1Jets_PTG-10to100_TuneCP5_13p6TeV"))             xsec = 4.216;
         if(file.Contains("TTG-1Jets_PTG-100to200_TuneCP5_13p6TeV"))            xsec = 0.4114;
         if(file.Contains("TTG-1Jets_PTG-200_TuneCP5_13p6TeV"))                 xsec = 0.1284;
         //ST
         if(file.Contains("TBbartoLplusNuBbar-s-channel")) xsec = 2.278;
+        if(file.Contains("TGQB-4FS")) xsec = 3.873;  //XSDB
+ 
         //diboson
         if(file.Contains("WW_Tune"))                      xsec = 80.23;
         if(file.Contains("WZ_Tune"))                      xsec = 29.10;
         if(file.Contains("WZGtoLNuZG"))                   xsec = 0.08425;
         if(file.Contains("ZZ_Tune"))                      xsec = 12.75;
+        if(file.Contains("ZZto2L2Nu_TuneCP5"))            xsec = 1.031; //XSDB
+        if(file.Contains("ZZto2L2Q_TuneCP5"))             xsec = 6.788; //XSDB
+        if(file.Contains("ZZto4L_TuneCP5"))               xsec = 1.39; //XSDB
+
+
         //triboson using method from https://arxiv.org/pdf/2006.11191.pdf, with values from https://twiki.cern.ch/twiki/bin/view/LHCPhysics/HiggsXSBR and xsdb combined
         if(file.Contains("WWW_4F"))                       xsec = 0.2328 + (xs_wph+xs_wmh)*HToWW; // xsdb value (LO)+ (pp->VH)*BR(H->VV)
         if(file.Contains("WWZ_4F"))                       xsec = 0.1851 + (xs_z_h)*HToZZ;
