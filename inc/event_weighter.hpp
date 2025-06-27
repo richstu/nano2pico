@@ -41,12 +41,14 @@ private:
   std::string in_file_btag_mceff_;
   std::string in_file_electron_iso0p10_;
   std::string in_file_electron_iso0p15_;
+  std::string in_file_electron_reco_;
   std::string in_file_muon_iso0p10_;
   std::string in_file_muon_iso0p15_;
   std::string key_;
   std::string puName_;
   std::string year_;
   std::unique_ptr<correction::CorrectionSet> cs_electron_;
+  std::unique_ptr<correction::CorrectionSet> cs_electron_reco_;
   std::unique_ptr<correction::CorrectionSet> cs_electron_bpixhole_;
   std::unique_ptr<correction::CorrectionSet> cs_photon_;
   std::unique_ptr<correction::CorrectionSet> cs_photon_low_;
@@ -75,6 +77,10 @@ private:
   correction::Correction::Ref map_electron_hole_id_pass_unc_;
   correction::Correction::Ref map_electron_hole_id_fail_;
   correction::Correction::Ref map_electron_hole_id_fail_unc_;
+  correction::Correction::Ref map_electron_reco_pass_;
+  correction::Correction::Ref map_electron_reco_pass_unc_;
+  correction::Correction::Ref map_electron_reco_fail_;
+  correction::Correction::Ref map_electron_reco_fail_unc_;
   correction::Correction::Ref map_muon_id_pass_;
   correction::Correction::Ref map_muon_id_pass_unc_;
   correction::Correction::Ref map_muon_id_fail_;

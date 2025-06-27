@@ -102,7 +102,7 @@ input_files = [
                '/net/cms11/cms11r0/pico/NanoAODv12/nano/2023BPix/mc/TTto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8__Run3Summer23BPixNanoAODv12__130X_mcRun3_2023_realistic_postBPix_v2-v3__2550000__844b724c-9c84-4ae3-8b91-04d6d1d84212.root'
                ]
 
-input_files = ['/net/cms17/cms17r0/pico/NanoAODv9/nano/2017/signal/GluGluHToZG_ZToLL_M-125_TuneCP5_13TeV-powheg-pythia8__RunIISummer20UL17NanoAODv9__106X_mc2017_realistic_v9-v1__70000__93B37B9F-16D5-6F4F-B920-3B9C682CA8A8.root']
+#input_files = ['/net/cms17/cms17r0/pico/NanoAODv9/nano/2017/signal/GluGluHToZG_ZToLL_M-125_TuneCP5_13TeV-powheg-pythia8__RunIISummer20UL17NanoAODv9__106X_mc2017_realistic_v9-v1__70000__93B37B9F-16D5-6F4F-B920-3B9C682CA8A8.root']
 
 #input_files = ['/net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc/ZGToLLG_01J_5f_lowMLL_lowGPt_TuneCP5_13TeV-amcatnloFXFX-pythia8__RunIISummer20UL18NanoAODv9__106X_upgrade2018_realistic_v16_L1v1-v1__2520000__3363228C-76B3-9245-AEE9-8644875EE6D0.root']
 
@@ -120,7 +120,7 @@ for input_file in input_files:
     #cmd = './run/process_nano.exe --in_file '+infile+' --in_dir '+indir+' --out_dir out/zgamma/'
     cmd = './run/process_nano.exe --in_file '+infile+' --in_dir '+indir+' --out_dir out/zgamma/ --nent 1000'
     print_and_run(cmd)
-  #merge corrections
+  ##merge corrections
   #for infile in infiles:
   #  cmd = './run/merge_corrections.exe out/zgamma/corrections/corr_'+infile
   #  cmd += ' out/zgamma/wgt_sums/wgt_sums_'+infile

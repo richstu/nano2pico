@@ -20,6 +20,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
   string btag_lightname = "deepJet_incl";
   if (year=="2016APV") {
     in_file_electron_         = "data/zgamma/2016preVFP_UL/hzg_elid_2016APV_scalefactors.json";
+    in_file_electron_reco_    = "data/zgamma/2016preVFP_UL/electron_recoSF2016preVFP.json";
     in_file_photon_           = "data/zgamma/2016preVFP_UL/photon.json";
     in_file_photon_low_       = "data/zgamma/2016preVFP_UL/hzg_phidel_2016APV_scalefactors.json";
     in_file_photon_mceff_     = "data/zgamma/2016preVFP_UL/photon_wp80mceff_2016APV.json";
@@ -37,6 +38,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     photon_csevmapname        = "UL-Photon-CSEV-SF";
   } else if (year=="2016") {
     in_file_electron_         = "data/zgamma/2016postVFP_UL/hzg_elid_2016_scalefactors.json";
+    in_file_electron_reco_    = "data/zgamma/2016postVFP_UL/electron_recoSF2016postVFP.json";
     in_file_photon_           = "data/zgamma/2016postVFP_UL/photon.json";
     in_file_photon_low_       = "data/zgamma/2016postVFP_UL/hzg_phidvalidate_2016_scalefactors.json";
     in_file_photon_mceff_     = "data/zgamma/2016postVFP_UL/photon_wp80mceff_2016.json";
@@ -54,6 +56,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     photon_csevmapname        = "UL-Photon-CSEV-SF";
   } else if (year=="2017") {
     in_file_electron_         = "data/zgamma/2017_UL/hzg_elid_2017_scalefactors.json";
+    in_file_electron_reco_    = "data/zgamma/2017_UL/electron_recoSF2017.json";
     in_file_photon_           = "data/zgamma/2017_UL/photon.json";
     in_file_photon_low_       = "data/zgamma/2017_UL/hzg_phidvalidate_2017_scalefactors.json";
     in_file_photon_mceff_     = "data/zgamma/2017_UL/photon_wp80mceff_2017.json";
@@ -71,6 +74,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     photon_csevmapname        = "UL-Photon-CSEV-SF";
   } else if (year=="2018") {
     in_file_electron_         = "data/zgamma/2018_UL/hzg_elid_2018_scalefactors.json";
+    in_file_electron_reco_    = "data/zgamma/2018_UL/electron_recoSF2018.json";
     in_file_photon_           = "data/zgamma/2018_UL/photon.json";
     in_file_photon_low_       = "data/zgamma/2018_UL/hzg_phidvalidate_2018_scalefactors.json";
     in_file_photon_mceff_     = "data/zgamma/2018_UL/photon_wp80mceff_2018.json";
@@ -88,6 +92,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     photon_csevmapname        = "UL-Photon-CSEV-SF";
   } else if (year=="2022"){
     in_file_electron_         = "data/zgamma/2022/hzg_elid_2022_scalefactors.json";
+    in_file_electron_reco_    = "data/zgamma/2022/electron_recoSF2022.json";
     in_file_photon_           = "data/zgamma/2022/photon.json";
     in_file_photon_low_       = "data/zgamma/2022/hzg_phidvalidate_2022_scalefactors.json";
     in_file_photon_mceff_     = "data/zgamma/2022/photon_wp80mceff_2022.json";
@@ -104,6 +109,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     btag_lightname            = "deepJet_light";
   } else if (year=="2022EE"){
     in_file_electron_         = "data/zgamma/2022EE/hzg_elid_2022EE_scalefactors.json";
+    in_file_electron_reco_    = "data/zgamma/2022EE/electron_recoSF2022EE.json";
     in_file_photon_           = "data/zgamma/2022EE/photon.json";
     in_file_photon_low_       = "data/zgamma/2022EE/hzg_phidvalidate_2022EE_scalefactors.json";
     in_file_photon_mceff_     = "data/zgamma/2022EE/photon_wp80mceff_2022EE.json";
@@ -120,6 +126,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     btag_lightname            = "deepJet_light";
   } else if (year=="2023"){
     in_file_electron_         = "data/zgamma/2023/hzg_elid_2023_scalefactors.json";
+    in_file_electron_reco_    = "data/zgamma/2023/electron_recoSF2023.json";
     in_file_photon_           = "data/zgamma/2023/photon.json";
     in_file_photon_low_       = "data/zgamma/2022EE/hzg_phidvalidate_2022EE_scalefactors.json";
     in_file_photon_mceff_     = "data/zgamma/2023/photon_wp80mceff_2023.json";
@@ -136,6 +143,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     btag_lightname            = "deepJet_light";
   } else if (year=="2023BPix"){
     in_file_electron_         = "data/zgamma/2023BPix/hzg_elid_2023BPix_scalefactors.json";
+    in_file_electron_reco_    = "data/zgamma/2023BPix/electron_recoSF2023BPix.json";
     in_file_photon_           = "data/zgamma/2023BPix/photon.json";
     in_file_photon_low_       = "data/zgamma/2022EE/hzg_phidvalidate_2022EE_scalefactors.json";
     in_file_photon_mceff_     = "data/zgamma/2023BPix/photon_wp80mceff_2023BPix.json";
@@ -160,6 +168,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     cout<<"Year has not been implemented in event_weighter"<<endl;
   }
   cs_electron_              = correction::CorrectionSet::from_file(in_file_electron_);
+  cs_electron_reco_         = correction::CorrectionSet::from_file(in_file_electron_reco_);
   cs_photon_                = correction::CorrectionSet::from_file(in_file_photon_);
   cs_photon_low_            = correction::CorrectionSet::from_file(in_file_photon_low_);
   cs_photon_mceff_          = correction::CorrectionSet::from_file(in_file_photon_mceff_);
@@ -179,6 +188,10 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
   map_electron_id_pass_unc_ = cs_electron_->at("unc_pass");
   map_electron_id_fail_     = cs_electron_->at("sf_fail");
   map_electron_id_fail_unc_ = cs_electron_->at("unc_fail");
+  map_electron_reco_pass_     = cs_electron_reco_->at("sf_pass");
+  map_electron_reco_pass_unc_ = cs_electron_reco_->at("unc_pass");
+  map_electron_reco_fail_     = cs_electron_reco_->at("sf_fail");
+  map_electron_reco_fail_unc_ = cs_electron_reco_->at("unc_fail");
   map_photon_id_low_pass_     = cs_photon_low_->at("sf_pass");
   map_photon_id_low_pass_unc_ = cs_photon_low_->at("unc_pass");
   post_bpix_                = false;
@@ -202,7 +215,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
   btag_wp_tight_            = btag_wpts[2];
 }
 
-// Electron MVA ID Scale Factors
+// Electron Reco+MVA ID Scale Factors
 // note: electron prodcer and gen particle producer should already have been run
 void EventWeighter::ElectronSF(pico_tree &pico){
   float sf_tot = 1.0;
@@ -239,6 +252,8 @@ void EventWeighter::ElectronSF(pico_tree &pico){
         reco_eta = pico.out_mc_eta().at(imc);
         reco_phi = pico.out_mc_phi().at(imc);
       }
+      float sf_reco = 1.0;
+      float unc_reco = 1.0;
       float sf = 1.0;
       float unc = 1.0;
       float sf_up = 1.0;
@@ -249,25 +264,33 @@ void EventWeighter::ElectronSF(pico_tree &pico){
         if (post_bpix_ && in_bpix_region) {
           sf = map_electron_hole_id_pass_->evaluate({reco_pt,reco_eta});
           unc = map_electron_hole_id_pass_unc_->evaluate({reco_pt,reco_eta});
+          sf_reco = map_electron_reco_pass_->evaluate({reco_pt,reco_eta});
+          unc_reco = map_electron_reco_pass_unc_->evaluate({reco_pt,reco_eta});
         }
         else {
           sf = map_electron_id_pass_->evaluate({reco_pt,reco_eta});
           unc = map_electron_id_pass_unc_->evaluate({reco_pt,reco_eta});
+          sf_reco = map_electron_reco_pass_->evaluate({reco_pt,reco_eta});
+          unc_reco = map_electron_reco_pass_unc_->evaluate({reco_pt,reco_eta});
         }
       }
       else {
         if (post_bpix_ && in_bpix_region) {
           sf = map_electron_hole_id_pass_->evaluate({reco_pt,reco_eta});
-          unc = map_electron_hole_id_pass_unc_->evaluate({reco_pt,reco_eta});
+          unc = -1.0*map_electron_hole_id_pass_unc_->evaluate({reco_pt,
+                                                               reco_eta});
+          sf_reco = map_electron_reco_fail_->evaluate({reco_pt,reco_eta});
+          unc_reco = -1.0*map_electron_reco_fail_unc_->evaluate({reco_pt,
+                                                                 reco_eta});
         }
         else {
           sf = map_electron_id_fail_->evaluate({reco_pt,reco_eta});
-          unc = map_electron_id_fail_unc_->evaluate({reco_pt,reco_eta});
+          unc = -1.0*map_electron_id_fail_unc_->evaluate({reco_pt,reco_eta});
         }
       }
-      sf_up = sf+unc;
-      sf_dn = sf-unc;
-      sf_tot *= sf;
+      sf_up = (sf+unc)*(sf_reco+unc_reco);
+      sf_dn = (sf-unc)*(sf_reco-unc_reco);
+      sf_tot *= sf*sf_reco;
       sf_tot_up *= sf_up;
       sf_tot_dn *= fmax(sf_dn,0.0);
     }
