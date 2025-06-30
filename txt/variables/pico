@@ -272,7 +272,7 @@ vector<int>   mu_charge
 vector<int>   mu_pflavor
 vector<int>   mu_fsrphotonid
 vector<float> mu_raw_pt
-vector<float> mu_raw_ptErr
+vector<float> mu_scare_pt
 
 int nel
 int nvel
@@ -675,6 +675,12 @@ vector<float> sys_el_pt_scaleup
 vector<float> sys_el_pt_scaledn
 vector<float> sys_el_pt_resup
 vector<float> sys_el_pt_resdn
+
+#index matches muon_*
+vector<float> sys_mu_pt_scaleup
+vector<float> sys_mu_pt_scaledn
+vector<float> sys_mu_pt_resup
+vector<float> sys_mu_pt_resdn
 
 #index matches photon_*
 vector<float> sys_photon_pt_scaleup

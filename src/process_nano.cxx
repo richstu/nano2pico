@@ -274,7 +274,7 @@ int main(int argc, char *argv[]){
   //Initialize object producers
   GenParticleProducer mc_producer(year, nanoaod_version);
   ElectronProducer el_producer(year_string, isData, nanoaod_version);
-  MuonProducer mu_producer(year, isData, nanoaod_version, rocco_file);
+  MuonProducer mu_producer(year_string, isData, nanoaod_version, rocco_file);
   DileptonProducer dilep_producer(year);
   IsoTrackProducer tk_producer(year);
   PhotonProducer photon_producer(year_string, isData, nanoaod_version);

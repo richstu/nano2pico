@@ -1,19 +1,43 @@
 #include "mu_producer.hpp"
 
 
+#include "correction.hpp"
+#include "muon_scare.hpp"
 #include "utilities.hpp"
 
 #include <algorithm>
+#include <memory>
 
 using namespace std;
 
-MuonProducer::MuonProducer(int year_, bool isData_, float nanoaod_version_, std::string rocco_file) :
+//TODO update year to string in process_nano
+MuonProducer::MuonProducer(string year_, bool isData_, float nanoaod_version_, std::string rocco_file) :
   year(year_),
   isData(isData_),
   rc(rocco_file),
   rng(4357),
-  nanoaod_version(nanoaod_version_){
-    (void) year;
+  nanoaod_version(nanoaod_version_),
+  run3(false){
+  if (year=="2022") {
+    cs_scare_ = correction::CorrectionSet::from_file(
+        "data/zgamma/2022/2022_Summer22.json");
+    run3 = true;
+  }
+  else if (year=="2022EE") {
+    cs_scare_ = correction::CorrectionSet::from_file(
+        "data/zgamma/2022EE/2022_Summer22EE.json");
+    run3 = true;
+  }
+  else if (year=="2023") {
+    cs_scare_ = correction::CorrectionSet::from_file(
+        "data/zgamma/2023/2023_Summer23.json");
+    run3 = true;
+  }
+  else if (year=="2023BPix") {
+    cs_scare_ = correction::CorrectionSet::from_file(
+        "data/zgamma/2023BPix/2023_Summer23BPix.json");
+    run3 = true;
+  }
 }
 
 MuonProducer::~MuonProducer(){
@@ -82,6 +106,9 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
   for(int imu : ordered_nano_indices){
     float pt = nano.Muon_pt()[imu];
     float eta = nano.Muon_eta()[imu];
+    float phi = nano.Muon_phi()[imu];
+    int charge = nano.Muon_charge()[imu];
+    int nTrackerLayers = Muon_nTrackerLayers[imu];
     bool isSignal = false;
     if(isZgamma) { // For Zgamma productions
       if (pt <= ZgMuonPtCut) continue;
@@ -102,7 +129,6 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
       isSignal = IsSignal(nano, imu, isZgamma);
     }
     pico.out_mu_raw_pt().push_back(pt);
-    pico.out_mu_raw_ptErr().push_back(nano.Muon_ptErr()[imu]);
     pico.out_mu_eta().push_back(eta);
     pico.out_mu_phi().push_back(nano.Muon_phi()[imu]);
     pico.out_mu_miniso().push_back(nano.Muon_miniPFRelIso_all()[imu]);
@@ -113,32 +139,68 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
     pico.out_mu_id().push_back(nano.Muon_looseId()[imu]);
     pico.out_mu_sig().push_back(isSignal);
     pico.out_mu_charge().push_back(nano.Muon_charge()[imu]);
-    if (year < 2022) {
+    if (!run3) {
+      pico.out_mu_ptErr().push_back(nano.Muon_ptErr()[imu]);
       //Rochester corrections, see https://github.com/cms-nanoAOD/nanoAOD-tools/blob/master/python/postprocessing/modules/common/muonScaleResProducer.py
+      float scale_sf = rc.kScaleDT(charge,pt,eta,phi);
       if (isData) {
-        pico.out_mu_pt().push_back(pt*rc.kScaleDT(nano.Muon_charge()[imu],pt,eta,nano.Muon_phi()[imu]));
-        pico.out_mu_ptErr().push_back(pt*rc.kScaleDTerror(nano.Muon_charge()[imu],pt,eta,nano.Muon_phi()[imu]));
+        pico.out_mu_pt().push_back(pt*scale_sf);
       }
       else {
-        if (Muon_genPartIdx[imu] > 0 && Muon_genPartIdx[imu] < nano.nGenPart()) {
+        float resolution_sf = 1.0;
+        float scale_unc = rc.kScaleDTerror(charge,pt,eta,phi);
+        float resolution_unc = 1.0;
+        if (Muon_genPartIdx[imu] > 0 
+            && Muon_genPartIdx[imu] < nano.nGenPart()) {
           float gen_pt = nano.GenPart_pt()[Muon_genPartIdx[imu]];
-          pico.out_mu_pt().push_back(pt*rc.kSpreadMC(nano.Muon_charge()[imu],pt,eta,nano.Muon_phi()[imu],gen_pt));
-          pico.out_mu_ptErr().push_back(pt*rc.kSpreadMCerror(nano.Muon_charge()[imu],pt,eta,nano.Muon_phi()[imu],gen_pt));
+          resolution_sf = rc.kSpreadMC(charge,pt,eta,phi,gen_pt);
+          resolution_unc = rc.kSpreadMCerror(charge,pt,eta,phi,gen_pt)
+            *(resolution_sf > 1.0 ? 1.0 : -1.0);
         }
         else {
           float unif_rand = rng.Uniform();
-          pico.out_mu_pt().push_back(pt*rc.kSmearMC(nano.Muon_charge()[imu],pt,eta,nano.Muon_phi()[imu],Muon_nTrackerLayers[imu],unif_rand));
-          pico.out_mu_ptErr().push_back(pt*rc.kSmearMCerror(nano.Muon_charge()[imu],pt,eta,nano.Muon_phi()[imu],Muon_nTrackerLayers[imu],unif_rand));
+          resolution_sf = rc.kSmearMC(charge,pt,eta,phi,nTrackerLayers,
+              unif_rand);
+          resolution_unc = rc.kSmearMCerror(charge,pt,eta,phi,nTrackerLayers,
+              unif_rand)*(resolution_sf > 1.0 ? 1.0 : -1.0);
         }
+        pico.out_mu_pt().push_back(pt*resolution_sf);
+        pico.out_sys_mu_pt_scaleup().push_back(pt*resolution_sf
+                                               *(scale_sf+scale_unc)/scale_sf);
+        pico.out_sys_mu_pt_scaledn().push_back(pt*resolution_sf
+                                               *(scale_sf-scale_unc)/scale_sf);
+        pico.out_sys_mu_pt_resup().push_back(pt*(resolution_sf+resolution_unc));
+        pico.out_sys_mu_pt_resdn().push_back(pt*(resolution_sf-resolution_unc));
       }
-    }
-    else if (nanoaod_version > 11.95) {
-      pico.out_mu_pt().push_back(nano.Muon_bsConstrainedPt()[imu]);
-      pico.out_mu_ptErr().push_back(nano.Muon_bsConstrainedPtErr()[imu]);
+      pico.out_mu_scare_pt().push_back(pico.out_mu_pt().back()); 
     }
     else {
-      pico.out_mu_pt().push_back(pt);
-      pico.out_mu_ptErr().push_back(nano.Muon_ptErr()[imu]);
+      if (isData) {
+        pico.out_mu_scare_pt().push_back(scarekit::pt_scale(1, pt, eta, phi,
+            charge, cs_scare_));
+      }
+      else {
+        float sca_pt = scarekit::pt_scale(0, pt, eta, phi, charge, cs_scare_);
+        float re_pt = scarekit::pt_resol(sca_pt, eta, 
+            static_cast<float>(nTrackerLayers), cs_scare_);
+        pico.out_mu_scare_pt().push_back(re_pt);
+        pico.out_sys_mu_pt_scaleup().push_back(scarekit::pt_scale_var(re_pt, 
+            eta, phi, charge, "up", cs_scare_));
+        pico.out_sys_mu_pt_scaledn().push_back(scarekit::pt_scale_var(re_pt, 
+            eta, phi, charge, "dn", cs_scare_));
+        pico.out_sys_mu_pt_resup().push_back(scarekit::pt_resol_var(sca_pt, 
+            re_pt, eta, "up", cs_scare_));
+        pico.out_sys_mu_pt_resdn().push_back(scarekit::pt_resol_var(sca_pt, 
+            re_pt, eta, "dn", cs_scare_));
+      }
+      if (nanoaod_version > 11.95) {
+        pico.out_mu_pt().push_back(nano.Muon_bsConstrainedPt()[imu]);
+        pico.out_mu_ptErr().push_back(nano.Muon_bsConstrainedPtErr()[imu]);
+      }
+      else {
+        pico.out_mu_pt().push_back(pt);
+        pico.out_mu_ptErr().push_back(nano.Muon_ptErr()[imu]);
+      }
     }
     if (!isData)
       pico.out_mu_pflavor().push_back(nano.Muon_genPartFlav()[imu]);

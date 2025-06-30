@@ -89,7 +89,7 @@ input_files = [
                '/net/cms11/cms11r0/pico/NanoAODv9/nano/2016/data/DoubleMuon__Run2016G__UL2016_MiniAODv2_NanoAODv9-v2__2430000__D1989538-A8AE-854E-9F7B-6638D5D45817.root',
                '/net/cms11/cms11r0/pico/NanoAODv9/nano/2016/mc/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8__RunIISummer20UL16NanoAODv9__106X_mcRun2_asymptotic_v17-v1__30000__E94099CB-E3C8-EB43-B182-4EA89C7C5411.root',
                '/net/cms11/cms11r0/pico/NanoAODv9/nano/2017/data/DoubleEG__Run2017C__UL2017_MiniAODv2_NanoAODv9-v1__270000__528C245A-DC66-7140-9F91-23C029849439.root',
-               '/net/cms11/cms11r0/pico/NanoAODv9/nano/2017/mc/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8__RunIISummer20UL17NanoAODv9__106X_mc2017_realistic_v9-v1__2510000__AF3EC52D-5109-A94D-876A-AFCC224E3944.root',
+               '/net/cms17/cms17r0/pico/NanoAODv9/nano/2017/mc/GluGluHToZG_ZToLL_M-125_TuneCP5_13TeV-powheg-pythia8__RunIISummer20UL17NanoAODv9__106X_mc2017_realistic_v9-v1__70000__93B37B9F-16D5-6F4F-B920-3B9C682CA8A8.root',
                '/net/cms11/cms11r0/pico/NanoAODv9/nano/2018/data/EGamma__Run2018D__UL2018_MiniAODv2_NanoAODv9-v3__250000__973B1E8F-106B-1F44-92C8-3A2926E6761C.root',
                '/net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc/ZGToLLG_01J_5f_lowMLL_lowGPt_TuneCP5_13TeV-amcatnloFXFX-pythia8__RunIISummer20UL18NanoAODv9__106X_upgrade2018_realistic_v16_L1v1-v1__2520000__3363228C-76B3-9245-AEE9-8644875EE6D0.root',
                '/net/cms11/cms11r0/pico/NanoAODv12/nano/2022/data/DoubleMuon__Run2022C__22Sep2023-v1__50000__bbfa5e3e-9080-43c4-ad61-f335ac9171fc.root',
@@ -102,7 +102,7 @@ input_files = [
                '/net/cms11/cms11r0/pico/NanoAODv12/nano/2023BPix/mc/TTto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8__Run3Summer23BPixNanoAODv12__130X_mcRun3_2023_realistic_postBPix_v2-v3__2550000__844b724c-9c84-4ae3-8b91-04d6d1d84212.root'
                ]
 
-#input_files = ['/net/cms17/cms17r0/pico/NanoAODv9/nano/2017/signal/GluGluHToZG_ZToLL_M-125_TuneCP5_13TeV-powheg-pythia8__RunIISummer20UL17NanoAODv9__106X_mc2017_realistic_v9-v1__70000__93B37B9F-16D5-6F4F-B920-3B9C682CA8A8.root']
+#input_files = ['/net/cms17/cms17r0/pico/NanoAODv9/nano/2017/mc/GluGluHToZG_ZToLL_M-125_TuneCP5_13TeV-powheg-pythia8__RunIISummer20UL17NanoAODv9__106X_mc2017_realistic_v9-v1__70000__93B37B9F-16D5-6F4F-B920-3B9C682CA8A8.root']
 
 #input_files = ['/net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc/ZGToLLG_01J_5f_lowMLL_lowGPt_TuneCP5_13TeV-amcatnloFXFX-pythia8__RunIISummer20UL18NanoAODv9__106X_upgrade2018_realistic_v16_L1v1-v1__2520000__3363228C-76B3-9245-AEE9-8644875EE6D0.root']
 
