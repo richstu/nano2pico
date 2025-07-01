@@ -516,8 +516,8 @@ namespace xsec{
     if(file.Contains("ZHto2Zto4L"))           xsec = HToZZ * ZToLL * ZToLL * xs_z_h;
     
     if(file.Contains("VBFto2L_MLL-50_TuneCP5_13p6TeV")) xsec = 7.659;
-    if(file.Contains("ZH_ZtoAll_Hto2Wto2L2Nu_M-125_TuneCP5_13p6TeV_powheg-minlo")   xsec = 0.8428;
-    if(file.Contains("WminusH_Hto2Mu_WtoAll_M-125_TuneCP5_13p6TeV")   xsec = 0.5804;
+    if(file.Contains("ZH_ZtoAll_Hto2Wto2L2Nu_M-125_TuneCP5_13p6TeV_powheg-minlo"))   xsec = 0.8428;
+    if(file.Contains("WminusH_Hto2Mu_WtoAll_M-125_TuneCP5_13p6TeV"))   xsec = 0.5804;
 
     //Here the factor of 2 is to allow either Z boson to decay into two leptons
     if(file.Contains("VBF_HToZZTo2L2X"))              xsec = HToZZ * ZToLL * xs_vbf;
