@@ -206,7 +206,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
   map_muon_id_pass_unc_     = cs_muon_->at("unc_pass");
   map_muon_id_fail_         = cs_muon_->at("sf_fail");
   map_muon_id_fail_unc_     = cs_muon_->at("unc_fail");
-  map_btag_                 = cs_btag_->at("deepJet_mujets");
+  map_btag_                 = cs_btag_->at("deepJet_comb");
   map_udsgtag_              = cs_btag_->at(btag_lightname);
   map_pileup_               = cs_pileup_->at(puName_);
   year_                     = year;
@@ -216,7 +216,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
 }
 
 // Electron Reco+MVA ID Scale Factors
-// note: electron prodcer and gen particle producer should already have been run
+// note: electron and gen particle producer should already have been run
 void EventWeighter::ElectronSF(pico_tree &pico){
   float sf_tot = 1.0;
   float sf_tot_up = 1.0;
@@ -228,7 +228,8 @@ void EventWeighter::ElectronSF(pico_tree &pico){
         ((pico.out_mc_statusflag().at(imc) & 0x2000)!=0) &&
         ((pico.out_mc_statusflag().at(imc) & 0x1) != 0)) {
       //is electron and last copy and prompt
-      if ((pico.out_mc_pt().at(imc)<7.0f) || (fabs(pico.out_mc_eta().at(imc))>2.5f)) continue;
+      if ((pico.out_mc_pt().at(imc)<7.0f) 
+          || (fabs(pico.out_mc_eta().at(imc))>2.5f)) continue;
       bool pass_id = false;
       float reco_pt = -999;
       float reco_eta = -999;
@@ -627,10 +628,13 @@ void EventWeighter::MuonMinisoSF(pico_tree &pico){
 
 // Pileup Scale Factors
 void EventWeighter::PileupSF(pico_tree &pico){
-  pico.out_w_pu() = min(map_pileup_->evaluate({float(pico.out_npu_tru()), "nominal"}),10.0);
+  pico.out_w_pu() = min(map_pileup_->evaluate({float(pico.out_npu_tru()), 
+      "nominal"}),10.0);
   pico.out_sys_pu().resize(2, 1.);
-  pico.out_sys_pu()[0] = min(map_pileup_->evaluate({float(pico.out_npu_tru()), "up"}),10.0);
-  pico.out_sys_pu()[1] = min(map_pileup_->evaluate({float(pico.out_npu_tru()), "down"}),10.0);
+  pico.out_sys_pu()[0] = min(map_pileup_->evaluate({float(pico.out_npu_tru()), 
+      "up"}),10.0);
+  pico.out_sys_pu()[1] = min(map_pileup_->evaluate({float(pico.out_npu_tru()), 
+      "down"}),10.0);
 }
 
 // b-tagging Scale Factors
@@ -697,47 +701,30 @@ void EventWeighter::bTaggingSF(pico_tree &pico){
       float m_sf_up_uncorr(m_sf), m_sf_dn_uncorr(m_sf);
       float l_sf_up(l_sf), l_sf_dn(l_sf);
       float l_sf_up_uncorr(l_sf), l_sf_dn_uncorr(l_sf);
-      if (jet_flavor == 0 && (year_=="2022" || year_=="2022EE" 
-          || year_=="2023" || year_=="2023BPix")) {
-        t_sf_up = (*btag_map)->evaluate({"up", "T", 
-          jet_flavor, abseta, pt});
-        t_sf_dn = (*btag_map)->evaluate({"down", "T",
-          jet_flavor, abseta, pt});
-        m_sf_up = (*btag_map)->evaluate({"up", "M", 
-          jet_flavor, abseta, pt});
-        m_sf_dn = (*btag_map)->evaluate({"down", "M", 
-          jet_flavor, abseta, pt});
-        l_sf_up = (*btag_map)->evaluate({"up", "L", 
-          jet_flavor, abseta, pt});
-        l_sf_dn = (*btag_map)->evaluate({"down", "L", 
-          jet_flavor, abseta, pt});
-      }
-      else {
-        t_sf_up = (*btag_map)->evaluate({"up_correlated", "T", 
-          jet_flavor, abseta, pt});
-        t_sf_dn = (*btag_map)->evaluate({"down_correlated", "T",
-          jet_flavor, abseta, pt});
-        t_sf_up_uncorr = (*btag_map)->evaluate({"up_uncorrelated", "T", 
-          jet_flavor, abseta, pt});
-        t_sf_dn_uncorr = (*btag_map)->evaluate({"down_uncorrelated", "T", 
-          jet_flavor, abseta, pt});
-        m_sf_up = (*btag_map)->evaluate({"up_correlated", "M", 
-          jet_flavor, abseta, pt});
-        m_sf_dn = (*btag_map)->evaluate({"down_correlated", "M", 
-          jet_flavor, abseta, pt});
-        m_sf_up_uncorr = (*btag_map)->evaluate({"up_uncorrelated", "M", 
-          jet_flavor, abseta, pt});
-        m_sf_dn_uncorr = (*btag_map)->evaluate({"down_uncorrelated", "M", 
-          jet_flavor, abseta, pt});
-        l_sf_up = (*btag_map)->evaluate({"up_correlated", "L", 
-          jet_flavor, abseta, pt});
-        l_sf_dn = (*btag_map)->evaluate({"down_correlated", "L", 
-          jet_flavor, abseta, pt});
-        l_sf_up_uncorr = (*btag_map)->evaluate({"up_uncorrelated", "L", 
-          jet_flavor, abseta, pt});
-        l_sf_dn_uncorr = (*btag_map)->evaluate({"down_uncorrelated", "L", 
-          jet_flavor, abseta, pt});
-      }
+      t_sf_up = (*btag_map)->evaluate({"up_correlated", "T", 
+        jet_flavor, abseta, pt});
+      t_sf_dn = (*btag_map)->evaluate({"down_correlated", "T",
+        jet_flavor, abseta, pt});
+      t_sf_up_uncorr = (*btag_map)->evaluate({"up_uncorrelated", "T", 
+        jet_flavor, abseta, pt});
+      t_sf_dn_uncorr = (*btag_map)->evaluate({"down_uncorrelated", "T", 
+        jet_flavor, abseta, pt});
+      m_sf_up = (*btag_map)->evaluate({"up_correlated", "M", 
+        jet_flavor, abseta, pt});
+      m_sf_dn = (*btag_map)->evaluate({"down_correlated", "M", 
+        jet_flavor, abseta, pt});
+      m_sf_up_uncorr = (*btag_map)->evaluate({"up_uncorrelated", "M", 
+        jet_flavor, abseta, pt});
+      m_sf_dn_uncorr = (*btag_map)->evaluate({"down_uncorrelated", "M", 
+        jet_flavor, abseta, pt});
+      l_sf_up = (*btag_map)->evaluate({"up_correlated", "L", 
+        jet_flavor, abseta, pt});
+      l_sf_dn = (*btag_map)->evaluate({"down_correlated", "L", 
+        jet_flavor, abseta, pt});
+      l_sf_up_uncorr = (*btag_map)->evaluate({"up_uncorrelated", "L", 
+        jet_flavor, abseta, pt});
+      l_sf_dn_uncorr = (*btag_map)->evaluate({"down_uncorrelated", "L", 
+        jet_flavor, abseta, pt});
       //currently, do not propoagate MC stats (negligible WRT SFs)
       if (pico.out_jet_deepflav().at(ijet) > btag_wp_tight_) { 
         cat_mc_eff = t_mc_eff;
@@ -828,16 +815,16 @@ void EventWeighter::bTaggingSF(pico_tree &pico){
         sf_tot_dn_bc *= sf_dn;
         sf_tot_up_uncorr_bc *= sf_up_uncorr;
         sf_tot_dn_uncorr_bc *= sf_dn_uncorr;
-        sf_tot_up_udsg *= sf_nm;
-        sf_tot_dn_udsg *= sf_nm;
-        sf_tot_up_uncorr_udsg *= sf_nm;
-        sf_tot_dn_uncorr_udsg *= sf_nm;
+        sf_tot_up_udsg *= sf_nm_wpm;
+        sf_tot_dn_udsg *= sf_nm_wpm;
+        sf_tot_up_uncorr_udsg *= sf_nm_wpm;
+        sf_tot_dn_uncorr_udsg *= sf_nm_wpm;
       }
       else { //light flavor
-        sf_tot_up_bc *= sf_nm;
-        sf_tot_dn_bc *= sf_nm;
-        sf_tot_up_uncorr_bc *= sf_nm;
-        sf_tot_dn_uncorr_bc *= sf_nm;
+        sf_tot_up_bc *= sf_nm_wpm;
+        sf_tot_dn_bc *= sf_nm_wpm;
+        sf_tot_up_uncorr_bc *= sf_nm_wpm;
+        sf_tot_dn_uncorr_bc *= sf_nm_wpm;
         sf_tot_up_udsg *= sf_up;
         sf_tot_dn_udsg *= sf_dn;
         sf_tot_up_uncorr_udsg *= sf_up_uncorr;
