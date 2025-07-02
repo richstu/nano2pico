@@ -122,24 +122,41 @@ void JetMetProducer::GetJetUncertainties(nano_tree &nano, pico_tree &pico,
                                       vector<float> &jer_up_factor,
                                       vector<float> &jer_dn_factor,
                                       vector<float> &jes_up_factor,
-                                      vector<float> &jes_dn_factor) {
+                                      vector<float> &jes_dn_factor ) {
 
   //do not call this function for data
   //implementation basically follows the following without the 2017 EE fix
   //https://github.com/cms-nanoAOD/nanoAOD-tools/blob/master/python/postprocessing/modules/jme/jetmetUncertainties.py
+  float met_x, met_y;
+  float met_x_nom, met_y_nom, met_x_jesup, met_y_jesup, met_x_jesdn, met_y_jesdn, met_x_jerup, met_y_jerup, met_x_jerdn, met_y_jerdn;
+  if(year <= 2018){
+    met_x = nano.MET_pt()*cos(nano.MET_phi());
+    met_y = nano.MET_pt()*sin(nano.MET_phi());
+    met_x_nom = met_x;
+    met_y_nom = met_y;
+    met_x_jesup = met_x;
+    met_y_jesup = met_y;
+    met_x_jesdn = met_x;
+    met_y_jesdn = met_y;
+    met_x_jerup = met_x;
+    met_y_jerup = met_y;
+    met_x_jerdn = met_x;
+    met_y_jerdn = met_y;
+  } else{
+    met_x = nano.PuppiMET_pt()*cos(nano.PuppiMET_phi());
+    met_y = nano.PuppiMET_pt()*sin(nano.PuppiMET_phi());
+    met_x_nom = met_x;
+    met_y_nom = met_y;
+    met_x_jesup = nano.PuppiMET_ptJESUp()*cos(nano.PuppiMET_phiJESUp());
+    met_y_jesup = nano.PuppiMET_ptJESUp()*sin(nano.PuppiMET_phiJESUp());
+    met_x_jesdn = nano.PuppiMET_ptJESDown()*cos(nano.PuppiMET_phiJESDown());
+    met_y_jesdn = nano.PuppiMET_ptJESDown()*sin(nano.PuppiMET_phiJESDown());
+    met_x_jerup = nano.PuppiMET_ptJERUp()*cos(nano.PuppiMET_phiJERUp());
+    met_y_jerup = nano.PuppiMET_ptJERUp()*sin(nano.PuppiMET_phiJERUp());
+    met_x_jerdn = nano.PuppiMET_ptJERDown()*cos(nano.PuppiMET_phiJERDown());
+    met_y_jerdn = nano.PuppiMET_ptJERDown()*sin(nano.PuppiMET_phiJERDown());
+  }
 
-  float met_x = nano.MET_pt()*cos(nano.MET_phi());
-  float met_y = nano.MET_pt()*sin(nano.MET_phi());
-  float met_x_nom = met_x;
-  float met_y_nom = met_y;
-  float met_x_jesup = met_x;
-  float met_y_jesup = met_y;
-  float met_x_jesdn = met_x;
-  float met_y_jesdn = met_y;
-  float met_x_jerup = met_x;
-  float met_y_jerup = met_y;
-  float met_x_jerdn = met_x;
-  float met_y_jerdn = met_y;
   //loop over regular jets and jets that didn't make it into slimmedjets (CorrT1METJets)
   for (int jet_type(0); jet_type<2; jet_type++) {
 
@@ -293,7 +310,7 @@ void JetMetProducer::GetJetUncertainties(nano_tree &nano, pico_tree &pico,
 
   pico.out_sys_met().resize(4,0.0);
   pico.out_sys_met_phi().resize(4,0.0);
-  pico.out_met() = sqrt(met_x_nom*met_x_nom+met_y_nom*met_y_nom);
+  pico.out_met() = sqrt(met_x_nom*met_x_nom+met_y_nom*met_y_nom);//Should account for puppi vs pf
   pico.out_sys_met()[0] = sqrt(met_x_jerup*met_x_jerup+met_y_jerup*met_y_jerup);
   pico.out_sys_met()[1] = sqrt(met_x_jerdn*met_x_jerdn+met_y_jerdn*met_y_jerdn);
   pico.out_sys_met()[2] = sqrt(met_x_jesup*met_x_jesup+met_y_jesup*met_y_jesup);
@@ -315,8 +332,13 @@ void JetMetProducer::WriteMet(nano_tree &nano, pico_tree &pico) {
   pico.out_met_tru_phi() = nano.GenMET_phi();
   pico.out_ht_isr_me()   = nano.LHE_HTIncoming();
   if (isData) {
-    pico.out_met() = nano.MET_pt();
-    pico.out_met_phi() = nano.MET_phi();
+    if(year <= 2018){
+      pico.out_met() = nano.MET_pt();
+      pico.out_met_phi() = nano.MET_phi();
+    } else{ 
+      pico.out_met() = nano.PuppiMET_pt();
+      pico.out_met_phi() = nano.PuppiMET_phi();
+    }
     return;
   }
 
@@ -372,16 +394,27 @@ void JetMetProducer::WriteMet(nano_tree &nano, pico_tree &pico) {
           unc_factor*sin(pico.out_mu_phi()[imu])*pico.out_mu_pt()[imu];
     }
   }
-  pico.out_sys_met().push_back(sqrt(met_x_unclup*met_x_unclup+met_y_unclup*met_y_unclup));
-  pico.out_sys_met().push_back(sqrt(met_x_uncldn*met_x_uncldn+met_y_uncldn*met_y_uncldn));
+  if(year <= 2018){
+    pico.out_sys_met().push_back(sqrt(met_x_unclup*met_x_unclup+met_y_unclup*met_y_unclup));
+    pico.out_sys_met().push_back(sqrt(met_x_uncldn*met_x_uncldn+met_y_uncldn*met_y_uncldn));
+  } else{
+    pico.out_sys_met().push_back(nano.PuppiMET_ptUnclusteredUp());
+    pico.out_sys_met().push_back(nano.PuppiMET_ptUnclusteredDown());
+  }
   pico.out_sys_met().push_back(sqrt(met_x_leptonphotonup*met_x_leptonphotonup
                                +met_y_leptonphotonup*met_y_leptonphotonup));
   pico.out_sys_met().push_back(sqrt(met_x_leptonphotondn*met_x_leptonphotondn
                                +met_y_leptonphotondn*met_y_leptonphotondn));
-  pico.out_sys_met_phi().push_back(atan2(met_y_unclup, met_x_unclup));
-  pico.out_sys_met_phi().push_back(atan2(met_y_uncldn, met_x_uncldn));
-  pico.out_sys_met_phi().push_back(atan2(met_y_leptonphotonup, met_x_leptonphotonup));
+  if(year <= 2018){
+    pico.out_sys_met_phi().push_back(atan2(met_y_unclup, met_x_unclup));
+    pico.out_sys_met_phi().push_back(atan2(met_y_uncldn, met_x_uncldn));
+  } else{
+    pico.out_sys_met_phi().push_back(nano.PuppiMET_phiUnclusteredUp());
+    pico.out_sys_met_phi().push_back(nano.PuppiMET_phiUnclusteredDown());
+  }
+  pico.out_sys_met_phi().push_back(atan2(met_y_leptonphotonup, met_x_leptonphotonup));//Does puppimet need this?
   pico.out_sys_met_phi().push_back(atan2(met_y_leptonphotondn, met_x_leptonphotondn));
+
 }
 
 vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico, 
