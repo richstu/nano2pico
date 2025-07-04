@@ -462,6 +462,8 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
   } else {
     if (nanoaod_version+0.01 < 9) {
       pico.out_pass_badcalib() = nano.Flag_ecalBadCalibFilterV2();
+    } else if(year>=2022){
+    //Procedure for Run 3 is performed in jetmet producer
     } else {
       pico.out_pass_badcalib() = nano.Flag_ecalBadCalibFilter();
     }

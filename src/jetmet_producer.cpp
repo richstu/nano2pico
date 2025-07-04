@@ -509,6 +509,8 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
     //TODO add variations for deepflavor b-tagging
   }
 
+  bool pass_badcalib = true;
+
   // saving jet info on all jets passing pt cut, including endcap
   for(int ijet(0); ijet<nano.nJet(); ++ijet){
     if (verbose) cout<<"Jet "<<ijet<<": pt = "<<setw(10)<<Jet_pt[ijet]
@@ -562,6 +564,11 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
     if(veto!=0.0 && isgood_min) {
       isvetomap = true;
       pico.out_ismapvetoevt()=true;
+    }
+
+    //Run 3 ecal bad calibration filter. Must be emulated in nanoaodv12.
+    if(nano.PuppiMET_pt()>100.f && year>=2022 && isData && (nano.run()>=362433 && nano.run()<=367144)){
+      if(nano.Jet_pt()[ijet]>50.f && nano.Jet_eta()[ijet]>-0.5f && nano.Jet_eta()[ijet]<0.1f && nano.Jet_phi()[ijet]>-2.1f && nano.Jet_phi()[ijet]<-1.8f && (nano.Jet_neEmEF()[ijet]>0.9f || nano.Jet_chEmEF()[ijet]>0.9f) && fabs(nano.PuppiMET_phi()-nano.Jet_phi()[ijet])>2.9f) pass_badcalib = false;
     }
 
     //don't include pt in isgood until later in order to save systematics
@@ -762,6 +769,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
       if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[2]) pico.out_nbdft()++; 
     }
   } // end jet loop
+  pico.out_pass_badcalib() = pass_badcalib;
   pico.out_low_dphi_mht_e5() = false;
   pico.out_low_dphi_met_e5() = false;
   for (unsigned ijet(0); ijet<pico.out_jet_mht_dphi().size(); ijet++){
