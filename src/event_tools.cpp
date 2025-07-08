@@ -463,7 +463,16 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
     if (nanoaod_version+0.01 < 9) {
       pico.out_pass_badcalib() = nano.Flag_ecalBadCalibFilterV2();
     } else if(year>=2022){
-    //Procedure for Run 3 is performed in jetmet producer
+      bool ecal_pass = true;
+      if(isData && nano.PuppiMET_pt()>100.f && (nano.run()>=362433 && nano.run()<=367144)){
+        for(int ijet(0); ijet < nano.nJet(); ijet++) {
+          if(nano.Jet_pt()[ijet]>50.f && nano.Jet_eta()[ijet]>-0.5f && nano.Jet_eta()[ijet]<0.1f
+                     && nano.Jet_phi()[ijet]>-2.1f && nano.Jet_phi()[ijet]<-1.8f
+                     && (nano.Jet_neEmEF()[ijet]>0.9f || nano.Jet_chEmEF()[ijet]>0.9f)
+                     && fabs(nano.PuppiMET_phi()-nano.Jet_phi()[ijet])>2.9f) ecal_pass = false;
+        }
+      }
+      pico.out_pass_badcalib() = ecal_pass;
     } else {
       pico.out_pass_badcalib() = nano.Flag_ecalBadCalibFilter();
     }
