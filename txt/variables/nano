@@ -508,6 +508,8 @@ float PuppiMET_sumEt
 float RawMET_phi
 float RawMET_pt
 float RawMET_sumEt
+float RawPuppiMET_phi
+float RawPuppiMET_pt
 float TkMET_phi
 float TkMET_pt
 float TkMET_sumEt
