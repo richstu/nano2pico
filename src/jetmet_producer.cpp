@@ -32,138 +32,240 @@ JetMetProducer::JetMetProducer(int year_, string year_string_,
   rng_ = TRandom3(4357);
   if (year_string=="2016APV") {
     cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2016preVFP_UL/jet_jerc_2016apv.json");
-    //despite strange name, this map does have JES variations and should be evaluated w.r.t. corrected jet pt
     map_jes_ = cs_jerc_->at("Summer19UL16APV_V7_MC_Total_AK4PFchs");
     map_jersf_ = cs_jerc_->at("Summer20UL16APV_JRV3_MC_ScaleFactor_AK4PFchs");
     map_jermc_ = cs_jerc_->at("Summer20UL16APV_JRV3_MC_PtResolution_AK4PFchs");
-    map_jec_ = cs_jerc_->compound().at("Summer19UL16APV_V7_MC_L1L2L3Res_AK4PFchs");
+    map_jec_.push_back(cs_jerc_->compound().at("Summer19UL16APV_V7_MC_L1L2L3Res_AK4PFchs"));
+    map_jec_l1_.push_back(cs_jerc_->at("Summer19UL16APV_V7_MC_L1FastJet_AK4PFchs"));
   }
   else if (year_string=="2016") {
     cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2016postVFP_UL/jet_jerc_2016.json");
     map_jes_ = cs_jerc_->at("Summer19UL16_V7_MC_Total_AK4PFchs");
     map_jersf_ = cs_jerc_->at("Summer20UL16_JRV3_MC_ScaleFactor_AK4PFchs");
     map_jermc_ = cs_jerc_->at("Summer20UL16_JRV3_MC_PtResolution_AK4PFchs");
-    map_jec_ = cs_jerc_->compound().at("Summer19UL16_V7_MC_L1L2L3Res_AK4PFchs");
+    map_jec_.push_back(cs_jerc_->compound().at("Summer19UL16_V7_MC_L1L2L3Res_AK4PFchs"));
+    map_jec_l1_.push_back(cs_jerc_->at("Summer19UL16_V7_MC_L1FastJet_AK4PFchs"));
   }
   else if (year_string=="2017") {
     cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2017_UL/jet_jerc_2017.json");
     map_jes_ = cs_jerc_->at("Summer19UL17_V5_MC_Total_AK4PFchs");
     map_jersf_ = cs_jerc_->at("Summer19UL17_JRV2_MC_ScaleFactor_AK4PFchs");
     map_jermc_ = cs_jerc_->at("Summer19UL17_JRV2_MC_PtResolution_AK4PFchs");
-    map_jec_ = cs_jerc_->compound().at("Summer19UL17_V5_MC_L1L2L3Res_AK4PFchs");
+    map_jec_.push_back(cs_jerc_->compound().at("Summer19UL17_V5_MC_L1L2L3Res_AK4PFchs"));
+    map_jec_l1_.push_back(cs_jerc_->at("Summer19UL17_V5_MC_L1FastJet_AK4PFchs"));
   }
   else if (year_string=="2018") {
     cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2018_UL/jet_jerc_2018.json");
     map_jes_ = cs_jerc_->at("Summer19UL18_V5_MC_Total_AK4PFchs");
     map_jersf_ = cs_jerc_->at("Summer19UL18_JRV2_MC_ScaleFactor_AK4PFchs");
     map_jermc_ = cs_jerc_->at("Summer19UL18_JRV2_MC_PtResolution_AK4PFchs");
-    map_jec_ = cs_jerc_->compound().at("Summer19UL18_V5_MC_L1L2L3Res_AK4PFchs");
+    map_jec_.push_back(cs_jerc_->compound().at("Summer19UL18_V5_MC_L1L2L3Res_AK4PFchs"));
+    map_jec_l1_.push_back(cs_jerc_->at("Summer19UL18_V5_MC_L1FastJet_AK4PFchs"));
   }
   else if (year_string=="2022") {
-    cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2022/jet_jerc_2022.json");
-    map_jes_ = cs_jerc_->at("Summer22_22Sep2023_V2_MC_Total_AK4PFPuppi");
-    map_jersf_ = cs_jerc_->at("Summer22_22Sep2023_JRV1_MC_ScaleFactor_AK4PFPuppi");
-    map_jermc_ = cs_jerc_->at("Summer22_22Sep2023_JRV1_MC_PtResolution_AK4PFPuppi");
-    map_jec_ = cs_jerc_->compound().at("Summer22_22Sep2023_V2_MC_L1L2L3Res_AK4PFPuppi");
+    cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2022/jet_jerc.json");
+    if (isData) {
+      map_jec_.push_back(cs_jerc_->compound().at("Summer22_22Sep2023_RunCD_V2_DATA_L1L2L3Res_AK4PFPuppi"));
+      map_jec_l1_.push_back(cs_jerc_->at("Summer22_22Sep2023_RunCD_V2_DATA_L1FastJet_AK4PFPuppi"));
+    }
+    else {
+      map_jes_ = cs_jerc_->at("Summer22_22Sep2023_V2_MC_Total_AK4PFPuppi");
+      map_jersf_ = cs_jerc_->at("Summer22_22Sep2023_JRV1_MC_ScaleFactor_AK4PFPuppi");
+      map_jermc_ = cs_jerc_->at("Summer22_22Sep2023_JRV1_MC_PtResolution_AK4PFPuppi");
+      map_jec_.push_back(cs_jerc_->compound().at("Summer22_22Sep2023_V2_MC_L1L2L3Res_AK4PFPuppi"));
+      map_jec_l1_.push_back(cs_jerc_->at("Summer22_22Sep2023_V2_MC_L1FastJet_AK4PFPuppi"));
+    }
 
     in_file_jetveto_ = "data/zgamma/2022/jetvetomaps_2022.json";
     cs_jetveto_ = correction::CorrectionSet::from_file(in_file_jetveto_);
     map_jetveto_ = cs_jetveto_->at("Summer22_23Sep2023_RunCD_V1");
   }
   else if (year_string=="2022EE") {
-    cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2022EE/jet_jerc_2022EE.json");
-    map_jes_ = cs_jerc_->at("Summer22EE_22Sep2023_V2_MC_Total_AK4PFPuppi");
-    map_jersf_ = cs_jerc_->at("Summer22EE_22Sep2023_JRV1_MC_ScaleFactor_AK4PFPuppi");
-    map_jermc_ = cs_jerc_->at("Summer22EE_22Sep2023_JRV1_MC_PtResolution_AK4PFPuppi");
-    map_jec_ = cs_jerc_->compound().at("Summer22EE_22Sep2023_V2_MC_L1L2L3Res_AK4PFPuppi");
+    cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2022EE/jet_jerc.json");
+    if (isData) {
+      map_jec_.push_back(cs_jerc_->compound().at("Summer22EE_22Sep2023_RunE_V2_DATA_L1L2L3Res_AK4PFPuppi"));
+      map_jec_l1_.push_back(cs_jerc_->at("Summer22EE_22Sep2023_RunE_V2_DATA_L1FastJet_AK4PFPuppi"));
+      map_jec_.push_back(cs_jerc_->compound().at("Summer22EE_22Sep2023_RunF_V2_DATA_L1L2L3Res_AK4PFPuppi"));
+      map_jec_l1_.push_back(cs_jerc_->at("Summer22EE_22Sep2023_RunF_V2_DATA_L1FastJet_AK4PFPuppi"));
+      map_jec_.push_back(cs_jerc_->compound().at("Summer22EE_22Sep2023_RunG_V2_DATA_L1L2L3Res_AK4PFPuppi"));
+      map_jec_l1_.push_back(cs_jerc_->at("Summer22EE_22Sep2023_RunG_V2_DATA_L1FastJet_AK4PFPuppi"));
+      jec_run_start_.push_back(359022);
+      jec_run_end_.push_back(360331);
+      jec_run_start_.push_back(360332);
+      jec_run_end_.push_back(362180);
+      jec_run_start_.push_back(362350);
+      jec_run_end_.push_back(362760);
+    }
+    else {
+      map_jes_ = cs_jerc_->at("Summer22EE_22Sep2023_V2_MC_Total_AK4PFPuppi");
+      map_jersf_ = cs_jerc_->at("Summer22EE_22Sep2023_JRV1_MC_ScaleFactor_AK4PFPuppi");
+      map_jermc_ = cs_jerc_->at("Summer22EE_22Sep2023_JRV1_MC_PtResolution_AK4PFPuppi");
+      map_jec_.push_back(cs_jerc_->compound().at("Summer22EE_22Sep2023_V2_MC_L1L2L3Res_AK4PFPuppi"));
+      map_jec_l1_.push_back(cs_jerc_->at("Summer22EE_22Sep2023_V2_MC_L1FastJet_AK4PFPuppi"));
+    }
 
     in_file_jetveto_ = "data/zgamma/2022EE/jetvetomaps_2022EE.json";
     cs_jetveto_ = correction::CorrectionSet::from_file(in_file_jetveto_);
     map_jetveto_ = cs_jetveto_->at("Summer22EE_23Sep2023_RunEFG_V1");
   }
   else if (year_string=="2023") {
-    cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2023/jet_jerc_2023.json");
-    map_jes_ = cs_jerc_->at("Summer23Prompt23_V1_MC_Total_AK4PFPuppi");
-    //are these right? there are also RunCv123 values
-    map_jersf_ = cs_jerc_->at("Summer23Prompt23_RunCv1234_JRV1_MC_ScaleFactor_AK4PFPuppi");
-    map_jermc_ = cs_jerc_->at("Summer23Prompt23_RunCv1234_JRV1_MC_PtResolution_AK4PFPuppi");
-    map_jec_ = cs_jerc_->compound().at("Summer23Prompt23_V1_MC_L1L2L3Res_AK4PFPuppi");
+    cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2023/jet_jerc.json");
+    if (isData) {
+      map_jec_.push_back(cs_jerc_->compound().at("Summer23Prompt23_V2_DATA_L1L2L3Res_AK4PFPuppi"));
+      map_jec_l1_.push_back(cs_jerc_->at("Summer23Prompt23_V2_DATA_L1FastJet_AK4PFPuppi"));
+    }
+    else {
+      map_jes_ = cs_jerc_->at("Summer23Prompt23_V2_MC_Total_AK4PFPuppi");
+      map_jersf_ = cs_jerc_->at("Summer23Prompt23_RunCv1234_JRV1_MC_ScaleFactor_AK4PFPuppi");
+      map_jermc_ = cs_jerc_->at("Summer23Prompt23_RunCv1234_JRV1_MC_PtResolution_AK4PFPuppi");
+      map_jec_.push_back(cs_jerc_->compound().at("Summer23Prompt23_V2_MC_L1L2L3Res_AK4PFPuppi"));
+      map_jec_l1_.push_back(cs_jerc_->at("Summer23Prompt23_V2_MC_L1FastJet_AK4PFPuppi"));
+    }
 
     in_file_jetveto_ = "data/zgamma/2023/jetvetomaps_2023.json";
     cs_jetveto_ = correction::CorrectionSet::from_file(in_file_jetveto_);
     map_jetveto_ = cs_jetveto_->at("Summer23Prompt23_RunC_V1");
   }
   else if (year_string=="2023BPix") {
-    cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2023BPix/jet_jerc_2023BPix.json");
-    map_jes_ = cs_jerc_->at("Summer23BPixPrompt23_V1_MC_Total_AK4PFPuppi");
-    map_jersf_ = cs_jerc_->at("Summer23BPixPrompt23_RunD_JRV1_MC_ScaleFactor_AK4PFPuppi");
-    map_jermc_ = cs_jerc_->at("Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi");
-    map_jec_ = cs_jerc_->compound().at("Summer23BPixPrompt23_V1_MC_L1L2L3Res_AK4PFPuppi");
+    cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2023BPix/jet_jerc.json");
+    if (isData) {
+      map_jec_.push_back(cs_jerc_->compound().at("Summer23BPixPrompt23_V3_DATA_L1L2L3Res_AK4PFPuppi"));
+      map_jec_l1_.push_back(cs_jerc_->at("Summer23BPixPrompt23_V3_DATA_L1FastJet_AK4PFPuppi"));
+    }
+    else {
+      map_jes_ = cs_jerc_->at("Summer23BPixPrompt23_V3_MC_Total_AK4PFPuppi");
+      map_jersf_ = cs_jerc_->at("Summer23BPixPrompt23_RunD_JRV1_MC_ScaleFactor_AK4PFPuppi");
+      map_jermc_ = cs_jerc_->at("Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi");
+      map_jec_.push_back(cs_jerc_->compound().at("Summer23BPixPrompt23_V3_MC_L1L2L3Res_AK4PFPuppi"));
+      map_jec_l1_.push_back(cs_jerc_->at("Summer23BPixPrompt23_V3_MC_L1FastJet_AK4PFPuppi"));
+    }
 
     in_file_jetveto_ = "data/zgamma/2023BPix/jetvetomaps_2023BPix.json";
     cs_jetveto_ = correction::CorrectionSet::from_file(in_file_jetveto_);
     map_jetveto_ = cs_jetveto_->at("Summer23BPixPrompt23_RunD_V1");
   }
   else {
-    std::cout << "WARNING: No dedicated JES/JER uncertainties, defaulting to 2023BPix" << std::endl;
-    map_jes_ = cs_jerc_->at("Summer23BPixPrompt23_V1_MC_Total_AK4PFPuppi");
-    map_jersf_ = cs_jerc_->at("Summer23BPixPrompt23_RunD_JRV1_MC_ScaleFactor_AK4PFPuppi");
-    map_jermc_ = cs_jerc_->at("Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi");
-    map_jec_ = cs_jerc_->compound().at("Summer23BPixPrompt23_V1_MC_L1L2L3Res_AK4PFPuppi");
+    cout << "WARNING: No dedicated JEC/JER, defaulting to 2023BPix" << endl;
+
+    cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2023BPix/jet_jerc.json");
+    if (isData) {
+      map_jec_.push_back(cs_jerc_->compound().at("Summer23BPixPrompt23_V3_DATA_L1L2L3Res_AK4PFPuppi"));
+      map_jec_l1_.push_back(cs_jerc_->at("Summer23BPixPrompt23_V3_DATA_L1FastJet_AK4PFPuppi"));
+    }
+    else {
+      map_jes_ = cs_jerc_->at("Summer23BPixPrompt23_V3_MC_Total_AK4PFPuppi");
+      map_jersf_ = cs_jerc_->at("Summer23BPixPrompt23_RunD_JRV1_MC_ScaleFactor_AK4PFPuppi");
+      map_jermc_ = cs_jerc_->at("Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi");
+      map_jec_.push_back(cs_jerc_->compound().at("Summer23BPixPrompt23_V3_MC_L1L2L3Res_AK4PFPuppi"));
+      map_jec_l1_.push_back(cs_jerc_->at("Summer23BPixPrompt23_V3_MC_L1FastJet_AK4PFPuppi"));
+    }
   }
 }
 
 JetMetProducer::~JetMetProducer(){
 }
 
-//Note this function also writes out MET and its systematic uncertainties from propagating JES/JER uncertainties
-void JetMetProducer::GetJetUncertainties(nano_tree &nano, pico_tree &pico, 
-                                      vector<float> &jer_nm_factor, 
-                                      vector<float> &jer_up_factor,
-                                      vector<float> &jer_dn_factor,
-                                      vector<float> &jes_up_factor,
-                                      vector<float> &jes_dn_factor ) {
+float JetMetProducer::GetJEC(float jet_area, float jet_eta, float jet_phi, 
+                             float jet_pt, float rho, unsigned int run, 
+                             JECType jec_type) {
+   if (year_string == "2023BPix") {
+     if (jec_type == JECType::L1L2L3) {
+       if (isData)
+         return map_jec_[0]->evaluate({jet_area, jet_eta, jet_pt, rho, 
+                                       jet_phi, static_cast<float>(run)});
+       return map_jec_[0]->evaluate({jet_area, jet_eta, jet_pt, rho, jet_phi});
+     }
+     else {
+       return map_jec_l1_[0]->evaluate({jet_area, jet_eta, jet_pt, rho});
+     }
+   }
+   else if (year_string == "2023" && isData) {
+     if (jec_type == JECType::L1L2L3) {
+       return map_jec_[0]->evaluate({jet_area, jet_eta, jet_pt, rho, 
+                                     static_cast<float>(run)});
+     }
+     else {
+       return map_jec_l1_[0]->evaluate({jet_area, jet_eta, jet_pt, rho});
+     }
+   }
+   else if (year_string == "2022EE" && isData) {
+     bool found_era = false;
+     unsigned int era_idx = 0;
+     for (unsigned iera = 0; iera < jec_run_start_.size(); iera++) {
+       if (run >= jec_run_start_[iera] && run <= jec_run_end_[iera]) {
+         found_era = true;
+         era_idx = iera;
+         break;
+       }
+     }
+     if (!found_era)
+       throw runtime_error("2022EE run number out of bounds (JEC check).");
+     if (jec_type == JECType::L1L2L3) {
+       return map_jec_[era_idx]->evaluate({jet_area, jet_eta, jet_pt, rho});
+     }
+     else {
+       return map_jec_l1_[era_idx]->evaluate({jet_area, jet_eta, jet_pt, rho});
+     }
+   }
+   else {
+     if (jec_type == JECType::L1L2L3) {
+       return map_jec_[0]->evaluate({jet_area, jet_eta, jet_pt, rho});
+     }
+     else {
+       return map_jec_l1_[0]->evaluate({jet_area, jet_eta, jet_pt, rho});
+     }
+   }
+}
 
-  //do not call this function for data
-  //implementation basically follows the following without the 2017 EE fix
-  //https://github.com/cms-nanoAOD/nanoAOD-tools/blob/master/python/postprocessing/modules/jme/jetmetUncertainties.py
-  float met_x, met_y;
-  float met_x_nom, met_y_nom, met_x_jesup, met_y_jesup, met_x_jesdn, met_y_jesdn, met_x_jerup, met_y_jerup, met_x_jerdn, met_y_jerdn;
-  if(year <= 2018){
-    met_x = nano.MET_pt()*cos(nano.MET_phi());
-    met_y = nano.MET_pt()*sin(nano.MET_phi());
-    met_x_nom = met_x;
-    met_y_nom = met_y;
-    met_x_jesup = met_x;
-    met_y_jesup = met_y;
-    met_x_jesdn = met_x;
-    met_y_jesdn = met_y;
-    met_x_jerup = met_x;
-    met_y_jerup = met_y;
-    met_x_jerdn = met_x;
-    met_y_jerdn = met_y;
-  } else{
-    met_x = nano.PuppiMET_pt()*cos(nano.PuppiMET_phi());
-    met_y = nano.PuppiMET_pt()*sin(nano.PuppiMET_phi());
-    met_x_nom = met_x;
-    met_y_nom = met_y;
-    met_x_jesup = nano.PuppiMET_ptJESUp()*cos(nano.PuppiMET_phiJESUp());
-    met_y_jesup = nano.PuppiMET_ptJESUp()*sin(nano.PuppiMET_phiJESUp());
-    met_x_jesdn = nano.PuppiMET_ptJESDown()*cos(nano.PuppiMET_phiJESDown());
-    met_y_jesdn = nano.PuppiMET_ptJESDown()*sin(nano.PuppiMET_phiJESDown());
-    met_x_jerup = nano.PuppiMET_ptJERUp()*cos(nano.PuppiMET_phiJERUp());
-    met_y_jerup = nano.PuppiMET_ptJERUp()*sin(nano.PuppiMET_phiJERUp());
-    met_x_jerdn = nano.PuppiMET_ptJERDown()*cos(nano.PuppiMET_phiJERDown());
-    met_y_jerdn = nano.PuppiMET_ptJERDown()*sin(nano.PuppiMET_phiJERDown());
+// Note this function also writes out MET and its systematic uncertainties 
+// from propagating JES/JER uncertainties
+void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico, 
+                                   vector<float> &jet_nm_factor, 
+                                   vector<float> &jer_up_factor,
+                                   vector<float> &jer_dn_factor,
+                                   vector<float> &jes_up_factor,
+                                   vector<float> &jes_dn_factor) {
+
+  if (year <= 2018 && isData) {
+    //JECs already correct- no updating needed
+    pico.out_met() = nano.MET_pt();
+    pico.out_met_phi() = nano.MET_phi();
+    jet_nm_factor.resize(nano.nJet(),1.0);
+    WriteMetVariations(nano, pico);
+    return;
   }
 
-  //loop over regular jets and jets that didn't make it into slimmedjets (CorrT1METJets)
+  //implementation originally based on the following:
+  //https://github.com/cms-nanoAOD/nanoAOD-tools/blob/master/python/postprocessing/modules/jme/jetmetUncertainties.py
+  float met_x, met_y;
+  if (year <= 2018) {
+    met_x = nano.MET_pt()*cos(nano.MET_phi());
+    met_y = nano.MET_pt()*sin(nano.MET_phi());
+  } else {
+    // Start from Raw in run 3 to reapply JECs
+    met_x = nano.RawPuppiMET_pt()*cos(nano.RawPuppiMET_phi());
+    met_y = nano.RawPuppiMET_pt()*sin(nano.RawPuppiMET_phi());
+  }
+  float met_x_nom = met_x;
+  float met_y_nom = met_y;
+  float met_x_jesup = 0.0;
+  float met_y_jesup = 0.0;
+  float met_x_jesdn = 0.0;
+  float met_y_jesdn = 0.0;
+  float met_x_jerup = 0.0;
+  float met_y_jerup = 0.0;
+  float met_x_jerdn = 0.0;
+  float met_y_jerdn = 0.0;
+
+  // loop over regular jets and jets that didn't make it into slimmedjets 
+  // (CorrT1METJets)
   for (int jet_type(0); jet_type<2; jet_type++) {
 
-    vector<float> jet_type_pt, jet_type_eta, jet_type_phi;
+    vector<float> jet_type_pt, jet_type_eta, jet_type_phi, jet_type_area;
     vector<float> jet_type_rawfactor, jet_type_muonfactor;
     int jet_type_size(0);
     if (jet_type==0) {
+      jet_type_area = nano.Jet_area();
       jet_type_pt = nano.Jet_pt();
       jet_type_eta = nano.Jet_eta();
       jet_type_phi = nano.Jet_phi();
@@ -172,6 +274,7 @@ void JetMetProducer::GetJetUncertainties(nano_tree &nano, pico_tree &pico,
       jet_type_size = nano.nJet();
     }
     else {
+      jet_type_area = nano.CorrT1METJet_area();
       jet_type_pt = nano.CorrT1METJet_rawPt();
       jet_type_eta = nano.CorrT1METJet_eta();
       jet_type_phi = nano.CorrT1METJet_phi();
@@ -179,106 +282,110 @@ void JetMetProducer::GetJetUncertainties(nano_tree &nano, pico_tree &pico,
       jet_type_muonfactor = nano.CorrT1METJet_muonSubtrFactor();
       jet_type_size = nano.nCorrT1METJet();
     }
+    float rho = 0.0f;
+    if (year <= 2018)
+      rho = nano.fixedGridRhoFastjetAll();
+    else
+      rho = nano.Rho_fixedGridRhoFastjetAll();
     
     for (int ijet(0); ijet<jet_type_size; ++ijet) {
-
-      //Get JECs and correct nominal pt for CorrT1METJets
-      float jec = 1.0/(1.0-jet_type_rawfactor[ijet]);
-      if (jet_type==1) {
-        if (year_string == "2023BPix") {
-          jec = map_jec_->evaluate({
-                nano.CorrT1METJet_area()[ijet],jet_type_eta[ijet],
-                jet_type_phi[ijet],jet_type_pt[ijet],
-                nano.fixedGridRhoFastjetAll()});
-        }
-        else {
-          jec = map_jec_->evaluate({
-                nano.CorrT1METJet_area()[ijet],jet_type_eta[ijet],
-                jet_type_pt[ijet],nano.fixedGridRhoFastjetAll()});
-        }
-        jet_type_pt[ijet] = jet_type_pt[ijet]*jec;
+      // Need new JECs for low pT jets (Run 2) and all jets (Run 3)
+      float jec_default = 1.0/(1.0-jet_type_rawfactor[ijet]);
+      float jec_l1 = 1.0;
+      float jec = jec_default;
+      if (jet_type==1 || year > 2018) {
+        jec = GetJEC(jet_type_area[ijet],jet_type_eta[ijet],jet_type_phi[ijet],
+                     jet_type_pt[ijet],rho,nano.run(),JECType::L1L2L3);
+        if (year > 2018)
+          jec_l1 = GetJEC(jet_type_area[ijet],jet_type_eta[ijet],
+                          jet_type_phi[ijet],jet_type_pt[ijet],rho,nano.run(),
+                          JECType::L1);
       }
-      float jet_raw_pt = jet_type_pt[ijet]/jec;
+      float jet_raw_pt = jet_type_pt[ijet]/jec_default;
+      float jet_l1_pt = jet_raw_pt*jec_l1;
+      float jet_l1l2l3_pt = jet_raw_pt*jec;
       float jet_raw_pt_nomu = jet_raw_pt*(1.0-jet_type_muonfactor[ijet]);
       float jet_l1l2l3_pt_nomu = jet_raw_pt_nomu*jec;
+      // jets below 15 GeV considered in unclustered energy
       if (jet_type == 1 && jet_l1l2l3_pt_nomu < 15.0f) continue;
 
-      //calculate JER (smearing) factors
-      //https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution#Smearing_procedures
-      //JSONS found at
-      //https://gitlab.cern.ch/cms-nanoAOD/jsonpog-integration/-/tree/master/POG/JME
-      float rho = 0.0f;
-      if (year < 2022)
-        rho = nano.fixedGridRhoFastjetAll();
-      else
-        rho = nano.Rho_fixedGridRhoFastjetAll();
-
-      float sigmajer = map_jermc_->evaluate({jet_type_eta[ijet],
-                                             jet_type_pt[ijet],rho});
-      float sjer_nom = 1.0f;
-      float sjer_up = 1.0f;
-      float sjer_dn = 1.0f;
-      if (year < 2022) {
-        sjer_nom = map_jersf_->evaluate({jet_type_eta[ijet],"nom"});
-        sjer_up = map_jersf_->evaluate({jet_type_eta[ijet],"up"});
-        sjer_dn = map_jersf_->evaluate({jet_type_eta[ijet],"down"});
-      }
-      else {
-        sjer_nom = map_jersf_->evaluate({jet_type_eta[ijet],jet_type_pt[ijet],
-                                         "nom"});
-        sjer_up = map_jersf_->evaluate({jet_type_eta[ijet],jet_type_pt[ijet],
-                                        "up"});
-        sjer_dn = map_jersf_->evaluate({jet_type_eta[ijet],jet_type_pt[ijet],
-                                        "down"});
-      }
       float indiv_jer_nm(1.0), indiv_jer_up(1.0), indiv_jer_dn(1.0);
+      // calculate JER (smearing) factors for MC only
+      // https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution#Smearing_procedures
+      // JSONS found at
+      // https://gitlab.cern.ch/cms-nanoAOD/jsonpog-integration/-/tree/master/POG/JME
+      if (!isData) {
 
-      bool found_genjet = false;
-      float mindr = 999.0f;
-      for (int igen(0); igen<nano.nGenJet(); ++igen) {
-        float dr = dR(jet_type_eta[ijet], nano.GenJet_eta()[igen], 
-                      jet_type_phi[ijet], nano.GenJet_phi()[igen]);
-        float dpt = jet_type_pt[ijet]-nano.GenJet_pt()[igen];
-        if (dr < 0.2f && fabs(dpt) < 3.0f*sigmajer*jet_type_pt[ijet]) {
-          if (dr > mindr) continue;
-          mindr = dr;
-          found_genjet = true;
-          indiv_jer_nm = (1.0+(sjer_nom-1.0)*dpt/jet_type_pt[ijet]);
-          indiv_jer_up = (1.0+(sjer_up-1.0)*dpt/jet_type_pt[ijet]);
-          indiv_jer_dn = (1.0+(sjer_dn-1.0)*dpt/jet_type_pt[ijet]);
-          //break;
+        float sigmajer = map_jermc_->evaluate({jet_type_eta[ijet],
+                                               jet_type_pt[ijet],rho});
+        float sjer_nom = 1.0f;
+        float sjer_up = 1.0f;
+        float sjer_dn = 1.0f;
+        if (year <= 2018) {
+          sjer_nom = map_jersf_->evaluate({jet_type_eta[ijet],"nom"});
+          sjer_up = map_jersf_->evaluate({jet_type_eta[ijet],"up"});
+          sjer_dn = map_jersf_->evaluate({jet_type_eta[ijet],"down"});
+        }
+        else {
+          sjer_nom = map_jersf_->evaluate({jet_type_eta[ijet],jet_type_pt[ijet],
+                                           "nom"});
+          sjer_up = map_jersf_->evaluate({jet_type_eta[ijet],jet_type_pt[ijet],
+                                          "up"});
+          sjer_dn = map_jersf_->evaluate({jet_type_eta[ijet],jet_type_pt[ijet],
+                                          "down"});
+        }
+
+        bool found_genjet = false;
+        float mindr = 999.0f;
+        for (int igen(0); igen<nano.nGenJet(); ++igen) {
+          float dr = dR(jet_type_eta[ijet], nano.GenJet_eta()[igen], 
+                        jet_type_phi[ijet], nano.GenJet_phi()[igen]);
+          float dpt = jet_type_pt[ijet]-nano.GenJet_pt()[igen];
+          if (dr < 0.2f && fabs(dpt) < 3.0f*sigmajer*jet_type_pt[ijet]) {
+            if (dr > mindr) continue;
+            mindr = dr;
+            found_genjet = true;
+            indiv_jer_nm = (1.0+(sjer_nom-1.0)*dpt/jet_type_pt[ijet]);
+            indiv_jer_up = (1.0+(sjer_up-1.0)*dpt/jet_type_pt[ijet]);
+            indiv_jer_dn = (1.0+(sjer_dn-1.0)*dpt/jet_type_pt[ijet]);
+          }
+        }
+
+        if (!found_genjet) {
+          float rand = rng_.Gaus(0,sigmajer);
+          indiv_jer_nm = 1.0+rand*sqrt(std::max(sjer_nom*sjer_nom-1.0,0.0));
+          indiv_jer_up = 1.0+rand*sqrt(std::max(sjer_up*sjer_up-1.0,0.0));
+          indiv_jer_dn = 1.0+rand*sqrt(std::max(sjer_dn*sjer_dn-1.0,0.0));
+        }
+        //turn off smearing for non-gen-jets with pT<50 and 2.5<|eta|<3 in 2017 and onward
+        //this fixes an issue with PU jets in the horn region
+        //roughly modified strategy 2 from VBF SUSY: 
+        //https://indico.cern.ch/event/1046356/contributions/4397877/attachments/2259227/3834282/BrendaFabelaEnriquez_VBFSUSY_METstudies_JERCMeeting_June7_2021.pdf#page=7
+        if (year>=2017) {
+          if (!found_genjet && fabs(jet_type_eta[ijet])>2.5f && 
+              fabs(jet_type_eta[ijet])<3.0f && jet_type_pt[ijet]<50.0f) {
+            indiv_jer_nm = 1.0;
+            indiv_jer_up = 1.0;
+            indiv_jer_dn = 1.0;
+          }
         }
       }
 
-      if (!found_genjet) {
-        float rand = rng_.Gaus(0,sigmajer);
-        indiv_jer_nm = 1.0+rand*sqrt(std::max(sjer_nom*sjer_nom-1.0,0.0));
-        indiv_jer_up = 1.0+rand*sqrt(std::max(sjer_up*sjer_up-1.0,0.0));
-        indiv_jer_dn = 1.0+rand*sqrt(std::max(sjer_dn*sjer_dn-1.0,0.0));
-      }
-      //turn off smearing for non-gen-jets with pT<50 and 2.5<|eta|<3 in 2017 and onward
-      //this fixes an issue with PU jets in the horn region
-      //roughly modified strategy 2 from VBF SUSY: 
-      //https://indico.cern.ch/event/1046356/contributions/4397877/attachments/2259227/3834282/BrendaFabelaEnriquez_VBFSUSY_METstudies_JERCMeeting_June7_2021.pdf#page=7
-      if (year>=2017) {
-        if (!found_genjet && fabs(jet_type_eta[ijet])>2.5f && 
-            fabs(jet_type_eta[ijet])<3.0f && jet_type_pt[ijet]<50.0f) {
-          indiv_jer_nm = 1.0;
-          indiv_jer_up = 1.0;
-          indiv_jer_dn = 1.0;
-        }
-      }
+      float jet_factor = jet_l1l2l3_pt*indiv_jer_nm/jet_type_pt[ijet];
+      float jes_unc = 0.0;
 
-      //Following NanoAOD-tools, JES uncertainties are evaluated post-smearing
-      float jes_unc = map_jes_->evaluate({jet_type_eta[ijet],jet_type_pt[ijet]*indiv_jer_nm});
-
-      //Save values for regular jets
+      //Save values for regular jets 
       if (jet_type==0) {
-        jer_nm_factor.push_back(indiv_jer_nm);
-        jer_up_factor.push_back(indiv_jer_up);
-        jer_dn_factor.push_back(indiv_jer_dn);
-        jes_up_factor.push_back(1.0+jes_unc);
-        jes_dn_factor.push_back(1.0-jes_unc);
+        jet_nm_factor.push_back(jet_factor);
+        if (!isData) {
+          //Following NanoAOD-tools, JES uncertainties are evaluated post-JER
+          jes_unc = map_jes_->evaluate({jet_type_eta[ijet],
+                                        jet_l1l2l3_pt*indiv_jer_nm});
+          jer_up_factor.push_back(indiv_jer_up/indiv_jer_nm);
+          jer_dn_factor.push_back(indiv_jer_dn/indiv_jer_nm);
+          jes_up_factor.push_back(1.0+jes_unc);
+          jes_dn_factor.push_back(1.0-jes_unc);
+        }
       }
 
       //propagate corrections to MET
@@ -291,40 +398,69 @@ void JetMetProducer::GetJetUncertainties(nano_tree &nano, pico_tree &pico,
         emef = nano.Jet_neEmEF()[ijet]+nano.Jet_chEmEF()[ijet];
       float jet_cosphi = cos(jet_type_phi[ijet]);
       float jet_sinphi = sin(jet_type_phi[ijet]);
-      //starting from T1 corrected MET in contrast with NanoAOD-tools
-      //i.e. L2L3-L1 already done, just need to worry about variations
-      if (jet_l1l2l3_pt_nomu > 15.0f && fabs(jet_type_eta[ijet])<5.2f && emef < 0.9f) {
-        met_x_nom -= jet_cosphi*(jet_type_pt[ijet]*indiv_jer_nm-jet_type_pt[ijet]);
-        met_y_nom -= jet_sinphi*(jet_type_pt[ijet]*indiv_jer_nm-jet_type_pt[ijet]);
-        met_x_jerup -= jet_cosphi*(jet_type_pt[ijet]*indiv_jer_up-jet_type_pt[ijet]);
-        met_y_jerup -= jet_sinphi*(jet_type_pt[ijet]*indiv_jer_up-jet_type_pt[ijet]);
-        met_x_jerdn -= jet_cosphi*(jet_type_pt[ijet]*indiv_jer_dn-jet_type_pt[ijet]);
-        met_y_jerdn -= jet_sinphi*(jet_type_pt[ijet]*indiv_jer_dn-jet_type_pt[ijet]);
-        met_x_jesup -= jet_cosphi*(jet_type_pt[ijet]*indiv_jer_nm*(1.0+jes_unc)-jet_type_pt[ijet]);
-        met_y_jesup -= jet_sinphi*(jet_type_pt[ijet]*indiv_jer_nm*(1.0+jes_unc)-jet_type_pt[ijet]);
-        met_x_jesdn -= jet_cosphi*(jet_type_pt[ijet]*indiv_jer_nm*(1.0-jes_unc)-jet_type_pt[ijet]);
-        met_y_jesdn -= jet_sinphi*(jet_type_pt[ijet]*indiv_jer_nm*(1.0-jes_unc)-jet_type_pt[ijet]);
+      // Run 2: starting from T1 corrected MET  (i.e. L2L3-L1 applied)
+      // Run 3: Apply L2L3-L1 corrections
+      if (jet_l1l2l3_pt_nomu > 15.0f && fabs(jet_type_eta[ijet])<5.2f 
+          && emef < 0.9f) {
+        float jet_nom_pt = jet_type_pt[ijet]*jet_factor;
+        if (year <= 2018) {
+          met_x_nom -= jet_cosphi*jet_type_pt[ijet]*(jet_factor-1.0);
+          met_y_nom -= jet_sinphi*jet_type_pt[ijet]*(jet_factor-1.0);
+        }
+        else {
+          met_x_nom -= jet_cosphi*(jet_nom_pt-jet_l1_pt);
+          met_y_nom -= jet_sinphi*(jet_nom_pt-jet_l1_pt);
+        }
+        if (!isData) {
+          met_x_jerup -= (jet_cosphi*jet_nom_pt*(indiv_jer_up/indiv_jer_nm
+                                                 -1.0));
+          met_y_jerup -= (jet_sinphi*jet_nom_pt*(indiv_jer_up/indiv_jer_nm
+                                                 -1.0));
+          met_x_jerdn -= (jet_cosphi*jet_nom_pt*(indiv_jer_dn/indiv_jer_nm
+                                                 -1.0));
+          met_y_jerdn -= (jet_sinphi*jet_nom_pt*(indiv_jer_dn/indiv_jer_nm
+                                                 -1.0));
+          met_x_jesup -= (jet_cosphi*jet_nom_pt*(jes_unc));
+          met_y_jesup -= (jet_sinphi*jet_nom_pt*(jes_unc));
+          met_x_jesdn -= (jet_cosphi*jet_nom_pt*(-1.0*jes_unc));
+          met_y_jesdn -= (jet_sinphi*jet_nom_pt*(-1.0*jes_unc));
+        }
       }
     }
   }
+  met_x_jerup += met_x_nom;
+  met_y_jerup += met_y_nom;
+  met_x_jerdn += met_x_nom;
+  met_y_jerdn += met_y_nom;
+  met_x_jesup += met_x_nom;
+  met_y_jesup += met_y_nom;
+  met_x_jesdn += met_x_nom;
+  met_y_jesdn += met_y_nom;
 
-  pico.out_sys_met().resize(4,0.0);
-  pico.out_sys_met_phi().resize(4,0.0);
-  pico.out_met() = sqrt(met_x_nom*met_x_nom+met_y_nom*met_y_nom);//Should account for puppi vs pf
-  pico.out_sys_met()[0] = sqrt(met_x_jerup*met_x_jerup+met_y_jerup*met_y_jerup);
-  pico.out_sys_met()[1] = sqrt(met_x_jerdn*met_x_jerdn+met_y_jerdn*met_y_jerdn);
-  pico.out_sys_met()[2] = sqrt(met_x_jesup*met_x_jesup+met_y_jesup*met_y_jesup);
-  pico.out_sys_met()[3] = sqrt(met_x_jesdn*met_x_jesdn+met_y_jesdn*met_y_jesdn);
+  pico.out_met() = sqrt(met_x_nom*met_x_nom+met_y_nom*met_y_nom);
   pico.out_met_phi() = atan2(met_y_nom, met_x_nom);
-  pico.out_sys_met_phi()[0] = atan2(met_y_jerup, met_x_jerup);
-  pico.out_sys_met_phi()[1] = atan2(met_y_jerdn, met_x_jerdn);
-  pico.out_sys_met_phi()[2] = atan2(met_y_jesup, met_x_jesup);
-  pico.out_sys_met_phi()[3] = atan2(met_y_jesdn, met_x_jesdn);
+  if (!isData) {
+    pico.out_sys_met().resize(4,0.0);
+    pico.out_sys_met_phi().resize(4,0.0);
+    pico.out_sys_met()[0] = sqrt(met_x_jerup*met_x_jerup
+                                 +met_y_jerup*met_y_jerup);
+    pico.out_sys_met()[1] = sqrt(met_x_jerdn*met_x_jerdn
+                                 +met_y_jerdn*met_y_jerdn);
+    pico.out_sys_met()[2] = sqrt(met_x_jesup*met_x_jesup
+                                 +met_y_jesup*met_y_jesup);
+    pico.out_sys_met()[3] = sqrt(met_x_jesdn*met_x_jesdn
+                                 +met_y_jesdn*met_y_jesdn);
+    pico.out_sys_met_phi()[0] = atan2(met_y_jerup, met_x_jerup);
+    pico.out_sys_met_phi()[1] = atan2(met_y_jerdn, met_x_jerdn);
+    pico.out_sys_met_phi()[2] = atan2(met_y_jesup, met_x_jesup);
+    pico.out_sys_met_phi()[3] = atan2(met_y_jesdn, met_x_jesdn);
+  }
+
+  WriteMetVariations(nano, pico);
 }
 
-//replaces MET_producer for UL and beyond
 //writes other MET variables and non-jet MET uncertainties
-void JetMetProducer::WriteMet(nano_tree &nano, pico_tree &pico) {
+void JetMetProducer::WriteMetVariations(nano_tree &nano, pico_tree &pico) {
   pico.out_met_calo()    = nano.CaloMET_pt();
   pico.out_met_tk()      = nano.TkMET_pt();
   pico.out_met_tk_phi()  = nano.TkMET_phi();
@@ -332,23 +468,33 @@ void JetMetProducer::WriteMet(nano_tree &nano, pico_tree &pico) {
   pico.out_met_tru_phi() = nano.GenMET_phi();
   pico.out_ht_isr_me()   = nano.LHE_HTIncoming();
   if (isData) {
-    if(year <= 2018){
-      pico.out_met() = nano.MET_pt();
-      pico.out_met_phi() = nano.MET_phi();
-    } else{ 
-      pico.out_met() = nano.PuppiMET_pt();
-      pico.out_met_phi() = nano.PuppiMET_phi();
-    }
     return;
   }
 
   //https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETRun2Corrections
   float met_x = pico.out_met()*cos(pico.out_met_phi());
   float met_y = pico.out_met()*sin(pico.out_met_phi());
-  float met_x_unclup = met_x + nano.MET_MetUnclustEnUpDeltaX();
-  float met_y_unclup = met_y + nano.MET_MetUnclustEnUpDeltaX();
-  float met_x_uncldn = met_x - nano.MET_MetUnclustEnUpDeltaX();
-  float met_y_uncldn = met_y - nano.MET_MetUnclustEnUpDeltaX();
+  float met_x_unclup, met_y_unclup, met_x_uncldn, met_y_uncldn;
+  if (year <= 2018) {
+    met_x_unclup = met_x + nano.MET_MetUnclustEnUpDeltaX();
+    met_y_unclup = met_y + nano.MET_MetUnclustEnUpDeltaX();
+    met_x_uncldn = met_x - nano.MET_MetUnclustEnUpDeltaX();
+    met_y_uncldn = met_y - nano.MET_MetUnclustEnUpDeltaX();
+  }
+  else {
+    met_x_unclup = met_x + (nano.PuppiMET_ptUnclusteredUp()
+                            *cos(nano.PuppiMET_phiUnclusteredUp())
+                            -nano.PuppiMET_pt()*cos(nano.PuppiMET_phi()));
+    met_y_unclup = met_y + (nano.PuppiMET_ptUnclusteredUp()
+                            *sin(nano.PuppiMET_phiUnclusteredUp())
+                            -nano.PuppiMET_pt()*sin(nano.PuppiMET_phi()));
+    met_x_uncldn = met_x + (nano.PuppiMET_ptUnclusteredDown()
+                            *cos(nano.PuppiMET_phiUnclusteredDown())
+                            -nano.PuppiMET_pt()*cos(nano.PuppiMET_phi()));
+    met_y_uncldn = met_y + (nano.PuppiMET_ptUnclusteredDown()
+                            *sin(nano.PuppiMET_phiUnclusteredDown())
+                            -nano.PuppiMET_pt()*sin(nano.PuppiMET_phi()));
+  }
   float met_x_leptonphotonup = met_x;
   float met_y_leptonphotonup = met_y;
   float met_x_leptonphotondn = met_x;
@@ -394,38 +540,28 @@ void JetMetProducer::WriteMet(nano_tree &nano, pico_tree &pico) {
           unc_factor*sin(pico.out_mu_phi()[imu])*pico.out_mu_pt()[imu];
     }
   }
-  if(year <= 2018){
-    pico.out_sys_met().push_back(sqrt(met_x_unclup*met_x_unclup+met_y_unclup*met_y_unclup));
-    pico.out_sys_met().push_back(sqrt(met_x_uncldn*met_x_uncldn+met_y_uncldn*met_y_uncldn));
-  } else{
-    pico.out_sys_met().push_back(nano.PuppiMET_ptUnclusteredUp());
-    pico.out_sys_met().push_back(nano.PuppiMET_ptUnclusteredDown());
-  }
+  pico.out_sys_met().push_back(sqrt(met_x_unclup*met_x_unclup+met_y_unclup*met_y_unclup));
+  pico.out_sys_met().push_back(sqrt(met_x_uncldn*met_x_uncldn+met_y_uncldn*met_y_uncldn));
   pico.out_sys_met().push_back(sqrt(met_x_leptonphotonup*met_x_leptonphotonup
                                +met_y_leptonphotonup*met_y_leptonphotonup));
   pico.out_sys_met().push_back(sqrt(met_x_leptonphotondn*met_x_leptonphotondn
                                +met_y_leptonphotondn*met_y_leptonphotondn));
-  if(year <= 2018){
-    pico.out_sys_met_phi().push_back(atan2(met_y_unclup, met_x_unclup));
-    pico.out_sys_met_phi().push_back(atan2(met_y_uncldn, met_x_uncldn));
-  } else{
-    pico.out_sys_met_phi().push_back(nano.PuppiMET_phiUnclusteredUp());
-    pico.out_sys_met_phi().push_back(nano.PuppiMET_phiUnclusteredDown());
-  }
-  pico.out_sys_met_phi().push_back(atan2(met_y_leptonphotonup, met_x_leptonphotonup));//Does puppimet need this?
+  pico.out_sys_met_phi().push_back(atan2(met_y_unclup, met_x_unclup));
+  pico.out_sys_met_phi().push_back(atan2(met_y_uncldn, met_x_uncldn));
+  pico.out_sys_met_phi().push_back(atan2(met_y_leptonphotonup, met_x_leptonphotonup));
   pico.out_sys_met_phi().push_back(atan2(met_y_leptonphotondn, met_x_leptonphotondn));
 
 }
 
 vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico, 
-                                   vector<int> jet_islep_nano_idx, 
-                                   vector<int> jet_isvlep_nano_idx,  
-                                   vector<int> jet_isphoton_nano_idx,
-                                   const vector<float> &btag_wpts, 
-                                   const vector<float> &btag_df_wpts, 
-                                   bool isFastsim, 
-                                   bool isSignal,
-                                   vector<HiggsConstructionVariables> &sys_higvars){
+    vector<int> jet_islep_nano_idx, 
+    vector<int> jet_isvlep_nano_idx,  
+    vector<int> jet_isphoton_nano_idx,
+    const vector<float> &btag_wpts, 
+    const vector<float> &btag_df_wpts, 
+    bool isFastsim, 
+    bool isSignal,
+    vector<HiggsConstructionVariables> &sys_higvars){
   vector<int> sig_jet_nano_idx;
   pico.out_njet() = 0; pico.out_ht() = 0; pico.out_ht5() = 0; 
   pico.out_nbl() = 0; pico.out_nbm() = 0; pico.out_nbt() = 0; 
@@ -435,24 +571,13 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
   pico.out_ishemvetoevt() = false;
   //add smearing to jets and calculate uncertainties
   vector<float> Jet_pt, Jet_mass;
-  vector<float> jer_nm_factor, jer_up_factor, jer_dn_factor, jes_up_factor, jes_dn_factor;
+  vector<float> jet_nm_factor;
+  vector<float> jer_up_factor, jer_dn_factor, jes_up_factor, jes_dn_factor;
   float MET_pt, MET_phi;
-  if (isData) {
-    WriteMet(nano, pico);
-    MET_pt = pico.out_met();
-    MET_phi = pico.out_met_phi();
-    Jet_pt = nano.Jet_pt();
-    Jet_mass = nano.Jet_mass();
-    jer_nm_factor.resize(Jet_pt.size(),1.0);
-    jer_up_factor.resize(Jet_pt.size(),1.0);
-    jer_dn_factor.resize(Jet_pt.size(),1.0);
-    jes_up_factor.resize(Jet_pt.size(),1.0);
-    jes_dn_factor.resize(Jet_pt.size(),1.0);
-  }
-  else if ((nanoaod_version+0.01) < 9) {
+  if ((nanoaod_version+0.01) < 9) {
     getJetWithJEC(nano, isFastsim, Jet_pt, Jet_mass);
     getMETWithJEC(nano, year, isFastsim, MET_pt, MET_phi, is_preUL);
-    jer_nm_factor.resize(Jet_pt.size(),1.0);
+    jet_nm_factor.resize(Jet_pt.size(),1.0);
     jer_up_factor.resize(Jet_pt.size(),1.0);
     jer_dn_factor.resize(Jet_pt.size(),1.0);
     jes_up_factor.resize(Jet_pt.size(),1.0);
@@ -460,14 +585,13 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
     met_producer.WriteMet(nano, pico, isFastsim, isSignal, is_preUL);
   }
   else  {
-    GetJetUncertainties(nano, pico, jer_nm_factor, jer_up_factor, jer_dn_factor, 
-                        jes_up_factor, jes_dn_factor);
+    PropagateJERC(nano, pico, jet_nm_factor, jer_up_factor, 
+                  jer_dn_factor, jes_up_factor, jes_dn_factor);
     MET_pt = pico.out_met();
     MET_phi = pico.out_met_phi();
-    WriteMet(nano, pico);
     for(int ijet(0); ijet<nano.nJet(); ++ijet) {
-      Jet_pt.push_back(nano.Jet_pt()[ijet]*jer_nm_factor[ijet]);
-      Jet_mass.push_back(nano.Jet_mass()[ijet]*jer_nm_factor[ijet]);
+      Jet_pt.push_back(nano.Jet_pt()[ijet]*jet_nm_factor[ijet]);
+      Jet_mass.push_back(nano.Jet_mass()[ijet]*jet_nm_factor[ijet]);
     }
   }
   vector<int> Jet_jetId;
@@ -643,14 +767,18 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
       }
     }
 
-    if (Jet_pt[ijet] <= min_jet_pt && 
-        (Jet_pt[ijet]*jer_up_factor[ijet]/jer_nm_factor[ijet]) <= min_jet_pt &&
-        (Jet_pt[ijet]*jer_dn_factor[ijet]/jer_nm_factor[ijet]) <= min_jet_pt &&
-        (Jet_pt[ijet]*jes_up_factor[ijet]) <= min_jet_pt) continue;
+    if (isData && Jet_pt[ijet] <= min_jet_pt) continue;
+    if (!isData) {
+      if (Jet_pt[ijet] <= min_jet_pt && 
+          (Jet_pt[ijet]*jer_up_factor[ijet]) <= min_jet_pt &&
+          (Jet_pt[ijet]*jer_dn_factor[ijet]) <= min_jet_pt &&
+          (Jet_pt[ijet]*jes_up_factor[ijet]) <= min_jet_pt &&
+          (Jet_pt[ijet]*jes_dn_factor[ijet]) <= min_jet_pt) continue;
+    }
     if (!isData && (nanoaod_version+0.01)>9 && isgood) {
-      if ((Jet_pt[ijet]*jer_up_factor[ijet]/jer_nm_factor[ijet]) > min_jet_pt)
+      if ((Jet_pt[ijet]*jer_up_factor[ijet]) > min_jet_pt)
         pico.out_sys_njet()[0]++;
-      if ((Jet_pt[ijet]*jer_dn_factor[ijet]/jer_nm_factor[ijet]) > min_jet_pt)
+      if ((Jet_pt[ijet]*jer_dn_factor[ijet]) > min_jet_pt)
         pico.out_sys_njet()[1]++;
       if ((Jet_pt[ijet]*jes_up_factor[ijet]) > min_jet_pt)
         pico.out_sys_njet()[2]++;
@@ -687,14 +815,22 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
         pico.out_jet_puid().push_back(nano.Jet_puId()[ijet]);
         pico.out_jet_puid_disc().push_back(nano.Jet_puIdDisc()[ijet]);
         if (!isData) {
-          pico.out_sys_jet_pt_jesup().push_back(Jet_pt[ijet]*jes_up_factor[ijet]);
-          pico.out_sys_jet_pt_jesdn().push_back(Jet_pt[ijet]*jes_dn_factor[ijet]);
-          pico.out_sys_jet_pt_jerup().push_back(Jet_pt[ijet]*jer_up_factor[ijet]/jer_nm_factor[ijet]);
-          pico.out_sys_jet_pt_jerdn().push_back(Jet_pt[ijet]*jer_dn_factor[ijet]/jer_nm_factor[ijet]);
-          pico.out_sys_jet_m_jesup().push_back(Jet_mass[ijet]*jes_up_factor[ijet]);
-          pico.out_sys_jet_m_jesdn().push_back(Jet_mass[ijet]*jes_dn_factor[ijet]);
-          pico.out_sys_jet_m_jerup().push_back(Jet_mass[ijet]*jer_up_factor[ijet]/jer_nm_factor[ijet]);
-          pico.out_sys_jet_m_jerdn().push_back(Jet_mass[ijet]*jer_dn_factor[ijet]/jer_nm_factor[ijet]);
+          pico.out_sys_jet_pt_jesup().push_back(
+              Jet_pt[ijet]*jes_up_factor[ijet]);
+          pico.out_sys_jet_pt_jesdn().push_back(
+              Jet_pt[ijet]*jes_dn_factor[ijet]);
+          pico.out_sys_jet_pt_jerup().push_back(
+              Jet_pt[ijet]*jer_up_factor[ijet]);
+          pico.out_sys_jet_pt_jerdn().push_back(
+              Jet_pt[ijet]*jer_dn_factor[ijet]);
+          pico.out_sys_jet_m_jesup().push_back(
+              Jet_mass[ijet]*jes_up_factor[ijet]);
+          pico.out_sys_jet_m_jesdn().push_back(
+              Jet_mass[ijet]*jes_dn_factor[ijet]);
+          pico.out_sys_jet_m_jerup().push_back(
+              Jet_mass[ijet]*jer_up_factor[ijet]);
+          pico.out_sys_jet_m_jerdn().push_back(
+              Jet_mass[ijet]*jer_dn_factor[ijet]);
         }
         break;
       case 2022:
@@ -724,14 +860,22 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
         //pico.out_jet_puid().push_back(nano.Jet_puId()[ijet]);
         //pico.out_jet_puid_disc().push_back(nano.Jet_puIdDisc()[ijet]);
         if (!isData) {
-          pico.out_sys_jet_pt_jesup().push_back(Jet_pt[ijet]*jes_up_factor[ijet]);
-          pico.out_sys_jet_pt_jesdn().push_back(Jet_pt[ijet]*jes_dn_factor[ijet]);
-          pico.out_sys_jet_pt_jerup().push_back(Jet_pt[ijet]*jer_up_factor[ijet]/jer_nm_factor[ijet]);
-          pico.out_sys_jet_pt_jerdn().push_back(Jet_pt[ijet]*jer_dn_factor[ijet]/jer_nm_factor[ijet]);
-          pico.out_sys_jet_m_jesup().push_back(Jet_mass[ijet]*jes_up_factor[ijet]);
-          pico.out_sys_jet_m_jesdn().push_back(Jet_mass[ijet]*jes_dn_factor[ijet]);
-          pico.out_sys_jet_m_jerup().push_back(Jet_mass[ijet]*jer_up_factor[ijet]/jer_nm_factor[ijet]);
-          pico.out_sys_jet_m_jerdn().push_back(Jet_mass[ijet]*jer_dn_factor[ijet]/jer_nm_factor[ijet]);
+          pico.out_sys_jet_pt_jesup().push_back(
+              Jet_pt[ijet]*jes_up_factor[ijet]);
+          pico.out_sys_jet_pt_jesdn().push_back(
+              Jet_pt[ijet]*jes_dn_factor[ijet]);
+          pico.out_sys_jet_pt_jerup().push_back(
+              Jet_pt[ijet]*jer_up_factor[ijet]);
+          pico.out_sys_jet_pt_jerdn().push_back(
+              Jet_pt[ijet]*jer_dn_factor[ijet]);
+          pico.out_sys_jet_m_jesup().push_back(
+              Jet_mass[ijet]*jes_up_factor[ijet]);
+          pico.out_sys_jet_m_jesdn().push_back(
+              Jet_mass[ijet]*jes_dn_factor[ijet]);
+          pico.out_sys_jet_m_jerup().push_back(
+              Jet_mass[ijet]*jer_up_factor[ijet]);
+          pico.out_sys_jet_m_jerdn().push_back(
+              Jet_mass[ijet]*jer_dn_factor[ijet]);
         }
         break;
       default:
