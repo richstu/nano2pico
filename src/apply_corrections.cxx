@@ -83,6 +83,7 @@ int main(int argc, char *argv[]){
     pico.out_w_trig()     = pico.w_trig()*static_cast<float>(corr.w_trig());
     pico.out_w_isr()      = pico.w_isr()*static_cast<float>(corr.w_isr());
     pico.out_w_pu()       = pico.w_pu()*static_cast<float>(corr.w_pu());
+    pico.out_w_nnlo()     = pico.w_nnlo()*static_cast<float>(corr.w_nnlo());
 
     float btag_weight = pico.out_w_bhig();
     if (is_zgamma) {

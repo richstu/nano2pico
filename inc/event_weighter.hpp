@@ -30,6 +30,8 @@ public:
 
   void bTaggingSF(pico_tree &pico);
 
+  void NNLOCorrection(pico_tree &pico);
+
 private:
   std::string in_file_electron_;
   std::string in_file_photon_;
@@ -43,6 +45,7 @@ private:
   std::string in_file_electron_iso0p15_;
   std::string in_file_muon_iso0p10_;
   std::string in_file_muon_iso0p15_;
+  std::string in_file_ggf_nnlo_;
   std::string key_;
   std::string puName_;
   std::string year_;
@@ -61,6 +64,7 @@ private:
   std::unique_ptr<correction::CorrectionSet> cs_el_hole_iso0p15_;
   std::unique_ptr<correction::CorrectionSet> cs_mu_iso0p10_;
   std::unique_ptr<correction::CorrectionSet> cs_mu_iso0p15_;
+  std::unique_ptr<correction::CorrectionSet> cs_ggf_nnlo_;
   correction::Correction::Ref map_photon_id_;
   correction::Correction::Ref map_photon_csev_;
   correction::Correction::Ref map_photon_mceff_;
@@ -82,6 +86,7 @@ private:
   correction::Correction::Ref map_pileup_;
   correction::Correction::Ref map_btag_;
   correction::Correction::Ref map_udsgtag_;
+  correction::Correction::Ref map_ggf_nnlo_;
   float btag_wp_loose_;
   float btag_wp_medium_;
   float btag_wp_tight_;
