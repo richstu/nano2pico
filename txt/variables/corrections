@@ -11,6 +11,7 @@ double w_photon
 # just need to add up 
 double w_el
 double w_mu
+double w_phshape
 double w_btag
 double w_btag_df
 double w_bhig
@@ -27,6 +28,7 @@ vector<double> sys_mu
 vector<double> sys_lep
 vector<double> sys_fs_lep
 vector<double> sys_photon
+vector<double> sys_photon_csev
 vector<double> sys_bchig
 vector<double> sys_udsghig
 vector<double> sys_fs_bchig

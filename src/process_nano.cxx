@@ -489,7 +489,7 @@ int main(int argc, char *argv[]){
     float w_lep(1.), w_fs_lep(1.);
     float w_photon(1.);
     vector<float> sys_lep(2,1.), sys_fs_lep(2,1.);
-    vector<float> sys_photon(2,1.);
+    vector<float> sys_photon(2,1.), sys_photon_csev(2,1.);
 
     if (isData) {
       pico.out_w_btag()    = 1.; 
@@ -506,6 +506,7 @@ int main(int argc, char *argv[]){
       pico.out_w_photon() = 1.;
       pico.out_w_trig() = 1.;
       pico.out_sys_photon().resize(2,0);
+      pico.out_sys_photon_csev().resize(2,0);
     } else { // MC
       if ((!is_preUL) || year>=2022) { //UL or run 3
         // ElectronISO SF need to be implemented for non-HToZgamma
@@ -514,8 +515,8 @@ int main(int argc, char *argv[]){
         event_weighter.PileupSF(pico);
         event_weighter.bTaggingSF(pico);
         event_weighter.PhotonSF(pico);
+        event_weighter.PhotonShapeSF(pico);
         pico.out_sys_lep().resize(2,1.); 
-        pico.out_sys_photon().resize(2, 1.); 
         pico.out_sys_prefire().resize(2, 1.); 
         pico.out_w_lep()          = pico.out_w_el() * pico.out_w_mu();
         pico.out_sys_lep()[0]     = pico.out_sys_el()[0]*pico.out_sys_mu()[0]; 
@@ -603,8 +604,9 @@ int main(int argc, char *argv[]){
     // do not include w_prefire, or anything that should not be renormalized! Will be set again in Step 3
     if (isZgamma) {
       pico.out_weight() = pico.out_w_lumi() *
-                          pico.out_w_lep() * pico.out_w_bhig() * pico.out_w_photon()  *
-                          pico.out_w_isr() * pico.out_w_pu() * pico.out_w_trig();
+                          pico.out_w_lep() * pico.out_w_btag_df() * pico.out_w_photon()  *
+                          pico.out_w_isr() * pico.out_w_pu() * pico.out_w_trig() *
+                          pico.out_w_phshape();
     } else {
       pico.out_weight() = pico.out_w_lumi() *
                           pico.out_w_lep() * pico.out_w_fs_lep() * pico.out_w_bhig() *
@@ -642,6 +644,7 @@ int main(int argc, char *argv[]){
       wgt_sums.out_w_el()      += pico.out_w_el();
       wgt_sums.out_w_mu()      += pico.out_w_mu();
       wgt_sums.out_w_photon()  += pico.out_w_photon();
+      wgt_sums.out_w_phshape() += pico.out_w_phshape();
       wgt_sums.out_w_btag()    += pico.out_w_btag();
       wgt_sums.out_w_btag_df() += pico.out_w_btag_df();
       wgt_sums.out_w_bhig()    += pico.out_w_bhig();
@@ -651,16 +654,17 @@ int main(int argc, char *argv[]){
       wgt_sums.out_w_trig()    += pico.out_w_trig();
 
       for(size_t i = 0; i<2; ++i){ 
-        wgt_sums.out_sys_el()[i]         += pico.out_sys_el()[i];
-        wgt_sums.out_sys_mu()[i]         += pico.out_sys_mu()[i];
-        wgt_sums.out_sys_photon()[i]     += pico.out_sys_photon()[i];
-        wgt_sums.out_sys_trig()[i]       += pico.out_sys_trig()[i];
-        wgt_sums.out_sys_bchig()[i]      += pico.out_sys_bchig()[i];
-        wgt_sums.out_sys_udsghig()[i]    += pico.out_sys_udsghig()[i];
-        wgt_sums.out_sys_fs_bchig()[i]   += pico.out_sys_fs_bchig()[i];
-        wgt_sums.out_sys_fs_udsghig()[i] += pico.out_sys_fs_udsghig()[i];
-        wgt_sums.out_sys_isr()[i]        += pico.out_sys_isr()[i];
-        wgt_sums.out_sys_pu()[i]         += pico.out_sys_pu()[i];
+        wgt_sums.out_sys_el()[i]          += pico.out_sys_el()[i];
+        wgt_sums.out_sys_mu()[i]          += pico.out_sys_mu()[i];
+        wgt_sums.out_sys_photon()[i]      += pico.out_sys_photon()[i];
+        wgt_sums.out_sys_photon_csev()[i] += pico.out_sys_photon_csev()[i];
+        wgt_sums.out_sys_trig()[i]        += pico.out_sys_trig()[i];
+        wgt_sums.out_sys_bchig()[i]       += pico.out_sys_bchig()[i];
+        wgt_sums.out_sys_udsghig()[i]     += pico.out_sys_udsghig()[i];
+        wgt_sums.out_sys_fs_bchig()[i]    += pico.out_sys_fs_bchig()[i];
+        wgt_sums.out_sys_fs_udsghig()[i]  += pico.out_sys_fs_udsghig()[i];
+        wgt_sums.out_sys_isr()[i]         += pico.out_sys_isr()[i];
+        wgt_sums.out_sys_pu()[i]          += pico.out_sys_pu()[i];
       }
       for(size_t i = 0; i<pico.out_sys_murf().size(); ++i){ 
         wgt_sums.out_sys_murf()[i] += pico.out_sys_murf()[i];
@@ -698,6 +702,7 @@ void Initialize(corrections_tree &wgt_sums){
   wgt_sums.out_w_lep()       = 0.;
   wgt_sums.out_w_fs_lep()    = 0.;
   wgt_sums.out_w_photon()    = 0.;
+  wgt_sums.out_w_phshape()   = 0.;
   wgt_sums.out_w_btag()      = 0.;
   wgt_sums.out_w_btag_df()   = 0.;
   wgt_sums.out_w_bhig()      = 0.;
@@ -714,6 +719,7 @@ void Initialize(corrections_tree &wgt_sums){
   wgt_sums.out_sys_lep().resize(2,0);
   wgt_sums.out_sys_fs_lep().resize(2,0);
   wgt_sums.out_sys_photon().resize(2,0);
+  wgt_sums.out_sys_photon_csev().resize(2,0);
   wgt_sums.out_sys_bchig().resize(2,0);
   wgt_sums.out_sys_udsghig().resize(2,0);
   wgt_sums.out_sys_fs_bchig().resize(2,0);

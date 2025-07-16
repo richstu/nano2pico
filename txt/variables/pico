@@ -453,8 +453,7 @@ float w_el
 float w_mu
 float w_fs_lep
 float w_photon
-float w_photon_id
-float w_photon_csev
+float w_phshape
 float w_btag
 float w_btag_df
 float w_bhig
@@ -641,6 +640,7 @@ vector<float> sys_lep
 vector<float> sys_fs_lep
 
 vector<float> sys_photon
+vector<float> sys_photon_csev
 
 vector<float> sys_bchig
 vector<float> sys_udsghig

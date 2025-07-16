@@ -120,15 +120,16 @@ for input_file in input_files:
     #cmd = './run/process_nano.exe --in_file '+infile+' --in_dir '+indir+' --out_dir out/zgamma/'
     cmd = './run/process_nano.exe --in_file '+infile+' --in_dir '+indir+' --out_dir out/zgamma/ --nent 1000'
     print_and_run(cmd)
-  ##merge corrections
-  #for infile in infiles:
-  #  cmd = './run/merge_corrections.exe out/zgamma/corrections/corr_'+infile
-  #  cmd += ' out/zgamma/wgt_sums/wgt_sums_'+infile
-  #  print_and_run(cmd)
-  ##apply corrections
-  #for infile in infiles:
-  #  cmd = './run/apply_corrections.exe --in_file raw_pico_'+infile+' --in_dir out/zgamma/raw_pico/ --corr_file corr_'+infile
-  #  print_and_run(cmd)
+  if not 'data' in input_file:
+    #merge corrections
+    for infile in infiles:
+      cmd = './run/merge_corrections.exe out/zgamma/corrections/corr_'+infile
+      cmd += ' out/zgamma/wgt_sums/wgt_sums_'+infile
+      print_and_run(cmd)
+    #apply corrections
+    for infile in infiles:
+      cmd = './run/apply_corrections.exe --in_file raw_pico_'+infile+' --in_dir out/zgamma/raw_pico/ --corr_file corr_'+infile
+      print_and_run(cmd)
 
 ##clean output
 #for dirname in ['raw_pico','unskimmed','corrections','wgt_sums']:

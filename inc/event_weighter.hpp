@@ -2,15 +2,16 @@
 #define H_EVENT_WEIGHTER
 
 #include <string>
+#include <memory>
 #include <vector>
 #include <utility>
 
 #include "TH2D.h"
 #include "TH2F.h"
 
-#include "pico_tree.hpp"
-
 #include "correction.hpp"
+#include "photon_shape_weighter.hpp"
+#include "pico_tree.hpp"
 
 class EventWeighter{
 public:
@@ -29,6 +30,8 @@ public:
   void PileupSF(pico_tree &pico);
 
   void bTaggingSF(pico_tree &pico);
+
+  void PhotonShapeSF(pico_tree &pico);
 
 private:
   std::string in_file_electron_;
@@ -88,6 +91,7 @@ private:
   correction::Correction::Ref map_pileup_;
   correction::Correction::Ref map_btag_;
   correction::Correction::Ref map_udsgtag_;
+  std::unique_ptr<PhotonShapeWeighter> ph_shape_weighter_;
   float btag_wp_loose_;
   float btag_wp_medium_;
   float btag_wp_tight_;

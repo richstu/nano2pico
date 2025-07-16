@@ -121,6 +121,7 @@ void Initialize(corrections_tree &wgt_sums, corrections_tree &corr){
   corr.out_w_isr() = 0.;
   corr.out_w_pu() = 0.;
   corr.out_w_photon() = 0.;
+  corr.out_w_phshape() = 0.;
   corr.out_w_trig() = 0.;
   corr.out_w_zvtx_pass() = 0.;
   corr.out_w_zvtx_fail() = 0.;
@@ -137,6 +138,8 @@ void Initialize(corrections_tree &wgt_sums, corrections_tree &corr){
   CopySize(wgt_sums.sys_el(),                 corr.out_sys_el());
   CopySize(wgt_sums.sys_mu(),                 corr.out_sys_mu());
   CopySize(wgt_sums.sys_lep(),                corr.out_sys_lep());
+  CopySize(wgt_sums.sys_photon(),             corr.out_sys_photon());
+  CopySize(wgt_sums.sys_photon_csev(),        corr.out_sys_photon_csev());
   CopySize(wgt_sums.sys_fs_lep(),             corr.out_sys_fs_lep());
   CopySize(wgt_sums.sys_bchig(),              corr.out_sys_bchig());
   CopySize(wgt_sums.sys_udsghig(),            corr.out_sys_udsghig());
@@ -174,10 +177,13 @@ void AddEntry(corrections_tree &wgt_sums, corrections_tree &corr){
   corr.out_w_isr()             += wgt_sums.w_isr();
   corr.out_w_pu()              += wgt_sums.w_pu();
   corr.out_w_photon()          += wgt_sums.w_photon();
+  corr.out_w_phshape()         += wgt_sums.w_phshape();
 
   VecAdd(wgt_sums.sys_el(),            corr.out_sys_el());
   VecAdd(wgt_sums.sys_mu(),            corr.out_sys_mu());
   VecAdd(wgt_sums.sys_lep(),           corr.out_sys_lep());
+  VecAdd(wgt_sums.sys_photon(),        corr.out_sys_photon());
+  VecAdd(wgt_sums.sys_photon_csev(),   corr.out_sys_photon_csev());
   VecAdd(wgt_sums.sys_fs_lep(),        corr.out_sys_fs_lep());
   VecAdd(wgt_sums.sys_bchig(),         corr.out_sys_bchig());
   VecAdd(wgt_sums.sys_udsghig(),       corr.out_sys_udsghig());
@@ -363,11 +369,14 @@ void Normalize(corrections_tree &corr){
   Normalize(corr.out_w_pu(), nent);
 
   Normalize(corr.out_w_photon(), nent);
+  Normalize(corr.out_w_phshape(), nent);
 
   Normalize(corr.out_w_trig(), nent);
 
   Normalize(corr.out_sys_el(), nent);
   Normalize(corr.out_sys_mu(), nent);
+  Normalize(corr.out_sys_photon(), nent);
+  Normalize(corr.out_sys_photon_csev(), nent);
   Normalize(corr.out_sys_bchig(), nent);
   Normalize(corr.out_sys_udsghig(), nent);
   Normalize(corr.out_sys_fs_bchig(), nent);
