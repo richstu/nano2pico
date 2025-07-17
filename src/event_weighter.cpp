@@ -190,6 +190,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
   cs_el_iso0p15_            = correction::CorrectionSet::from_file(in_file_electron_iso0p15_);
   cs_mu_iso0p10_            = correction::CorrectionSet::from_file(in_file_muon_iso0p10_);
   cs_mu_iso0p15_            = correction::CorrectionSet::from_file(in_file_muon_iso0p15_);
+  cs_fakephoton_            = correction::CorrectionSet::from_file("data/zgamma/fakephoton.json");
   map_photon_id_            = cs_photon_->at(photon_idmapname);
   map_photon_csev_          = cs_photon_->at(photon_csevmapname);
   map_photon_mceff_         = cs_photon_mceff_->at("effmc");
@@ -219,6 +220,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
   map_btag_                 = cs_btag_->at("deepJet_comb");
   map_udsgtag_              = cs_btag_->at(btag_lightname);
   map_pileup_               = cs_pileup_->at(puName_);
+  map_fakephoton_           = cs_fakephoton_->at("fakephoton_corrections");
   year_                     = year;
   btag_wp_loose_            = btag_wpts[0];
   btag_wp_medium_           = btag_wpts[1];
@@ -973,4 +975,28 @@ void EventWeighter::PhotonShapeSF(pico_tree &pico){
   if (fabs(weight) > 5.0)
     weight = 5.0*weight/fabs(weight);
   pico.out_w_phshape() = weight;
+}
+
+// Gets DY fake photon weight
+void EventWeighter::FakePhotonSF(pico_tree &pico) {
+  if (!(pico.out_type() >= 6000 && pico.out_type() < 7000) 
+        || pico.out_nphoton() < 1) {
+    pico.out_w_fakephoton() = 1.0f;
+    return;
+  }
+  if (pico.out_photon_pflavor()[0]==1) {
+    pico.out_w_fakephoton() = 1.0f;
+    return;
+  }
+  string run = "run3";
+  int this_photon_isjet = 0;
+  if (year_=="2016APV" || year_=="2016" || year_=="2017" || year_=="2018")
+    run = "run2";
+  if (pico.out_photon_hardprocess()[0])
+    this_photon_isjet = 1;
+  float ph_pt = pico.out_photon_pt()[0];
+  float ph_abseta = fabs(pico.out_photon_eta()[0]);
+  float sf_fp = map_fakephoton_->evaluate({run, this_photon_isjet, ph_pt, 
+                                           ph_abseta});
+  pico.out_w_fakephoton() = sf_fp;
 }

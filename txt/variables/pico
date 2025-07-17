@@ -373,6 +373,7 @@ vector<float> photon_jet_mindr
 vector<float> photon_jet_maxdr
 vector<float> photon_jet1_dr
 vector<float> photon_jet2_dr
+vector<bool>  photon_hardprocess
 
 vector<float> photon_zeppenfeld
 
@@ -462,6 +463,7 @@ float w_btag_dc
 float w_pu
 float w_prefire
 float w_trig
+float w_fakephoton
 
 ################  Triggers copy straight from Nano, same names   ##################
 

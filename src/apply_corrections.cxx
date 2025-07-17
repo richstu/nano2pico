@@ -119,7 +119,7 @@ int main(int argc, char *argv[]){
                      pico.out_w_lep() * pico.out_w_fs_lep() * //post-corr values in order for 0l to be correct
                      btag_weight * pico.out_w_trig() * pico.out_w_isr() * 
                      pico.out_w_pu() * pico.w_prefire() * pico.out_w_photon() *
-                     pico.out_w_phshape();
+                     pico.out_w_phshape() * pico.w_fakephoton();
 
     pico.out_sys_bchig().resize(2); pico.out_sys_fs_bchig().resize(2);
     pico.out_sys_udsghig().resize(2); pico.out_sys_fs_udsghig().resize(2);

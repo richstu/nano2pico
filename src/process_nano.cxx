@@ -516,6 +516,7 @@ int main(int argc, char *argv[]){
         event_weighter.bTaggingSF(pico);
         event_weighter.PhotonSF(pico);
         event_weighter.PhotonShapeSF(pico);
+        event_weighter.FakePhotonSF(pico);
         pico.out_sys_lep().resize(2,1.); 
         pico.out_sys_prefire().resize(2, 1.); 
         pico.out_w_lep()          = pico.out_w_el() * pico.out_w_mu();

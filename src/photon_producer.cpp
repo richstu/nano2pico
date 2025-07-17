@@ -118,6 +118,10 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
   //Set a default value 
   pico.out_photon_idx_hig019014() = -1;
 
+  vector<int> GenPart_statusFlags;
+  if (!isData)
+    getGenPart_statusFlags(nano, nanoaod_version, GenPart_statusFlags);
+
   //calculate scale/resolution corrections and drmin/drmax
   vector<float> scaleres_corr;
   vector<float> scale_syst_up;
@@ -282,6 +286,24 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
         }
       }
     }
+
+    //check for nearby gen particles with pT>15 GeV and fromHardprocess
+    bool hardprocess = false;
+    if (!isData) {
+      for (int imc = 0; imc < nano.nGenPart(); imc++) {
+        if (nano.GenPart_pt()[imc] > 15
+            && ((GenPart_statusFlags[imc] & 0x100) != 0)) {
+          //skip promptly decaying particles (W Z t H)
+          int abs_mc_id = abs(nano.GenPart_pdgId()[imc]);
+          if (abs_mc_id == 6 || abs_mc_id == 23 || abs_mc_id == 24
+              || abs_mc_id ==25) continue;
+          //use large radius to capture ex. fragmentation photons in jets
+          if (dR(eta,nano.GenPart_eta()[imc],phi,nano.GenPart_phi()[imc])<0.4) {
+            hardprocess = true;
+          }
+        }
+      }
+    }
     
     pico.out_photon_pt().push_back(pt);
     pico.out_photon_pt_raw().push_back(raw_pt);
@@ -307,6 +329,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
     pico.out_photon_id80().push_back(nano.Photon_mvaID_WP80()[iph]);
     if (!isData) {
       pico.out_photon_pflavor().push_back(nano.Photon_genPartFlav()[iph]);
+      pico.out_photon_hardprocess().push_back(hardprocess);
       pico.out_sys_photon_pt_resup().push_back(raw_pt*smear_syst_up[iph]);
       pico.out_sys_photon_pt_resdn().push_back(raw_pt*smear_syst_dn[iph]);
       pico.out_sys_photon_pt_scaleup().push_back(pt*scale_syst_up[iph]);
