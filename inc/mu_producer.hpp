@@ -39,7 +39,7 @@ private:
   bool run3;
   std::unique_ptr<correction::CorrectionSet> cs_scare_;
 
-  bool IsSignal(nano_tree &nano, int nano_idx, bool isZgamma);
+  bool IsSignal(nano_tree &nano, int nano_idx, bool isZgamma, float pt);
   
 };
 

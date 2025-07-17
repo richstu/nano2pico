@@ -272,7 +272,6 @@ vector<int>   mu_charge
 vector<int>   mu_pflavor
 vector<int>   mu_fsrphotonid
 vector<float> mu_raw_pt
-vector<float> mu_scare_pt
 
 int nel
 int nvel

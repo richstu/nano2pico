@@ -43,8 +43,7 @@ MuonProducer::MuonProducer(string year_, bool isData_, float nanoaod_version_, s
 MuonProducer::~MuonProducer(){
 }
 
-bool MuonProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma) {
-  float pt = nano.Muon_pt()[nano_idx];
+bool MuonProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma, float pt) {
   float eta = nano.Muon_eta()[nano_idx];
   if(isZgamma) { // For Zgamma productions
     if (pt <= ZgMuonPtCut) return false;
@@ -78,73 +77,26 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
   getMuon_fsrPhotonIdx(nano, nanoaod_version, Muon_fsrPhotonIdx);
   vector<int> Muon_nTrackerLayers;
   getMuon_nTrackerLayers(nano, nanoaod_version, Muon_nTrackerLayers);
-  vector<int> Muon_genPartIdx;;
+  vector<int> Muon_genPartIdx;
   if (!isData) getMuon_genPartIdx(nano, nanoaod_version, Muon_genPartIdx);
 
-  //first, determine ordering based on signal and pt
-  std::vector<NanoOrderEntry> nano_entries;
+  //scale+resolution corrections
+  vector<float> muon_pt_corr;
+  vector<float> muon_pt_scaleup;
+  vector<float> muon_pt_scaledn;
+  vector<float> muon_pt_resup;
+  vector<float> muon_pt_resdn;
   for(int imu(0); imu<nano.nMuon(); ++imu){
-    NanoOrderEntry nano_entry;
-    nano_entry.nano_idx = imu;
-    nano_entry.pt = nano.Muon_pt()[imu];
-    nano_entry.is_sig = IsSignal(nano, imu, isZgamma);
-    nano_entries.push_back(nano_entry);
-  }
-  std::sort(nano_entries.begin(),nano_entries.end(), 
-      [](NanoOrderEntry a, NanoOrderEntry b) {
-        if (a.is_sig && !b.is_sig) return true;
-        if (b.is_sig && !a.is_sig) return false;
-        return (a.pt>b.pt);
-      });
-  std::vector<int> ordered_nano_indices;
-  for (NanoOrderEntry nano_entry : nano_entries)
-    ordered_nano_indices.push_back(nano_entry.nano_idx);
-
-  vector<int> sig_mu_nano_idx;
-  pico.out_nmu() = 0; pico.out_nvmu() = 0;
-  int pico_idx = 0;
-  for(int imu : ordered_nano_indices){
-    float pt = nano.Muon_pt()[imu];
     float eta = nano.Muon_eta()[imu];
     float phi = nano.Muon_phi()[imu];
     int charge = nano.Muon_charge()[imu];
     int nTrackerLayers = Muon_nTrackerLayers[imu];
-    bool isSignal = false;
-    if(isZgamma) { // For Zgamma productions
-      if (pt <= ZgMuonPtCut) continue;
-      if (fabs(eta) > MuonEtaCut) continue;
-      if (fabs(nano.Muon_dz()[imu])>dzCut)  continue;
-      if (fabs(nano.Muon_dxy()[imu])>dxyCut) continue; 
-      isSignal = IsSignal(nano, imu, isZgamma);
-      pico.out_mu_sip3d().push_back(nano.Muon_sip3d()[imu]);
-      pico.out_mu_mediumid().push_back(nano.Muon_mediumId()[imu]);
-      pico.out_mu_tightid().push_back(nano.Muon_tightId()[imu]);
-      pico.out_mu_highptid().push_back(nano.Muon_highPtId()[imu]);
-      pico.out_mu_fsrphotonid().push_back(Muon_fsrPhotonIdx[imu]);
-    }
-    else {
-      if (!nano.Muon_mediumId()[imu]) continue;
-      if (pt <= VetoMuonPtCut) continue;
-      if (fabs(eta) > MuonEtaCut) continue;
-      isSignal = IsSignal(nano, imu, isZgamma);
-    }
-    pico.out_mu_raw_pt().push_back(pt);
-    pico.out_mu_eta().push_back(eta);
-    pico.out_mu_phi().push_back(nano.Muon_phi()[imu]);
-    pico.out_mu_miniso().push_back(nano.Muon_miniPFRelIso_all()[imu]);
-    pico.out_mu_reliso().push_back(nano.Muon_pfRelIso03_all()[imu]);
-    pico.out_mu_dz().push_back(nano.Muon_dz()[imu]);
-    pico.out_mu_dxy().push_back(nano.Muon_dxy()[imu]);
-    pico.out_mu_ip3d().push_back(nano.Muon_ip3d()[imu]);
-    pico.out_mu_id().push_back(nano.Muon_looseId()[imu]);
-    pico.out_mu_sig().push_back(isSignal);
-    pico.out_mu_charge().push_back(nano.Muon_charge()[imu]);
     if (!run3) {
-      pico.out_mu_ptErr().push_back(nano.Muon_ptErr()[imu]);
       //Rochester corrections, see https://github.com/cms-nanoAOD/nanoAOD-tools/blob/master/python/postprocessing/modules/common/muonScaleResProducer.py
+      float pt = nano.Muon_pt()[imu];
       float scale_sf = rc.kScaleDT(charge,pt,eta,phi);
       if (isData) {
-        pico.out_mu_pt().push_back(pt*scale_sf);
+        muon_pt_corr.push_back(pt*scale_sf);
       }
       else {
         float resolution_sf = 1.0;
@@ -164,46 +116,107 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
           resolution_unc = rc.kSmearMCerror(charge,pt,eta,phi,nTrackerLayers,
               unif_rand)*(resolution_sf > 1.0 ? 1.0 : -1.0);
         }
-        pico.out_mu_pt().push_back(pt*resolution_sf);
-        pico.out_sys_mu_pt_scaleup().push_back(pt*resolution_sf
-                                               *(scale_sf+scale_unc)/scale_sf);
-        pico.out_sys_mu_pt_scaledn().push_back(pt*resolution_sf
-                                               *(scale_sf-scale_unc)/scale_sf);
-        pico.out_sys_mu_pt_resup().push_back(pt*(resolution_sf+resolution_unc));
-        pico.out_sys_mu_pt_resdn().push_back(pt*(resolution_sf-resolution_unc));
+        muon_pt_corr.push_back(pt*resolution_sf);
+        muon_pt_scaleup.push_back(pt*resolution_sf
+                                  *(scale_sf+scale_unc)/scale_sf);
+        muon_pt_scaledn.push_back(pt*resolution_sf
+                                  *(scale_sf-scale_unc)/scale_sf);
+        muon_pt_resup.push_back(pt*(resolution_sf+resolution_unc));
+        muon_pt_resdn.push_back(pt*(resolution_sf-resolution_unc));
       }
-      pico.out_mu_scare_pt().push_back(pico.out_mu_pt().back()); 
     }
     else {
+      float pt = nano.Muon_bsConstrainedPt()[imu];
       if (isData) {
-        pico.out_mu_scare_pt().push_back(scarekit::pt_scale(1, pt, eta, phi,
+        muon_pt_corr.push_back(scarekit::pt_scale(1, pt, eta, phi,
             charge, cs_scare_));
       }
       else {
         float sca_pt = scarekit::pt_scale(0, pt, eta, phi, charge, cs_scare_);
         float re_pt = scarekit::pt_resol(sca_pt, eta, 
             static_cast<float>(nTrackerLayers), cs_scare_);
-        pico.out_mu_scare_pt().push_back(re_pt);
-        pico.out_sys_mu_pt_scaleup().push_back(scarekit::pt_scale_var(re_pt, 
-            eta, phi, charge, "up", cs_scare_));
-        pico.out_sys_mu_pt_scaledn().push_back(scarekit::pt_scale_var(re_pt, 
-            eta, phi, charge, "dn", cs_scare_));
-        pico.out_sys_mu_pt_resup().push_back(scarekit::pt_resol_var(sca_pt, 
-            re_pt, eta, "up", cs_scare_));
-        pico.out_sys_mu_pt_resdn().push_back(scarekit::pt_resol_var(sca_pt, 
-            re_pt, eta, "dn", cs_scare_));
-      }
-      if (nanoaod_version > 11.95) {
-        pico.out_mu_pt().push_back(nano.Muon_bsConstrainedPt()[imu]);
-        pico.out_mu_ptErr().push_back(nano.Muon_bsConstrainedPtErr()[imu]);
-      }
-      else {
-        pico.out_mu_pt().push_back(pt);
-        pico.out_mu_ptErr().push_back(nano.Muon_ptErr()[imu]);
+        muon_pt_corr.push_back(re_pt);
+        muon_pt_scaleup.push_back(scarekit::pt_scale_var(re_pt, eta, phi, 
+            charge, "up", cs_scare_));
+        muon_pt_scaledn.push_back(scarekit::pt_scale_var(re_pt, eta, phi, 
+            charge, "dn", cs_scare_));
+        muon_pt_resup.push_back(scarekit::pt_resol_var(sca_pt, re_pt, eta, 
+            "up", cs_scare_));
+        muon_pt_resdn.push_back(scarekit::pt_resol_var(sca_pt, re_pt, eta, 
+            "dn", cs_scare_));
       }
     }
-    if (!isData)
+  }
+
+  //first, determine ordering based on signal and pt
+  std::vector<NanoOrderEntry> nano_entries;
+  for(int imu(0); imu<nano.nMuon(); ++imu){
+    NanoOrderEntry nano_entry;
+    nano_entry.nano_idx = imu;
+    nano_entry.pt = muon_pt_corr[imu];
+    nano_entry.is_sig = IsSignal(nano, imu, isZgamma, muon_pt_corr[imu]);
+    nano_entries.push_back(nano_entry);
+  }
+  std::sort(nano_entries.begin(),nano_entries.end(), 
+      [](NanoOrderEntry a, NanoOrderEntry b) {
+        if (a.is_sig && !b.is_sig) return true;
+        if (b.is_sig && !a.is_sig) return false;
+        return (a.pt>b.pt);
+      });
+  std::vector<int> ordered_nano_indices;
+  for (NanoOrderEntry nano_entry : nano_entries)
+    ordered_nano_indices.push_back(nano_entry.nano_idx);
+
+  vector<int> sig_mu_nano_idx;
+  pico.out_nmu() = 0; pico.out_nvmu() = 0;
+  int pico_idx = 0;
+  for(int imu : ordered_nano_indices){
+    float pt = muon_pt_corr[imu];
+    float eta = nano.Muon_eta()[imu];
+    bool isSignal = false;
+    if(isZgamma) { // For Zgamma productions
+      if (pt <= ZgMuonPtCut) continue;
+      if (fabs(eta) > MuonEtaCut) continue;
+      if (fabs(nano.Muon_dz()[imu])>dzCut)  continue;
+      if (fabs(nano.Muon_dxy()[imu])>dxyCut) continue; 
+      isSignal = IsSignal(nano, imu, isZgamma, pt);
+      pico.out_mu_sip3d().push_back(nano.Muon_sip3d()[imu]);
+      pico.out_mu_mediumid().push_back(nano.Muon_mediumId()[imu]);
+      pico.out_mu_tightid().push_back(nano.Muon_tightId()[imu]);
+      pico.out_mu_highptid().push_back(nano.Muon_highPtId()[imu]);
+      pico.out_mu_fsrphotonid().push_back(Muon_fsrPhotonIdx[imu]);
+    }
+    else {
+      if (!nano.Muon_mediumId()[imu]) continue;
+      if (pt <= VetoMuonPtCut) continue;
+      if (fabs(eta) > MuonEtaCut) continue;
+      isSignal = IsSignal(nano, imu, isZgamma, pt);
+    }
+    pico.out_mu_raw_pt().push_back(nano.Muon_pt()[imu]);
+    pico.out_mu_pt().push_back(pt);
+    pico.out_mu_eta().push_back(eta);
+    pico.out_mu_phi().push_back(nano.Muon_phi()[imu]);
+    pico.out_mu_miniso().push_back(nano.Muon_miniPFRelIso_all()[imu]);
+    pico.out_mu_reliso().push_back(nano.Muon_pfRelIso03_all()[imu]);
+    pico.out_mu_dz().push_back(nano.Muon_dz()[imu]);
+    pico.out_mu_dxy().push_back(nano.Muon_dxy()[imu]);
+    pico.out_mu_ip3d().push_back(nano.Muon_ip3d()[imu]);
+    pico.out_mu_id().push_back(nano.Muon_looseId()[imu]);
+    pico.out_mu_sig().push_back(isSignal);
+    pico.out_mu_charge().push_back(nano.Muon_charge()[imu]);
+    if (!isData) {
       pico.out_mu_pflavor().push_back(nano.Muon_genPartFlav()[imu]);
+      pico.out_sys_mu_pt_scaleup().push_back(muon_pt_scaleup[imu]);
+      pico.out_sys_mu_pt_scaledn().push_back(muon_pt_scaledn[imu]);
+      pico.out_sys_mu_pt_resup().push_back(muon_pt_resup[imu]);
+      pico.out_sys_mu_pt_resdn().push_back(muon_pt_resdn[imu]);
+    }
+    if (nanoaod_version > 11.95) {
+      pico.out_mu_ptErr().push_back(nano.Muon_bsConstrainedPtErr()[imu]);
+    }
+    else {
+      pico.out_mu_ptErr().push_back(nano.Muon_ptErr()[imu]);
+    }
 
     // veto muon selection
     if (nano.Muon_miniPFRelIso_all()[imu] < MuonMiniIsoCut && 
