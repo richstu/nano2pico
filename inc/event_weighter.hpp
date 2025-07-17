@@ -10,6 +10,7 @@
 #include "TH2F.h"
 
 #include "correction.hpp"
+#include "zgbkg_isr_weighter.hpp"
 #include "photon_shape_weighter.hpp"
 #include "pico_tree.hpp"
 
@@ -34,6 +35,8 @@ public:
   void PhotonShapeSF(pico_tree &pico);
 
   void FakePhotonSF(pico_tree &pico);
+
+  void ZISRSF(pico_tree &pico);
 
 private:
   std::string in_file_electron_;
@@ -96,6 +99,7 @@ private:
   correction::Correction::Ref map_udsgtag_;
   correction::Correction::Ref map_fakephoton_;
   std::unique_ptr<PhotonShapeWeighter> ph_shape_weighter_;
+  std::unique_ptr<ZgBkgIsrWeighter> zgbkg_isr_weighter_;
   float btag_wp_loose_;
   float btag_wp_medium_;
   float btag_wp_tight_;

@@ -12,6 +12,7 @@
 #include "TGraphAsymmErrors.h"
 
 #include "photon_shape_weighter.hpp"
+#include "zgbkg_isr_weighter.hpp"
 #include "utilities.hpp"
 
 using namespace std;
@@ -39,6 +40,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     photon_idmapname          = "UL-Photon-ID-SF";
     photon_csevmapname        = "UL-Photon-CSEV-SF";
     ph_shape_weighter_        = make_unique<rw_mmp>();
+    zgbkg_isr_weighter_       = make_unique<kinr2_weighter>();
   } else if (year=="2016") {
     in_file_electron_         = "data/zgamma/2016postVFP_UL/hzg_elid_2016_scalefactors.json";
     in_file_electron_reco_    = "data/zgamma/2016postVFP_UL/electron_recoSF2016postVFP.json";
@@ -58,6 +60,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     photon_idmapname          = "UL-Photon-ID-SF";
     photon_csevmapname        = "UL-Photon-CSEV-SF";
     ph_shape_weighter_        = make_unique<rw_mmp>();
+    zgbkg_isr_weighter_       = make_unique<kinr2_weighter>();
   } else if (year=="2017") {
     in_file_electron_         = "data/zgamma/2017_UL/hzg_elid_2017_scalefactors.json";
     in_file_electron_reco_    = "data/zgamma/2017_UL/electron_recoSF2017.json";
@@ -77,6 +80,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     photon_idmapname          = "UL-Photon-ID-SF";
     photon_csevmapname        = "UL-Photon-CSEV-SF";
     ph_shape_weighter_        = make_unique<rw_mmp>();
+    zgbkg_isr_weighter_       = make_unique<kinr2_weighter>();
   } else if (year=="2018") {
     in_file_electron_         = "data/zgamma/2018_UL/hzg_elid_2018_scalefactors.json";
     in_file_electron_reco_    = "data/zgamma/2018_UL/electron_recoSF2018.json";
@@ -96,6 +100,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     photon_idmapname          = "UL-Photon-ID-SF";
     photon_csevmapname        = "UL-Photon-CSEV-SF";
     ph_shape_weighter_        = make_unique<rw_mmp>();
+    zgbkg_isr_weighter_       = make_unique<kinr2_weighter>();
   } else if (year=="2022"){
     in_file_electron_         = "data/zgamma/2022/hzg_elid_2022_scalefactors.json";
     in_file_electron_reco_    = "data/zgamma/2022/electron_recoSF2022.json";
@@ -114,6 +119,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     puName_                   = "Collisions2022_355100_357900_eraBCD_GoldenJson";
     btag_lightname            = "deepJet_light";
     ph_shape_weighter_        = make_unique<rw_mmp_r3>();
+    zgbkg_isr_weighter_       = make_unique<kinr3_weighter>();
   } else if (year=="2022EE"){
     in_file_electron_         = "data/zgamma/2022EE/hzg_elid_2022EE_scalefactors.json";
     in_file_electron_reco_    = "data/zgamma/2022EE/electron_recoSF2022EE.json";
@@ -132,6 +138,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     puName_                   = "Collisions2022_359022_362760_eraEFG_GoldenJson";
     btag_lightname            = "deepJet_light";
     ph_shape_weighter_        = make_unique<rw_mmp_r3>();
+    zgbkg_isr_weighter_       = make_unique<kinr3_weighter>();
   } else if (year=="2023"){
     in_file_electron_         = "data/zgamma/2023/hzg_elid_2023_scalefactors.json";
     in_file_electron_reco_    = "data/zgamma/2023/electron_recoSF2023.json";
@@ -150,6 +157,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     puName_                   = "Collisions2023_366403_369802_eraBC_GoldenJson";
     btag_lightname            = "deepJet_light";
     ph_shape_weighter_        = make_unique<rw_mmp_r3>();
+    zgbkg_isr_weighter_       = make_unique<kinr3_weighter>();
   } else if (year=="2023BPix"){
     in_file_electron_         = "data/zgamma/2023BPix/hzg_elid_2023BPix_scalefactors.json";
     in_file_electron_reco_    = "data/zgamma/2023BPix/electron_recoSF2023BPix.json";
@@ -174,6 +182,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     cs_el_hole_iso0p15_       = correction::CorrectionSet::from_file(
         "data/zgamma/2023BPix/hzg_eliso0p15_2023BPixHole_efficiencies.json");
     ph_shape_weighter_        = make_unique<rw_mmp_r3>();
+    zgbkg_isr_weighter_       = make_unique<kinr3_weighter>();
   } else {
     cout<<"Year has not been implemented in event_weighter"<<endl;
   }
@@ -999,4 +1008,29 @@ void EventWeighter::FakePhotonSF(pico_tree &pico) {
   float sf_fp = map_fakephoton_->evaluate({run, this_photon_isjet, ph_pt, 
                                            ph_abseta});
   pico.out_w_fakephoton() = sf_fp;
+}
+
+// Z ISR/kinematics SF
+void EventWeighter::ZISRSF(pico_tree &pico){
+  //for DY and DYG samples
+  if (!((pico.out_type() >= 6000 && pico.out_type() < 7000) ||
+        (pico.out_type() >= 17000 && pico.out_type() < 18000))
+        || pico.out_nllphoton() < 1) {
+    pico.out_w_isr() = 1.0f;
+    return;
+  }
+
+  vector<float> dnn_input = {pico.out_photon_idmva()[0],
+                             pico.out_photon_mht_dphi()[0], 
+                             static_cast<float>(pico.out_njet()), 
+                             pico.out_ll_pt()[0], 
+                             pico.out_photon_pt()[0], 
+                             pico.out_llphoton_pt()[0], 
+                             pico.out_mht(), 
+                             pico.out_ht()}; 
+  float dnn_output = zgbkg_isr_weighter_->evaluate(dnn_input);
+  float weight = (dnn_output/(1.0-dnn_output));
+  if (fabs(weight) > 5.0)
+    weight = 5.0*weight/fabs(weight);
+  pico.out_w_isr() = weight;
 }

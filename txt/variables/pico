@@ -374,6 +374,7 @@ vector<float> photon_jet_maxdr
 vector<float> photon_jet1_dr
 vector<float> photon_jet2_dr
 vector<bool>  photon_hardprocess
+vector<float> photon_mht_dphi
 
 vector<float> photon_zeppenfeld
 

@@ -132,6 +132,7 @@ void Initialize(corrections_tree &wgt_sums, corrections_tree &corr){
   corr.out_neff_pass_eltrigs() = 0;
   corr.out_nent() = 0;
   corr.out_nent_zlep() = 0;
+  corr.out_nent_isr() = 0;
   corr.out_tot_weight_l0() = 0.;
   corr.out_tot_weight_l1() = 0.;
 
@@ -159,6 +160,7 @@ void AddEntry(corrections_tree &wgt_sums, corrections_tree &corr){
   corr.out_neff() += wgt_sums.neff();
   corr.out_nent() += wgt_sums.nent();
   corr.out_nent_zlep() += wgt_sums.nent_zlep();
+  corr.out_nent_isr() += wgt_sums.nent_isr();
   corr.out_neff_pass_eltrigs() += wgt_sums.neff_pass_eltrigs();
   corr.out_neff_el() += wgt_sums.neff_el();
   corr.out_tot_weight_l0() += wgt_sums.tot_weight_l0();
@@ -260,6 +262,13 @@ void FixLumi(corrections_tree &corr, const string &corr_path, int year){
 }
 
 void FixISR(corrections_tree &corr, const string &corr_path, int year, bool is_zgamma){
+  if (is_zgamma) {
+    corr.out_weight() = 1.0;
+    double nent_isr = corr.out_nent_isr();
+    Normalize(corr.out_w_isr(), nent_isr);
+    return;
+  }
+
   double corr_w_isr(1.);
   vector<double> corr_sys_isr(2,1.);
   double tot_w_isr = corr.out_w_isr();
@@ -298,18 +307,10 @@ void FixISR(corrections_tree &corr, const string &corr_path, int year, bool is_z
   if (corr.out_w_fs_lep()) w_corr_l0 *= (nent-corr.out_w_fs_lep())/nent_zlep;
   if(nent_zlep==0) w_corr_l0 = 1.;
   // again normalize to total w_isr, not unity
-  if (!is_zgamma) {
-    if(year==2016) 
-      corr.out_weight() = (tot_w_isr*corr_w_isr)/(corr.out_tot_weight_l0()*w_corr_l0 + corr.out_tot_weight_l1());
-    else
-      corr.out_weight() = nent/(corr.out_tot_weight_l0()*w_corr_l0 + corr.out_tot_weight_l1());
-  }
-  else {
-    if(year==2016) 
-      corr.out_weight() = (tot_w_isr*corr_w_isr)/nent;
-    else
-      corr.out_weight() = 1.0;
-  }
+  if(year==2016) 
+    corr.out_weight() = (tot_w_isr*corr_w_isr)/(corr.out_tot_weight_l0()*w_corr_l0 + corr.out_tot_weight_l1());
+  else
+    corr.out_weight() = nent/(corr.out_tot_weight_l0()*w_corr_l0 + corr.out_tot_weight_l1());
 
   //cout<<"tot_w_isr: "<<tot_w_isr<<" corr_w_isr: "<<corr_w_isr<<" nent: "<<corr.out_nent()<<" out_tot_weight_l0: "<<corr.out_tot_weight_l0()<<" w_corr_l0: "<<w_corr_l0<<" out_tot_weight_l1: "<<corr.out_tot_weight_l1()<<" out_weight: "<<corr.out_weight()<<endl;
 }

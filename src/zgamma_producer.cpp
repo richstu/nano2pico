@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include "zgamma_producer.hpp"
 #include "utilities.hpp"
 #include "KinZfitter.hpp"
@@ -16,6 +18,8 @@ ZGammaVarProducer::~ZGammaVarProducer(){
 }
 
 void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector<int> sig_jet_nano_idx){
+
+  // write dijet variables
   if(sig_jet_nano_idx.size() > 1) {
     TLorentzVector j1, j2, dijet;
     j1.SetPtEtaPhiM(nano.Jet_pt()[sig_jet_nano_idx[0]], nano.Jet_eta()[sig_jet_nano_idx[0]], nano.Jet_phi()[sig_jet_nano_idx[0]],nano.Jet_mass()[sig_jet_nano_idx[0]]);
@@ -30,6 +34,45 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
     pico.out_dijet_deta() = fabs(j1.Eta() - j2.Eta());
   }
 
+  // (over)write ht, mht, and associated photon branch
+  float ht = 0.0f;
+  float mht_x = 0.0f;
+  float mht_y = 0.0f;
+  for (unsigned iel = 0; iel < pico.out_el_pt().size(); iel++) {
+    if (pico.out_el_sig()[iel]) {
+      ht += pico.out_el_pt()[iel];
+      mht_x -= pico.out_el_pt()[iel]*cos(pico.out_el_phi()[iel]);
+      mht_y -= pico.out_el_pt()[iel]*sin(pico.out_el_phi()[iel]);
+    }
+  }
+  for (unsigned imu = 0; imu < pico.out_mu_pt().size(); imu++) {
+    if (pico.out_mu_sig()[imu]) {
+      ht += pico.out_mu_pt()[imu];
+      mht_x -= pico.out_mu_pt()[imu]*cos(pico.out_mu_phi()[imu]);
+      mht_y -= pico.out_mu_pt()[imu]*sin(pico.out_mu_phi()[imu]);
+    }
+  }
+  for (unsigned iph = 0; iph < pico.out_photon_pt().size(); iph++) {
+    if (pico.out_photon_sig()[iph]) {
+      ht += pico.out_photon_pt()[iph];
+      mht_x -= pico.out_photon_pt()[iph]*cos(pico.out_photon_phi()[iph]);
+      mht_y -= pico.out_photon_pt()[iph]*sin(pico.out_photon_phi()[iph]);
+    }
+  }
+  for (unsigned ijet = 0; ijet < pico.out_jet_pt().size(); ijet++) {
+    if (pico.out_jet_isgood()[ijet]) {
+      ht += pico.out_jet_pt()[ijet];
+      mht_x -= pico.out_jet_pt()[ijet]*cos(pico.out_jet_phi()[ijet]);
+      mht_y -= pico.out_jet_pt()[ijet]*sin(pico.out_jet_phi()[ijet]);
+    }
+  }
+  pico.out_ht() = ht;
+  pico.out_mht() = sqrt(mht_x*mht_x+mht_y*mht_y);
+  pico.out_mht_phi() = atan2(mht_y, mht_x);
+  for (unsigned iph = 0; iph < pico.out_photon_pt().size(); iph++) {
+    pico.out_photon_mht_dphi().push_back(
+        DeltaPhi(pico.out_photon_phi()[iph], pico.out_mht_phi()));
+  }
 
 //Generate pT cut summary branches here so they are useful even for unskimmed files
   pico.out_trig_el_pt() = false;

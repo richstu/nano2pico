@@ -49,5 +49,6 @@ int nent
 int neff_el
 int neff_pass_eltrigs
 int nent_zlep
+int nent_isr
 float tot_weight_l0
 float tot_weight_l1

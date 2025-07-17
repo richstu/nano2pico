@@ -82,8 +82,21 @@ int main(int argc, char *argv[]){
     pico.out_w_phshape()   = pico.w_phshape()*static_cast<float>(corr.w_phshape());
     
     pico.out_w_trig()     = pico.w_trig()*static_cast<float>(corr.w_trig());
-    pico.out_w_isr()      = pico.w_isr()*static_cast<float>(corr.w_isr());
     pico.out_w_pu()       = pico.w_pu()*static_cast<float>(corr.w_pu());
+
+    if (is_zgamma) {
+      if (((pico.type() >= 6000 && pico.type() < 7000) ||
+           (pico.type() >= 17000 && pico.type() < 18000))
+          && pico.nllphoton() >= 1) {
+        pico.out_w_isr() = pico.w_isr()*static_cast<float>(corr.w_isr());
+      }
+      else {
+        pico.out_w_isr() = pico.w_isr();
+      }
+    }
+    else {
+      pico.out_w_isr()      = pico.w_isr()*static_cast<float>(corr.w_isr());
+    }
 
     float btag_weight = pico.out_w_bhig();
     if (is_zgamma) {
