@@ -818,8 +818,9 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
       }
     }
 
-    if (isData)
+    if (isData) {
       if (Jet_pt[ijet] <= min_jet_pt) continue;
+    }
     else {
       if ((nanoaod_version+0.01)<9) {
         if (Jet_pt[ijet] <= min_jet_pt && 
@@ -837,7 +838,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
       }
     }
     if (!isData && (nanoaod_version+0.01)>9 && isgood_nopt) {
-      if ((Jet_pt[ijet]*jer_up_factor[ijet]/jer_nm_factor[ijet]) > min_jet_pt)
+      if ((Jet_pt[ijet]*jer_up_factor[ijet]) > min_jet_pt)
         pico.out_sys_njet()[0]++;
       if ((Jet_pt[ijet]*jer_dn_factor[ijet]) > min_jet_pt)
         pico.out_sys_njet()[1]++;

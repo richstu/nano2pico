@@ -32,6 +32,8 @@ vector<double> sys_photon
 vector<double> sys_photon_csev
 vector<double> sys_bchig
 vector<double> sys_udsghig
+vector<double> sys_bchig_uncorr
+vector<double> sys_udsghig_uncorr
 vector<double> sys_fs_bchig
 vector<double> sys_fs_udsghig
 vector<double> sys_trig

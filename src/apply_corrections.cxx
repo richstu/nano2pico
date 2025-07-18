@@ -137,21 +137,25 @@ int main(int argc, char *argv[]){
 
     pico.out_sys_bchig().resize(2); pico.out_sys_fs_bchig().resize(2);
     pico.out_sys_udsghig().resize(2); pico.out_sys_fs_udsghig().resize(2);
+    pico.out_sys_bchig_uncorr().resize(2); 
+    pico.out_sys_udsghig_uncorr().resize(2); 
     pico.out_sys_isr().resize(2); pico.out_sys_pu().resize(2);
     pico.out_sys_el().resize(2); pico.out_sys_mu().resize(2);
     pico.out_sys_photon().resize(2); pico.out_sys_photon_csev().resize(2);
     for (unsigned i(0); i<2; i++) {        
-      pico.out_sys_el()[i]          = pico.sys_el()[i]*static_cast<float>(corr.sys_el()[i]);
-      pico.out_sys_mu()[i]          = pico.sys_mu()[i]*static_cast<float>(corr.sys_mu()[i]);
-      pico.out_sys_bchig()[i]       = pico.sys_bchig()[i]*static_cast<float>(corr.sys_bchig()[i]);
-      pico.out_sys_udsghig()[i]     = pico.sys_udsghig()[i]*static_cast<float>(corr.sys_udsghig()[i]);
-      pico.out_sys_fs_bchig()[i]    = pico.sys_fs_bchig()[i]*static_cast<float>(corr.sys_fs_bchig()[i]);
-      pico.out_sys_fs_udsghig()[i]  = pico.sys_fs_udsghig()[i]*static_cast<float>(corr.sys_fs_udsghig()[i]);
+      pico.out_sys_el()[i]             = pico.sys_el()[i]*static_cast<float>(corr.sys_el()[i]);
+      pico.out_sys_mu()[i]             = pico.sys_mu()[i]*static_cast<float>(corr.sys_mu()[i]);
+      pico.out_sys_bchig()[i]          = pico.sys_bchig()[i]*static_cast<float>(corr.sys_bchig()[i]);
+      pico.out_sys_udsghig()[i]        = pico.sys_udsghig()[i]*static_cast<float>(corr.sys_udsghig()[i]);
+      pico.out_sys_bchig_uncorr()[i]   = pico.sys_bchig_uncorr()[i]*static_cast<float>(corr.sys_bchig_uncorr()[i]);
+      pico.out_sys_udsghig_uncorr()[i] = pico.sys_udsghig_uncorr()[i]*static_cast<float>(corr.sys_udsghig_uncorr()[i]);
+      pico.out_sys_fs_bchig()[i]       = pico.sys_fs_bchig()[i]*static_cast<float>(corr.sys_fs_bchig()[i]);
+      pico.out_sys_fs_udsghig()[i]     = pico.sys_fs_udsghig()[i]*static_cast<float>(corr.sys_fs_udsghig()[i]);
 
-      pico.out_sys_pu()[i]          = pico.sys_pu()[i]*static_cast<float>(corr.sys_pu()[i]);
-      pico.out_sys_isr()[i]         = pico.sys_isr()[i]*static_cast<float>(corr.sys_isr()[i]);
-      pico.out_sys_photon()[i]      = pico.sys_photon()[i]*static_cast<float>(corr.sys_photon()[i]);
-      pico.out_sys_photon_csev()[i] = pico.sys_photon_csev()[i]*static_cast<float>(corr.sys_photon()[i]);
+      pico.out_sys_pu()[i]             = pico.sys_pu()[i]*static_cast<float>(corr.sys_pu()[i]);
+      pico.out_sys_isr()[i]            = pico.sys_isr()[i]*static_cast<float>(corr.sys_isr()[i]);
+      pico.out_sys_photon()[i]         = pico.sys_photon()[i]*static_cast<float>(corr.sys_photon()[i]);
+      pico.out_sys_photon_csev()[i]    = pico.sys_photon_csev()[i]*static_cast<float>(corr.sys_photon()[i]);
 
     } 
     if (is_zgamma) {

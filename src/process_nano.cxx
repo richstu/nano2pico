@@ -686,17 +686,19 @@ int main(int argc, char *argv[]){
       wgt_sums.out_w_nnlo()    += pico.out_w_nnlo();
 
       for(size_t i = 0; i<2; ++i){ 
-        wgt_sums.out_sys_el()[i]          += pico.out_sys_el()[i];
-        wgt_sums.out_sys_mu()[i]          += pico.out_sys_mu()[i];
-        wgt_sums.out_sys_photon()[i]      += pico.out_sys_photon()[i];
-        wgt_sums.out_sys_photon_csev()[i] += pico.out_sys_photon_csev()[i];
-        wgt_sums.out_sys_trig()[i]        += pico.out_sys_trig()[i];
-        wgt_sums.out_sys_bchig()[i]       += pico.out_sys_bchig()[i];
-        wgt_sums.out_sys_udsghig()[i]     += pico.out_sys_udsghig()[i];
-        wgt_sums.out_sys_fs_bchig()[i]    += pico.out_sys_fs_bchig()[i];
-        wgt_sums.out_sys_fs_udsghig()[i]  += pico.out_sys_fs_udsghig()[i];
-        wgt_sums.out_sys_isr()[i]         += pico.out_sys_isr()[i];
-        wgt_sums.out_sys_pu()[i]          += pico.out_sys_pu()[i];
+        wgt_sums.out_sys_el()[i]           += pico.out_sys_el()[i];
+        wgt_sums.out_sys_mu()[i]           += pico.out_sys_mu()[i];
+        wgt_sums.out_sys_photon()[i]       += pico.out_sys_photon()[i];
+        wgt_sums.out_sys_photon_csev()[i]  += pico.out_sys_photon_csev()[i];
+        wgt_sums.out_sys_trig()[i]         += pico.out_sys_trig()[i];
+        wgt_sums.out_sys_bchig()[i]        += pico.out_sys_bchig()[i];
+        wgt_sums.out_sys_udsghig()[i]      += pico.out_sys_udsghig()[i];
+        wgt_sums.out_sys_fs_bchig()[i]     += pico.out_sys_fs_bchig()[i];
+        wgt_sums.out_sys_fs_udsghig()[i]   += pico.out_sys_fs_udsghig()[i];
+        wgt_sums.out_sys_isr()[i]          += pico.out_sys_isr()[i];
+        wgt_sums.out_sys_pu()[i]           += pico.out_sys_pu()[i];
+        wgt_sums.out_sys_bchig_uncorr()[i] += pico.out_sys_bchig_uncorr()[i];
+        wgt_sums.out_sys_udsghig_uncorr()[i] += pico.out_sys_udsghig_uncorr()[i];
       }
       for(size_t i = 0; i<pico.out_sys_murf().size(); ++i){ 
         wgt_sums.out_sys_murf()[i] += pico.out_sys_murf()[i];
@@ -756,6 +758,8 @@ void Initialize(corrections_tree &wgt_sums){
   wgt_sums.out_sys_photon_csev().resize(2,0);
   wgt_sums.out_sys_bchig().resize(2,0);
   wgt_sums.out_sys_udsghig().resize(2,0);
+  wgt_sums.out_sys_bchig_uncorr().resize(2,0);
+  wgt_sums.out_sys_udsghig_uncorr().resize(2,0);
   wgt_sums.out_sys_fs_bchig().resize(2,0);
   wgt_sums.out_sys_fs_udsghig().resize(2,0);
   wgt_sums.out_sys_isr().resize(2,0);

@@ -145,6 +145,8 @@ void Initialize(corrections_tree &wgt_sums, corrections_tree &corr){
   CopySize(wgt_sums.sys_fs_lep(),             corr.out_sys_fs_lep());
   CopySize(wgt_sums.sys_bchig(),              corr.out_sys_bchig());
   CopySize(wgt_sums.sys_udsghig(),            corr.out_sys_udsghig());
+  CopySize(wgt_sums.sys_bchig_uncorr(),       corr.out_sys_bchig_uncorr());
+  CopySize(wgt_sums.sys_udsghig_uncorr(),     corr.out_sys_udsghig_uncorr());
   CopySize(wgt_sums.sys_fs_bchig(),           corr.out_sys_fs_bchig());
   CopySize(wgt_sums.sys_fs_udsghig(),         corr.out_sys_fs_udsghig());
   CopySize(wgt_sums.sys_trig(),               corr.out_sys_trig());
@@ -183,21 +185,23 @@ void AddEntry(corrections_tree &wgt_sums, corrections_tree &corr){
   corr.out_w_phshape()         += wgt_sums.w_phshape();
   corr.out_w_nnlo()            += wgt_sums.w_nnlo();
 
-  VecAdd(wgt_sums.sys_el(),            corr.out_sys_el());
-  VecAdd(wgt_sums.sys_mu(),            corr.out_sys_mu());
-  VecAdd(wgt_sums.sys_lep(),           corr.out_sys_lep());
-  VecAdd(wgt_sums.sys_photon(),        corr.out_sys_photon());
-  VecAdd(wgt_sums.sys_photon_csev(),   corr.out_sys_photon_csev());
-  VecAdd(wgt_sums.sys_fs_lep(),        corr.out_sys_fs_lep());
-  VecAdd(wgt_sums.sys_bchig(),         corr.out_sys_bchig());
-  VecAdd(wgt_sums.sys_udsghig(),       corr.out_sys_udsghig());
-  VecAdd(wgt_sums.sys_fs_bchig(),      corr.out_sys_fs_bchig());
-  VecAdd(wgt_sums.sys_fs_udsghig(),    corr.out_sys_fs_udsghig());
-  VecAdd(wgt_sums.sys_isr(),           corr.out_sys_isr());
-  VecAdd(wgt_sums.sys_trig(),          corr.out_sys_trig());
-  VecAdd(wgt_sums.sys_pu(),            corr.out_sys_pu());
-  VecAdd(wgt_sums.sys_murf(),          corr.out_sys_murf());
-  VecAdd(wgt_sums.sys_ps(),            corr.out_sys_ps());
+  VecAdd(wgt_sums.sys_el(),             corr.out_sys_el());
+  VecAdd(wgt_sums.sys_mu(),             corr.out_sys_mu());
+  VecAdd(wgt_sums.sys_lep(),            corr.out_sys_lep());
+  VecAdd(wgt_sums.sys_photon(),         corr.out_sys_photon());
+  VecAdd(wgt_sums.sys_photon_csev(),    corr.out_sys_photon_csev());
+  VecAdd(wgt_sums.sys_fs_lep(),         corr.out_sys_fs_lep());
+  VecAdd(wgt_sums.sys_bchig(),          corr.out_sys_bchig());
+  VecAdd(wgt_sums.sys_udsghig(),        corr.out_sys_udsghig());
+  VecAdd(wgt_sums.sys_bchig_uncorr(),   corr.out_sys_bchig_uncorr());
+  VecAdd(wgt_sums.sys_udsghig_uncorr(), corr.out_sys_udsghig_uncorr());
+  VecAdd(wgt_sums.sys_fs_bchig(),       corr.out_sys_fs_bchig());
+  VecAdd(wgt_sums.sys_fs_udsghig(),     corr.out_sys_fs_udsghig());
+  VecAdd(wgt_sums.sys_isr(),            corr.out_sys_isr());
+  VecAdd(wgt_sums.sys_trig(),           corr.out_sys_trig());
+  VecAdd(wgt_sums.sys_pu(),             corr.out_sys_pu());
+  VecAdd(wgt_sums.sys_murf(),           corr.out_sys_murf());
+  VecAdd(wgt_sums.sys_ps(),             corr.out_sys_ps());
   // VecAdd(wgt_sums.w_pdf(),             corr.out_w_pdf());
   // VecAdd(wgt_sums.sys_pdf(),           corr.out_sys_pdf());
 }
@@ -383,6 +387,8 @@ void Normalize(corrections_tree &corr){
   Normalize(corr.out_sys_photon_csev(), nent);
   Normalize(corr.out_sys_bchig(), nent);
   Normalize(corr.out_sys_udsghig(), nent);
+  Normalize(corr.out_sys_bchig_uncorr(), nent);
+  Normalize(corr.out_sys_udsghig_uncorr(), nent);
   Normalize(corr.out_sys_fs_bchig(), nent);
   Normalize(corr.out_sys_fs_udsghig(), nent);
   Normalize(corr.out_sys_trig(), nent);
