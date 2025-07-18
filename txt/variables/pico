@@ -352,6 +352,7 @@ vector<float> photon_drmin
 vector<float> photon_drmax
 vector<float> photon_energyErr
 vector<float> photon_energy_raw
+vector<float> photon_relpterr
 vector<float> photon_origin_eta
 vector<float> photon_hoe
 vector<float> photon_esoversc
@@ -664,6 +665,9 @@ vector<float> sys_murf
 
 #variations have index: 0 (ISR=2 FSR=1), 1 (ISR=1 FSR=2), 2 (ISR=0.5 FSR=1), 2(ISR=1 FSR=0.5)
 vector<float> sys_ps
+
+#variations indices correspond to PDF set variations
+#vector<float> sys_pdf
 
 #index matches jet_*
 vector<float> sys_jet_pt_jesup

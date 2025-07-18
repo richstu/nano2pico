@@ -607,9 +607,10 @@ int main(int argc, char *argv[]){
     else
       pico.out_w_lumi() = 1.;
 
-    //copy LHE scale variation weights and PS weights
+    //copy LHE scale variation, PDF, and PS weights
     if (!isData) {
       pico.out_sys_murf() = nano.LHEScaleWeight();
+      //pico.out_sys_pdf() = nano.LHEPdfWeight();
       pico.out_sys_ps() = nano.PSWeight();
     }
 
@@ -704,6 +705,9 @@ int main(int argc, char *argv[]){
       for(size_t i = 0; i<pico.out_sys_ps().size(); ++i){ 
         wgt_sums.out_sys_ps()[i] += pico.out_sys_ps()[i];
       }
+      //for(size_t i = 0; i<pico.out_sys_pdf().size(); ++i){ 
+      //  wgt_sums.out_sys_pdf()[i] += pico.out_sys_pdf()[i];
+      //}
     }
     
     if (debug) cout<<"INFO:: Filling tree"<<endl;
@@ -767,6 +771,7 @@ void Initialize(corrections_tree &wgt_sums){
   wgt_sums.out_sys_trig_mu().resize(2,0);
   wgt_sums.out_sys_murf().resize(9,0);
   wgt_sums.out_sys_ps().resize(4,0);
+  //wgt_sums.out_sys_pdf().resize(102,0);
 }
 
 void GetOptions(int argc, char *argv[]){

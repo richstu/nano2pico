@@ -313,6 +313,8 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
     pico.out_photon_sieie().push_back(nano.Photon_sieie()[iph]);
     pico.out_photon_hoe().push_back(nano.Photon_hoe()[iph]);
     pico.out_photon_energyErr().push_back(nano.Photon_energyErr()[iph]);
+    pico.out_photon_relpterr().push_back(nano.Photon_energyErr()[iph]
+                                         /(pt*TMath::CosH(eta)));
     pico.out_photon_elveto().push_back(eVeto);
     pico.out_photon_isScEtaEB().push_back(nano.Photon_isScEtaEB()[iph]);
     pico.out_photon_isScEtaEE().push_back(nano.Photon_isScEtaEE()[iph]);

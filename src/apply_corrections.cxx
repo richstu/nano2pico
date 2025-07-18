@@ -193,12 +193,18 @@ int main(int argc, char *argv[]){
         pico.out_sys_ps()[i]      = 1.0;
       }
     }
+    //pico.out_sys_pdf().resize(102);
+    //for (unsigned i(0); i<pico.out_sys_pdf().size(); i++) {        
+    //  if (pico.sys_pdf().size() != 0) {
+    //    pico.out_sys_pdf()[i]      = pico.sys_pdf()[i]*static_cast<float>(corr.sys_pdf()[i]);
+    //  } else {
+    //    pico.out_sys_pdf()[i]      = 1.0;
+    //  }
+    //}
 
 
     // for (unsigned i(0); i<pico.w_pdf().size(); i++) 
     //   pico.out_w_pdf()[i] = pico.w_pdf()[i]*corr.w_pdf()[i];    
-    // for (unsigned i(0); i<pico.sys_pdf().size(); i++) 
-    //   pico.out_sys_pdf()[i] = pico.sys_pdf()[i]*corr.sys_pdf()[i];    
     
     pico.Fill();
 

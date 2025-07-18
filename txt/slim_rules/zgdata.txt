@@ -3,6 +3,7 @@ drop *
 keep run
 keep event
 keep type
+keep use_event
 
 keep npv
 keep rho
