@@ -1090,5 +1090,7 @@ void EventTools::WriteTriggerEfficiency(pico_tree &pico) {
   pico.out_sys_trig().resize(2,0);
   pico.out_sys_trig()[0] = 1+effunc;
   pico.out_sys_trig()[1] = 1-effunc;
+  pico.out_sys_trig_el().resize(2,0);
+  pico.out_sys_trig_mu().resize(2,0);
 
 }

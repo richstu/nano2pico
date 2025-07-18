@@ -37,6 +37,8 @@ vector<double> sys_udsghig_uncorr
 vector<double> sys_fs_bchig
 vector<double> sys_fs_udsghig
 vector<double> sys_trig
+vector<double> sys_trig_el
+vector<double> sys_trig_mu
 
 vector<double> sys_isr
 vector<double> sys_pu

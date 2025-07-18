@@ -475,11 +475,7 @@ int main(int argc, char *argv[]){
 
     if (isHiggsino) event_tools.WriteTriggerEfficiency(pico);
     if (isZgamma && !isData) {
-      std::vector<float> zgamma_trigsfs = trigger_weighter.GetSF(pico);
-      pico.out_w_trig() = zgamma_trigsfs[0];
-      pico.out_sys_trig().resize(2,0.);
-      pico.out_sys_trig()[0] = zgamma_trigsfs[1];
-      pico.out_sys_trig()[1] = zgamma_trigsfs[2];
+      trigger_weighter.GetSF(pico);
     }
 
     // ----------------------------------------------------------------------------------------------
@@ -691,6 +687,8 @@ int main(int argc, char *argv[]){
         wgt_sums.out_sys_photon()[i]       += pico.out_sys_photon()[i];
         wgt_sums.out_sys_photon_csev()[i]  += pico.out_sys_photon_csev()[i];
         wgt_sums.out_sys_trig()[i]         += pico.out_sys_trig()[i];
+        wgt_sums.out_sys_trig_el()[i]      += pico.out_sys_trig_el()[i];
+        wgt_sums.out_sys_trig_mu()[i]      += pico.out_sys_trig_mu()[i];
         wgt_sums.out_sys_bchig()[i]        += pico.out_sys_bchig()[i];
         wgt_sums.out_sys_udsghig()[i]      += pico.out_sys_udsghig()[i];
         wgt_sums.out_sys_fs_bchig()[i]     += pico.out_sys_fs_bchig()[i];
@@ -765,6 +763,8 @@ void Initialize(corrections_tree &wgt_sums){
   wgt_sums.out_sys_isr().resize(2,0);
   wgt_sums.out_sys_pu().resize(2,0);
   wgt_sums.out_sys_trig().resize(2,0);
+  wgt_sums.out_sys_trig_el().resize(2,0);
+  wgt_sums.out_sys_trig_mu().resize(2,0);
   wgt_sums.out_sys_murf().resize(9,0);
   wgt_sums.out_sys_ps().resize(4,0);
 }

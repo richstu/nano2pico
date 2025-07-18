@@ -150,6 +150,8 @@ void Initialize(corrections_tree &wgt_sums, corrections_tree &corr){
   CopySize(wgt_sums.sys_fs_bchig(),           corr.out_sys_fs_bchig());
   CopySize(wgt_sums.sys_fs_udsghig(),         corr.out_sys_fs_udsghig());
   CopySize(wgt_sums.sys_trig(),               corr.out_sys_trig());
+  CopySize(wgt_sums.sys_trig_el(),            corr.out_sys_trig_el());
+  CopySize(wgt_sums.sys_trig_mu(),            corr.out_sys_trig_mu());
   CopySize(wgt_sums.sys_isr(),                corr.out_sys_isr());
   CopySize(wgt_sums.sys_pu(),                 corr.out_sys_pu());
   CopySize(wgt_sums.sys_murf(),               corr.out_sys_murf());
@@ -199,6 +201,8 @@ void AddEntry(corrections_tree &wgt_sums, corrections_tree &corr){
   VecAdd(wgt_sums.sys_fs_udsghig(),     corr.out_sys_fs_udsghig());
   VecAdd(wgt_sums.sys_isr(),            corr.out_sys_isr());
   VecAdd(wgt_sums.sys_trig(),           corr.out_sys_trig());
+  VecAdd(wgt_sums.sys_trig_el(),        corr.out_sys_trig_el());
+  VecAdd(wgt_sums.sys_trig_mu(),        corr.out_sys_trig_mu());
   VecAdd(wgt_sums.sys_pu(),             corr.out_sys_pu());
   VecAdd(wgt_sums.sys_murf(),           corr.out_sys_murf());
   VecAdd(wgt_sums.sys_ps(),             corr.out_sys_ps());
@@ -392,6 +396,8 @@ void Normalize(corrections_tree &corr){
   Normalize(corr.out_sys_fs_bchig(), nent);
   Normalize(corr.out_sys_fs_udsghig(), nent);
   Normalize(corr.out_sys_trig(), nent);
+  Normalize(corr.out_sys_trig_el(), nent);
+  Normalize(corr.out_sys_trig_mu(), nent);
   Normalize(corr.out_sys_pu(), nent);
 
   Normalize(corr.out_sys_murf(), nent);

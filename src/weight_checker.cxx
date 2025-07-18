@@ -377,8 +377,13 @@ int main() {
                       }
                     }
                     //get trigger weight and check sanity
-                    vector<float> sfs = trigger_weighters[iyear].GetSF(pico);
-                    bool found_bad = sf_is_bad(sfs[0]) || sf_is_bad(sfs[1]) || sf_is_bad(sfs[2]);
+                    trigger_weighters[iyear].GetSF(pico);
+                    vector<float> sfs = {pico.out_w_trig(), 
+                        pico.out_sys_trig_el()[0], pico.out_sys_trig_el()[1], 
+                        pico.out_sys_trig_mu()[0], pico.out_sys_trig_mu()[1]};
+                    bool found_bad = (sf_is_bad(sfs[0]) || sf_is_bad(sfs[1]) 
+                        || sf_is_bad(sfs[2]) || sf_is_bad(sfs[3]) 
+                        || sf_is_bad(sfs[4]));
                     bool trig_in_sr = false;
                     if (pico.out_trig_single_el() && lead_el_pt > 30) trig_in_sr = true;
                     if (pico.out_trig_double_el() && lead_el_pt > 25 && subl_el_pt > 15) trig_in_sr = true;
@@ -405,7 +410,9 @@ int main() {
                       cout << "trig_single_mu: " << trig_decision[1] << endl;
                       cout << "trig_double_el: " << trig_decision[2] << endl;
                       cout << "trig_double_mu: " << trig_decision[3] << endl;
-                      cout << "sf = " << sfs[0] << ", up = " << sfs[1] << ", dn = " << sfs[2] << endl;
+                      cout << "sf = " << sfs[0] << ", elup = " << sfs[1] 
+                           << ", eldn = " << sfs[2] << ", muup = " << sfs[3] 
+                           << ", mudn = " << sfs[4] << endl;
                     }
                     if (found_bad && (trig_in_sr || do_all_trig) && !auto_continue) {
                       cout << "!!! Found bad SF" << endl;

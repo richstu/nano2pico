@@ -28,6 +28,12 @@ float bound(float value, float upper, float lower) {
   return value;
 }
 
+float safe_div(float num, float den) {
+  if (den > 0.0f)
+    return num/den;
+  return 1.0f;
+}
+
 TriggerWeighter::TriggerWeighter(string year) {
   string in_file_path;
   string in_file_ello;
@@ -179,7 +185,7 @@ TriggerWeighter::TriggerWeighter(string year) {
 }
 
 
-vector<float> TriggerWeighter::GetSF(pico_tree &pico) {
+void TriggerWeighter::GetSF(pico_tree &pico) {
   //this is just a wrapper around the other GetSF that extracts relevant info
   //from pico tree
 
@@ -202,76 +208,77 @@ vector<float> TriggerWeighter::GetSF(pico_tree &pico) {
     }
   }
 
-  return GetSF(electron_pt, muon_pt, electron_eta, muon_eta, electron_phi,
-      pico.out_trig_single_el(), pico.out_trig_single_mu(), 
+  vector<float> sfs =  GetSF(electron_pt, muon_pt, electron_eta, muon_eta, 
+      electron_phi, pico.out_trig_single_el(), pico.out_trig_single_mu(), 
       pico.out_trig_double_el(), pico.out_trig_double_mu());
+  pico.out_w_trig() = sfs[0];
+  pico.out_sys_trig().resize(2,1.0f); //unused in ZGamma
+  pico.out_sys_trig_el().resize(2,1.0f);
+  pico.out_sys_trig_mu().resize(2,1.0f);
+  pico.out_sys_trig_el()[0] = sfs[1];
+  pico.out_sys_trig_el()[1] = sfs[2];
+  pico.out_sys_trig_mu()[0] = sfs[3];
+  pico.out_sys_trig_mu()[1] = sfs[4];
 }
 
-
-vector<float> TriggerWeighter::GetSF(std::vector<float> electron_pt, 
-    vector<float> muon_pt, std::vector<float> electron_eta, 
-    std::vector<float> muon_eta, std::vector<float> electron_phi,
-    bool pass_singleel, bool pass_singlemu, 
+vector<float> TriggerWeighter::GetSF(
+    vector<float> electron_pt, vector<float> muon_pt, 
+    vector<float> electron_eta, vector<float> muon_eta, 
+    vector<float> electron_phi, bool pass_singleel, bool pass_singlemu, 
     bool pass_diel, bool pass_dimu) {
+
   //note that this only weights leptons that pass the signal criteria
   //i.e. trigger efficiencies will remain uncorrected for leptons failing
   //signal criteria
-
-  if (muon_pt.size()==0 && electron_pt.size()==0) return {1.0,1.0,1.0};
-
-  //get data/mc probability/uncertainty from appropriate functions
-  vector<float> data_prob = GetTotalProbability(electron_pt, muon_pt, 
-    electron_eta, muon_eta, electron_phi, pass_singleel, pass_singlemu, 
-    pass_diel, 
-    pass_dimu, true);
-  vector<float> mc_prob = GetTotalProbability(electron_pt, muon_pt, 
-    electron_eta, muon_eta, electron_phi, pass_singleel, pass_singlemu, 
-    pass_diel, pass_dimu, false);
+  //get lepton probability/uncertainty from appropriate functions
+  vector<float> el_prob_data, mu_prob_data, el_prob_mc, mu_prob_mc;
+  vector<float> muon_phi(muon_pt.size(), 0.0);
+  if (electron_pt.size()==0) {
+    el_prob_data.resize(3,1.0f);
+    el_prob_mc.resize(3,1.0f);
+  }
+  else {
+    el_prob_data = GetFlavorProbability(electron_pt, 
+        electron_eta, electron_phi, pass_singleel, pass_diel, true, true);
+    el_prob_mc = GetFlavorProbability(electron_pt, 
+        electron_eta, electron_phi, pass_singleel, pass_diel, false, true);
+  }
+  if (muon_pt.size()==0) {
+    mu_prob_data.resize(3,1.0f);
+    mu_prob_mc.resize(3,1.0f);
+  }
+  else {
+    mu_prob_data = GetFlavorProbability(muon_pt, muon_eta, 
+        muon_phi, pass_singlemu, pass_dimu, true, false);
+    mu_prob_mc = GetFlavorProbability(muon_pt, muon_eta, 
+        muon_phi, pass_singlemu, pass_dimu, false, false);
+  }
 
   //calculate SFs
-  if (mc_prob[0] < 0.001f) mc_prob[0] = 0.0;
-  float sf = 1.0f;
-  float unc = 0.0f;
-  propagate_uncertainty_ratio(data_prob[0], data_prob[1], mc_prob[0], 
-                              mc_prob[1], sf, unc);
-  bool pass_trig = (pass_singleel || pass_singlemu || pass_diel || pass_dimu);
-  float sf_up = sf+unc;
-  float sf_dn = sf-unc;
-  if (!pass_trig) {
-    sf_up = sf-unc;
-    sf_dn = sf+unc;
-  }
-  sf = bound(sf,5.0,0.0);
-  sf_up = bound(sf_up,5.0,0.0);
-  sf_dn = bound(sf_dn,5.0,0.0);
-
-  return {sf, sf_up, sf_dn};
-}
-
-
-vector<float> TriggerWeighter::GetTotalProbability(
-    vector<float> electron_pt, vector<float> muon_pt, 
-    vector<float> electron_eta, vector<float> muon_eta, 
-    vector<float> electron_phi,
-    bool pass_singleel, bool pass_singlemu, bool pass_diel, bool pass_dimu, 
-    bool is_data) {
-
-  //get lepton probability/uncertainty from appropriate functions
-  vector<float> muon_phi(muon_pt.size(), 0.0);
-  vector<float> electron_prob = GetFlavorProbability(electron_pt, electron_eta,
-    electron_phi, pass_singleel, pass_diel, is_data, true);
-  vector<float> muon_prob = GetFlavorProbability(muon_pt, muon_eta, muon_phi,
-    pass_singlemu, pass_dimu, is_data, false);
-
-  //calculate probability and uncertainty
-  //assume electron and muon triggers independent
-  float prob = electron_prob[0]+muon_prob[0]-electron_prob[0]*muon_prob[0];
-  float unc = hypotf(electron_prob[1],hypotf(muon_prob[1],hypotf(electron_prob[0]*muon_prob[1],muon_prob[0]*electron_prob[1])));
-  if (isnan(prob) || isnan(unc)) {
+  //assume worst case for variations (data overestimated, MC under or v.v.)
+  float sflep_el_nm = safe_div(el_prob_data[0], el_prob_mc[0]);
+  float sflep_el_up = safe_div(el_prob_data[1], el_prob_mc[2]);
+  float sflep_el_dn = safe_div(el_prob_data[2], el_prob_mc[1]);
+  float sflep_mu_nm = safe_div(mu_prob_data[0], mu_prob_mc[0]);
+  float sflep_mu_up = safe_div(mu_prob_data[1], mu_prob_mc[2]);
+  float sflep_mu_dn = safe_div(mu_prob_data[2], mu_prob_mc[1]);
+  float sf = sflep_el_nm*sflep_mu_nm;
+  float sf_elup = sflep_el_up*sflep_mu_nm;
+  float sf_eldn = sflep_el_dn*sflep_mu_nm;
+  float sf_muup = sflep_el_nm*sflep_mu_up;
+  float sf_mudn = sflep_el_nm*sflep_mu_dn;
+  if (isnan(sf) || isnan(sf_elup) || isnan(sf_eldn) || isnan(sf_muup) 
+      || isnan(sf_mudn)) {
     DBG("Error: NaN propagated in trigger weighter.\n");
     exit(1);
   }
-  return {prob, unc};
+  sf = bound(sf, 5.0f, 0.0f);
+  sf_elup = bound(sf_elup, 5.0f, 0.0f);
+  sf_eldn = bound(sf_eldn, 5.0f, 0.0f);
+  sf_muup = bound(sf_muup, 5.0f, 0.0f);
+  sf_mudn = bound(sf_mudn, 5.0f, 0.0f);
+
+  return {sf, sf_elup, sf_eldn, sf_muup, sf_mudn};
 }
 
 
@@ -297,7 +304,8 @@ vector<float> TriggerWeighter::GetFlavorProbability(
 
   vector<LeptonHLTStatus> lepton_status;
   float tot_prob = 0.0;
-  float tot_unc = 0.0;
+  float tot_prob_up = 0.0;
+  float tot_prob_dn = 0.0;
   for (unsigned int ilep = 0; ilep < lepton_pt.size(); ilep++) 
     lepton_status.push_back(LeptonHLTStatus::fail_all);
   //loop over every category
@@ -322,10 +330,12 @@ vector<float> TriggerWeighter::GetFlavorProbability(
       //the probability for an exclusive category is just the product of the 
       //probabilities for each lepton in the category
       float cat_prob = 1.0;
-      float cat_unc = 0.0;
+      float cat_prob_up = 1.0;
+      float cat_prob_dn = 1.0;
       for (unsigned int ilep = 0; ilep < lepton_status.size(); ilep++) {
         float lep_prob = 0.0;
-        float lep_unc = 0.0;
+        float lep_prob_up = 0.0;
+        float lep_prob_dn = 0.0;
 
         //probability to fail all is 1 - probability to pass dilep lower leg
         if (lepton_status[ilep]==LeptonHLTStatus::fail_all) {
@@ -333,7 +343,8 @@ vector<float> TriggerWeighter::GetFlavorProbability(
               lepton_eta[ilep],lepton_phi[ilep],is_data,is_electron,
               LeptonHLTStatus::pass_lowerdilep);
           lep_prob = 1.0-prob_lower[0];
-          lep_unc = prob_lower[1];
+          lep_prob_up = 1.0-prob_lower[1];
+          lep_prob_dn = 1.0-prob_lower[2];
         }
 
         //probability to pass only lower leg is prob(lower leg)-prob(upper leg)
@@ -345,7 +356,8 @@ vector<float> TriggerWeighter::GetFlavorProbability(
               lepton_eta[ilep],lepton_phi[ilep],is_data,is_electron,
               LeptonHLTStatus::pass_upperdilep);
           lep_prob = prob_lower[0]-prob_upper[0];
-          lep_unc = hypotf(prob_lower[1], prob_upper[1]);
+          lep_prob_up = prob_lower[1]-prob_upper[1];
+          lep_prob_dn = prob_lower[2]-prob_upper[2];
         }
 
         //probability to pass upper leg but fail single lep is 
@@ -358,7 +370,8 @@ vector<float> TriggerWeighter::GetFlavorProbability(
               lepton_eta[ilep],lepton_phi[ilep],is_data,is_electron,
               LeptonHLTStatus::pass_singlelep);
           lep_prob = prob_upper[0]-prob_single[0];
-          lep_unc = hypotf(prob_upper[1], prob_single[1]);
+          lep_prob_up = prob_upper[1]-prob_single[1];
+          lep_prob_dn = prob_upper[2]-prob_single[2];
         }
 
         //probability to pass single lep trigger
@@ -367,20 +380,25 @@ vector<float> TriggerWeighter::GetFlavorProbability(
               lepton_eta[ilep],lepton_phi[ilep],is_data,is_electron,
               LeptonHLTStatus::pass_singlelep);
           lep_prob = prob_single[0];
-          lep_unc = prob_single[1];
+          lep_prob_up = prob_single[1];
+          lep_prob_dn = prob_single[2];
         }
 
         //deal with rounding errors/low stats categories
         if (lep_prob < 0) lep_prob = 0;
+        if (lep_prob_up < 0) lep_prob_up = 0;
+        if (lep_prob_dn < 0) lep_prob_dn = 0;
 
         //combine lepton probability into total
-        cat_unc = hypotf(lep_unc*cat_prob,cat_unc*lep_prob);
         cat_prob *= lep_prob;
+        cat_prob_up *= lep_prob_up;
+        cat_prob_dn *= lep_prob_dn;
       }
 
       //add to total probability
       tot_prob += cat_prob;
-      tot_unc = hypotf(tot_unc,cat_unc);
+      tot_prob_up += cat_prob_up;
+      tot_prob_dn += cat_prob_dn;
     }
 
     //iterate to next category
@@ -405,7 +423,7 @@ vector<float> TriggerWeighter::GetFlavorProbability(
     }
   }
 
-  return {tot_prob, tot_unc};
+  return {tot_prob, tot_prob_up, tot_prob_dn};
 }
 
 
@@ -524,7 +542,7 @@ vector<float> TriggerWeighter::GetLeptonProbability(float lepton_pt,
   //evaluate
   float prob = (*prob_map)->evaluate({lepton_pt, map_eta});
   float uncr = (*unc_map)->evaluate({lepton_pt, map_eta});
-  return {prob, uncr};
+  return {prob, prob+uncr, prob-uncr};
 }
 
 

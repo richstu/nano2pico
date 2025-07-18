@@ -109,21 +109,35 @@ int main(int argc, char *argv[]){
     }
 
     pico.out_sys_trig().resize(2);
+    pico.out_sys_trig_el().resize(2);
+    pico.out_sys_trig_mu().resize(2);
     if (pico.nel()>0) {
       if (pico.trig_single_el() || pico.trig_double_el()) {
         pico.out_w_trig() = pico.out_w_trig()*static_cast<float>(corr.w_zvtx_pass());
         pico.out_sys_trig()[0] = pico.sys_trig()[0]*static_cast<float>(corr.sys_trig()[0])*static_cast<float>(corr.w_zvtx_pass());
         pico.out_sys_trig()[1] = pico.sys_trig()[1]*static_cast<float>(corr.sys_trig()[1])*static_cast<float>(corr.w_zvtx_pass());
+        pico.out_sys_trig_el()[0] = pico.sys_trig_el()[0]*static_cast<float>(corr.sys_trig_el()[0])*static_cast<float>(corr.w_zvtx_pass());
+        pico.out_sys_trig_el()[1] = pico.sys_trig_el()[1]*static_cast<float>(corr.sys_trig_el()[1])*static_cast<float>(corr.w_zvtx_pass());
+        pico.out_sys_trig_mu()[0] = pico.sys_trig_mu()[0]*static_cast<float>(corr.sys_trig_mu()[0])*static_cast<float>(corr.w_zvtx_pass());
+        pico.out_sys_trig_mu()[1] = pico.sys_trig_mu()[1]*static_cast<float>(corr.sys_trig_mu()[1])*static_cast<float>(corr.w_zvtx_pass());
       }
       else {
         pico.out_w_trig() = pico.out_w_trig()*static_cast<float>(corr.w_zvtx_fail());
         pico.out_sys_trig()[0] = pico.sys_trig()[0]*static_cast<float>(corr.sys_trig()[0])*static_cast<float>(corr.w_zvtx_fail());
         pico.out_sys_trig()[1] = pico.sys_trig()[1]*static_cast<float>(corr.sys_trig()[1])*static_cast<float>(corr.w_zvtx_fail());
+        pico.out_sys_trig_el()[0] = pico.sys_trig_el()[0]*static_cast<float>(corr.sys_trig_el()[0])*static_cast<float>(corr.w_zvtx_fail());
+        pico.out_sys_trig_el()[1] = pico.sys_trig_el()[1]*static_cast<float>(corr.sys_trig_el()[1])*static_cast<float>(corr.w_zvtx_fail());
+        pico.out_sys_trig_mu()[0] = pico.sys_trig_mu()[0]*static_cast<float>(corr.sys_trig_mu()[0])*static_cast<float>(corr.w_zvtx_fail());
+        pico.out_sys_trig_mu()[1] = pico.sys_trig_mu()[1]*static_cast<float>(corr.sys_trig_mu()[1])*static_cast<float>(corr.w_zvtx_fail());
       }
     }
     else {
       pico.out_sys_trig()[0] = pico.sys_trig()[0]*static_cast<float>(corr.sys_trig()[0]);
       pico.out_sys_trig()[1] = pico.sys_trig()[1]*static_cast<float>(corr.sys_trig()[1]);
+      pico.out_sys_trig_el()[0] = pico.sys_trig_el()[0]*static_cast<float>(corr.sys_trig_el()[0]);
+      pico.out_sys_trig_el()[1] = pico.sys_trig_el()[1]*static_cast<float>(corr.sys_trig_el()[1]);
+      pico.out_sys_trig_mu()[0] = pico.sys_trig_mu()[0]*static_cast<float>(corr.sys_trig_mu()[0]);
+      pico.out_sys_trig_mu()[1] = pico.sys_trig_mu()[1]*static_cast<float>(corr.sys_trig_mu()[1]);
     }
 
     pico.out_w_lumi() = pico.w_lumi()>0 ? 1. : -1.; //get the generator weight sign
