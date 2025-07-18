@@ -506,6 +506,7 @@ int main(int argc, char *argv[]){
       pico.out_w_photon() = 1.;
       pico.out_w_trig() = 1.;
       pico.out_sys_photon().resize(2,0);
+      pico.out_w_nnlo()   = 1.;
     } else { // MC
       if ((!is_preUL) || year>=2022) { //UL or run 3
         // ElectronISO SF need to be implemented for non-HToZgamma
@@ -652,6 +653,7 @@ int main(int argc, char *argv[]){
       wgt_sums.out_w_isr()     += pico.out_w_isr();
       wgt_sums.out_w_pu()      += pico.out_w_pu();
       wgt_sums.out_w_trig()    += pico.out_w_trig();
+      wgt_sums.out_w_nnlo()    += pico.out_w_nnlo();
 
       for(size_t i = 0; i<2; ++i){ 
         wgt_sums.out_sys_el()[i]         += pico.out_sys_el()[i];
@@ -710,6 +712,7 @@ void Initialize(corrections_tree &wgt_sums){
   wgt_sums.out_w_trig()      = 0.;
   wgt_sums.out_w_zvtx_pass() = 0.;
   wgt_sums.out_w_zvtx_fail() = 0.;
+  wgt_sums.out_w_nnlo()      = 0.;
   // w_prefire should not be normalized
 
   wgt_sums.out_sys_el().resize(2,0);
