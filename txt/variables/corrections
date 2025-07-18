@@ -22,6 +22,7 @@ double w_zvtx_fail
 
 double w_isr
 double w_pu
+double w_nnlo
 
 vector<double> sys_el
 vector<double> sys_mu

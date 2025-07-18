@@ -123,6 +123,7 @@ void Initialize(corrections_tree &wgt_sums, corrections_tree &corr){
   corr.out_w_photon() = 0.;
   corr.out_w_phshape() = 0.;
   corr.out_w_trig() = 0.;
+  corr.out_w_nnlo() = 0.;
   corr.out_w_zvtx_pass() = 0.;
   corr.out_w_zvtx_fail() = 0.;
   // w_prefire should not be normalized!!
@@ -180,6 +181,7 @@ void AddEntry(corrections_tree &wgt_sums, corrections_tree &corr){
   corr.out_w_pu()              += wgt_sums.w_pu();
   corr.out_w_photon()          += wgt_sums.w_photon();
   corr.out_w_phshape()         += wgt_sums.w_phshape();
+  corr.out_w_nnlo()            += wgt_sums.w_nnlo();
 
   VecAdd(wgt_sums.sys_el(),            corr.out_sys_el());
   VecAdd(wgt_sums.sys_mu(),            corr.out_sys_mu());
@@ -371,6 +373,7 @@ void Normalize(corrections_tree &corr){
 
   Normalize(corr.out_w_photon(), nent);
   Normalize(corr.out_w_phshape(), nent);
+  Normalize(corr.out_w_nnlo(), nent);
 
   Normalize(corr.out_w_trig(), nent);
 

@@ -513,13 +513,16 @@ int main(int argc, char *argv[]){
       if ((!is_preUL) || year>=2022) { //UL or run 3
         // ElectronISO SF need to be implemented for non-HToZgamma
         event_weighter.ElectronSF(pico);
+        event_weighter.ElectronMinisoSF(pico);
         event_weighter.MuonSF(pico);
+        event_weighter.MuonMinisoSF(pico);
         event_weighter.PileupSF(pico);
         event_weighter.bTaggingSF(pico);
         event_weighter.PhotonSF(pico);
         event_weighter.PhotonShapeSF(pico);
         event_weighter.FakePhotonSF(pico);
         event_weighter.ZISRSF(pico);
+        event_weighter.NNLOCorrection(pico);
         pico.out_sys_isr().resize(2,1.);
         pico.out_sys_lep().resize(2,1.); 
         pico.out_sys_prefire().resize(2, 1.); 
@@ -619,7 +622,8 @@ int main(int argc, char *argv[]){
                           pico.out_w_btag_df() * pico.out_w_photon()  *
                           pico.out_w_isr() * pico.out_w_pu() * 
                           pico.out_w_trig() * pico.out_w_phshape() * 
-                          pico.out_w_prefire() * pico.out_w_fakephoton();
+                          pico.out_w_prefire() * pico.out_w_fakephoton() *
+                          pico.out_w_nnlo();
     } else {
       // for non Z-gamma: do not put anything that will not be renormalized
       // in weight
