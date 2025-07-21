@@ -464,6 +464,7 @@ float w_btag_dc
 float w_pu
 float w_prefire
 float w_trig
+float w_nnlo
 
 ################  Triggers copy straight from Nano, same names   ##################
 
