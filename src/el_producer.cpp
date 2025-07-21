@@ -302,7 +302,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
         pico.out_el_fsrphotonidx().push_back(nano.Electron_fsrPhotonIdx()[iel]);
       }
       else {
-        std::cout<<"Need code for new year in getZGammaElBr (in el_producer.cpp)"<<endl;
+        std::cout<<"Need code for new year in WriteElectrons (in el_producer.cpp)"<<endl;
         exit(1);
       }
       int bitmap = nano.Electron_vidNestedWPBitmapHEEP()[iel];

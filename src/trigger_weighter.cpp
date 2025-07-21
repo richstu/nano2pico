@@ -272,11 +272,11 @@ vector<float> TriggerWeighter::GetSF(
     DBG("Error: NaN propagated in trigger weighter.\n");
     exit(1);
   }
-  sf = bound(sf, 5.0f, 0.0f);
-  sf_elup = bound(sf_elup, 5.0f, 0.0f);
-  sf_eldn = bound(sf_eldn, 5.0f, 0.0f);
-  sf_muup = bound(sf_muup, 5.0f, 0.0f);
-  sf_mudn = bound(sf_mudn, 5.0f, 0.0f);
+  sf = bound(sf, 10.0f, 0.0f);
+  sf_elup = bound(sf_elup, 10.0f, 0.0f);
+  sf_eldn = bound(sf_eldn, 10.0f, 0.0f);
+  sf_muup = bound(sf_muup, 10.0f, 0.0f);
+  sf_mudn = bound(sf_mudn, 10.0f, 0.0f);
 
   return {sf, sf_elup, sf_eldn, sf_muup, sf_mudn};
 }
