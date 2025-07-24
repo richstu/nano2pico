@@ -20,6 +20,7 @@ public:
   const float SignalMuonPtCut  = 20.0;
   const float VetoMuonPtCut    = 10.0;
   const float ZgMuonPtCut      =  5.0;
+  const float PicoMuonPtCut    =  3.0;
   const float MuonEtaCut        = 2.4;
   const float MuonMiniIsoCut    = 0.2;
   const float MuonRelIsoCut     = 0.35;

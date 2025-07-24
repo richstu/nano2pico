@@ -175,7 +175,7 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
     float eta = nano.Muon_eta()[imu];
     bool isSignal = false;
     if(isZgamma) { // For Zgamma productions
-      if (pt <= ZgMuonPtCut) continue;
+      if (pt <= PicoMuonPtCut) continue;
       if (fabs(eta) > MuonEtaCut) continue;
       if (fabs(nano.Muon_dz()[imu])>dzCut)  continue;
       if (fabs(nano.Muon_dxy()[imu])>dxyCut) continue; 

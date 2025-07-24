@@ -238,7 +238,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
       if (fabs(etasc) > ElectronEtaCut) continue;
       if (fabs(dz) > dzCut)  continue;
       if (fabs(dxy) > dxyCut) continue; 
-      if (scaleres_corr[iel]*pt <= ZgElectronPtCut) continue;
+      if (scaleres_corr[iel]*pt <= PicoElectronPtCut) continue;
       isSignal = IsSignal(nano, iel, isZgamma, scaleres_corr[iel]);
     }
     else {
