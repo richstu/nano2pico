@@ -630,7 +630,9 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
   }
   else if (!isData) { 
     pico.out_sys_njet().resize(4,0);
-    //TODO add variations for deepflavor b-tagging
+    pico.out_sys_nbl().resize(4,0);
+    pico.out_sys_nbm().resize(4,0);
+    pico.out_sys_nbt().resize(4,0);
   }
 
   //calculate jet quality variables first to order pico list
@@ -838,14 +840,42 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
       }
     }
     if (!isData && (nanoaod_version+0.01)>9 && isgood_nopt) {
-      if ((Jet_pt[ijet]*jer_up_factor[ijet]) > min_jet_pt)
+      if ((Jet_pt[ijet]*jer_up_factor[ijet]) > min_jet_pt) {
         pico.out_sys_njet()[0]++;
-      if ((Jet_pt[ijet]*jer_dn_factor[ijet]) > min_jet_pt)
+        if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[0]) 
+          pico.out_sys_nbl()[0]++; 
+        if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[1]) 
+          pico.out_sys_nbm()[0]++; 
+        if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[2]) 
+          pico.out_sys_nbt()[0]++; 
+      }
+      if ((Jet_pt[ijet]*jer_dn_factor[ijet]) > min_jet_pt) {
         pico.out_sys_njet()[1]++;
-      if ((Jet_pt[ijet]*jes_up_factor[ijet]) > min_jet_pt)
+        if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[0]) 
+          pico.out_sys_nbl()[1]++; 
+        if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[1]) 
+          pico.out_sys_nbm()[1]++; 
+        if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[2]) 
+          pico.out_sys_nbt()[1]++; 
+      }
+      if ((Jet_pt[ijet]*jes_up_factor[ijet]) > min_jet_pt) {
         pico.out_sys_njet()[2]++;
-      if ((Jet_pt[ijet]*jes_dn_factor[ijet]) > min_jet_pt)
+        if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[0]) 
+          pico.out_sys_nbl()[2]++; 
+        if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[1]) 
+          pico.out_sys_nbm()[2]++; 
+        if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[2]) 
+          pico.out_sys_nbt()[2]++; 
+      }
+      if ((Jet_pt[ijet]*jes_dn_factor[ijet]) > min_jet_pt) {
         pico.out_sys_njet()[3]++;
+        if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[0]) 
+          pico.out_sys_nbl()[3]++; 
+        if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[1]) 
+          pico.out_sys_nbm()[3]++; 
+        if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[2]) 
+          pico.out_sys_nbt()[3]++; 
+      }
     }
 
     switch(year) {
