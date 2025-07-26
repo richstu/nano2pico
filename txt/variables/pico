@@ -272,7 +272,6 @@ vector<int>   mu_charge
 vector<int>   mu_pflavor
 vector<int>   mu_fsrphotonid
 vector<float> mu_raw_pt
-vector<float> mu_raw_ptErr
 
 int nel
 int nvel
@@ -353,6 +352,7 @@ vector<float> photon_drmin
 vector<float> photon_drmax
 vector<float> photon_energyErr
 vector<float> photon_energy_raw
+vector<float> photon_relpterr
 vector<float> photon_origin_eta
 vector<float> photon_hoe
 vector<float> photon_esoversc
@@ -374,6 +374,8 @@ vector<float> photon_jet_mindr
 vector<float> photon_jet_maxdr
 vector<float> photon_jet1_dr
 vector<float> photon_jet2_dr
+vector<bool>  photon_hardprocess
+vector<float> photon_mht_dphi
 
 vector<float> photon_zeppenfeld
 
@@ -453,8 +455,7 @@ float w_el
 float w_mu
 float w_fs_lep
 float w_photon
-float w_photon_id
-float w_photon_csev
+float w_phshape
 float w_btag
 float w_btag_df
 float w_bhig
@@ -464,6 +465,7 @@ float w_btag_dc
 float w_pu
 float w_prefire
 float w_trig
+float w_fakephoton
 float w_nnlo
 
 ################  Triggers copy straight from Nano, same names   ##################
@@ -642,6 +644,7 @@ vector<float> sys_lep
 vector<float> sys_fs_lep
 
 vector<float> sys_photon
+vector<float> sys_photon_csev
 
 vector<float> sys_bchig
 vector<float> sys_udsghig
@@ -651,6 +654,8 @@ vector<float> sys_bchig_uncorr
 vector<float> sys_udsghig_uncorr
 
 vector<float> sys_trig
+vector<float> sys_trig_mu
+vector<float> sys_trig_el
 vector<float> sys_isr
 vector<float> sys_pu
 vector<float> sys_prefire
@@ -660,6 +665,9 @@ vector<float> sys_murf
 
 #variations have index: 0 (ISR=2 FSR=1), 1 (ISR=1 FSR=2), 2 (ISR=0.5 FSR=1), 2(ISR=1 FSR=0.5)
 vector<float> sys_ps
+
+#variations indices correspond to PDF set variations
+#vector<float> sys_pdf
 
 #index matches jet_*
 vector<float> sys_jet_pt_jesup
@@ -676,6 +684,12 @@ vector<float> sys_el_pt_scaleup
 vector<float> sys_el_pt_scaledn
 vector<float> sys_el_pt_resup
 vector<float> sys_el_pt_resdn
+
+#index matches muon_*
+vector<float> sys_mu_pt_scaleup
+vector<float> sys_mu_pt_scaledn
+vector<float> sys_mu_pt_resup
+vector<float> sys_mu_pt_resdn
 
 #index matches photon_*
 vector<float> sys_photon_pt_scaleup

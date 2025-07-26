@@ -19,6 +19,7 @@ public:
   const float SignalElectronPtCut  = 20.0;
   const float VetoElectronPtCut    = 10.0;
   const float ZgElectronPtCut      =  7.0;
+  const float PicoElectronPtCut    =  5.0;
   const float ElectronEtaCut     = 2.5;
   const float ElectronMiniIsoCut = 0.1;
   const float ElectronRelIsoCut = 0.35;

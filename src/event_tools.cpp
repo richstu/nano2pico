@@ -1006,7 +1006,11 @@ int EventTools::GetEventType(){
       if(Contains(name,"PTG-10to50")){         bin = 0;
       }else if(Contains(name,"PTG-50to100")){  bin = 1;
       }else if(Contains(name,"PTG-100to200")){ bin = 2;
-      }else if(Contains(name,"PTG-200")){      bin = 3;
+      }else if(Contains(name,"PTG-200_")){     bin = 3;
+      }else if(Contains(name,"PTG-10to100")){  bin = 4;
+      }else if(Contains(name,"PTG-200to400")){ bin = 5;
+      }else if(Contains(name,"PTG-400to600")){ bin = 6;
+      }else if(Contains(name,"PTG-600")){      bin = 7;
       }
     }
   }else if(Contains(name, "TGJets")) { sample = 18; bin = 0;
@@ -1086,5 +1090,7 @@ void EventTools::WriteTriggerEfficiency(pico_tree &pico) {
   pico.out_sys_trig().resize(2,0);
   pico.out_sys_trig()[0] = 1+effunc;
   pico.out_sys_trig()[1] = 1-effunc;
+  pico.out_sys_trig_el().resize(2,0);
+  pico.out_sys_trig_mu().resize(2,0);
 
 }

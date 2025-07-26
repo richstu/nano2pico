@@ -377,16 +377,17 @@ Previously calculated in many dedicated files, but for UL, now calculated in [ev
 * `w_mu` - weights to correct muon ID efficiency
 * `w_fs_lep` - weights to correct FastSim lepton ID efficiency
 * `w_photon` - weights to correct photon ID and electron veto efficiency 
-* `w_photon_id` - weights to correct photon ID efficiency 
-* `w_photon_csev` - weights to correct photon electron-veto efficiency
+* `w_fakephoton` - weights to correct fake photon rate/efficiency
+* `w_phshape` - weights to correct photon IDMVA and resolution shapes
 * `w_btag` - weight to correct _medium WP only_ of deepCSV b-jet ID efficiency
 * `w_btag_df` - weight to correct _medium WP only_ of deepFlavor b-jet ID efficiency. This is now default in HtoZgamma productions
 * `w_bhig` - weight to correct _all WPs_ of deepCSV b-jet ID efficiency
 * `w_bhig_df` - weight to correct _all WPs_ of deepFlavor b-jet ID efficiency. This should be used as the primary b-tag weight
-* `w_isr` - 1., except for TTJets 2016 and signal, SUSY ISR reweighting
+* `w_isr` - weight to correct MC kinematics modelling
 * `w_pu` - weight to correct pileup distribution
 * `w_prefire` - weight to correct for inefficiency caused by run 2 trigger prefiring
 * `w_trig` - weight to correct for trigger efficiency
+* `w_nnlo` - weight to correct NLO ggF Higgs samples to NNLO accuracy in pTH
 
 #### Trigger
 

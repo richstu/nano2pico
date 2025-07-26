@@ -1,0 +1,221 @@
+{
+  "schema_version": 2,
+  "description": "",
+  "corrections": [
+    {
+      "name": "fakephoton_corrections",
+      "version": 1,
+      "inputs": [
+        {
+          "name": "run",
+          "type": "string",
+          "description": "run2 or run3"
+        },
+        {
+          "name": "isjet",
+          "type": "int",
+          "description": "isjet"
+        },
+        {
+          "name": "pt",
+          "type": "real",
+          "description": "pt"
+        },
+        {
+          "name": "abseta",
+          "type": "real",
+          "description": "eta"
+        }
+      ],
+      "output": {
+        "name": "sf",
+        "type": "real",
+        "description": "fake photon SF"
+      },
+      "data": {
+        "nodetype": "category",
+        "input": "run",
+        "content": [
+          {
+            "key": "run2",
+            "value": {
+              "nodetype": "category",
+              "input": "isjet",
+              "content": [
+                {
+                  "key": 1,
+                  "value": {
+                    "nodetype": "multibinning",
+                    "inputs": [
+                      "pt",
+                      "abseta"
+                    ],
+                    "edges": [
+                      [
+                        15.0,
+                        20.0,
+                        30.0,
+                        500.0
+                      ],
+                      [
+                        0.0,
+                        0.8,
+                        1.5,
+                        2.0,
+                        2.5
+                      ]
+                    ],
+                    "content": [
+                      0.87784536,
+                      0.86090972,
+                      0.83359961,
+                      1.00905351,
+                      1.20656524,
+                      1.15353438,
+                      1.28262424,
+                      1.15435585,
+                      0.52378337,
+                      0.87839728,
+                      0.63154299,
+                      1.13529129
+                    ],
+                    "flow": "clamp"
+                  }
+                },
+                {
+                  "key": 0,
+                  "value": {
+                    "nodetype": "multibinning",
+                    "inputs": [
+                      "pt",
+                      "abseta"
+                    ],
+                    "edges": [
+                      [
+                        15.0,
+                        20.0,
+                        30.0,
+                        500.0
+                      ],
+                      [
+                        0.0,
+                        0.8,
+                        1.5,
+                        2.0,
+                        2.5
+                      ]
+                    ],
+                    "content": [
+                      1.38054607,
+                      1.29143011,
+                      1.22872195,
+                      1.26953528,
+                      1.11197443,
+                      1.34174906,
+                      1.19494895,
+                      1.25048567,
+                      2.59609818,
+                      1.86582932,
+                      3.16422829,
+                      1.41518427
+                    ],
+                    "flow": "clamp"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key": "run3",
+            "value": {
+              "nodetype": "category",
+              "input": "isjet",
+              "content": [
+                {
+                  "key": 1,
+                  "value": {
+                    "nodetype": "multibinning",
+                    "inputs": [
+                      "pt",
+                      "abseta"
+                    ],
+                    "edges": [
+                      [
+                        15.0,
+                        20.0,
+                        30.0,
+                        500.0
+                      ],
+                      [
+                        0.0,
+                        0.8,
+                        1.5,
+                        2.0,
+                        2.5
+                      ]
+                    ],
+                    "content": [
+                      0.73009776,
+                      1.02800363,
+                      0.7667346,
+                      1.29045474,
+                      1.03924426,
+                      1.12586378,
+                      0.90955539,
+                      1.10089699,
+                      0.74353182,
+                      0.34798856,
+                      0.7923226,
+                      0.69352779
+                    ],
+                    "flow": "clamp"
+                  }
+                },
+                {
+                  "key": 0,
+                  "value": {
+                    "nodetype": "multibinning",
+                    "inputs": [
+                      "pt",
+                      "abseta"
+                    ],
+                    "edges": [
+                      [
+                        15.0,
+                        20.0,
+                        30.0,
+                        500.0
+                      ],
+                      [
+                        0.0,
+                        0.8,
+                        1.5,
+                        2.0,
+                        2.5
+                      ]
+                    ],
+                    "content": [
+                      1.26284615,
+                      1.17956303,
+                      1.28810042,
+                      1.39744805,
+                      1.45429152,
+                      1.37924462,
+                      1.47740148,
+                      1.47429645,
+                      2.11270871,
+                      3.20168632,
+                      1.77614373,
+                      1.49915009
+                    ],
+                    "flow": "clamp"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

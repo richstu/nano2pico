@@ -630,72 +630,132 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
   }
   else if (!isData) { 
     pico.out_sys_njet().resize(4,0);
-    //TODO add variations for deepflavor b-tagging
+    pico.out_sys_nbl().resize(4,0);
+    pico.out_sys_nbm().resize(4,0);
+    pico.out_sys_nbt().resize(4,0);
   }
 
-  // saving jet info on all jets passing pt cut, including endcap
+  //calculate jet quality variables first to order pico list
+  vector<bool> jet_pass_jetidFix;
+  vector<bool> jet_islep; 
+  vector<bool> jet_isvlep; 
+  vector<bool> jet_isphoton; 
+  vector<bool> jet_inetahornveto;
+  vector<bool> jet_inhemveto;
+  vector<bool> jet_invetomap;
+  vector<bool> jet_isgood_min; //!lep, !pho, eta cut, ID(fix), eta horn
+  vector<bool> jet_isgood; //same as isgood_min + HEM/Run3 veto + pT cut
   for(int ijet(0); ijet<nano.nJet(); ++ijet){
+    float jet_abseta = fabs(nano.Jet_eta()[ijet]);
+    // jetid applied to only fullsim and data
+    //Check if this is correct for R2
+    if (isFastsim) {
+      jet_pass_jetidFix.push_back(true);
+    }
+    else {
+      if (year < 2022) {
+        jet_pass_jetidFix.push_back((Jet_jetId[ijet] >= 1));
+      }
+      else {
+        if(jet_abseta<=2.7f){
+          jet_pass_jetidFix.push_back(Jet_jetId[ijet] & (0b010));
+        } else if (jet_abseta>2.7f && jet_abseta<=3.0f){
+          jet_pass_jetidFix.push_back((Jet_jetId[ijet] & (0b010)) 
+              && (nano.Jet_neHEF()[ijet] < 0.99f));
+        } else {
+          jet_pass_jetidFix.push_back((Jet_jetId[ijet] & (0b010)) 
+              && (nano.Jet_neEmEF()[ijet] < 0.4f));
+        }
+      }
+    }
+    // check overlap with signal leptons (or photons)
+    // N.B. photon collection is not filled for Higgsino analysis, so there is 
+    // no overlap removal!
+    jet_islep.push_back(find(jet_islep_nano_idx.begin(), 
+        jet_islep_nano_idx.end(), ijet) != jet_islep_nano_idx.end());
+    jet_isvlep.push_back(find(jet_isvlep_nano_idx.begin(), 
+        jet_isvlep_nano_idx.end(), ijet) != jet_isvlep_nano_idx.end());
+    jet_isphoton.push_back(find(jet_isphoton_nano_idx.begin(), 
+        jet_isphoton_nano_idx.end(), ijet) != jet_isphoton_nano_idx.end()); 
+    // eta horn veto
+    jet_inetahornveto.push_back(year >=2017 && Jet_pt[ijet] < 50.0f 
+        && jet_abseta > 2.5f && jet_abseta < 3.0f); 
+    // For studying jetmaps and HEM vetos. Don't include eta veto yet in order 
+    // to remove anomalous met events.
+    bool isgood_min = !jet_islep.back() && !jet_isphoton.back() 
+        && (jet_abseta < max_jet_eta) && jet_pass_jetidFix.back();
+    // 2018 HEM veto. JetMET POG gives tighter selection than ours except 
+    // 15 GeV cut. Apply our selection, with lower pT cut for veto events.
+    bool isvetohem  = false;
+    if (year==2018 && isgood_min && nano.Jet_pt()[ijet]>15.0f 
+        && nano.Jet_eta()[ijet]>-3.2f && nano.Jet_eta()[ijet]<-1.3f 
+        && nano.Jet_phi()[ijet]>-1.57f && nano.Jet_phi()[ijet]<-0.87f){
+      if(isData && nano.run()>=319077) isvetohem = true;
+      else if(!isData && (nano.event()%10000>3564)) isvetohem = true;
+      //same approximate portion of MC as to match the data percentage. 
+      pico.out_ishemvetoevt()=isvetohem;
+    }
+    jet_inhemveto.push_back(isvetohem);
+    // Run 3 jet veto maps. JetMET POG gives tighter selection than ours except 
+    // 15 GeV cut. Apply our selection, with lower pT cut for veto events.
+    float veto = 0.0f; 
+    float phicorr;
+    //a dumb addition because sometimes jet phi is slightly larger than pi
+    if(nano.Jet_phi()[ijet]>3.1415926f) phicorr = 3.1415926f;
+    else if (nano.Jet_phi()[ijet]<-3.1415926f) phicorr = -3.1415926f;
+    else phicorr = nano.Jet_phi()[ijet];
+
+    if (year>=2022 && nano.Jet_pt()[ijet]>15.0f && jet_abseta<5.191f) 
+      veto = map_jetveto_->evaluate({"jetvetomap", nano.Jet_eta()[ijet],
+                                     phicorr});
+    if(veto!=0.0 && isgood_min) {
+      pico.out_ismapvetoevt()=true;
+      jet_invetomap.push_back(true);
+    }
+    else {
+      jet_invetomap.push_back(false);
+    }
+    jet_isgood_min.push_back(isgood_min && !jet_inetahornveto.back());
+    jet_isgood.push_back(jet_isgood_min.back() && !jet_invetomap.back() 
+                         && !jet_inhemveto.back() 
+                         && (Jet_pt[ijet] > min_jet_pt));
+  }
+
+  //determine ordering based on isgood and pt
+  vector<NanoOrderEntry> nano_entries;
+  vector<int> ordered_nano_indices;
+  for(int ijet(0); ijet<nano.nJet(); ++ijet){
+    NanoOrderEntry nano_entry;
+    nano_entry.nano_idx = ijet;
+    nano_entry.pt = Jet_pt[ijet];
+    nano_entry.is_sig = jet_isgood[ijet];
+    nano_entries.push_back(nano_entry);
+  }
+  sort(nano_entries.begin(),nano_entries.end(), 
+      [](NanoOrderEntry a, NanoOrderEntry b) {
+        if (a.is_sig && !b.is_sig) return true;
+        if (b.is_sig && !a.is_sig) return false;
+        return (a.pt>b.pt);
+      });
+  for (NanoOrderEntry nano_entry : nano_entries)
+    ordered_nano_indices.push_back(nano_entry.nano_idx);
+
+  // saving jet info on all jets passing pt cut with any variation
+  for(int ijet : ordered_nano_indices) {
     if (verbose) cout<<"Jet "<<ijet<<": pt = "<<setw(10)<<Jet_pt[ijet]
                                     <<" eta = "<<setw(10)<<nano.Jet_eta()[ijet]
                                     <<" phi = "<<setw(10)<<nano.Jet_phi()[ijet]
                                     <<" m = "<<setw(10)<<Jet_mass[ijet]
                                     <<endl;
+    bool isgood_nopt = jet_isgood_min[ijet] && !jet_invetomap[ijet] 
+                       && !jet_inhemveto[ijet];
 
-
-    // check overlap with signal leptons (or photons)
-    bool islep = find(jet_islep_nano_idx.begin(), jet_islep_nano_idx.end(), ijet) != jet_islep_nano_idx.end();
-    bool isvlep = find(jet_isvlep_nano_idx.begin(), jet_isvlep_nano_idx.end(), ijet) != jet_isvlep_nano_idx.end();
-    // N.B. photon collection is not filled for Higgsino analysis, so there is no overlap removal!
-    bool isphoton = find(jet_isphoton_nano_idx.begin(), jet_isphoton_nano_idx.end(), ijet) != jet_isphoton_nano_idx.end(); 
-    // jetid applied to only fullsim and data
-    //bool pass_jetid = true;
-    bool pass_jetidFix = false; //tight id bugged, recipe here https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetID13p6TeV#Recommendations_for_the_13_6_AN1
-    //Check if this is correct for R2
-    if (!isFastsim && Jet_jetId[ijet] >=1 && year < 2022) pass_jetidFix = true;
-    else if (isFastsim) pass_jetidFix = true;
-    if(year>=2022){
-      if(fabs(nano.Jet_eta()[ijet])<=2.7f){
-        pass_jetidFix = Jet_jetId[ijet] & (0b010);
-      } else if (fabs(nano.Jet_eta()[ijet])>2.7f && fabs(nano.Jet_eta()[ijet])<=3.0f){
-        pass_jetidFix = (Jet_jetId[ijet] & (0b010)) && (nano.Jet_neHEF()[ijet] < 0.99f);
-      } else if (fabs(nano.Jet_eta()[ijet])>3.0f){
-        pass_jetidFix = (Jet_jetId[ijet] & (0b010)) && (nano.Jet_neEmEF()[ijet] < 0.4f);
-      }
-    }
-
-    bool in_jet_horn_eta_veto = (year >=2017 && nano.Jet_pt()[ijet] < 40.0f && fabs(nano.Jet_eta()[ijet]) > 2.5f && fabs(nano.Jet_eta()[ijet]) < 3.0f); 
-    bool isgood_min = !islep && !isphoton && (fabs(nano.Jet_eta()[ijet]) <= max_jet_eta) && pass_jetidFix;//For studying jetmaps and HEM vetos. Don't include eta veto yet in order to remove anomalous met events.
-
-    //2018 HEM veto. JetMET POG gives tighter selection than ours except 15 GeV cut. Apply our selection, with lower pT cut for veto events.
-    bool isvetohem  = false;
-    if(year==2018 && isgood_min && nano.Jet_pt()[ijet]>15.0f && nano.Jet_eta()[ijet]>-3.2f && nano.Jet_eta()[ijet]<-1.3f && nano.Jet_phi()[ijet]>-1.57f && nano.Jet_phi()[ijet]<-0.87f){
-      if(isData && nano.run()>=319077) isvetohem = true;
-      else if(!isData && (nano.event()%10000>3564)) isvetohem = true;//same approximate portion of MC as to match the data percentage. 
-      pico.out_ishemvetoevt()=isvetohem;
-    }
-
-    //Run 3 jet veto maps. JetMET POG gives tighter selection than ours except 15 GeV cut. Apply our selection, with lower pT cut for veto events.
-    bool isvetomap = false;
-    float veto = 0.0f; 
-    float phicorr;
-    if(nano.Jet_phi()[ijet]>3.1415926f) phicorr = 3.1415926f;//a dumb addition because sometimes jet phi is slightly larger than pi
-    else if (nano.Jet_phi()[ijet]<-3.1415926f) phicorr = -3.1415926f;
-    else phicorr = nano.Jet_phi()[ijet];
-
-    if (year>=2022 && nano.Jet_pt()[ijet]>15.0f && fabs(nano.Jet_eta()[ijet])<5.191f) veto = map_jetveto_->evaluate({"jetvetomap", nano.Jet_eta()[ijet],phicorr});
-    if(veto!=0.0 && isgood_min) {
-      isvetomap = true;
-      pico.out_ismapvetoevt()=true;
-    }
-
-    //don't include pt in isgood until later in order to save systematics
-    isgood_min = isgood_min && !in_jet_horn_eta_veto;
-    bool isgood = !islep && !isphoton && (fabs(nano.Jet_eta()[ijet]) <= max_jet_eta) && pass_jetidFix && !isvetomap && !in_jet_horn_eta_veto && !isvetohem;
     //sys_jetvar convention: [0] JER up, [1] JER down, [2] JEC up, [3] JEC down
     //for now, only save sys_ variables
+    //old code for preUL Nanos; see GetJetUncertainties for newer Nano versions
     if (isSignal && (nanoaod_version+0.01)<9) {
       if (nano.Jet_pt_jerUp()[ijet] > min_jet_pt) {
-        if (isgood) {
+        if (isgood_nopt) {
           pico.out_sys_njet()[0]++;
           pico.out_sys_ht()[0] += nano.Jet_pt_jerUp()[ijet];
           if (nano.Jet_btagDeepB()[ijet] > btag_wpts[0]) pico.out_sys_nbl()[0]++; 
@@ -711,7 +771,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
           sys_jet_met_dphi.at(0).push_back(DeltaPhi(nano.Jet_phi()[ijet], pico.out_sys_met_phi()[0]));
       }
       if (nano.Jet_pt_jerDown()[ijet] > min_jet_pt) {
-        if (isgood) {
+        if (isgood_nopt) {
           pico.out_sys_njet()[1]++;
           pico.out_sys_ht()[1] += nano.Jet_pt_jerDown()[ijet];
           if (nano.Jet_btagDeepB()[ijet] > btag_wpts[0]) pico.out_sys_nbl()[1]++; 
@@ -727,7 +787,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
           sys_jet_met_dphi.at(1).push_back(DeltaPhi(nano.Jet_phi()[ijet], pico.out_sys_met_phi()[1]));
       }
       if (nano.Jet_pt_jesTotalUp()[ijet] > min_jet_pt) {
-        if (isgood) {
+        if (isgood_nopt) {
           pico.out_sys_njet()[2]++;
           pico.out_sys_ht()[2] += nano.Jet_pt_jesTotalUp()[ijet];
           if (nano.Jet_btagDeepB()[ijet] > btag_wpts[0]) pico.out_sys_nbl()[2]++; 
@@ -743,7 +803,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
           sys_jet_met_dphi.at(2).push_back(DeltaPhi(nano.Jet_phi()[ijet], pico.out_sys_met_phi()[2]));
       }
       if (nano.Jet_pt_jesTotalDown()[ijet] > min_jet_pt) {
-        if (isgood) {
+        if (isgood_nopt) {
           pico.out_sys_njet()[3]++;
           pico.out_sys_ht()[3] += nano.Jet_pt_jesTotalDown()[ijet];
           if (nano.Jet_btagDeepB()[ijet] > btag_wpts[0]) pico.out_sys_nbl()[3]++; 
@@ -760,26 +820,63 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
       }
     }
 
-    if (isData && Jet_pt[ijet] <= min_jet_pt) continue;
-    if (!isData) {
-      if (Jet_pt[ijet] <= min_jet_pt && 
-          (Jet_pt[ijet]*jer_up_factor[ijet]) <= min_jet_pt &&
-          (Jet_pt[ijet]*jer_dn_factor[ijet]) <= min_jet_pt &&
-          (Jet_pt[ijet]*jes_up_factor[ijet]) <= min_jet_pt &&
-          (Jet_pt[ijet]*jes_dn_factor[ijet]) <= min_jet_pt) continue;
+    if (isData) {
+      if (Jet_pt[ijet] <= min_jet_pt) continue;
     }
-    if (!isData && (nanoaod_version+0.01)>9 && isgood) {
-      if ((Jet_pt[ijet]*jer_up_factor[ijet]) > min_jet_pt)
+    else {
+      if ((nanoaod_version+0.01)<9) {
+        if (Jet_pt[ijet] <= min_jet_pt && 
+            nano.Jet_pt_jerUp()[ijet]<=min_jet_pt &&
+            nano.Jet_pt_jerDown()[ijet]<=min_jet_pt &&
+            nano.Jet_pt_jesTotalUp()[ijet]<=min_jet_pt &&
+            nano.Jet_pt_jesTotalDown()[ijet]<=min_jet_pt) continue;
+      }
+      else {
+        if (Jet_pt[ijet] <= min_jet_pt && 
+            (Jet_pt[ijet]*jer_up_factor[ijet]) <= min_jet_pt &&
+            (Jet_pt[ijet]*jer_dn_factor[ijet]) <= min_jet_pt &&
+            (Jet_pt[ijet]*jes_up_factor[ijet]) <= min_jet_pt &&
+            (Jet_pt[ijet]*jes_dn_factor[ijet]) <= min_jet_pt) continue;
+      }
+    }
+    if (!isData && (nanoaod_version+0.01)>9 && isgood_nopt) {
+      if ((Jet_pt[ijet]*jer_up_factor[ijet]) > min_jet_pt) {
         pico.out_sys_njet()[0]++;
-      if ((Jet_pt[ijet]*jer_dn_factor[ijet]) > min_jet_pt)
+        if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[0]) 
+          pico.out_sys_nbl()[0]++; 
+        if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[1]) 
+          pico.out_sys_nbm()[0]++; 
+        if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[2]) 
+          pico.out_sys_nbt()[0]++; 
+      }
+      if ((Jet_pt[ijet]*jer_dn_factor[ijet]) > min_jet_pt) {
         pico.out_sys_njet()[1]++;
-      if ((Jet_pt[ijet]*jes_up_factor[ijet]) > min_jet_pt)
+        if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[0]) 
+          pico.out_sys_nbl()[1]++; 
+        if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[1]) 
+          pico.out_sys_nbm()[1]++; 
+        if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[2]) 
+          pico.out_sys_nbt()[1]++; 
+      }
+      if ((Jet_pt[ijet]*jes_up_factor[ijet]) > min_jet_pt) {
         pico.out_sys_njet()[2]++;
-      if ((Jet_pt[ijet]*jes_dn_factor[ijet]) > min_jet_pt)
+        if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[0]) 
+          pico.out_sys_nbl()[2]++; 
+        if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[1]) 
+          pico.out_sys_nbm()[2]++; 
+        if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[2]) 
+          pico.out_sys_nbt()[2]++; 
+      }
+      if ((Jet_pt[ijet]*jes_dn_factor[ijet]) > min_jet_pt) {
         pico.out_sys_njet()[3]++;
+        if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[0]) 
+          pico.out_sys_nbl()[3]++; 
+        if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[1]) 
+          pico.out_sys_nbm()[3]++; 
+        if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[2]) 
+          pico.out_sys_nbt()[3]++; 
+      }
     }
-    //after this point isgood means with nominal (smeared) pt
-    isgood = isgood && (Jet_pt[ijet] >= min_jet_pt);
 
     switch(year) {
       case 2016:
@@ -795,13 +892,13 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
         pico.out_jet_deepflav().push_back(nano.Jet_btagDeepFlavB()[ijet]);
         pico.out_jet_ne_emef().push_back(nano.Jet_neEmEF()[ijet]);
         pico.out_jet_qgl().push_back(nano.Jet_qgl()[ijet]);
-        pico.out_jet_islep().push_back(islep);
-        pico.out_jet_isvlep().push_back(isvlep);
-        pico.out_jet_isphoton().push_back(isphoton);
-        pico.out_jet_isgood().push_back(isgood);
-        pico.out_jet_isgood_min().push_back(isgood_min);
-        pico.out_jet_isvetomap().push_back(isvetomap);
-        pico.out_jet_isvetohem().push_back(isvetohem);
+        pico.out_jet_islep().push_back(jet_islep[ijet]);
+        pico.out_jet_isvlep().push_back(jet_isvlep[ijet]);
+        pico.out_jet_isphoton().push_back(jet_isphoton[ijet]);
+        pico.out_jet_isgood().push_back(jet_isgood[ijet]);
+        pico.out_jet_isgood_min().push_back(jet_isgood_min[ijet]);
+        pico.out_jet_isvetomap().push_back(jet_invetomap[ijet]);
+        pico.out_jet_isvetohem().push_back(jet_inhemveto[ijet]);
         pico.out_jet_id().push_back(Jet_jetId[ijet]);
         pico.out_jet_mht_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], mht_vec.Phi()));
         pico.out_jet_met_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], MET_phi));
@@ -840,13 +937,13 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
         pico.out_jet_deepflav().push_back(nano.Jet_btagDeepFlavB()[ijet]);
         pico.out_jet_ne_emef().push_back(nano.Jet_neEmEF()[ijet]);
         //pico.out_jet_qgl().push_back(nano.Jet_qgl()[ijet]);
-        pico.out_jet_islep().push_back(islep);
-        pico.out_jet_isvlep().push_back(isvlep);
-        pico.out_jet_isphoton().push_back(isphoton);
-        pico.out_jet_isgood().push_back(isgood);
-        pico.out_jet_isgood_min().push_back(isgood_min);
-        pico.out_jet_isvetomap().push_back(isvetomap);
-        pico.out_jet_isvetohem().push_back(isvetohem);
+        pico.out_jet_islep().push_back(jet_islep[ijet]);
+        pico.out_jet_isvlep().push_back(jet_isvlep[ijet]);
+        pico.out_jet_isphoton().push_back(jet_isphoton[ijet]);
+        pico.out_jet_isgood().push_back(jet_isgood[ijet]);
+        pico.out_jet_isgood_min().push_back(jet_isgood_min[ijet]);
+        pico.out_jet_isvetomap().push_back(jet_invetomap[ijet]);
+        pico.out_jet_isvetohem().push_back(jet_inhemveto[ijet]);
         pico.out_jet_id().push_back(Jet_jetId[ijet]);
         pico.out_jet_mht_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], mht_vec.Phi()));
         pico.out_jet_met_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], MET_phi));
@@ -886,9 +983,10 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
     pico.out_jet_h1d().push_back(false);
     pico.out_jet_h2d().push_back(false);
 
-    if (!islep && !isphoton) pico.out_ht5() += Jet_pt[ijet];
+    if (!jet_islep[ijet] && !jet_isphoton[ijet]) 
+      pico.out_ht5() += Jet_pt[ijet];
 
-    if (isgood) {
+    if (jet_isgood[ijet]) {
       sig_jet_nano_idx.push_back(ijet);
       pico.out_njet()++;
       pico.out_ht() += Jet_pt[ijet];

@@ -11,6 +11,7 @@ double w_photon
 # just need to add up 
 double w_el
 double w_mu
+double w_phshape
 double w_btag
 double w_btag_df
 double w_bhig
@@ -28,11 +29,16 @@ vector<double> sys_mu
 vector<double> sys_lep
 vector<double> sys_fs_lep
 vector<double> sys_photon
+vector<double> sys_photon_csev
 vector<double> sys_bchig
 vector<double> sys_udsghig
+vector<double> sys_bchig_uncorr
+vector<double> sys_udsghig_uncorr
 vector<double> sys_fs_bchig
 vector<double> sys_fs_udsghig
 vector<double> sys_trig
+vector<double> sys_trig_el
+vector<double> sys_trig_mu
 
 vector<double> sys_isr
 vector<double> sys_pu
@@ -48,5 +54,6 @@ int nent
 int neff_el
 int neff_pass_eltrigs
 int nent_zlep
+int nent_isr
 float tot_weight_l0
 float tot_weight_l1

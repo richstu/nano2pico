@@ -24,15 +24,15 @@ public:
    */
   TriggerWeighter(std::string year);
 
-  /*!\brief returns MC-data scale factor for event in the format {value, systup, systdown}
+  /*!\brief calculates MC-data scale factor for event in the format {value, systup, systdown}
      where the variations are obtained by taking value*syst(up|down)
  
   \param[in] pico pico n-tuple. Lepton and trigger branches must be filled
  */
-  std::vector<float> GetSF(pico_tree &pico);
+  void GetSF(pico_tree &pico);
 
 private:
-  /*!\brief returns MC-data scale factor for event in the format {value, systup, systdown}
+  /*!\brief returns MC-data scale factor for event in the format {value, elsystup, elsystdown, musystup, musystdn}
      where the variations are obtained by taking value*syst(up|down)
    
     \param[in] electron_pt list of electron pts
@@ -49,27 +49,6 @@ private:
       std::vector<float> muon_pt, std::vector<float> electron_eta, 
       std::vector<float> muon_eta, std::vector<float> electron_phi,
       bool pass_singleel, bool pass_singlemu, bool pass_diel, bool pass_dimu);
-
-  /*!\brief returns probability (efficiency) for event to pass electron OR muon 
-    triggers in the format {nominal value, up variation, down variation}
-   
-    \param[in] electron_pt list of electron pts
-    \param[in] muon_pt list of muon pts
-    \param[in] electron_eta list of electron etas
-    \param[in] electron_phi list of electron phis
-    \param[in] muon_eta list of muon etas
-    \param[in] pass_singleel if event passes single electron trigger(s)
-    \param[in] pass_singlemu if event passes single muon trigger(s)
-    \param[in] pass_diel if event passes double electron trigger(s)
-    \param[in] pass_dimu if event passes double muon trigger(s)
-    \param[in] is_data sets whether data or MC probability is calculated
-   */
-  std::vector<float> GetTotalProbability(
-      std::vector<float> electron_pt, std::vector<float> muon_pt, 
-      std::vector<float> electron_eta, std::vector<float> muon_eta, 
-      std::vector<float> electron_phi,
-      bool pass_singleel, bool pass_singlemu, bool pass_diel, bool pass_dimu, 
-      bool is_data);
 
   /*!\brief returns probability (efficiency) for event to pass single or dilepton
     triggers for a particular lepton flavor in the format 
