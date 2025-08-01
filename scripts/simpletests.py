@@ -110,6 +110,8 @@ input_files = [
 
 #input_files = ['/net/cms11/cms11r0/pico/NanoAODv12/nano/2023/mc/DYGto2LG-1Jets_MLL-50_PTG-10to100_TuneCP5_13p6TeV_amcatnloFXFX-pythia8__Run3Summer23NanoAODv12__130X_mcRun3_2023_realistic_v15-v4__120000__14592dd6-3aa5-4e8c-b756-984c8d35392c.root']
 
+#input_files = ['/net/cms11/cms11r0/pico/NanoAODv12/nano/2022EE/mc/DYGto2LG-1Jets_MLL-50_PTG-200_TuneCP5_13p6TeV_amcatnloFXFX-pythia8__Run3Summer22EENanoAODv12__130X_mcRun3_2022_realistic_postEE_v6-v4__30000__f5929cb0-6abf-4d15-a539-82dd8a25e07e.root']
+
 for input_file in input_files:
   path_pos = input_file.rfind('/')
   indir = input_file[:path_pos]

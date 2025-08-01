@@ -991,6 +991,7 @@ void EventWeighter::PhotonShapeSF(pico_tree &pico){
       (pico.out_photon_pt().at(0)*TMath::CosH(pico.out_photon_eta().at(0))))};
   float dnn_output = ph_shape_weighter_->evaluate(dnn_input);
   float weight = (dnn_output/(1.0-dnn_output));
+  if (isnan(weight)) weight = 1.0;
   if (fabs(weight) > 5.0)
     weight = 5.0*weight/fabs(weight);
   pico.out_w_phshape() = weight;
@@ -1040,6 +1041,7 @@ void EventWeighter::ZISRSF(pico_tree &pico){
                              pico.out_ht()}; 
   float dnn_output = zgbkg_isr_weighter_->evaluate(dnn_input);
   float weight = (dnn_output/(1.0-dnn_output));
+  if (isnan(weight)) weight = 1.0;
   if (fabs(weight) > 5.0)
     weight = 5.0*weight/fabs(weight);
   pico.out_w_isr() = weight;
