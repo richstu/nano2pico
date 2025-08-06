@@ -114,6 +114,8 @@ double pt_resol(double pt, double eta, float nL, unique_ptr<correction::Correcti
     // calculate corrected value and return original value if a parameter is nan
     double ptc = pt * ( 1 + k * std * rndm);
     if (isnan(ptc)) ptc = pt;
+    if (ptc / pt > 2 || ptc / pt < 0.1 || ptc < 0)
+        ptc = pt;
     return ptc;
 }
 
@@ -138,6 +140,8 @@ double pt_resol_var(double pt_woresol, double pt_wresol, double eta, string updn
     else {
         cout << "ERROR: updn must be 'up' or 'dn'" << endl;
     }
+    if (pt_var / pt_woresol > 2 || pt_var / pt_woresol < 0.1 || pt_var < 0)
+        pt_var = pt_woresol; 
 
     return pt_var;
 }
@@ -174,3 +178,4 @@ double pt_scale_var(double pt, double eta, double phi, int charge, string updn, 
 }
 
 }
+

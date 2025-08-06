@@ -166,7 +166,7 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
     pico.out_photon_mht_dphi().push_back(
         DeltaPhi(pico.out_photon_phi()[iph], pico.out_mht_phi()));
     float eta = pico.out_photon_eta()[iph];
-    float phi = pico.out_photon_eta()[iph];
+    float phi = pico.out_photon_phi()[iph];
     if (pico.out_njet() >= 1) {
       float ph_j1_dr = dR(eta, pico.out_jet_eta()[0], 
                           phi, pico.out_jet_phi()[0]);
