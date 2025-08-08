@@ -652,11 +652,10 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
   //ttH leptonic
   if((pico.out_nlep()==3 && pico.out_njet()>=3 && pico.out_nbdfm()>=1) || (pico.out_nlep()>=4 && pico.out_nbdfm() >= 1)){
     categoryBit+=0b00100000; 
-
-    float mll = pico.out_ll_m().at(pico.out_llphoton_ill().at(0));
+ 
     bool pass_miniso = check_miniso(pico,0.1);
     //Category selections
-    if(pass_miniso && mll > 85.f && mll < 95.f){categoryBit+=0b00000001;}
+    if(pass_miniso){categoryBit+=0b00000001;}
   }
 
   //VH 3l
@@ -665,9 +664,8 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
 
     //Category selections
     float ptom_llgamma = pico.out_llphoton_pt().at(0)/pico.out_llphoton_m().at(0);
-    float mll = pico.out_ll_m().at(pico.out_llphoton_ill().at(0));
     bool pass_miniso = check_miniso(pico,0.15);
-    if(pass_miniso && pico.out_met() > 30.0f && ptom_llgamma > 0.3f && mll > 85.f && mll < 95.f){categoryBit+=0b00000001;}
+    if(pass_miniso && pico.out_met() > 30.0f && ptom_llgamma > 0.3f){categoryBit+=0b00000001;}
   }
 
   //ttH hadronic
@@ -684,9 +682,8 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
     categoryBit += 0b00000100;
 
     //Category selections
-    float mll = pico.out_ll_m().at(pico.out_llphoton_ill().at(0));
     float ptom_llgamma = pico.out_llphoton_pt().at(0)/pico.out_llphoton_m().at(0);
-    if(mll > 85.f && mll < 95.f && ptom_llgamma > 0.4f){categoryBit+=0b00000001;}
+    if(ptom_llgamma > 0.4f){categoryBit+=0b00000001;}
   }
 
   //"Untagged" aka events that pass baseline but arent put into a category
