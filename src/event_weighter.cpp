@@ -1051,8 +1051,18 @@ void EventWeighter::ZISRSF(pico_tree &pico){
 void EventWeighter::NNLOCorrection(pico_tree &pico){
   float sf = 1.0;
   if(pico.out_type()==200000 && pico.out_nllphoton()>0){
-    float h_pt = pico.out_llphoton_m().at(0);
-    sf = map_ggf_nnlo_->evaluate({h_pt});
+    //generator level Higgs
+    int hidx = -1;
+    for (unsigned int i(0); i<pico.out_mc_pt().size(); i++){
+      if (pico.out_mc_id().at(i)==25){
+        hidx = i;
+        break;
+      }
+    }
+    if (hidx>=0){
+      float h_pt = pico.out_mc_pt().at(hidx);
+      sf = map_ggf_nnlo_->evaluate({h_pt});
+    }
   }
   pico.out_w_nnlo() = sf;
 }
