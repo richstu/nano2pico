@@ -1050,7 +1050,7 @@ void EventWeighter::ZISRSF(pico_tree &pico){
 // reweight ggF kinematics to NNLO
 void EventWeighter::NNLOCorrection(pico_tree &pico){
   float sf = 1.0;
-  if(pico.out_type()==200000 && pico.out_nllphoton()>0){
+  if(pico.out_type()==200000){
     //generator level Higgs
     int hidx = -1;
     for (unsigned int i(0); i<pico.out_mc_pt().size(); i++){
