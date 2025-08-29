@@ -845,6 +845,7 @@ void EventWeighter::bTaggingSF(pico_tree &pico){
       float sf_up_uncorr = cat_data_eff_up_uncorr/cat_mc_eff_wpm;
       float sf_dn_uncorr = cat_data_eff_dn_uncorr/cat_mc_eff_wpm;
       if (isinf(sf_nm)||isnan(sf_nm)) sf_nm = 1.0;
+      if (isinf(sf_nm_wpm)||isnan(sf_nm_wpm)) sf_nm_wpm = 1.0;
       if (isinf(sf_up)||isnan(sf_up)) sf_up = 1.0;
       if (isinf(sf_dn)||isnan(sf_dn)) sf_dn = 1.0;
       if (isinf(sf_up_uncorr)||isnan(sf_up_uncorr)) sf_up_uncorr = 1.0;
