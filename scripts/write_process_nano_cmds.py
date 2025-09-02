@@ -55,6 +55,7 @@ if args['dataset_list']!='':
         if (istr in ifile):
           in_file_paths.append(ifile)
   else:
+    print(datasets)
     for ds in datasets:
       if len(ds)<2: #in case of empty lines
         continue
@@ -63,6 +64,7 @@ if args['dataset_list']!='':
 else:
   in_file_paths = all_file_paths
 
+print(in_dir)
 print("Found {} input files.\n".format(len(in_file_paths)))
 
 cmdfile_name = 'process_nano_cmds.py'

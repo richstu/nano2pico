@@ -293,23 +293,23 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
       }
 
       //For bbgg analysis, if a prompt photon is found radiated off from a jet.
-      if(mc_statusFlags[0] && nano.GenPart_genPartIdxMother().at(mc_idx) != -1 && nano.GenPart_pt().at(mc_idx) >= 10){
+      if(mc_statusFlags[0] && GenPart_genPartIdxMother.at(mc_idx) != -1 && nano.GenPart_pt().at(mc_idx) >= 10){
         
-        if (nano.GenPart_pdgId().at(nano.GenPart_genPartIdxMother().at(mc_idx)) == 5  || 
-            nano.GenPart_pdgId().at(nano.GenPart_genPartIdxMother().at(mc_idx)) == -5 || 
-            nano.GenPart_pdgId().at(nano.GenPart_genPartIdxMother().at(mc_idx)) == 4  || 
-            nano.GenPart_pdgId().at(nano.GenPart_genPartIdxMother().at(mc_idx)) == -4 || 
-            nano.GenPart_pdgId().at(nano.GenPart_genPartIdxMother().at(mc_idx)) == 3  || 
-            nano.GenPart_pdgId().at(nano.GenPart_genPartIdxMother().at(mc_idx)) == -3 || 
-            nano.GenPart_pdgId().at(nano.GenPart_genPartIdxMother().at(mc_idx)) == 2  || 
-            nano.GenPart_pdgId().at(nano.GenPart_genPartIdxMother().at(mc_idx)) == -2 || 
-            nano.GenPart_pdgId().at(nano.GenPart_genPartIdxMother().at(mc_idx)) == 1  || 
-            nano.GenPart_pdgId().at(nano.GenPart_genPartIdxMother().at(mc_idx)) == -1 || 
-            nano.GenPart_pdgId().at(nano.GenPart_genPartIdxMother().at(mc_idx)) == 21)    number_of_promptgamma += 1;     
+        if (nano.GenPart_pdgId().at(GenPart_genPartIdxMother.at(mc_idx)) == 5  || 
+            nano.GenPart_pdgId().at(GenPart_genPartIdxMother.at(mc_idx)) == -5 || 
+            nano.GenPart_pdgId().at(GenPart_genPartIdxMother.at(mc_idx)) == 4  || 
+            nano.GenPart_pdgId().at(GenPart_genPartIdxMother.at(mc_idx)) == -4 || 
+            nano.GenPart_pdgId().at(GenPart_genPartIdxMother.at(mc_idx)) == 3  || 
+            nano.GenPart_pdgId().at(GenPart_genPartIdxMother.at(mc_idx)) == -3 || 
+            nano.GenPart_pdgId().at(GenPart_genPartIdxMother.at(mc_idx)) == 2  || 
+            nano.GenPart_pdgId().at(GenPart_genPartIdxMother.at(mc_idx)) == -2 || 
+            nano.GenPart_pdgId().at(GenPart_genPartIdxMother.at(mc_idx)) == 1  || 
+            nano.GenPart_pdgId().at(GenPart_genPartIdxMother.at(mc_idx)) == -1 || 
+            nano.GenPart_pdgId().at(GenPart_genPartIdxMother.at(mc_idx)) == 21)    number_of_promptgamma += 1;     
       } 
 
     } //GenPart_pdgId==22
-
+    
     //Overlap removal for bbgg analysis: between diphoton, diphoton1b and diphoton2b analysis
     if(nano.GenPart_pdgId().at(mc_idx) == 5 || nano.GenPart_pdgId().at(mc_idx) == -5){
       
@@ -322,9 +322,10 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
         bool found_other_particles = false;
         
         for (int mc_idx_2 = 0; mc_idx_2 < nano.nGenPart(); mc_idx_2++) {     
-
           double isocone_bbgg_b = 0.1;
-          bitset<15> mc_statusFlags2(nano.GenPart_statusFlags().at(mc_idx_2));
+          //bitset<15> mc_statusFlags2(nano.GenPart_statusFlags().at(mc_idx_2)); old code
+          bitset<15> mc_statusFlags2(GenPart_statusFlags.at(mc_idx_2));
+
           compPart.SetPtEtaPhi(nano.GenPart_pt().at(mc_idx_2), 
                                nano.GenPart_eta().at(mc_idx_2), 
                                nano.GenPart_phi().at(mc_idx_2));
@@ -333,15 +334,19 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
 
           if ((compPart.Pt() >= 10.0) && (mc_idx != mc_idx_2) && (mc_statusFlags2[7] && genb.DeltaR(compPart) < isocone_bbgg_b)) {
             found_other_particles = true;
+
             break;
           }     
         }
+
         if (!found_other_particles) number_of_b += 1;
       } 
 
     } //GenPart_pdgId==5/-5
 
+
   } //loop over GenParts
+
 
   //This bit of code uses the overlap removal variable to then select whether an event should be kept or not. 
   //If the event contains should and does (does not) contain a generator photon then is_overlap_old = false, is_overlap = false, use_event = true (is_overlap_old=true, is_overlap=true, use_event=false)
@@ -391,8 +396,8 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
   
   if(year<=2018 && isWJets_LO  && nano.LHE_HT()>70.0f) 
     pico.out_stitch_htmet() = pico.out_stitch_ht() = pico.out_stitch() = false;
-  else if(year>=2022 && isWJets_LO && nano.LHE_HT()>40.0f)
-    pico.out_stitch_htmet() = pico.out_stitch_ht() = pico.out_stitch() = false; // Run 3 WJets samples have HT binning starting at 40GeV
+  else if(year>=2022 && isWJets_LO && nano.LHE_HT()>40.0f) {
+    pico.out_stitch_htmet() = pico.out_stitch_ht() = pico.out_stitch() = false; }// Run 3 WJets samples have HT binning starting at 40GeV
   return;
 }
 

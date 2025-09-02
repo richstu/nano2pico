@@ -37,13 +37,15 @@ void HigVarProducer::WriteHigVars(pico_tree &pico, bool doDeepFlav, bool isSigna
     }
   }
   
-  // ideally this should be in jetmet_producer.cpp but it will be moved once I understand what is going on in there
-  sort(ordered_by_pt.begin(), ordered_by_pt.end(), //* new addition
-        [](const pair<int, float> &a, const pair<int, float> &b) -> bool {
-          return a.second > b.second;
-        }); 
-  for (unsigned ijet(0); ijet<pico.out_jet_pt().size(); ijet++){
-    pico.out_jet_ordered_pt_indices().push_back(ordered_by_pt[ijet].first);
+  if (ordered_by_pt.size()>=1) {
+    // ideally this should be in jetmet_producer.cpp but it will be moved once I understand what is going on in there
+    sort(ordered_by_pt.begin(), ordered_by_pt.end(), //* new addition
+          [](const pair<int, float> &a, const pair<int, float> &b) -> bool {
+            return a.second > b.second;
+          });
+    for (unsigned ijet(0); ijet<pico.out_jet_pt().size(); ijet++){
+      pico.out_jet_ordered_pt_indices().push_back(ordered_by_pt[ijet].first);
+    }
   }
  
   // enough jets to make two higgses?
