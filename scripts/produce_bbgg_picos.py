@@ -183,12 +183,12 @@ def processMc(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, 
 
     #1
     [notify_script+' "Start merge corrections '+mc_tag+'"',
-    './scripts/merge_corrections.py --wgt_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/SMS-TChiHH-Hto2G-FullSIM_split/wgt_sums --corr_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/SMS-TChiHH-Hto2G-FullSIM_split/corrections/',
+    './scripts/merge_corrections.py --wgt_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/SMS-TChiHH-Hto2G-FullSIM_split/wgt_sums/ --corr_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/SMS-TChiHH-Hto2G-FullSIM_split/corrections/',
     notify_script+' "Finished merge corrections '+mc_tag+'"'],
     
     #2
     [notify_script+' "Start applied corrections '+mc_tag+'"',
-    './scripts/write_apply_corrections_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/SMS-TChiHH-Hto2G-FullSIM_split/raw_pico --tag '+mc_tag,
+    './scripts/write_apply_corrections_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/SMS-TChiHH-Hto2G-FullSIM_split/raw_pico/ --tag '+mc_tag,
     'auto_submit_jobs.py '+mc_tag+'_apply_corr_cmds.json -c scripts/check_apply_corrections_job.py -f',
     notify_script+' "Finished applied corrections '+mc_tag+'"'],
     
