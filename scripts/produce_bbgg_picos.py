@@ -183,7 +183,7 @@ def processMc(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, 
 
     #1
     [notify_script+' "Start merge corrections '+mc_tag+'"',
-    './scripts/merge_corrections.py --wgt_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/SMS-TChiHH-Hto2G-FullSIM_split/wgt_sums --corr_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/corrections/',
+    './scripts/merge_corrections.py --wgt_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/SMS-TChiHH-Hto2G-FullSIM_split/wgt_sums --corr_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/SMS-TChiHH-Hto2G-FullSIM_split/corrections/',
     notify_script+' "Finished merge corrections '+mc_tag+'"'],
     
     #2
