@@ -302,7 +302,6 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
                           jet_type_phi[ijet],jet_raw_pt,rho,nano.run(),
                           JECType::L1);
       }
-      //float jet_raw_pt = jet_type_pt[ijet]/jec_default;
       float jet_l1_pt = jet_raw_pt*jec_l1;
       float jet_l1l2l3_pt = jet_raw_pt*jec;
       float jet_raw_pt_nomu = jet_raw_pt*(1.0-jet_type_muonfactor[ijet]);
