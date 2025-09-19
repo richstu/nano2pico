@@ -85,7 +85,7 @@ def processSteps(process_commands, YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG
         print('\n')
       print('[Step '+str(iStep)+'] Next command to run')
       print('\n'.join(process_commands[iStep]))
-      #input('Press Enter to continue')
+      input('Press Enter to continue')
       FIRST_COMMAND = False
       break
 
