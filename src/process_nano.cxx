@@ -94,6 +94,7 @@ int main(int argc, char *argv[]){
       else if (regex_search(in_file, std::regex("RunIIFall17"))) year = 2017;
       else if (regex_search(in_file, std::regex("RunIIAutumn18"))) year = 2018;
       else if (regex_search(in_file, std::regex("Run3Summer22"))) year = 2022;
+      else if (regex_search(in_file, std::regex("Run3Summer23"))) year = 2023;
     }
   } else { // Data
     if (Contains(in_file, "HIPM")) isAPV = true;
@@ -400,7 +401,6 @@ int main(int argc, char *argv[]){
     vector<int> sig_el_pico_idx = vector<int>();
     vector<int> sig_mu_pico_idx = vector<int>();
     vector<int> photon_el_pico_idx = vector<int>();
-    
     vector<int> sig_el_nano_idx = el_producer.WriteElectrons(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, sig_el_pico_idx, photon_el_pico_idx, isZgamma, isFastsim);
     vector<int> sig_mu_nano_idx = mu_producer.WriteMuons(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, sig_mu_pico_idx, isZgamma, isFastsim);
     // save a separate vector with just signal leptons ordered by pt
@@ -426,7 +426,8 @@ int main(int argc, char *argv[]){
       vector<int> sig_ph_nano_idx = photon_producer.WritePhotons(nano, pico, jet_isphoton_nano_idx,
                                                                  sig_el_nano_idx, sig_mu_nano_idx,
                                                                  photon_el_pico_idx, isHiggsino);
-    event_tools.WriteStitch(nano, pico);
+
+    event_tools.WriteStitch(nano, pico);    
     tk_producer.WriteIsoTracks(nano, pico, sig_el_nano_idx, sig_mu_nano_idx, isFastsim, is_preUL);
     dilep_producer.WriteDileptons(pico, sig_el_pico_idx, sig_mu_pico_idx);
 

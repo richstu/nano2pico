@@ -518,14 +518,18 @@ namespace xsec{
 
     //bbgammagamma cross sections at 13.6 TeV
     //Background samples
-    if(file.Contains("GG-Box-3Jets_MGG-80_13p6TeV")) xsec = 126.7; // from XSDB
-    if(file.Contains("GJet_PT-20to40_DoubleEMEnriched_MGG-80_TuneCP5_13p6TeV_pythia8")) xsec = 219.2; 
-    if(file.Contains("GJet_PT-40_DoubleEMEnriched_MGG-80_TuneCP5_13p6TeV_pythia8")) xsec = 862.4;
-    if(file.Contains("TTto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8")) xsec = 831.8 * 0.105;
-    if(file.Contains("TTG-1Jets_PTG-10to100_TuneCP5_13p6TeV_amcatnloFXFXold-pythia8"))  xsec = 3.795;
-    if(file.Contains("TTG-1Jets_PTG-100to200_TuneCP5_13p6TeV_amcatnloFXFXold-pythia8"))  xsec = 3.795;
-    if(file.Contains("TTG-1Jets_PTG-200_TuneCP5_13p6TeV_amcatnloFXFXold-pythia8"))  xsec = 3.795;
-    
+    if(file.Contains("GG-Box-3Jets_MGG-80_13p6TeV")) xsec = 88.75; // from XSDB
+    if(file.Contains("GG-Box-1B-2Jets_MGG-80_13p6TeV_sherpa")) xsec = 82.51; //using run2 xsec, change this
+    if(file.Contains("GG-Box-2B-2Jets_MGG-80_13p6TeV_sherpa")) xsec = 0.8185; //using run2 xsec, change this
+    if(file.Contains("GJet_PT-20to40_DoubleEMEnriched_MGG-80_TuneCP5_13p6TeV_pythia8")) xsec = 242.5; // from XSDB
+    if(file.Contains("GJet_PT-40_DoubleEMEnriched_MGG-80_TuneCP5_13p6TeV_pythia8")) xsec = 919.1; // from XSDB
+    if(file.Contains("TTto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8")) xsec = 762.1 * 0.105; // from XSDB
+    if(file.Contains("TTG-1Jets_PTG-10to100_TuneCP5_13p6TeV_amcatnloFXFXold-pythia8"))  xsec = 4.216; // from XSDB
+    if(file.Contains("TTG-1Jets_PTG-100to200_TuneCP5_13p6TeV_amcatnloFXFXold-pythia8"))  xsec = 0.4114; // from XSDB
+    if(file.Contains("TTG-1Jets_PTG-200_TuneCP5_13p6TeV_amcatnloFXFXold-pythia8"))  xsec = 0.1284; // from XSDB
+    if(file.Contains("TTtoLplusNu2Q-3Jets_TuneCP5_13p6TeV_madgraphMLM-pythia8"))  xsec = 117.5 * 0.219; // from XSDB
+    if(file.Contains("TTtoLminusNu2Q-3Jets_TuneCP5_13p6TeV_madgraphMLM-pythia8"))  xsec = 117.5 * 0.219 ; // from XSDB
+
     // updated 4b background cross sections at 13 TeV
     // TTJets background from https://pdg.lbl.gov/2024/reviews/rpp2024-rev-top-quark.pdf
     if(file.Contains("TTJets_SingleLept") && !file.Contains("genMET-150"))		xsec=833.9*0.219; 

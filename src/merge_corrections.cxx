@@ -225,13 +225,13 @@ void FixLumi(corrections_tree &corr, const string &corr_path, int year){
     xsec::higgsinoCrossSection(mglu, xsec, exsec, year);
     xsec = xsec / .5824/.5824; // Remove H to bb branch ratio
     exsec = exsec / .5824/.5824; // Remove H to bb branch ratio
-  } else if (Contains(corr_path, "SMS-TChiHH")&&Contains(corr_path, "HToGG")) {
+  } else if (Contains(corr_path, "SMS-TChiHH")&& (Contains(corr_path, "HToGG") || Contains(corr_path, "Hto2G")) ) {
     double exsec(0.);
     int mglu = GetHiggsinoMass(corr_path);
     xsec::higgsinoCrossSection(mglu, xsec, exsec, year);
     xsec = xsec * (2*0.00227 - 0.00227 * 0.00227);
     exsec = exsec; // Is exsec in cross_sec.cpp already multiplied by .5824 * .5824?
-  } else if (Contains(corr_path, "SMS-TChiHZ")&&Contains(corr_path, "HToGG")) {
+  } else if (Contains(corr_path, "SMS-TChiHZ")&&(Contains(corr_path, "HToGG") || Contains(corr_path, "Hto2G"))) {
     double exsec(0.);
     int mglu = GetHiggsinoMass(corr_path);
     xsec::higgsinoCrossSection(mglu, xsec, exsec, year);

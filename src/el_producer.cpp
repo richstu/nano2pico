@@ -80,7 +80,8 @@ bool ElectronProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma) {
     }
   }
   else {
-    pt = nano.Electron_pt()[nano_idx]/nano.Electron_eCorr()[nano_idx];
+    //pt = nano.Electron_pt()[nano_idx]/nano.Electron_eCorr()[nano_idx];
+    pt = nano.Electron_pt()[nano_idx];
     int bitmap = nano.Electron_vidNestedWPBitmap()[nano_idx];
     bool isBarrel = fabs(eta) <= 1.479;
     bool id = idElectron_noIso(bitmap,3);
@@ -192,7 +193,8 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
     }
     else {
       // Redefine pt and eta to match RA2B ntuples
-      pt = nano.Electron_pt()[iel]/nano.Electron_eCorr()[iel];
+      //pt = nano.Electron_pt()[iel]/nano.Electron_eCorr()[iel];
+      pt = nano.Electron_pt()[iel];
       if (pt <= VetoElectronPtCut) continue;
       if (fabs(eta) > ElectronEtaCut) continue;
       int bitmap = nano.Electron_vidNestedWPBitmap()[iel];
