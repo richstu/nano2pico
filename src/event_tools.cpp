@@ -49,10 +49,10 @@ EventTools::EventTools(const string &name_, int year_, bool isData_, float nanoa
   if(Contains(name, "DiPhotonJetsBox_MGG") || Contains(name,"GG-Box-3Jets"))
     isDiphoton = true;
 
-  if(Contains(name, "DiPhotonJetsBox1BJet") || Contains(name, "DiPhotonJets-1BJet"))
+  if(Contains(name, "DiPhotonJetsBox1BJet") || Contains(name, "GG-Box-1B-2Jets"))
     isDiphoton1b = true;
 
-  if(Contains(name, "DiPhotonJetsBox2BJets") || Contains(name, "DiPhotonJets-2BJets"))
+  if(Contains(name, "DiPhotonJetsBox2BJets") || Contains(name, "GG-Box-2B-2Jets"))
     isDiphoton2b = true;
 
   if(Contains(name, "GJet_Pt") || Contains(name, "GJet_PT"))
