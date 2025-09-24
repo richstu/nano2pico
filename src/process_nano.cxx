@@ -57,7 +57,6 @@ void Initialize(corrections_tree& wgt_sums);
 void GetOptions(int argc, char *argv[]);
 
 int main(int argc, char *argv[]){
-  // gErrorIgnoreLevel=6000; // Turns off ROOT errors due to missing branches       
   GetOptions(argc, argv);
 
   if(in_file=="" || in_dir=="" || out_dir == "") {
@@ -116,7 +115,8 @@ int main(int argc, char *argv[]){
         is2022preEE = true;
       }
     } else {
-      if (!Contains(in_file, "Summer2022EE")){
+      if (!Contains(in_file, "Summer2022EE") && 
+          !Contains(in_file, "Summer22EE")){
         is2022preEE = true;
       }
     }
@@ -148,6 +148,7 @@ int main(int argc, char *argv[]){
     cout << "ERROR: unknown year";
     exit(1);
   }
+  cout << "Processing nano with settings for " << year_string << endl;
 
   //if (Contains(in_file, "RunIISummer20")) { 
   //  is_preUL = false;
@@ -283,6 +284,8 @@ int main(int argc, char *argv[]){
       rocco_file = "data/RoccoR2017.txt";
     else if (year==2018)
       rocco_file = "data/RoccoR2018.txt";
+    //else
+    //  cout<<"INFO: No rochester corrections for year."<<endl;
   }
   else {
     if (year==2016 && isAPV)
@@ -293,17 +296,19 @@ int main(int argc, char *argv[]){
       rocco_file = "data/zgamma/2017_UL/RoccoR2017UL.txt";
     else if (year==2018)
       rocco_file = "data/zgamma/2018_UL/RoccoR2018UL.txt";
+    //else
+    //  cout<<"INFO: No rochester corrections for year."<<endl;
   }
 
   //Initialize object producers
   GenParticleProducer mc_producer(year, nanoaod_version);
-  ElectronProducer el_producer(year, isData, isAPV, nanoaod_version);
-  MuonProducer mu_producer(year, isData, nanoaod_version, rocco_file);
+  ElectronProducer el_producer(year_string, isData, nanoaod_version);
+  MuonProducer mu_producer(year_string, isData, nanoaod_version, rocco_file);
   DileptonProducer dilep_producer(year);
   IsoTrackProducer tk_producer(year);
-  PhotonProducer photon_producer(year, isData, isAPV, nanoaod_version);
-  JetMetProducer jetmet_producer(year, nanoaod_version, min_jet_pt, max_jet_eta, 
-                                 isData, isAPV, is_preUL);
+  PhotonProducer photon_producer(year_string, isData, nanoaod_version);
+  JetMetProducer jetmet_producer(year, year_string, nanoaod_version, min_jet_pt, max_jet_eta, 
+                                 isData, is_preUL);
   HigVarProducer hig_producer(year);
   ZGammaVarProducer zgamma_producer(year);
   GammaGammaVarProducer gammagamma_producer(year);
@@ -311,7 +316,6 @@ int main(int argc, char *argv[]){
   BBGammaGammaVarProducer bbgammagamma_producer(year);
 
   //Initialize scale factor tools
-  std::cout<<"For years past 2018, currently using 2018 weights in Prefire, BTag, Lepton, Photon, and event by default. Remove this message only when this has been fixed."<<endl;
   const string ctr = "central";
   const vector<string> updn = {"up","down"};
   PrefireWeighter prefire_weighter(year, true);
@@ -324,16 +328,18 @@ int main(int argc, char *argv[]){
   PhotonWeighter photon_weighter(year, isZgamma || isHiggsino);
   // UL scale factors
   EventWeighter event_weighter(year_string, btag_df_wpts[year_string]);
-  TriggerWeighter trigger_weighter(year, isAPV);
+  TriggerWeighter trigger_weighter(year_string);
   //cout<<"Is APV: "<<isAPV<<endl;
 
   // Other tools
   EventTools event_tools(in_path, year, isData, nanoaod_version);
   int event_type = event_tools.GetEventType();
+  bool isDY = ((event_type / 100 == 62) || (event_type / 100 == 63)) && isZgamma;
 
   ISRTools isr_tools(in_path, year, nanoaod_version, isData);
 
   // Initialize trees
+  gErrorIgnoreLevel=6000; // Turns off ROOT errors due to missing branches
   nano_tree nano(in_path, nanoaod_version);
   //nano_tree nano(in_path, 9);
   size_t nentries(nent_test>0 ? nent_test : nano.GetEntries());
@@ -347,6 +353,7 @@ int main(int argc, char *argv[]){
   // cout << "Calculating weights based on " << year << " scale factors." << endl;
 
   pico_tree pico("", out_path);
+  gErrorIgnoreLevel=-1;
   cout << "Writing output to: " << out_path << endl;
 
   corrections_tree wgt_sums("", wgt_sums_path);
@@ -360,8 +367,8 @@ int main(int argc, char *argv[]){
     if (entry%2000==0 || entry == nentries-1) {
       cout<<"Processing event: "<<entry<<endl;
     }
-
     //skip events that are data but not in the golden json
+
     if (isData) {
       if(!inJSON(VVRunLumi, nano.run(), nano.luminosityBlock())) continue; 
     }
@@ -433,7 +440,7 @@ int main(int argc, char *argv[]){
 
     if (debug) cout<<"INFO:: Writing gen particles"<<endl;
 
-    if (!isData) mc_producer.WriteGenParticles(nano, pico);
+    if (!isData) mc_producer.WriteGenParticles(nano, pico, isDY);
     isr_tools.WriteISRSystemPt(nano, pico);
 
     if (debug) cout<<"INFO:: Writing jets, MET and ISR vars"<<endl;
@@ -441,9 +448,7 @@ int main(int argc, char *argv[]){
     vector<HiggsConstructionVariables> sys_higvars;
     vector<int> sig_jet_nano_idx = jetmet_producer.WriteJetMet(nano, pico, 
         jet_islep_nano_idx, jet_isvlep_nano_idx, jet_isphoton_nano_idx,
-        btag_wpts[year_string], btag_df_wpts[year_string], isFastsim, isSignal, 
-        is2022preEE, sys_higvars);
-
+        btag_wpts[year_string], btag_df_wpts[year_string], isFastsim, isSignal, sys_higvars);
     jetmet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year_string][1], isFastsim); // usually w.r.t. medium WP
     jetmet_producer.WriteFatJets(nano, pico, ddb_wpts[year_string], mdak8_wpts[year_string], pnetmd_wpts[year_string]); // jetmet_producer.SetVerbose(nano.nSubJet()>0);
     jetmet_producer.WriteSubJets(nano, pico);
@@ -476,6 +481,11 @@ int main(int argc, char *argv[]){
         }
       }
     } 
+
+    if (debug) cout<<"INFO:: Writing filters"<<endl;
+    // N.B. Jets: pico.out_pass_jets() and pico.out_pass_fsjets() filled in jetmet_producer
+    event_tools.WriteDataQualityFilters(nano, pico, sig_jet_nano_idx, min_jet_pt, isFastsim, is_preUL);
+
     if (debug) cout<<"INFO:: Writing analysis specific variables"<<endl;
     // might need as input sig_el_nano_idx, sig_mu_nano_idx, sig_ph_nano_idx
     if(isZgamma)
@@ -490,17 +500,11 @@ int main(int argc, char *argv[]){
     hig_producer.WriteHigVars(pico, false, isSignal, sys_higvars, nanoaod_version);
     hig_producer.WriteHigVars(pico, true, isSignal, sys_higvars, nanoaod_version);
 
-    if (debug) cout<<"INFO:: Writing filters and triggers"<<endl;
-    // N.B. Jets: pico.out_pass_jets() and pico.out_pass_fsjets() filled in jetmet_producer
-    event_tools.WriteDataQualityFilters(nano, pico, sig_jet_nano_idx, min_jet_pt, isFastsim, is_preUL);
+    if (debug) cout<<"INFO:: Writing triggers"<<endl;
 
     if (isHiggsino) event_tools.WriteTriggerEfficiency(pico);
-    if (isZgamma && !isData) { 
-      std::vector<float> zgamma_trigsfs = trigger_weighter.GetSF(pico);
-      pico.out_w_trig() = zgamma_trigsfs[0];
-      pico.out_sys_trig().resize(2,0.);
-      pico.out_sys_trig()[0] = zgamma_trigsfs[1];
-      pico.out_sys_trig()[1] = zgamma_trigsfs[2];
+    if (isZgamma && !isData) {
+      trigger_weighter.GetSF(pico);
     }
     else if(isHiggsino && !isData){ //Need to change this, hack for now
       pico.out_sys_trig().resize(2,0.);
@@ -514,10 +518,8 @@ int main(int argc, char *argv[]){
     if (debug) cout<<"INFO:: Calculating weights"<<endl;
     float w_lep(1.), w_fs_lep(1.);
     float w_photon(1.);
-    float w_photon_id(1.);
-    float w_photon_csev(1.);
     vector<float> sys_lep(2,1.), sys_fs_lep(2,1.);
-    vector<float> sys_photon(2,1.);
+    vector<float> sys_photon(2,1.), sys_photon_csev(2,1.);
 
     if (isData) {
       pico.out_w_btag()    = 1.; 
@@ -533,35 +535,47 @@ int main(int argc, char *argv[]){
       pico.out_sys_pu().resize(2, 0);
       pico.out_w_photon() = 1.;
       pico.out_w_trig() = 1.;
+      pico.out_w_isr() = 1.;
       pico.out_sys_photon().resize(2,0);
+      pico.out_sys_photon_csev().resize(2,0);
+      pico.out_sys_isr().resize(2,0);
+      pico.out_w_nnlo()   = 1.;
     } else { // MC
       if ((!is_preUL) || year>=2022) { //UL or run 3
         // ElectronISO SF need to be implemented for non-HToZgamma
         event_weighter.ElectronSF(pico);
+        event_weighter.ElectronMinisoSF(pico);
         event_weighter.MuonSF(pico);
+        event_weighter.MuonMinisoSF(pico);
         event_weighter.PileupSF(pico);
         event_weighter.bTaggingSF(pico);
-        event_weighter.PhotonIDSF(pico, w_photon_id);
-        event_weighter.PhotonCSEVSF(pico, w_photon_csev, sys_photon);
+        event_weighter.PhotonSF(pico);
+        event_weighter.PhotonShapeSF(pico);
+        event_weighter.FakePhotonSF(pico);
+        event_weighter.ZISRSF(pico);
+        event_weighter.NNLOCorrection(pico);
+        pico.out_sys_isr().resize(2,1.);
         pico.out_sys_lep().resize(2,1.); 
-        pico.out_sys_photon().resize(2, 1.); 
         pico.out_sys_prefire().resize(2, 1.); 
         pico.out_w_lep()          = pico.out_w_el() * pico.out_w_mu();
         pico.out_sys_lep()[0]     = pico.out_sys_el()[0]*pico.out_sys_mu()[0]; 
         pico.out_sys_lep()[1]     = pico.out_sys_el()[1]*pico.out_sys_mu()[1]; 
-        pico.out_w_photon()       = w_photon_id * w_photon_csev;
-        pico.out_sys_photon()[0]  = sys_photon[0];
-        pico.out_sys_photon()[1]  = sys_photon[1];
-        pico.out_w_prefire()      = nano.L1PreFiringWeight_Nom();
-        pico.out_sys_prefire()[0] = nano.L1PreFiringWeight_Up();
-        pico.out_sys_prefire()[1] = nano.L1PreFiringWeight_Dn();
         pico.out_sys_fs_bchig().resize(2,1.); 
         pico.out_sys_fs_udsghig().resize(2,1.); 
         pico.out_sys_fs_lep().resize(2,1.);
         pico.out_w_btag()    = 1.; 
-        pico.out_w_btag_df() = 1.; 
         pico.out_w_bhig()    = 1.; 
         pico.out_w_fs_lep()  = 1.;
+        if (year >= 2022) {
+          pico.out_w_prefire()      = 1.0;
+          pico.out_sys_prefire()[0] = 1.0;
+          pico.out_sys_prefire()[1] = 1.0;
+        }
+        else {
+          pico.out_w_prefire()      = nano.L1PreFiringWeight_Nom();
+          pico.out_sys_prefire()[0] = nano.L1PreFiringWeight_Up();
+          pico.out_sys_prefire()[1] = nano.L1PreFiringWeight_Dn();
+        }
       } else { // Pre-UL run 2
         pico.out_w_btag()    = btag_weighter.EventWeight(pico, BTagEntry::OP_MEDIUM, ctr, ctr);; 
         pico.out_w_btag_df() = btag_df_weighter.EventWeight(pico, BTagEntry::OP_MEDIUM, ctr, ctr); 
@@ -599,6 +613,9 @@ int main(int argc, char *argv[]){
           pico.out_sys_lep() = sys_lep;
         }
         pico.out_w_pu() = 1.; // To be implemented
+        pico.out_w_phshape() = 1.;
+        pico.out_w_fakephoton() = 1.;
+        pico.out_w_isr() = 1.;
         pico.out_sys_pu().resize(2, 0.); // Need to be implemented
         // N.B. out_w_prefire should not be renormalized because it models an inefficiency, 
         // i.e. we *should* get less events!
@@ -609,7 +626,14 @@ int main(int argc, char *argv[]){
         pico.out_sys_prefire() = sys_prefire;
       } // Pre-UL
     } // MC
-    if (!isZgamma) pico.out_w_photon() = 1.0;
+    if (!isZgamma) {
+      pico.out_w_photon() = 1.;
+      pico.out_w_phshape() = 1.;
+      pico.out_w_fakephoton() = 1.;
+      //piece of histotical machinery for madgraph tt and gluino samples
+      //probably should be deprecated
+      isr_tools.WriteISRWeights(pico);
+    }
 
     // to be calculated in Step 2: merge_corrections
     if (!isData)
@@ -617,21 +641,24 @@ int main(int argc, char *argv[]){
     else
       pico.out_w_lumi() = 1.;
 
-    //copy LHE scale variation weights and PS weights
+    //copy LHE scale variation, PDF, and PS weights
     if (!isData) {
       pico.out_sys_murf() = nano.LHEScaleWeight();
+      //pico.out_sys_pdf() = nano.LHEPdfWeight();
       pico.out_sys_ps() = nano.PSWeight();
     }
 
-    isr_tools.WriteISRWeights(pico);
-
-    
-    // do not include w_prefire, or anything that should not be renormalized! Will be set again in Step 3
+    // note: will be set again in Step 3
     if (isZgamma) {
-      pico.out_weight() = pico.out_w_lumi() *
-                          pico.out_w_lep() * pico.out_w_bhig() * pico.out_w_photon()  *
-                          pico.out_w_isr() * pico.out_w_pu() * pico.out_w_trig();
+      pico.out_weight() = pico.out_w_lumi() * pico.out_w_lep() * 
+                          pico.out_w_btag_df() * pico.out_w_photon()  *
+                          pico.out_w_isr() * pico.out_w_pu() * 
+                          pico.out_w_trig() * pico.out_w_phshape() * 
+                          pico.out_w_prefire() * pico.out_w_fakephoton() *
+                          pico.out_w_nnlo();
     } else {
+      // for non Z-gamma: do not put anything that will not be renormalized
+      // in weight
       pico.out_weight() = pico.out_w_lumi() *
                           pico.out_w_lep() * pico.out_w_fs_lep() * pico.out_w_bhig() *
                           pico.out_w_isr() * pico.out_w_pu();
@@ -673,25 +700,44 @@ int main(int argc, char *argv[]){
       wgt_sums.out_w_el()      += pico.out_w_el();
       wgt_sums.out_w_mu()      += pico.out_w_mu();
       wgt_sums.out_w_photon()  += pico.out_w_photon();
+      wgt_sums.out_w_phshape() += pico.out_w_phshape();
       wgt_sums.out_w_btag()    += pico.out_w_btag();
       wgt_sums.out_w_btag_df() += pico.out_w_btag_df();
       wgt_sums.out_w_bhig()    += pico.out_w_bhig();
       wgt_sums.out_w_bhig_df() += pico.out_w_bhig_df();
-      wgt_sums.out_w_isr()     += pico.out_w_isr();
       wgt_sums.out_w_pu()      += pico.out_w_pu();
       wgt_sums.out_w_trig()    += pico.out_w_trig();
-      
-      for(size_t i = 0; i<2; ++i){
-        wgt_sums.out_sys_el()[i]         += pico.out_sys_el()[i];
-        wgt_sums.out_sys_mu()[i]         += pico.out_sys_mu()[i];
-        wgt_sums.out_sys_photon()[i]     += pico.out_sys_photon()[i];
-        //wgt_sums.out_sys_trig()[i]       += pico.out_sys_trig()[i]; //causing problems somehow for v9 signal Fastsim sample production without JEC corrections, commenting for now
-        wgt_sums.out_sys_bchig()[i]      += pico.out_sys_bchig()[i];
-        wgt_sums.out_sys_udsghig()[i]    += pico.out_sys_udsghig()[i];
-        wgt_sums.out_sys_fs_bchig()[i]   += pico.out_sys_fs_bchig()[i];
-        wgt_sums.out_sys_fs_udsghig()[i] += pico.out_sys_fs_udsghig()[i];
-        wgt_sums.out_sys_isr()[i]        += pico.out_sys_isr()[i];
-        wgt_sums.out_sys_pu()[i]         += pico.out_sys_pu()[i];
+
+      if (isZgamma) {
+        //only sum w_ISR for events to which it applies (DY/DYG nllphoton>=1)
+        if (((pico.out_type() >= 6000 && pico.out_type() < 7000) ||
+              (pico.out_type() >= 17000 && pico.out_type() < 18000))
+              && pico.out_nllphoton() >= 1) {
+          wgt_sums.out_w_isr() += pico.out_w_isr();
+          wgt_sums.out_nent_isr() += 1.;
+        }
+      }
+      else {
+        wgt_sums.out_w_isr()     += pico.out_w_isr();
+      }
+      wgt_sums.out_w_nnlo()    += pico.out_w_nnlo();
+
+      for(size_t i = 0; i<2; ++i){ 
+        wgt_sums.out_sys_el()[i]           += pico.out_sys_el()[i];
+        wgt_sums.out_sys_mu()[i]           += pico.out_sys_mu()[i];
+        wgt_sums.out_sys_photon()[i]       += pico.out_sys_photon()[i];
+        wgt_sums.out_sys_photon_csev()[i]  += pico.out_sys_photon_csev()[i];
+        wgt_sums.out_sys_trig()[i]         += pico.out_sys_trig()[i];
+        wgt_sums.out_sys_trig_el()[i]      += pico.out_sys_trig_el()[i];
+        wgt_sums.out_sys_trig_mu()[i]      += pico.out_sys_trig_mu()[i];
+        wgt_sums.out_sys_bchig()[i]        += pico.out_sys_bchig()[i];
+        wgt_sums.out_sys_udsghig()[i]      += pico.out_sys_udsghig()[i];
+        wgt_sums.out_sys_fs_bchig()[i]     += pico.out_sys_fs_bchig()[i];
+        wgt_sums.out_sys_fs_udsghig()[i]   += pico.out_sys_fs_udsghig()[i];
+        wgt_sums.out_sys_isr()[i]          += pico.out_sys_isr()[i];
+        wgt_sums.out_sys_pu()[i]           += pico.out_sys_pu()[i];
+        wgt_sums.out_sys_bchig_uncorr()[i] += pico.out_sys_bchig_uncorr()[i];
+        wgt_sums.out_sys_udsghig_uncorr()[i] += pico.out_sys_udsghig_uncorr()[i];
       }
       for(size_t i = 0; i<pico.out_sys_murf().size(); ++i){ 
         wgt_sums.out_sys_murf()[i] += pico.out_sys_murf()[i];
@@ -699,6 +745,9 @@ int main(int argc, char *argv[]){
       for(size_t i = 0; i<pico.out_sys_ps().size(); ++i){ 
         wgt_sums.out_sys_ps()[i] += pico.out_sys_ps()[i];
       }
+      //for(size_t i = 0; i<pico.out_sys_pdf().size(); ++i){ 
+      //  wgt_sums.out_sys_pdf()[i] += pico.out_sys_pdf()[i];
+      //}
     }
     
     if (debug) cout<<"INFO:: Filling tree"<<endl;
@@ -714,6 +763,7 @@ int main(int argc, char *argv[]){
 void Initialize(corrections_tree &wgt_sums){
   wgt_sums.out_neff()              = 0;
   wgt_sums.out_nent_zlep()         = 0;
+  wgt_sums.out_nent_isr()          = 0;
   wgt_sums.out_neff_el()           = 0;
   wgt_sums.out_neff_pass_eltrigs() = 0;
   wgt_sums.out_tot_weight_l0()     = 0.;
@@ -726,6 +776,7 @@ void Initialize(corrections_tree &wgt_sums){
   wgt_sums.out_w_lep()       = 0.;
   wgt_sums.out_w_fs_lep()    = 0.;
   wgt_sums.out_w_photon()    = 0.;
+  wgt_sums.out_w_phshape()   = 0.;
   wgt_sums.out_w_btag()      = 0.;
   wgt_sums.out_w_btag_df()   = 0.;
   wgt_sums.out_w_bhig()      = 0.;
@@ -735,6 +786,7 @@ void Initialize(corrections_tree &wgt_sums){
   wgt_sums.out_w_trig()      = 0.;
   wgt_sums.out_w_zvtx_pass() = 0.;
   wgt_sums.out_w_zvtx_fail() = 0.;
+  wgt_sums.out_w_nnlo()      = 0.;
   // w_prefire should not be normalized
 
   wgt_sums.out_sys_el().resize(2,0);
@@ -742,15 +794,21 @@ void Initialize(corrections_tree &wgt_sums){
   wgt_sums.out_sys_lep().resize(2,0);
   wgt_sums.out_sys_fs_lep().resize(2,0);
   wgt_sums.out_sys_photon().resize(2,0);
+  wgt_sums.out_sys_photon_csev().resize(2,0);
   wgt_sums.out_sys_bchig().resize(2,0);
   wgt_sums.out_sys_udsghig().resize(2,0);
+  wgt_sums.out_sys_bchig_uncorr().resize(2,0);
+  wgt_sums.out_sys_udsghig_uncorr().resize(2,0);
   wgt_sums.out_sys_fs_bchig().resize(2,0);
   wgt_sums.out_sys_fs_udsghig().resize(2,0);
   wgt_sums.out_sys_isr().resize(2,0);
   wgt_sums.out_sys_pu().resize(2,0);
   wgt_sums.out_sys_trig().resize(2,0);
+  wgt_sums.out_sys_trig_el().resize(2,0);
+  wgt_sums.out_sys_trig_mu().resize(2,0);
   wgt_sums.out_sys_murf().resize(9,0);
   wgt_sums.out_sys_ps().resize(4,0);
+  //wgt_sums.out_sys_pdf().resize(102,0);
 }
 
 void GetOptions(int argc, char *argv[]){

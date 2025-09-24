@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include "TRandom3.h"
+
 #include "correction.hpp"
 #include "nano_tree.hpp"
 #include "pico_tree.hpp"
@@ -11,7 +13,7 @@
 class PhotonProducer{
 public:
 
-  explicit PhotonProducer(int year, bool isData, bool preVFP, float nanoaod_version);
+  explicit PhotonProducer(std::string year, bool isData, float nanoaod_version);
   ~PhotonProducer();
 
   // check what these should be in a relevant AN
@@ -26,6 +28,10 @@ public:
   const float FsrPhotondRCut    = 0.012;
   const float FsrSeparationReq  = 0.2;
 
+  bool IsSignal(nano_tree &nano, pico_tree &pico, int nano_idx, 
+                float scaleres_corr, float minLepDR, 
+                std::vector<int> &photon_el_pico_idx);
+
   std::vector<int> WritePhotons(nano_tree &nano, pico_tree &pico, 
                                 std::vector<int> &jet_isphoton_nano_idx, 
                                 std::vector<int> &sig_el_nano_idx, 
@@ -34,13 +40,16 @@ public:
                                 bool isHiggsino);
 
 private:
-  int year;
+  std::string year;
   bool isData;
   float nanoaod_version;
+  TRandom3 rng_;
 
   bool idPhoton(int bitmap, int level);
   std::unique_ptr<correction::CorrectionSet> cs_scale_syst_;
   correction::Correction::Ref map_scale_syst_;
+  correction::CompoundCorrection::Ref map_scale_;
+  correction::Correction::Ref map_smearing_;
   std::string str_scale_syst_;
 };
 

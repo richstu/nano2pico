@@ -3,7 +3,8 @@
 #include "hig_trig_eff.hpp"
 #include "TMath.h"
 #include <bitset>
-
+#include <vector>
+#include <unordered_map>
 using namespace std;
 
 EventTools::EventTools(const string &name_, int year_, bool isData_, float nanoaod_version_):
@@ -25,8 +26,40 @@ EventTools::EventTools(const string &name_, int year_, bool isData_, float nanoa
   isDiphoton2b(false),
   isGJet(false),
   isData(isData_),
+  bypass_overlap_removal(false),
+  has_photon_in_sample(false),
+  overlap_isocone(0.05),
+  overlap_pt(10.0),
   nanoaod_version(nanoaod_version_),
   dataset(-1){
+  
+  //pT,eta,isocone
+  std::string overlap_removal_key = "";
+  std::unordered_map<std::string,std::vector<float>> overlap_removal_map;
+  if(year<2020){
+    overlap_removal_map = {
+      {"DY",      {15.0, 0.05}},
+      {"DYlowpt", {9.0,  0.05}},
+      {"EWKZ",    {10.0, 0.05}}, //From Run card, "When ptgmin=0, all the other parameters are ignored" Will set ptg=10, miniso 0.05, and eta=999
+      {"TT",      {10.0, 0.05}},
+      {"ST",      {10.0, 0.05}},
+      {"WJ",      {15.0, 0.05}},
+      {"WW",      {20.0, 0.05}},
+      {"WZ",      {20.0, 0.05}},
+      {"ZZ",      {10.0, 0.05}}
+    };
+  } else {
+    overlap_removal_map = {
+      {"DY",   {10.0, 0.05}}, //999
+      {"EWKZ", {10.0, 0.05}}, //From Run card, "When ptgmin=0, all the other parameters are ignored" Will set ptg=10, miniso 0.05, and eta=999
+      {"TT",   {10.0, 0.05}}, //999
+      {"ST",   {10.0, 0.05}}, //From Run card, "When ptgmin=0, all the other parameters are ignored" Will set ptg=10, miniso 0.05, and eta=999
+      {"WJ",   {10.0, 0.05}},
+      //{"WW", {}}, //WWG Not found at UCSB or on DAS
+      {"WZ",   {20.0, 0.05}} //Untar and look
+      //{"ZZ", {}} //Not found at UCSB or on DAS
+    };
+  }
 
   if(Contains(name, "TTJets_") && Contains(name, "genMET-") && Contains(name, "madgraphMLM")) 
     isTTJets_LO_MET = true;
@@ -73,7 +106,6 @@ EventTools::EventTools(const string &name_, int year_, bool isData_, float nanoa
   if(Contains(name, "DYto2L-4Jets_MLL-50_Tune"))
     isDYJets_LO = true;
 
-
   //These four variables control the generator settings of the overlap removal variable in MC
   if(Contains(name, "WJetsToLNu") || Contains(name,"WGToLNuG_01J"))
     isWJ = true;
@@ -89,6 +121,53 @@ EventTools::EventTools(const string &name_, int year_, bool isData_, float nanoa
 
   if(Contains(name, "ZZ") && !Contains(name,"WZZ") && !Contains(name,"ZZZ") && !Contains(name,"HToZZ") && !Contains(name,"TChiHH"))
     isZZ = true; //ZZ or ZZG
+
+  //Sets variables for overlap removal
+  //DY
+  if((Contains(name,"DYJetsToLL_M-50") || Contains(name,"DYJetsToLL_M-50")) && year<2022){ has_photon_in_sample = false; overlap_removal_key = "DYlowpt";}
+  if((Contains(name,"DYJetsToLL_M-50") || Contains(name,"DYJetsToLL_M-50")) && year>=2022){ has_photon_in_sample = false; overlap_removal_key = "DY";}
+  if(Contains(name,"DYto2L-2Jets_MLL-50_TuneCP5")){ has_photon_in_sample = false; overlap_removal_key = "DY";}
+  if(Contains(name,"ZGToLLG_01J_5f_lowMLL_lowGPt")){ has_photon_in_sample = true;  overlap_removal_key = "DYlowpt";}
+  if(Contains(name,"ZGToLLG_01J_5f_TuneCP5") || Contains(name,"DYGto2LG-1Jets_MLL-50")){       has_photon_in_sample = true;  overlap_removal_key = "DY";} 
+
+  //TTbar samples
+  if(Contains(name,"TTTo2L2Nu") || Contains(name,"TTtoLNu2Q") || Contains(name,"TTJets") || Contains(name,"TTTo2L2Nu")){has_photon_in_sample = false; overlap_removal_key = "TT";}
+  if(Contains(name,"TTGJets") || Contains(name,"TTG-1Jets")){       has_photon_in_sample = true; overlap_removal_key = "TT";}
+
+  //WJets -- Dont currently have samples for Run 3 so dont apply overlap removal?
+  if(Contains(name,"WJetsToLNu") || Contains(name,"WtoLNu-2Jets")){    has_photon_in_sample=false; overlap_removal_key = "WJ";}
+  if(Contains(name,"WGToLNuG_01J")){  has_photon_in_sample=true; overlap_removal_key = "WJ";}
+  
+  //WW
+  if(Contains(name, "WW") && !Contains(name,"WWG") && !Contains(name,"WWW") && !Contains(name,"WWZ") && !Contains(name,"HToWW") && !Contains(name,"TChiHH")){
+    has_photon_in_sample=false; overlap_removal_key = "WW";
+  }
+  if(Contains(name, "WWG")){ has_photon_in_sample=true; overlap_removal_key = "WW"; }
+
+  //WZ
+  if(Contains(name, "WZ") && !Contains(name,"WZG") && !Contains(name,"WWZ") && !Contains(name,"WZZ") && !Contains(name,"TChiHH")){
+    has_photon_in_sample=false; overlap_removal_key = "WZ";
+  }
+  if(Contains(name, "WZG")){has_photon_in_sample=true; overlap_removal_key = "WZ";}
+
+  //ZZ
+  if(Contains(name, "ZZ") && !Contains(name,"ZZG") && !Contains(name,"WZZ") && !Contains(name,"ZZZ") && !Contains(name,"HToZZ") && !Contains(name,"TChiHH")){
+    has_photon_in_sample=false; overlap_removal_key = "ZZ";
+  }
+  if(Contains(name, "ZZG")){has_photon_in_sample=true; overlap_removal_key = "ZZ";}
+
+  //EWK ZG
+  if(Contains(name,"EWKZ2Jets") || Contains(name,"VBFto2L_MLL-50_TuneCP5")){has_photon_in_sample=false; overlap_removal_key = "EWKZ";}
+  if(Contains(name, "ZGamma2JToGamma2L2J_EWK") || Contains(name,"ZG2JtoG2L2J_EWK")){has_photon_in_sample=true; overlap_removal_key = "EWKZ";}
+
+  //Use the map to set the proper values for overlap removal
+  //Will still use some values for overlap removal in case this is incorrect, but will set use_event via the bypass_overlap_removal flag
+  if(overlap_removal_map.count(overlap_removal_key)==0){ bypass_overlap_removal = true; std::cout << "Using default values for overlap removal" << std::endl;
+  } else { 
+    overlap_pt = overlap_removal_map[overlap_removal_key][0]; overlap_isocone = overlap_removal_map[overlap_removal_key][1];
+    std::cout << "Using the following key for overlap removal: " << overlap_removal_key << std::endl;
+  }
+
 
   if(Contains(name, "EGamma")) // replaced SingleElectron and DoubleEG starting in 2018
     dataset = Dataset::EGamma;
@@ -168,22 +247,17 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
       }
     }
   }
-  //Need to include the new overlap removal by including the newer values for ZGtoLLG_lowMll_lowGPt
-  double ptmin = 9.0;
-  double isocone = 0.05;
-  if(isZZ || isTTJets_LO_Incl || Contains(name,"TTGJets") || isEWKZ){
-    ptmin = 10.0;
-  }
-  if(isWZ || isWW){
-    ptmin = 20.0;
-  }
-  if(isWJ){
-    ptmin = 15.0;
-  }
+    
+  //Here we still have the old method for overlap removal
+  //For the working overlap removal the information has been moved to the constructor
+  float ptmin = overlap_pt;
+  float isocone = overlap_isocone;
+  float ptmin_old = 15.0;
+  float etamax_old = 2.6;
+  float isocone_old = 0.05;
 
-  double ptmin_old = 15.0;
-  double etamax_old = 2.6;
-  double isocone_old = 0.05;
+  float ph_pt = 0;//avoiding floating point errors
+  float comp_pt = 0;//avoiding floating point errors
   if(isWW || isZZ || isTTJets_LO_Incl || Contains(name,"TTGJets")){
     ptmin_old = 10.0;
     etamax_old= 99.0;
@@ -221,24 +295,24 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
 
     if( nano.GenPart_pdgId().at(mc_idx) == 22 ){ // photons 
       TVector3 compPart,genPhoton;
-
       if( (mc_statusFlags[0] || mc_statusFlags[8]) ){  // Which are isPrompt or fromHardProcess
-        genPhoton.SetPtEtaPhi(nano.GenPart_pt().at(mc_idx), 
+        ph_pt = nano.GenPart_pt().at(mc_idx);
+        genPhoton.SetPtEtaPhi(ph_pt, 
                             nano.GenPart_eta().at(mc_idx), 
                             nano.GenPart_phi().at(mc_idx));
-
-        if( genPhoton.Pt() > ptmin){
+        if(ph_pt > ptmin){
           //check if another generator particle nearby
           bool found_other_particles = false;
           for (int mc_idx_2 = 0; mc_idx_2 < nano.nGenPart(); mc_idx_2++) {
             bitset<15> mc_statusFlags2(GenPart_statusFlags.at(mc_idx_2));
-            compPart.SetPtEtaPhi(nano.GenPart_pt().at(mc_idx_2), 
+            comp_pt = nano.GenPart_pt().at(mc_idx_2);
+            compPart.SetPtEtaPhi(comp_pt, 
                                  nano.GenPart_eta().at(mc_idx_2), 
                                  nano.GenPart_phi().at(mc_idx_2)); 
             
 
             //isPrompt and fromHardProcess already applied
-            if ( (compPart.Pt() > 5.0f) && (genPhoton.DeltaR(compPart) < isocone) && (mc_idx != mc_idx_2) && (mc_statusFlags2[8]) && (nano.GenPart_pdgId().at(mc_idx_2) != 22 )  ) {
+            if (  (comp_pt > 5.0f) && (genPhoton.DeltaR(compPart) < isocone) && (mc_idx != mc_idx_2) && (mc_statusFlags2[8]) && (nano.GenPart_pdgId().at(mc_idx_2) != 22 )  ) {
               found_other_particles = true;
               //Basically saying that a photon is not isolated so this is not SM Zgamma sample!
             }
@@ -350,56 +424,40 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
   } //loop over GenParts
 
 
-  //This bit of code uses the overlap removal variable to then select whether an event should be kept or not. 
   //If the event contains should and does (does not) contain a generator photon then is_overlap_old = false, is_overlap = false, use_event = true (is_overlap_old=true, is_overlap=true, use_event=false)
   //If the event contains should not and does not (does) contain a generator photon then is_overlap_old = true, is_overlap = false, use_event = true (is_overlap_old=false, is_overlap=true, use_event=false)
-  if( Contains(name,"ZZG") && found_higgs ){ //remove Higgs decays from ZZG sample
-    pico.out_is_overlap() = true; pico.out_use_event() = false;
-  } else if( (Contains(name, "TTGJets") ) || (isWZ && Contains(name, "WZG")) 
-             || (isZZ && Contains(name, "ZZG")) || Contains(name,"ZGToLLG") 
-             || (isWJ && Contains(name,"WGToLNuG_01J")) 
-             || (isEWKZ && Contains(name,"ZGamma2JToGamma2L2J_EWK")) ){
-    pico.out_use_event() = pico.out_is_overlap();
-  } else if( isTTJets_LO_Incl || Contains(name, "TTTo2L2Nu") || isWJ || isEWKZ
-             || (Contains(name, "DY") && !Contains(name, "DYG")) ){ //no WW due to bug in WWG
-    pico.out_use_event() = !pico.out_is_overlap();
-  } else if( isWZ && !found_hadronic_w ){ //WZG only generated with W->lnu
-    pico.out_use_event() = !pico.out_is_overlap();
-  } else if( isZZ && ntrulep==4 ){ //ZZ only generated with ZZ->4l
-    pico.out_use_event() = !pico.out_is_overlap();
-  } 
-    else if(isDiphoton || isDiphoton1b || isDiphoton2b){
-    if(number_of_b == 0){
-      pico.out_no_genb() = true;
-    }
-    else if(number_of_b == 1){
-      pico.out_one_genb() = true;
-    }
-    else if(number_of_b == 2){
-      pico.out_two_genb() = true;
-    }
-    else {
-      pico.out_threeormore_genb() = true;
-    }
-  }
-  else if(isGJet){
-    if(number_of_promptgamma == 1){
-      pico.out_use_event() = true; 
-    }
+  //This one line, with the addition of the has_photon_in_sample variable should properly set the use_event variable;
+  if(bypass_overlap_removal){
+    pico.out_use_event() = true;
+  } else {
+    pico.out_use_event() = pico.out_is_overlap()==has_photon_in_sample;
   }
 
-  else {
+  //This code handles the exceptions to the overlap removal 
+  if( Contains(name,"ZZG") && found_higgs ){ //remove Higgs decays from ZZG sample
+    pico.out_is_overlap() = true;  pico.out_use_event() = false;
+  }  else if( isWZ && !has_photon_in_sample  && found_hadronic_w ){ //WZG only generated with W->lnu
+    pico.out_is_overlap()=false;   pico.out_use_event() = true;
+  } else if( isZZ && ntrulep!=4 ){ //ZZ only generated with ZZ->4l
     pico.out_is_overlap() = false; pico.out_use_event() = true;
+  } else if(isDiphoton || isDiphoton1b || isDiphoton2b){
+        if(number_of_b == 0) pico.out_no_genb() = true;
+        else if(number_of_b == 1) pico.out_one_genb() = true;
+        else if(number_of_b == 2) pico.out_two_genb() = true;
+        else pico.out_threeormore_genb() = true;
+  } else if(isGJet){
+      if(number_of_promptgamma == 1) pico.out_use_event() = true; 
   }
-  //Note: removed overlap removal for WW and WWG since WWG sample may have bug
 
   if(isDYJets_LO  && nano.LHE_HT()>70.0f) 
     pico.out_stitch_htmet() = pico.out_stitch_ht() = pico.out_stitch() = false;
   
   if(year<=2018 && isWJets_LO  && nano.LHE_HT()>70.0f) 
     pico.out_stitch_htmet() = pico.out_stitch_ht() = pico.out_stitch() = false;
-  else if(year>=2022 && isWJets_LO && nano.LHE_HT()>40.0f) {
-    pico.out_stitch_htmet() = pico.out_stitch_ht() = pico.out_stitch() = false; }// Run 3 WJets samples have HT binning starting at 40GeV
+  else if(year>=2022 && isWJets_LO && nano.LHE_HT()>40.0f) 
+    pico.out_stitch_htmet() = pico.out_stitch_ht() = pico.out_stitch() = false; // Run 3 WJets samples have HT binning starting at 40GeV
+  
+
   return;
 }
 
@@ -504,6 +562,17 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
   } else {
     if (nanoaod_version+0.01 < 9) {
       pico.out_pass_badcalib() = nano.Flag_ecalBadCalibFilterV2();
+    } else if(year>=2022){
+      bool ecal_pass = true;
+      if(isData && nano.PuppiMET_pt()>100.f && (nano.run()>=362433 && nano.run()<=367144)){
+        for(int ijet(0); ijet < nano.nJet(); ijet++) {
+          if(nano.Jet_pt()[ijet]>50.f && nano.Jet_eta()[ijet]>-0.5f && nano.Jet_eta()[ijet]<-0.1f
+                     && nano.Jet_phi()[ijet]>-2.1f && nano.Jet_phi()[ijet]<-1.8f
+                     && (nano.Jet_neEmEF()[ijet]>0.9f || nano.Jet_chEmEF()[ijet]>0.9f)
+                     && DeltaPhi(nano.PuppiMET_phi(),nano.Jet_phi()[ijet])>2.9f) ecal_pass = false;
+        }
+      }
+      pico.out_pass_badcalib() = ecal_pass;
     } else {
       pico.out_pass_badcalib() = nano.Flag_ecalBadCalibFilter();
     }
@@ -999,13 +1068,13 @@ int EventTools::GetEventType(){
       if(Contains(name, "HT600toInf")){ bin = 0;
       }
     }
-  }else if(Contains(name, "ttH") && !Contains(name,"HToZG")){ sample = 9;
+  }else if(Contains(name, "ttH") && !Contains(name,"HToZG") && !Contains(name,"HtoZG")){ sample = 9;
     if(Contains(name, "ttHJetToGG")){       category = 0; bin = 0;
     }else if(Contains(name, "HToZZ")){      category = 1; bin = 0;
     }else if(Contains(name, "HToWW")){      category = 2; bin = 0;
     }else if(Contains(name, "HToTauTau")){  category = 3; bin = 0;
     }else if(Contains(name, "ttHJetTobb")){ category = 4; bin = 0; //previously category 0
-    }else if(Contains(name, "HToMuMu")){    category = 5; bin = 0;
+    }else if(Contains(name, "HToMuMu") || Contains(name,"Hto2Mu")){ category = 5; bin = 0;
     }
   }else if(Contains(name, "TTGJets")){ sample = 10;
     if(Contains(name, "TTGJets_Tune")){ category = 0; bin = 0;
@@ -1013,21 +1082,21 @@ int EventTools::GetEventType(){
   }else if(Contains(name, "TTTT")){ sample = 11;
     if(Contains(name, "TTTT_Tune")){ category = 0; bin = 0;
     }
-  }else if((Contains(name, "WH_") || Contains(name,"WplusH") || Contains(name,"WminusH") ) && !Contains(name,"TChiWH") && !Contains(name,"HToZG")){ sample = 12;
+  }else if((Contains(name, "WH_") || Contains(name,"WplusH") || Contains(name,"WminusH") ) && !Contains(name,"TChiWH") && !Contains(name,"HToZG") && !Contains(name,"HtoZG")){ sample = 12;
     if(Contains(name, "HToGG")){           category = 0; bin = 0;
     }else if(Contains(name, "HToZZ")){     category = 1; bin = 0;
     }else if(Contains(name, "HToWW")){     category = 2; bin = 0;
     }else if(Contains(name, "HToTauTau")){ category = 3; bin = 0;
     }else if(Contains(name, "HToBB")){     category = 4; bin = 0; //previously category 0
-    }else if(Contains(name, "HToMuMu")){   category = 5; bin = 0;
+    }else if(Contains(name, "HToMuMu") || Contains(name,"Hto2Mu")){   category = 5; bin = 0;
     }
-  }else if(Contains(name, "ZH") && !Contains(name,"HToZG") && !Contains(name, "T5qqqqZH")){ sample = 13;
+  }else if(Contains(name, "ZH") && !Contains(name,"HToZG") && !Contains(name,"HtoZG") && !Contains(name, "T5qqqqZH")){ sample = 13;
     if(Contains(name, "HToGG")){           category = 0; bin = 0;
     }else if(Contains(name, "HToZZ")){     category = 1; bin = 0;
     }else if(Contains(name, "HToWW")){     category = 2; bin = 0;
     }else if(Contains(name, "HToTauTau")){ category = 3; bin = 0;
     }else if(Contains(name, "HToBB")){     category = 4; bin = 0; //previously category 0
-    }else if(Contains(name, "HToMuMu")){   category = 5; bin = 0;
+    }else if(Contains(name, "HToMuMu") || Contains(name, "Hto2Mu")){   category = 5; bin = 0;
     }
   }else if(Contains(name, "WW") && !Contains(name,"WWG") && !Contains(name,"WWW") && !Contains(name,"WWZ") && !Contains(name,"HToWW") && !Contains(name,"TChiHH")){ sample = 14;
     if(Contains(name, "WWToLNuQQ")){ category = 0; bin = 0;
@@ -1052,7 +1121,11 @@ int EventTools::GetEventType(){
       if(Contains(name,"PTG-10to50")){         bin = 0;
       }else if(Contains(name,"PTG-50to100")){  bin = 1;
       }else if(Contains(name,"PTG-100to200")){ bin = 2;
-      }else if(Contains(name,"PTG-200")){      bin = 3;
+      }else if(Contains(name,"PTG-200_")){     bin = 3;
+      }else if(Contains(name,"PTG-10to100")){  bin = 4;
+      }else if(Contains(name,"PTG-200to400")){ bin = 5;
+      }else if(Contains(name,"PTG-400to600")){ bin = 6;
+      }else if(Contains(name,"PTG-600")){      bin = 7;
       }
     }
   }else if(Contains(name, "TGJets")) { sample = 18; bin = 0;
@@ -1076,21 +1149,21 @@ int EventTools::GetEventType(){
     }
   }else if(Contains(name, "WZZ")){ sample = 26; category = 0; bin = 0;
   }else if(Contains(name, "ZZZ")){ sample = 27; category = 0; bin = 0;
-  }else if(Contains(name, "GluGluH") && !Contains(name,"HToZG")){ sample = 28;
+  }else if(Contains(name, "GluGluH") && !Contains(name,"HToZG") && !Contains(name,"HtoZG")){ sample = 28;
     if(Contains(name, "HToGG")){           category = 0; bin = 0;
     }else if(Contains(name, "HToZZ")){     category = 1; bin = 0;
     }else if(Contains(name, "HToWW")){     category = 2; bin = 0;
     }else if(Contains(name, "HToTauTau")){ category = 3; bin = 0;
     }else if(Contains(name, "HToBB")){     category = 4; bin = 0;
-    }else if(Contains(name, "HToMuMu")){   category = 5; bin = 0;
+    }else if(Contains(name, "HToMuMu") || Contains(name,"Hto2Mu")){   category = 5; bin = 0;
     }
-  }else if(Contains(name, "VBFH") && !Contains(name,"HToZG")){ sample = 29;
+  }else if(Contains(name, "VBFH") && !Contains(name,"HToZG") && !Contains(name,"HtoZG")){ sample = 29;
     if(Contains(name, "HToGG")){           category = 0; bin = 0;
     }else if(Contains(name, "HToZZ")){     category = 1; bin = 0;
     }else if(Contains(name, "HToWW")){     category = 2; bin = 0;
     }else if(Contains(name, "HToTauTau")){ category = 3; bin = 0;
     }else if(Contains(name, "HToBB")){     category = 4; bin = 0;
-    }else if(Contains(name, "HToMuMu")){   category = 5; bin = 0;
+    }else if(Contains(name, "HToMuMu") || Contains(name,"Hto2Mu")){   category = 5; bin = 0;
     }
   }else if(Contains(name, "WGTo") && !Contains(name,"WWG")){ sample = 30; category = 0; bin = 0;
   }else if(Contains(name, "T1tttt")){ sample = 100; category = 0; bin = 0;
@@ -1101,7 +1174,7 @@ int EventTools::GetEventType(){
   }else if(Contains(name, "RPV")){    sample = 105; category = 0; bin = 0;
   }else if(Contains(name, "TChiHH")){ sample = 106; category = 0; bin = 0;
   }else if(Contains(name, "T5qqqqZH")){ sample = 107; category = 0; bin = 0;
-  }else if(Contains(name, "HToZG")) { sample = 200; bin = 0;
+  }else if(Contains(name, "HToZG")||Contains(name,"HtoZG")) { sample = 200; bin = 0;
     if(Contains(name,"GluGluH"))      category = 0; 
     else if(Contains(name,"VBF"))     category = 1; 
     else if(Contains(name,"WplusH"))  category = 2; 
@@ -1132,5 +1205,7 @@ void EventTools::WriteTriggerEfficiency(pico_tree &pico) {
   pico.out_sys_trig().resize(2,0);
   pico.out_sys_trig()[0] = 1+effunc;
   pico.out_sys_trig()[1] = 1-effunc;
+  pico.out_sys_trig_el().resize(2,0);
+  pico.out_sys_trig_mu().resize(2,0);
 
 }

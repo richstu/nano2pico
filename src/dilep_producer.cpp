@@ -17,7 +17,7 @@ void DileptonProducer::WriteDileptons(pico_tree &pico,
                                       std::vector<int> sig_el_pico_idx, std::vector<int> sig_mu_pico_idx) {
   pico.out_nll() = 0;
   if (pico.out_nmu() < 2 && pico.out_nel() < 2) return;
-  double mindm(999), zmass(91.1876);
+  double mindm(99999), zmass(91.1876);
   int nll(0), shift(0);
   TLorentzVector l1err, l2err;
   double ptl1err, ptl2err;

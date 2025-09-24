@@ -35,6 +35,7 @@ if args['dataset_list']!='':
   datasets = []
   with open(args['dataset_list']) as f:
     datasets = f.readlines()
+    #print(datasets)
   if (list_format == "DAS"):
     wanted_file_substr = []
     if args['data']:
@@ -51,9 +52,15 @@ if args['dataset_list']!='':
         tmp_ = ds.split("/")
         wanted_file_substr.append(re.sub(r'(NanoAODv\d+|NanoAODAPVv\d+|NanoAODv9UCSB1|NanoAODAPVv9UCSB1)-', r'\1__',tmp_[1]+'__'+tmp_[2]))
     for istr in wanted_file_substr:
+      found=False
       for ifile in all_file_paths:
-        if (istr in ifile):
+        #For all files checking that it matches a wanted dataset. The '/' removes possiblity of one file being added multiple times
+        if (('/' + istr) in ifile):
           in_file_paths.append(ifile)
+          found=True
+          #print(ifile)
+        if(not found and (ifile==all_file_paths[-1])):
+          print("Dataset not found, there may be a typo: " + istr)
   else:
     print(datasets)
     for ds in datasets:

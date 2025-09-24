@@ -11,7 +11,24 @@ namespace xsec{
     float xsec(-999999.), Htobb(0.5824), HToZG(0.001533), ZToLL(0.100974);
     float HToGG(0.00227), HToMM(0.000218), HToTT(0.06256);
     float HToZZ(0.02641), ZToQQ(0.69911), ZToNuNu(0.2);
-    float WToLNu(0.1086), HToWW(0.2152);
+    float WToLNu(0.3258), HToWW(0.2152), WToQQ(0.6742);
+    float HToZG_onshellfrac(0.96934);
+
+    float xs_ggh = 48.58;
+    float xs_vbf = 3.782;
+    float xs_wmh = 0.5328;
+    float xs_wph = 0.8400;
+    float xs_z_h = 0.8839;
+    float xs_tth = 0.5071;
+    if (year >= 2022) {
+      //13.6 TeV interrim XS values from https://twiki.cern.ch/twiki/bin/view/LHCPhysics/LHCHWG136TeVxsec_extrap
+      xs_ggh = 52.23;
+      xs_vbf = 4.078;
+      xs_wmh = 0.5677;
+      xs_wph = 0.8889;
+      xs_z_h = 0.9439;
+      xs_tth = 0.5700;
+    }
 
     if (year == 2016) {
         //  Cross-section taken from https://twiki.cern.ch/twiki/bin/view/LHCPhysics/TtbarNNLO
@@ -85,7 +102,7 @@ namespace xsec{
 
         if(file.Contains("DYJetsToLL_M-10to50_TuneCUETP8M1")) xsec = 18610*1.23;
         if(file.Contains("DYJetsToLL_M-50_TuneCUETP8M1"))     xsec = 4895*1.23;
-        if(file.Contains("DYJetsToLL_M-50_TuneCP5"))          xsec = 6077.22;
+        if(file.Contains("DYJetsToLL_M-50_TuneCP5"))          xsec = 6077.22; // https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat13TeV
 
         if(file.Contains("DYJetsToLL_M-50_HT-70to100_TuneCUETP8M1"))    xsec = 175.3*1.23;
         if(file.Contains("DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1"))   xsec = 139.4*1.23;
@@ -343,12 +360,80 @@ namespace xsec{
         if(file.Contains("ZH_HToBB_ZToNuNu_M125"))    xsec = 0.883*Htobb*0.2;
         if(file.Contains("WHiggs0PMToBB"))     xsec = 1.373*Htobb*(0.1071+0.1063+0.1138); //using same as 2016
 
-    } else if (year == 2022) {
-        if(file.Contains("DYto2L-2Jets_MLL-50_TuneCP5"))     xsec = 6688.0; // from XSDB
-        if(file.Contains("ZZ_TuneCP5_13p6TeV"))   xsec = 12.75;             // from XSDB
-        if(file.Contains("WZGtoLNuZG_TuneCP5_13p6TeV")) xsec = 0.08425;     // from XSDB
-        if(file.Contains("TTto2L2Nu_TuneCP5_13p6TeV")) xsec = 762.1*WToLNu*WToLNu*9;     // from XSDB; Both ttbar cross sections have same listed cross section so branching fractions are applied
-        if(file.Contains("TTtoLNu2Q_TuneCP5CR1_13p6TeV")) xsec = 762.1*2*WToLNu*3*(1-WToLNu);     // from XSDB
+    }
+
+    if (year < 2022) {
+        // All triboson xsecs using method from https://arxiv.org/pdf/2006.11191.pdf, with values from https://twiki.cern.ch/twiki/bin/view/LHCPhysics/HiggsXSBR and xsdb combined
+        if(file.Contains("WWW_4F_Tune"))                xsec = 0.2158 + HToWW*(xs_wph+xs_wmh); // xsdb value (LO)+ (pp->VH)*BR(H->VV). Method used for all VVV xsecs.
+        if(file.Contains("WWW_4F_DiLeptonFilter_Tune")) xsec = (0.2158 + HToWW*(xs_wph+xs_wmh)) * ((WToLNu*WToLNu*WToLNu) + (WToLNu*WToLNu*WToQQ*3.0));
+        if(file.Contains("WWZ_Tune"))                   xsec = 0.1676 + HToWW*(xs_z_h);
+        if(file.Contains("WWZ_4F_Tune"))                xsec = 0.1676 + HToWW*(xs_z_h);
+        if(file.Contains("WWZJetsTo4L2Nu_4F_Tune"))     xsec = (0.1676 + HToWW*(xs_z_h)) * WToLNu * WToLNu * ZToLL; 
+        if(file.Contains("WZZ_Tune"))                   xsec = 0.05709 + HToZZ*(xs_wph+xs_wmh);
+        if(file.Contains("ZZZ_Tune"))                   xsec = 0.01476 + HToZZ*(xs_z_h);
+
+    } else if (year >= 2022) {
+        //below from XSDB
+        //single boson
+        if(file.Contains("WtoLNu-2Jets_TuneCP5_13p6TeV")) xsec = 67710.0;
+        if(file.Contains("WGtoLNuG-1Jets_PTG-10to100_TuneCP5_13p6TeV"))         xsec = 662.2;
+        if(file.Contains("WGtoLNuG-1Jets_PTG-100to200_TuneCP5"))                xsec = 2.221;
+        if(file.Contains("WGtoLNuG-1Jets_PTG-200to400_TuneCP5"))                xsec = 0.2908;
+        if(file.Contains("WGtoLNuG-1Jets_PTG-400to600_TuneCP5_13p6TeV"))        xsec = 0.02231;
+        if(file.Contains("WGtoLNuG-1Jets_PTG-600_TuneCP5_13p6TeV"))             xsec = 0.004907;
+
+        if(file.Contains("DYJetsToLL_M-50_TuneCP5"))      xsec = 5558.0;
+        if(file.Contains("DYto2L-2Jets_MLL-50_TuneCP5"))  xsec = 6688.0;
+
+        if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-10to100_TuneCP5_13p6TeV"))  xsec = 126.6;
+        if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-100to200_TuneCP5_13p6TeV")) xsec = 0.3493;
+        if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-200to400_TuneCP5_13p6TeV")) xsec = 0.04331;
+        if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-400to600_TuneCP5_13p6TeV")) xsec = 0.00313;
+        if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-600_TuneCP5_13p6TeV"))      xsec = 0.0006528;
+    
+        if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-10to50_TuneCP5_13p6TeV"))   xsec = 124;
+        if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-50to100_TuneCP5_13p6TeV"))  xsec = 2.088;
+        if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-200_TuneCP5_13p6TeV"))      xsec = 0.04723;
+    
+        //tt
+        if(file.Contains("TTto2L2Nu_TuneCP5_13p6TeV"))    xsec = 762.1*WToLNu*WToLNu;
+        if(file.Contains("TTtoLNu2Q_TuneCP5CR1_13p6TeV")) xsec = 762.1*2.0*WToLNu*WToQQ;
+
+        if(file.Contains("TTLL_MLL-50_TuneCP5_13p6TeV_amcatnlo")) xsec = 0.08646; //XSDB
+        if(file.Contains("TTLNu-1Jets_TuneCP5_13p6TeV_amcatnloFXFX")) xsec = 0.2505; //XSDB
+
+        if(file.Contains("TTG-1Jets_PTG-10to100_TuneCP5_13p6TeV"))             xsec = 4.216;
+        if(file.Contains("TTG-1Jets_PTG-100to200_TuneCP5_13p6TeV"))            xsec = 0.4114;
+        if(file.Contains("TTG-1Jets_PTG-200_TuneCP5_13p6TeV"))                 xsec = 0.1284;
+
+        if(file.Contains("TTLNu-1Jets_TuneCP5_13p6TeV"))                       xsec = 0.2505;
+        if(file.Contains("TTLL_MLL-50_TuneCP5_13p6TeV"))                       xsec = 0.08646;
+        if(file.Contains("TT_TuneCP5_13p6TeV_powheg-pythia8"))                 xsec = 762.3;
+
+        //ST
+        if(file.Contains("TBbartoLplusNuBbar-s-channel")) xsec = 2.278;
+        if(file.Contains("TBbarQ_t-channel_4FS_TuneCP5_13p6TeV"))              xsec = 123.8;
+        if(file.Contains("TbarBQ_t-channel_4FS_TuneCP5_13p6TeV"))              xsec = 75.47;
+        if(file.Contains("TGQB-4FS_TuneCP5_13p6TeV"))                          xsec = 3.873;//XSDB
+        if(file.Contains("TbarBtoLminusNuB-s-channel-4FS_TuneCP5_13p6TeV"))    xsec = 1.43;
+
+        //diboson
+        if(file.Contains("WW_Tune"))                      xsec = 80.23;
+        if(file.Contains("WZ_Tune"))                      xsec = 29.10;
+        if(file.Contains("WZGtoLNuZG"))                   xsec = 0.08425;
+        if(file.Contains("ZZ_Tune"))                      xsec = 12.75;
+        if(file.Contains("ZZto2L2Q_TuneCP5_13p6TeV"))     xsec = 6.788; //XSDB
+        if(file.Contains("ZZto2L2Nu_TuneCP5_13p6TeV"))    xsec = 1.031; //XSDB
+        if(file.Contains("ZZto4L_TuneCP5_13p6TeV"))       xsec = 1.39; //XSDB
+        if(file.Contains("WWto2L2Nu_TuneCP5_13p6TeV"))    xsec = 11.79; //XSDB
+        if(file.Contains("WZto2L2Q_TuneCP5_13p6TeV"))     xsec = 7.568; //XSDB
+        if(file.Contains("WZto3LNu_TuneCP5_13p6TeV"))     xsec = 4.924; //XSDB
+
+        //triboson using method from https://arxiv.org/pdf/2006.11191.pdf, with values from https://twiki.cern.ch/twiki/bin/view/LHCPhysics/HiggsXSBR and xsdb combined
+        if(file.Contains("WWW_4F"))                       xsec = 0.2328 + (xs_wph+xs_wmh)*HToWW; // xsdb value (LO)+ (pp->VH)*BR(H->VV)
+        if(file.Contains("WWZ_4F"))                       xsec = 0.1851 + (xs_z_h)*HToZZ;
+        if(file.Contains("WZZ_Tune"))                     xsec = 0.06206 + (xs_wph+xs_wmh)*HToZZ;
+        if(file.Contains("ZZZ_Tune"))                     xsec = 0.01591 + (xs_z_h)*HToZZ;
     }
 
     if(file.Contains("ttHTobb_M125")) xsec = 0.2934;
@@ -357,14 +442,13 @@ namespace xsec{
     // https://twiki.cern.ch/twiki/bin/viewauth/CMS/SummaryTable1G25ns
     if(file.Contains("ZGamma2JToGamma2L2J_EWK"))      xsec = 0.1145; // from XSDB
     //NOT FOUND ON XSDB if(file.Contains("ZG2JtoG2L2J_EWK_MLL-50_MJJ-120_TuneCP5_withDipoleRecoil_13p6TeV"))      xsec = ; // from XSDB
+    if(file.Contains("ZG2JtoG2L2J_EWK_MLL-50_MJJ-120_TuneCP5_13p6TeV"))   xsec = 0.1136;
 
     if(file.Contains("WJetsToLNu") && !file.Contains("ttWJetsToLNu"))     xsec = 66680.0;  // from XSDB
-    if(file.Contains("WtoLNu-2Jets_TuneCP5_13p6TeV"))  xsec = 67710.0;  // from XSDB
 
     if(file.Contains("ZGTo2LG"))                      xsec = 117.864; // 123.8 in XSDB
     if(file.Contains("ZGToLLG"))                      xsec = 55.48; // Other sample name
     if(file.Contains("ZGToLLG_01J_5f_lowMLL_lowGPt")) xsec = 172.4; // Other sample name
-
 
     if(file.Contains("TTJets_Tune") && file.Contains("madgraphMLM"))  xsec = 833.9;
     if(file.Contains("TGJets") && !file.Contains("TTGJets")) xsec = 2.997;
@@ -374,36 +458,69 @@ namespace xsec{
 
     if(file.Contains("LLAJJ"))                      xsec = 0.1084;  // from XSDB
     if(file.Contains("WWG_Tune"))                   xsec = 0.2147;  // from XSDB Note: One W forced to l nu. Also possible bug for lvlv
-    if(file.Contains("WZG_Tune"))                   xsec = 0.04345; // from XSDB Note: W forced to l nu
+    if(file.Contains("WZG_Tune"))                   xsec = 0.07876; // 0.04345 previously, this was preUL value. XSDB Note: W forced to l nu
     if(file.Contains("ZZGTo4L_Tune"))               xsec = 0.02202; // from XSDB
 
-    // From https://arxiv.org/pdf/2006.11191.pdf Using Measured XSec for WWW,WWZ, and WZZ. For ZZZ used SM prediction
-    //Note WToLNu factor is only for ONE lepton flavor
-    if(file.Contains("WWW_4F_Tune"))                xsec = 0.509;   // 
-    if(file.Contains("WWW_4F_DiLeptonFilter_Tune")) xsec = 0.509 * 9 * WToLNu * WToLNu;   // 
-    if(file.Contains("WWZ_Tune"))                   xsec = 0.354;    // 
-    if(file.Contains("WWZ_4F_Tune"))                xsec = 0.354;    // 
-    if(file.Contains("WWZJetsTo4L2Nu_4F_Tune"))     xsec = 0.354 * 9 * WToLNu * WToLNu * ZToLL;    // 
-    if(file.Contains("WZZ_Tune"))                   xsec = 0.0916;    // 
-    if(file.Contains("ZZZ_Tune"))                   xsec = 0.0371; // 
+    if(file.Contains("GluGluHToWWTo2L2Nu"))      xsec = HToWW * WToLNu * WToLNu * 48.58;
+    if(file.Contains("VBFHToWWTo2L2Nu"))         xsec = HToWW * WToLNu * WToLNu * 3.782;
+    if(file.Contains("WminusHToWWTo2L2Nu"))      xsec = HToWW * WToLNu * WToLNu * 0.527;
+    if(file.Contains("WplusHToWWTo2L2Nu"))       xsec = HToWW * WToLNu * WToLNu * 0.831;
+    if(file.Contains("ZHToWWTo2L2Nu"))           xsec = HToWW * WToLNu * WToLNu * 0.8839;
+    if(file.Contains("ttHToWWTo2L2Nu"))          xsec = HToWW * WToLNu * WToLNu  * 0.5071;
+    if(file.Contains("GluGluHto2Wto2L2Nu_M-125_TuneCP5_13p6TeV"))  xsec = 23.12;
+    if(file.Contains("VBFHto2Wto2L2Nu_M-125_TuneCP5_13p6TeV"))     xsec = 4.201;
 
-    if(file.Contains("GluGluHToWWTo2L2Nu"))      xsec = HToWW * 9 * WToLNu * WToLNu * 48.58;
-    if(file.Contains("VBFHToWWTo2L2Nu"))         xsec = HToWW * 9 * WToLNu * WToLNu * 3.782;
-    if(file.Contains("WminusHToWWTo2L2Nu"))      xsec = HToWW * 9 * WToLNu * WToLNu * 0.527;
-    if(file.Contains("WplusHToWWTo2L2Nu"))       xsec = HToWW * 9 * WToLNu * WToLNu * 0.831;
-    if(file.Contains("ZHToWWTo2L2Nu"))           xsec = HToWW * 9 * WToLNu * WToLNu * 0.8839;
-    if(file.Contains("ttHToWWTo2L2Nu"))          xsec = HToWW * 9 * WToLNu * WToLNu  * 0.5071;
-
-    if(file.Contains("HWminusJ_HToWWTo2L2Nu_WTo2L_M-125"))      xsec = HToWW * 9 * WToLNu * WToLNu * 0.177;
-    if(file.Contains("HWplusJ_HToWWTo2L2Nu_WTo2L_M-125"))       xsec = HToWW * 9 * WToLNu * WToLNu * 0.282;
-    if(file.Contains("HWplusJ_HToWWTo2L2Nu_WTo2L_M-125") && file.Contains("PSweights"))      xsec = HToWW * 9 * WToLNu * WToLNu * 0.176;
+    if(file.Contains("HWminusJ_HToWWTo2L2Nu_WTo2L_M-125"))      xsec = HToWW * WToLNu * WToLNu * 0.177;
+    if(file.Contains("HWplusJ_HToWWTo2L2Nu_WTo2L_M-125"))       xsec = HToWW * WToLNu * WToLNu * 0.282;
+    if(file.Contains("HWplusJ_HToWWTo2L2Nu_WTo2L_M-125") && file.Contains("PSweights"))      xsec = HToWW * WToLNu * WToLNu * 0.176;
     if(file.Contains("HZJ_HToWWTo2L2Nu_ZTo2L_M-125"))      xsec = HToWW * ZToLL* 0.08237;
 
-
-
-    if(file.Contains("GluGluHToWWTo2L2Nu") && file.Contains("jhugen727"))   xsec = HToWW * 9 * WToLNu * WToLNu * 21.47;
-    if(file.Contains("VBFHToWWTo2L2Nu")    && file.Contains("jhugen727"))   xsec = HToWW * 9 * WToLNu * WToLNu * 3.892;
+    if(file.Contains("GluGluHToWWTo2L2Nu") && file.Contains("jhugen727"))   xsec = HToWW * WToLNu * WToLNu * 21.47;
+    if(file.Contains("VBFHToWWTo2L2Nu")    && file.Contains("jhugen727"))   xsec = HToWW * WToLNu * WToLNu * 3.892;
     
+    if(file.Contains("GluGluHToTauTau"))      xsec = HToTT * xs_ggh;
+    if(file.Contains("VBFHToTauTau"))         xsec = HToTT * xs_vbf;
+    if(file.Contains("WminusHToTauTau"))      xsec = HToTT * xs_wmh;
+    if(file.Contains("WplusHToTauTau"))       xsec = HToTT * xs_wph;
+    if(file.Contains("ZHToTauTau"))           xsec = HToTT * xs_z_h;
+    if(file.Contains("ttHToTauTau"))          xsec = HToTT * xs_tth;
+
+    if(file.Contains("GluGluHToGG"))          xsec = HToGG * xs_ggh;
+    if(file.Contains("GluGluHtoGG"))          xsec = HToGG * xs_ggh;
+    if(file.Contains("VBFHToGG"))             xsec = HToGG * xs_vbf;
+    if(file.Contains("VBFHtoGG"))             xsec = HToGG * xs_vbf;
+    if(file.Contains("WminusH_HToGG_WToAll")) xsec = HToGG * xs_wmh;
+    if(file.Contains("WplusH_HToGG_WToAll"))  xsec = HToGG * xs_wph;
+    if(file.Contains("ZH_HToGG_ZToAll"))      xsec = HToGG * xs_z_h;
+    if(file.Contains("ttHJetToGG"))           xsec = HToGG * xs_tth; 
+    if(file.Contains("ttHtoGG"))              xsec = HToGG * xs_tth; 
+    if(file.Contains("VHtoGG"))               xsec = HToGG * 2.556; //XSDB
+
+    if(file.Contains("GluGluHToMuMu"))        xsec = HToMM * xs_ggh ;
+    if(file.Contains("VBFHToMuMu"))           xsec = HToMM * xs_vbf ;
+    if(file.Contains("WminusH_HToMuMu"))      xsec = HToMM * xs_wmh ;
+    if(file.Contains("WminusHToMuMu"))        xsec = HToMM * xs_wmh ;
+    if(file.Contains("WplusH_HToMuMu"))       xsec = HToMM * xs_wph ;
+    if(file.Contains("WplusHToMuMu"))         xsec = HToMM * xs_wph ;
+    if(file.Contains("ZH_HToMuMu"))           xsec = HToMM * xs_z_h ;
+    if(file.Contains("ZHToMuMu"))             xsec = HToMM * xs_z_h ;
+    if(file.Contains("ttHToMuMu"))            xsec = HToMM * xs_tth ;
+    if(file.Contains("GluGluHto2Mu"))         xsec = HToMM * xs_ggh ;
+    if(file.Contains("VBFHto2Mu_M-125_TuneCP5_withDipoleRecoil_13p6TeV")) xsec = 4.18;
+    if(file.Contains("VBFHto2Mu_M-125")) xsec = 4.18;
+    if(file.Contains("WplusH_Hto2Mu_WtoAll_M-125_TuneCP5_13p6TeV"))       xsec = 0.9227;
+    if(file.Contains("ZH_Hto2Mu_ZtoAll_M-125_TuneCP5_13p6TeV"))           xsec = 0.5478;
+
+    if(file.Contains("GluGluHToZZTo2L2Nu"))   xsec = HToZZ * ZToLL * ZToNuNu * xs_ggh;
+    if(file.Contains("GluGluHToZZTo2L2Q"))    xsec = HToZZ * ZToLL * ZToQQ * xs_ggh ;
+    if(file.Contains("GluGluHToZZTo4L"))      xsec = HToZZ * ZToLL * ZToLL * xs_ggh ;
+    if(file.Contains("GluGluHtoZZto4L"))      xsec = HToZZ * ZToLL * ZToLL * xs_ggh ;
+    if(file.Contains("VBFHto2Zto4L_M125"))    xsec = HToZZ * ZToLL * ZToLL * xs_vbf;
+    if(file.Contains("WminusH_Hto2Zto4L"))    xsec = HToZZ * ZToLL * ZToLL * xs_wmh;
+    if(file.Contains("WplusH_Hto2Zto4L"))     xsec = HToZZ * ZToLL * ZToLL * xs_wph;
+    if(file.Contains("ZHto2Zto4L"))           xsec = HToZZ * ZToLL * ZToLL * xs_z_h;
+    
+    ''' //old changes before merging master
     if(file.Contains("GluGluHToTauTau"))      xsec = HToTT * 48.58;
     if(file.Contains("VBFHToTauTau"))         xsec = HToTT * 3.782;
     if(file.Contains("WminusHToTauTau"))      xsec = HToTT * 0.527;
@@ -433,68 +550,94 @@ namespace xsec{
     if(file.Contains("GluGluHToZZTo2L2Nu"))   xsec = HToZZ * ZToLL * ZToNuNu * 48.58;
     if(file.Contains("GluGluHToZZTo2L2Q"))    xsec = HToZZ * ZToLL * ZToQQ * 48.58 ;
     if(file.Contains("GluGluHToZZTo4L"))      xsec = HToZZ * ZToLL * ZToLL * 48.58 ;
+    '''
+    if(file.Contains("VBFto2L_MLL-50_TuneCP5_13p6TeV")) xsec = 7.659;
+    if(file.Contains("ZH_ZtoAll_Hto2Wto2L2Nu_M-125_TuneCP5_13p6TeV_powheg-minlo"))   xsec = 0.8428;
+    if(file.Contains("WminusH_Hto2Mu_WtoAll_M-125_TuneCP5_13p6TeV"))   xsec = 0.5804;
 
     //Here the factor of 2 is to allow either Z boson to decay into two leptons
-    if(file.Contains("VBF_HToZZTo2L2X"))              xsec = HToZZ * ZToLL * 3.782;
-    if(file.Contains("WminusH_HToZZTo2L2X"))          xsec = HToZZ * ZToLL * 0.527;
-    if(file.Contains("WplusH_HToZZTo2L2X"))           xsec = HToZZ * ZToLL * 0.831;
-    if(file.Contains("ZH_HToZZ_2LFilter"))            xsec = HToZZ * 2 * ZToLL * 0.8839;
-    if(file.Contains("ttH_HToZZ_2LOSSFFilter_M125"))  xsec = HToZZ * 2 * ZToLL * 0.5071;
+    if(file.Contains("VBF_HToZZTo2L2X"))              xsec = HToZZ * ZToLL * xs_vbf;
+    if(file.Contains("WminusH_HToZZTo2L2X"))          xsec = HToZZ * ZToLL * xs_wmh;
+    if(file.Contains("WplusH_HToZZTo2L2X"))           xsec = HToZZ * ZToLL * xs_wph;
+    if(file.Contains("ZH_HToZZ_2LFilter"))            xsec = HToZZ * 2 * ZToLL * xs_z_h;
+    if(file.Contains("ttH_HToZZ_2LOSSFFilter_M125"))  xsec = HToZZ * 2 * ZToLL * xs_tth;
 
 
     // Zgamma signal
     if(!(year == 2022 || year == 2023)){
-        if(file.Contains("GluGluHToZG"))          xsec = HToZG * ZToLL * 48.58 ;
-        if(file.Contains("VBFHToZG"))             xsec = HToZG * ZToLL * 3.782 ;
-        if(file.Contains("WplusH_HToZG"))         xsec = HToZG * 0.8400 ; // CERNYellowReportPageAt13TeV mH=125. WplusH, WminusH, ZH, ttH samples do not require decay of Z to leptons
-        if(file.Contains("WminusH_HToZG"))        xsec = HToZG * 0.5328 ; // CERNYellowReportPageAt13TeV mH=125. New samples are requested with this decay incorporated
-        if(file.Contains("ZH_HToZG"))             xsec = HToZG * 0.8839; // Add ZToLL when updated samples are available
-        if(file.Contains("ZH_ZToAll_HToZG"))      xsec = HToZG * 0.8839;
-        if(file.Contains("ttHToZG"))              xsec = HToZG * 0.5071;
+        if(file.Contains("GluGluHToZG"))          xsec = HToZG * ZToLL * xs_ggh / HToZG_onshellfrac;
+        if(file.Contains("GluGluHtoZG"))          xsec = HToZG * ZToLL * xs_ggh / HToZG_onshellfrac;
+        if(file.Contains("VBFHToZG"))             xsec = HToZG * ZToLL * xs_vbf / HToZG_onshellfrac;
+        if(file.Contains("VBFHtoZG"))             xsec = HToZG * ZToLL * xs_vbf / HToZG_onshellfrac;
+        if(file.Contains("WplusH_HToZG"))         xsec = HToZG * xs_wph / HToZG_onshellfrac; // CERNYellowReportPageAt13TeV mH=125.
+        if(file.Contains("WminusH_HToZG"))        xsec = HToZG * xs_wmh / HToZG_onshellfrac; // CERNYellowReportPageAt13TeV mH=125.
+        if(file.Contains("ZH_HToZG"))             xsec = HToZG * xs_z_h / HToZG_onshellfrac;
+        if(file.Contains("ZH_ZToAll_HToZG"))      xsec = HToZG * xs_z_h / HToZG_onshellfrac;
+        if(file.Contains("ttHToZG"))              xsec = HToZG * xs_tth / HToZG_onshellfrac;
 
-        if(file.Contains("WplusH_HToZG_WToAll_ZToLL"))  xsec = HToZG * 0.8400 * ZToLL ; //Currently H to ZZ, do not use 2024-03-07
-        if(file.Contains("WminusH_HToZG_WToAll_ZToLL")) xsec = HToZG * 0.5328 * ZToLL ; //Currently H to ZZ, do not use 2024-03-07
-        if(file.Contains("ZH_HToZG_ZToAll_ZToLL"))      xsec = HToZG * 0.8839 * ZToLL * ZToQQ;
-        if(file.Contains("ttHToZG_ZToLL"))              xsec = HToZG * 0.5071 * ZToLL ;
+        if(file.Contains("WplusH_HToZG_WToAll_ZToLL"))  xsec = HToZG * xs_wph * ZToLL / HToZG_onshellfrac;
+        if(file.Contains("WminusH_HToZG_WToAll_ZToLL")) xsec = HToZG * xs_wmh * ZToLL / HToZG_onshellfrac;
+        if(file.Contains("ZH_HToZG_ZToAll_ZToLL"))      xsec = HToZG * xs_z_h * ZToLL / HToZG_onshellfrac; //correct samples now 2024-11-19
+        if(file.Contains("ttHToZG_ZToLL"))              xsec = HToZG * xs_tth * ZToLL / HToZG_onshellfrac;
     } else {
-        if(file.Contains("GluGluHToZG"))          xsec = HToZG * ZToLL * 52.23 ;
-        if(file.Contains("VBFHToZG"))             xsec = HToZG * ZToLL * 4.078 ;
-        if(file.Contains("WplusH_HToZG"))         xsec = HToZG * 0.8889 ; // CERNYellowReportPageAt13TeV mH=125. WplusH, WminusH, ZH, ttH samples do not require decay of Z to leptons
-        if(file.Contains("WminusH_HToZG"))        xsec = HToZG * 0.5677 ; // CERNYellowReportPageAt13TeV mH=125. New samples are requested with this decay incorporated
-        if(file.Contains("ZH_HToZG"))             xsec = HToZG * 0.9439; // Add ZToLL when updated samples are available
-        if(file.Contains("ZH_ZToAll_HToZG"))      xsec = HToZG * 0.9439; //Are these two identical?
-        if(file.Contains("ttHToZG"))              xsec = HToZG * 0.5700;
+        if(file.Contains("GluGluHtoZG"))          xsec = HToZG * ZToLL * xs_ggh / HToZG_onshellfrac;
+        if(file.Contains("VBFHtoZG"))             xsec = HToZG * ZToLL * xs_vbf / HToZG_onshellfrac;
+        if(file.Contains("WplusH_HtoZG"))         xsec = HToZG * xs_wph / HToZG_onshellfrac;
+        if(file.Contains("WminusH_HtoZG"))        xsec = HToZG * xs_wmh / HToZG_onshellfrac;
+        if(file.Contains("ZH_HtoZG"))             xsec = HToZG * xs_z_h / HToZG_onshellfrac;
+        if(file.Contains("ZH_ZtoAll_HtoZGto2LG")) xsec = HToZG * xs_z_h * ZToLL / HToZG_onshellfrac;
+        if(file.Contains("ttHToZG"))              xsec = HToZG * xs_tth / HToZG_onshellfrac;
 
-        if(file.Contains("WplusH_HToZG_WToAll_ZToLL"))  xsec = HToZG * 0.8400 * ZToLL ; //Currently H to ZZ, do not use 2024-03-07
-        if(file.Contains("WminusH_HToZG_WToAll_ZToLL")) xsec = HToZG * 0.5677 * ZToLL ; //Currently H to ZZ, do not use 2024-03-07
-        if(file.Contains("ZH_HToZG_ZToAll_ZToLL"))      xsec = HToZG * 0.9439 * ZToLL * ZToQQ;
-        if(file.Contains("ttHToZG_ZToLL"))              xsec = HToZG * 0.5700 * ZToLL ;
+        if(file.Contains("WplusH_HtoZG_WtoAll_Zto2L"))  xsec = HToZG * xs_wph * ZToLL / HToZG_onshellfrac;
+        if(file.Contains("WminusH_HtoZG_WtoAll_Zto2L")) xsec = HToZG * xs_wmh * ZToLL / HToZG_onshellfrac;
+
+        if(file.Contains("ttHtoZG_Zto2L"))              xsec = HToZG * xs_tth * ZToLL / HToZG_onshellfrac;
 
     }
 
     double H120ToZG = 0.00110; double H130ToZG = 0.001941;
-    if(file.Contains("GluGluHToZG_ZToLL_M-120"))    xsec = H120ToZG * ZToLL * 52.22;
-    if(file.Contains("VBFHToZG_ZToLL_M-120"))       xsec = H120ToZG * ZToLL * 3.935 ;
-    if(file.Contains("WplusH_HToZG_WToAll_M-120"))  xsec = H120ToZG * 0.9558 ; // WplusH, WminusH, ZH, ttH samples do not require decay of Z to leptons
-    if(file.Contains("WminusH_HToZG_WToAll_M-120")) xsec = H120ToZG * 0.6092 ; // New samples are requested with this decay incorporated
-    if(file.Contains("ZH_HToZG_ZToAll_M-120"))      xsec = H120ToZG * 0.9939 ; // Add ZToLL when updated samples are available
-    if(file.Contains("ttHToZG_M120"))               xsec = H120ToZG * 0.5697 ;
+    if(file.Contains("GluGluHToZG_ZToLL_M-120"))          xsec = H120ToZG * ZToLL / HToZG_onshellfrac * 52.22;
+    if(file.Contains("GluGluHtoZG_Zto2L_M-120"))          xsec = H120ToZG * ZToLL / HToZG_onshellfrac * 56.11;
+    if(file.Contains("VBFHToZG_ZToLL_M-120"))             xsec = H120ToZG * ZToLL / HToZG_onshellfrac * 3.935 ;
+    if(file.Contains("VBFHtoZG_Zto2L_M-120"))             xsec = H120ToZG * ZToLL / HToZG_onshellfrac * 4.243 ;
+    if(file.Contains("WplusH_HToZG_WToAll_ZToLL_M-120"))  xsec = H120ToZG * ZToLL / HToZG_onshellfrac * 0.9558 ;
+    if(file.Contains("WplusH_HtoZG_WtoAll_M-120"))        xsec = H120ToZG / HToZG_onshellfrac * 1.042 ; 
+    if(file.Contains("WplusH_HtoZG_WtoAll_Zto2L_M-120"))  xsec = H120ToZG * ZToLL / HToZG_onshellfrac * 1.042 ; 
+    if(file.Contains("WminusH_HToZG_WToAll_ZToLL_M-120")) xsec = H120ToZG * ZToLL / HToZG_onshellfrac * 0.6092 ;
+    if(file.Contains("WminusH_HtoZG_WtoAll_M-120"))       xsec = H120ToZG / HToZG_onshellfrac * 0.6697 ; 
+    if(file.Contains("WminusH_HtoZG_WtoAll_Zto2L_M-120")) xsec = H120ToZG * ZToLL / HToZG_onshellfrac * 0.6697 ; 
+    if(file.Contains("ZH_HToZG_ZToAll_ZToLL_M-120"))      xsec = H120ToZG * ZToLL / HToZG_onshellfrac * 0.9939 ;
+    if(file.Contains("ZH_HtoZG_ZtoAll_M-120"))            xsec = H120ToZG / HToZG_onshellfrac * 1.063 ; 
+    if(file.Contains("ZH_ZtoAll_HtoZGto2LG_M-120"))       xsec = H120ToZG * ZToLL / HToZG_onshellfrac * 1.063 ; 
+    if(file.Contains("ttHToZG_ZToLL_M-120"))              xsec = H120ToZG * ZToLL / HToZG_onshellfrac * 0.5697 ;
+    if(file.Contains("ttHtoZG_Zto2L_M-120"))              xsec = H120ToZG * ZToLL / HToZG_onshellfrac * 0.6412 ;
 
-    if(file.Contains("GluGluHToZG_ZToLL_M-130"))    xsec = H130ToZG * ZToLL * 45.31;
-    if(file.Contains("VBFHToZG_ZToLL_M-130"))       xsec = H130ToZG * ZToLL * 3.637 ;
-    if(file.Contains("WplusH_HToZG_WToAll_M-130"))  xsec = H130ToZG * 0.7414 ; // WplusH, WminusH, ZH, ttH samples do not require decay of Z to leptons
-    if(file.Contains("WminusH_HToZG_WToAll_M-130")) xsec = H130ToZG * 0.4676 ; // New samples are requested with this decay incorporated
-    if(file.Contains("ZH_HToZG_ZToAll_M-130"))      xsec = H130ToZG * 0.7899 ; // Add ZToLL when updated samples are available
-    if(file.Contains("ttHToZG_M130"))               xsec = H130ToZG * 0.4539 ;
+    if(file.Contains("GluGluHToZG_ZToLL_M-130"))          xsec = H130ToZG * ZToLL / HToZG_onshellfrac * 45.31;
+    if(file.Contains("GluGluHtoZG_Zto2L_M-130"))          xsec = H130ToZG * ZToLL / HToZG_onshellfrac * 48.75;
+    if(file.Contains("VBFHToZG_ZToLL_M-130"))             xsec = H130ToZG * ZToLL / HToZG_onshellfrac * 3.637 ;
+    if(file.Contains("VBFHtoZG_Zto2L_M-130"))             xsec = H130ToZG * ZToLL / HToZG_onshellfrac * 3.925 ;
+    if(file.Contains("WplusH_HToZG_WToAll_ZToLL_M-130"))  xsec = H130ToZG * ZToLL / HToZG_onshellfrac * 0.7414 ;
+    if(file.Contains("WplusH_HtoZG_WtoAll_M-130"))        xsec = H130ToZG / HToZG_onshellfrac * 0.8142 ; 
+    if(file.Contains("WplusH_HtoZG_WtoAll_Zto2L_M-130"))  xsec = H130ToZG * ZToLL / HToZG_onshellfrac * 0.8142 ; 
+    if(file.Contains("WminusH_HToZG_WToAll_ZToLL_M-130")) xsec = H130ToZG * ZToLL / HToZG_onshellfrac * 0.4676 ; // New samples are requested with this decay incorporated
+    if(file.Contains("WminusH_HtoZG_WtoAll_M-130"))       xsec = H130ToZG / HToZG_onshellfrac * 0.5184 ; 
+    if(file.Contains("WminusH_HtoZG_WtoAll_Zto2L_M-130")) xsec = H130ToZG * ZToLL / HToZG_onshellfrac * 0.5184 ; 
+    if(file.Contains("ZH_HToZG_ZToAll_ZToLL_M-130"))      xsec = H130ToZG * ZToLL / HToZG_onshellfrac * 0.7899 ; // Add ZToLL when updated samples are available
+    if(file.Contains("ZH_HtoZG_ZtoAll_ZToLL_M-130"))      xsec = H130ToZG * ZToLL / HToZG_onshellfrac * 0.8645 ; 
+    if(file.Contains("ZH_ZtoAll_HtoZGto2LG_M-130"))       xsec = H130ToZG / HToZG_onshellfrac * 0.8645 ; 
+    if(file.Contains("ttHToZG_ZToLL_M-130"))              xsec = H130ToZG * ZToLL / HToZG_onshellfrac * 0.4539 ;
+    if(file.Contains("ttHtoZG_Zto2L_M-130"))              xsec = H120ToZG * ZToLL / HToZG_onshellfrac * 0.5107 ;
 
     // With cmssw GenXSecAnalyzer (pb)
     if(file.Contains("ST_tWAto2L2Nu_5f_TuneCP5_13TeV-madgraph-pythia8")) xsec = 0.1523;
-    if(file.Contains("TTtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8")) xsec = 762.1;
-    if(file.Contains("TWminusto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8")) xsec = 35.99;
-    if(file.Contains("TWminustoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8")) xsec = 35.99;
-    if(file.Contains("TbarWplusto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8")) xsec = 36.05;
-    if(file.Contains("TbarWplustoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8")) xsec = 36.05;
+    if(file.Contains("TTtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8")) xsec = 762.1 * 2.0 * WToLNu * WToQQ;
+    if(file.Contains("TWminusto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8")) xsec = 35.99 * WToLNu * WToLNu;
+    if(file.Contains("TWminustoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8")) xsec = 35.99 * 2.0 * WToLNu * WToQQ;
+    if(file.Contains("TbarWplusto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8")) xsec = 36.05 * WToLNu * WToLNu;
+    if(file.Contains("TbarWplustoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8")) xsec = 36.05 * 2.0 * WToLNu * WToQQ;
+    //using xsdb:
     if(file.Contains("ZG2JtoG2L2J_EWK_MLL-50_MJJ-120_TuneCP5_withDipoleRecoil_13p6TeV_madgraph-pythia8")) xsec = 0.1142;
+    if(file.Contains("ZG2JtoG2L2J_EWK_MLL-50_MJJ-120_TuneCP5") && !(file.Contains("withDipoleRecoil"))) xsec = 0.1136;
     if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-10to50_TuneCP5_13p6TeV_amcatnloFXFX-pythia8")) xsec = 124.4;
     if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-50to100_TuneCP5_13p6TeV_amcatnloFXFX-pythia8")) xsec = 2.092;
     if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-100to200_TuneCP5_13p6TeV_amcatnloFXFX-pythia8")) xsec = 0.3477;
