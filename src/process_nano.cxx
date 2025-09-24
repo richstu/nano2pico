@@ -432,7 +432,7 @@ int main(int argc, char *argv[]){
     if(isZgamma || isHiggsino) 
       vector<int> sig_ph_nano_idx = photon_producer.WritePhotons(nano, pico, jet_isphoton_nano_idx,
                                                                  sig_el_nano_idx, sig_mu_nano_idx,
-                                                                 photon_el_pico_idx, isHiggsino);
+                                                                 photon_el_pico_idx);
 
     event_tools.WriteStitch(nano, pico);    
     tk_producer.WriteIsoTracks(nano, pico, sig_el_nano_idx, sig_mu_nano_idx, isFastsim, is_preUL);

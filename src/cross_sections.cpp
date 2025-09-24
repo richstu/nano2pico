@@ -519,38 +519,7 @@ namespace xsec{
     if(file.Contains("WminusH_Hto2Zto4L"))    xsec = HToZZ * ZToLL * ZToLL * xs_wmh;
     if(file.Contains("WplusH_Hto2Zto4L"))     xsec = HToZZ * ZToLL * ZToLL * xs_wph;
     if(file.Contains("ZHto2Zto4L"))           xsec = HToZZ * ZToLL * ZToLL * xs_z_h;
-    
-    ''' //old changes before merging master
-    if(file.Contains("GluGluHToTauTau"))      xsec = HToTT * 48.58;
-    if(file.Contains("VBFHToTauTau"))         xsec = HToTT * 3.782;
-    if(file.Contains("WminusHToTauTau"))      xsec = HToTT * 0.527;
-    if(file.Contains("WplusHToTauTau"))       xsec = HToTT * 0.831;
-    if(file.Contains("ZHToTauTau"))           xsec = HToTT * 0.8839;
-    if(file.Contains("ttHToTauTau"))          xsec = HToTT * 0.5071;
 
-    if(file.Contains("GluGluHToGG"))          xsec = HToGG * 48.58;
-    if(file.Contains("VBFHToGG"))             xsec = HToGG * 3.782;
-    if(file.Contains("WminusH_HToGG_WToAll")) xsec = HToGG * 0.527;
-    if(file.Contains("WplusH_HToGG_WToAll"))  xsec = HToGG * 0.831;
-    if(file.Contains("ZH_HToGG_ZToAll"))      xsec = HToGG * 0.8839;
-    if(file.Contains("ttHJetToGG"))           xsec = HToGG * 0.5071; 
-    if(file.Contains("bbHToGG"))              xsec = HToGG * 0.3924; //0.5277 yellow pages
-    if(file.Contains("VHToGG"))               xsec = HToGG * 2.456;  //2.2569 from yellow pages summing wh and zh 
-
-    if(file.Contains("GluGluHToMuMu"))        xsec = HToMM * 48.58 ;
-    if(file.Contains("VBFHToMuMu"))           xsec = HToMM * 3.782 ;
-    if(file.Contains("WminusH_HToMuMu"))      xsec = HToMM * 0.527 ;
-    if(file.Contains("WminusHToMuMu"))        xsec = HToMM * 0.527;
-    if(file.Contains("WplusH_HToMuMu"))       xsec = HToMM * 0.831 ;
-    if(file.Contains("WplusHToMuMu"))         xsec = HToMM * 0.831 ;
-    if(file.Contains("ZH_HToMuMu"))           xsec = HToMM * 0.8839 ;
-    if(file.Contains("ZHToMuMu"))             xsec = HToMM * 0.8839 ;
-    if(file.Contains("ttHToMuMu"))            xsec = HToMM * 0.5071 ;
-
-    if(file.Contains("GluGluHToZZTo2L2Nu"))   xsec = HToZZ * ZToLL * ZToNuNu * 48.58;
-    if(file.Contains("GluGluHToZZTo2L2Q"))    xsec = HToZZ * ZToLL * ZToQQ * 48.58 ;
-    if(file.Contains("GluGluHToZZTo4L"))      xsec = HToZZ * ZToLL * ZToLL * 48.58 ;
-    '''
     if(file.Contains("VBFto2L_MLL-50_TuneCP5_13p6TeV")) xsec = 7.659;
     if(file.Contains("ZH_ZtoAll_Hto2Wto2L2Nu_M-125_TuneCP5_13p6TeV_powheg-minlo"))   xsec = 0.8428;
     if(file.Contains("WminusH_Hto2Mu_WtoAll_M-125_TuneCP5_13p6TeV"))   xsec = 0.5804;

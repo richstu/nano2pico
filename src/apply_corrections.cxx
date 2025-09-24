@@ -42,7 +42,7 @@ int main(int argc, char *argv[]){
   corr_file = CopyReplaceAll(in_dir, "/raw_pico/","/corrections/")+corr_file;
 
   bool is_zgamma = Contains(in_dir, "zgamma");
-  bool is_higgsino = Contains(in_dir, "higgsino");
+  //bool is_higgsino = Contains(in_dir, "higgsino");
 
   cout<<"Corrections file: "<<corr_file<<endl;
   corrections_tree corr(corr_file);

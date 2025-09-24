@@ -183,36 +183,21 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
     // Find min(dR) between photon and signal lepton
     double minLepDR(999.);
     double maxLepDR(0.);
-    bool isSignal = false;
-
-    if (isHiggsino){
-
-      isSignal = (((fabs(eta) < 1.4442 && mva > -0.4) ||
-                   (fabs(eta) > 1.566 && fabs(eta) < 2.5 && mva > -0.58)) &&
-                   eVeto && minLepDR > 0.4 && 
-                   pt > SignalPhotonPtCut);
-    } else{
-      
-      for(size_t iel(0); iel<sig_el_nano_idx.size(); iel++) {
-        double tempDR = dR(eta, nano.Electron_eta()[sig_el_nano_idx.at(iel)],
-                           phi, nano.Electron_phi()[sig_el_nano_idx.at(iel)]);
-        if(tempDR < minLepDR) minLepDR = tempDR;
-        if(tempDR > maxLepDR) maxLepDR = tempDR;
-      }
-      for(size_t imu(0); imu<sig_mu_nano_idx.size(); imu++) {
-        double tempDR = dR(eta, nano.Muon_eta()[sig_mu_nano_idx.at(imu)],
-                           phi, nano.Muon_phi()[sig_mu_nano_idx.at(imu)]);
-        if(tempDR < minLepDR) minLepDR = tempDR;
-        if(tempDR > maxLepDR) maxLepDR = tempDR;
-      }
-
-      isSignal = (nano.Photon_mvaID_WP80()[iph] &&
-                      eVeto && minLepDR > 0.3f && 
-                      pt > SignalPhotonPtCut &&
-                      (photon_el_pico_idx[iph]==-1 || !(pico.out_el_sig()[photon_el_pico_idx[iph]])));
+    for(size_t iel(0); iel<sig_el_nano_idx.size(); iel++) {
+      double tempDR = dR(eta, nano.Electron_eta()[sig_el_nano_idx.at(iel)],
+                         phi, nano.Electron_phi()[sig_el_nano_idx.at(iel)]);
+      if(tempDR < minLepDR) minLepDR = tempDR;
+      if(tempDR > maxLepDR) maxLepDR = tempDR;
+    }
+    for(size_t imu(0); imu<sig_mu_nano_idx.size(); imu++) {
+      double tempDR = dR(eta, nano.Muon_eta()[sig_mu_nano_idx.at(imu)],
+                         phi, nano.Muon_phi()[sig_mu_nano_idx.at(imu)]);
+      if(tempDR < minLepDR) minLepDR = tempDR;
+      if(tempDR > maxLepDR) maxLepDR = tempDR;
     }
     photon_drmin.push_back(minLepDR);
     photon_drmax.push_back(maxLepDR);
+
   }
 
   //first, determine ordering based on signal and pt
