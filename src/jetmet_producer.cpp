@@ -1078,7 +1078,7 @@ void JetMetProducer::WriteFatJets(nano_tree &nano, pico_tree &pico,
     getFatJet_particleNet_mass(nano, nanoaod_version, FatJet_particleNet_mass);
     getFatJet_particleNetMD_Xbb(nano, nanoaod_version, FatJet_particleNetMD_Xbb);
   }
-
+  
   for(int ifjet(0); ifjet<nano.nFatJet(); ++ifjet){
     if (verbose) cout<<"FatJet "<<ifjet<<": pt = "<<setw(10)<<nano.FatJet_pt()[ifjet]
                                        <<" eta = "<<setw(10)<<nano.FatJet_eta()[ifjet]
@@ -1125,6 +1125,12 @@ void JetMetProducer::WriteFatJets(nano_tree &nano, pico_tree &pico,
     }
 
     pico.out_nfjet()++;
+    
+    //Changes for boosted 4b, commenting them out and voiding the unused variables since it had errors and we are no longer doing boosted 4b
+    (void)ddb_wpts;
+    (void)mdak8_wpts;
+    (void)pnetmd_wpts;
+    /* 
     // function to count number of loose/medium/tight AK8 jets for different taggers
     if (pico.out_nfjet() < 2){ // only count two highest pt AK8 jets
       if (FatJet_btagDDBvL[ifjet] > ddb_wpts[0]) pico.out_nddbl()++;
@@ -1138,7 +1144,7 @@ void JetMetProducer::WriteFatJets(nano_tree &nano, pico_tree &pico,
         if (FatJet_particleNetMD_Xbb[ifjet] > pnetmd_wpts[1]) pico.out_npnetmdm()++;
         if (FatJet_particleNetMD_Xbb[ifjet] > pnetmd_wpts[2]) pico.out_npnetmdt()++;
       }
-    }
+    }*/
 
   }
   if (verbose) cout<<"Done with fat jets"<<endl;

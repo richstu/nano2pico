@@ -63,7 +63,6 @@ int main(int argc, char *argv[]){
     cout<<"ERROR: Input file, sum-of-weights and/or output directory not specified. Exit."<<endl;
     exit(1);
   }
-
   //bool isData = Contains(in_file, "Run201") ? true : false;
   bool isData = Contains(in_file, "Run20") ? true : false; //Changed to allow for Run 3 data
   //bool isFastsim = Contains(in_file, "Fast") ? true : false;  // new fastsim filenames use "FSUL" instead
@@ -134,7 +133,6 @@ int main(int argc, char *argv[]){
       }
     }
   }
-
   string year_string;
   if (year == 2016 && isAPV)               year_string = "2016APV";
   else if (year == 2016 && !isAPV)         year_string = "2016";
@@ -372,7 +370,7 @@ int main(int argc, char *argv[]){
     if (isData) {
       if(!inJSON(VVRunLumi, nano.run(), nano.luminosityBlock())) continue; 
     }
-    
+
     bool passed_trig = event_tools.SaveTriggerDecisions(nano, pico, isZgamma, isHiggsino);
     if (isData && !passed_trig) {
       continue;
@@ -419,6 +417,7 @@ int main(int argc, char *argv[]){
     for (auto &imu: sig_mu_nano_idx) 
       sig_leps.push_back({nano.Muon_pt()[imu], nano.Muon_eta()[imu], 
                           nano.Muon_phi()[imu], nano.Muon_pdgId()[imu]});
+
 
     auto greaterPt = [](SignalLepton lep1, SignalLepton lep2){ return lep1.pt > lep2.pt;};
     sort(sig_leps.begin(), sig_leps.end(), greaterPt);
@@ -632,6 +631,7 @@ int main(int argc, char *argv[]){
       pico.out_w_fakephoton() = 1.;
       //piece of histotical machinery for madgraph tt and gluino samples
       //probably should be deprecated
+
       isr_tools.WriteISRWeights(pico);
     }
 
