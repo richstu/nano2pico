@@ -293,15 +293,15 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
       float jec_default = 1.0/(1.0-jet_type_rawfactor[ijet]);
       float jec_l1 = 1.0;
       float jec = jec_default;
+      float jet_raw_pt = jet_type_pt[ijet]/jec_default;
       if (jet_type==1 || year > 2018) {
         jec = GetJEC(jet_type_area[ijet],jet_type_eta[ijet],jet_type_phi[ijet],
-                     jet_type_pt[ijet],rho,nano.run(),JECType::L1L2L3);
+                     jet_raw_pt,rho,nano.run(),JECType::L1L2L3);
         if (year > 2018)
           jec_l1 = GetJEC(jet_type_area[ijet],jet_type_eta[ijet],
-                          jet_type_phi[ijet],jet_type_pt[ijet],rho,nano.run(),
+                          jet_type_phi[ijet],jet_raw_pt,rho,nano.run(),
                           JECType::L1);
       }
-      float jet_raw_pt = jet_type_pt[ijet]/jec_default;
       float jet_l1_pt = jet_raw_pt*jec_l1;
       float jet_l1l2l3_pt = jet_raw_pt*jec;
       float jet_raw_pt_nomu = jet_raw_pt*(1.0-jet_type_muonfactor[ijet]);

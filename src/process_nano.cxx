@@ -309,7 +309,7 @@ int main(int argc, char *argv[]){
   // Other tools
   EventTools event_tools(in_path, year, isData, nanoaod_version);
   int event_type = event_tools.GetEventType();
-  bool isDY = event_type/100 == 62 ? isZgamma : false;
+  bool isDY = ((event_type / 100 == 62) || (event_type / 100 == 63)) && isZgamma;
 
   ISRTools isr_tools(in_path, year, nanoaod_version, isData);
 
