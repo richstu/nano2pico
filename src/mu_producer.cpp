@@ -43,10 +43,10 @@ MuonProducer::MuonProducer(string year_, bool isData_, float nanoaod_version_, s
 MuonProducer::~MuonProducer(){
 }
 
-bool MuonProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma, float pt) {
+bool MuonProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma, float pt, bool skip_pt) {
   float eta = nano.Muon_eta()[nano_idx];
   if(isZgamma) { // For Zgamma productions
-    if (pt <= ZgMuonPtCut) return false;
+    if (pt <= ZgMuonPtCut && !skip_pt) return false;
     if (fabs(eta) > MuonEtaCut) return false;
     if (fabs(nano.Muon_dz()[nano_idx])>dzCut)  return false;
     if (fabs(nano.Muon_dxy()[nano_idx])>dxyCut) return false; 
@@ -58,9 +58,9 @@ bool MuonProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma, float 
   }
   else {
     if (!nano.Muon_mediumId()[nano_idx]) return false;
-    if (pt <= VetoMuonPtCut) return false;
+    if (pt <= VetoMuonPtCut && !skip_pt) return false;
     if (fabs(eta) > MuonEtaCut) return false;
-    if (pt > SignalMuonPtCut &&
+    if ((pt > SignalMuonPtCut || skip_pt) &&
       nano.Muon_miniPFRelIso_all()[nano_idx] < MuonMiniIsoCut &&
       fabs(nano.Muon_dz()[nano_idx])<=0.5f && 
       fabs(nano.Muon_dxy()[nano_idx])<=0.2f)
@@ -70,7 +70,7 @@ bool MuonProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma, float 
   return false;
 }
 
-vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<int> &jet_islep_nano_idx, vector<int> &jet_isvlep_nano_idx, vector<int> &sig_mu_pico_idx, bool isZgamma, bool isFastsim){
+vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<int> &jet_islep_nano_idx, vector<int> &jet_isvlep_nano_idx, vector<int> &sig_mu_pico_idx, bool isZgamma, bool isSignal_sample, bool isFastsim){
   vector<float> Jet_pt, Jet_mass;
   getJetWithJEC(nano, isFastsim, Jet_pt, Jet_mass);
   vector<int> Muon_fsrPhotonIdx;
@@ -174,12 +174,14 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
     float pt = muon_pt_corr[imu];
     float eta = nano.Muon_eta()[imu];
     bool isSignal = false;
+    bool isSignal_nopt = false;
     if(isZgamma) { // For Zgamma productions
       if (pt <= PicoMuonPtCut) continue;
       if (fabs(eta) > MuonEtaCut) continue;
       if (fabs(nano.Muon_dz()[imu])>dzCut)  continue;
       if (fabs(nano.Muon_dxy()[imu])>dxyCut) continue; 
       isSignal = IsSignal(nano, imu, isZgamma, pt);
+      isSignal_nopt = IsSignal(nano, imu, isZgamma, pt, true);
       pico.out_mu_sip3d().push_back(nano.Muon_sip3d()[imu]);
       pico.out_mu_mediumid().push_back(nano.Muon_mediumId()[imu]);
       pico.out_mu_tightid().push_back(nano.Muon_tightId()[imu]);
@@ -204,12 +206,20 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
     pico.out_mu_id().push_back(nano.Muon_looseId()[imu]);
     pico.out_mu_sig().push_back(isSignal);
     pico.out_mu_charge().push_back(nano.Muon_charge()[imu]);
-    if (!isData) {
+    if (!isData && isSignal_sample) {
       pico.out_mu_pflavor().push_back(nano.Muon_genPartFlav()[imu]);
       pico.out_sys_mu_pt_scaleup().push_back(muon_pt_scaleup[imu]);
       pico.out_sys_mu_pt_scaledn().push_back(muon_pt_scaledn[imu]);
       pico.out_sys_mu_pt_resup().push_back(muon_pt_resup[imu]);
       pico.out_sys_mu_pt_resdn().push_back(muon_pt_resdn[imu]);
+      pico.out_sys_mu_sig_scaleup().push_back(isSignal_nopt 
+          && (muon_pt_scaleup[imu] > ZgMuonPtCut));
+      pico.out_sys_mu_sig_scaledn().push_back(isSignal_nopt 
+          && (muon_pt_scaledn[imu] > ZgMuonPtCut));
+      pico.out_sys_mu_sig_resup().push_back(isSignal_nopt 
+          && (muon_pt_resup[imu] > ZgMuonPtCut));
+      pico.out_sys_mu_sig_resdn().push_back(isSignal_nopt 
+          && (muon_pt_resdn[imu] > ZgMuonPtCut));
     }
     if (nanoaod_version > 11.95) {
       pico.out_mu_ptErr().push_back(nano.Muon_bsConstrainedPtErr()[imu]);

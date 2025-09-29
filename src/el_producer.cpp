@@ -87,7 +87,7 @@ ElectronProducer::ElectronProducer(string year_, bool isData_, float nanoaod_ver
 ElectronProducer::~ElectronProducer(){
 }
 
-bool ElectronProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma, float scaleres_corr) {
+bool ElectronProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma, float scaleres_corr, bool skip_pt) {
   float pt = nano.Electron_pt()[nano_idx]*scaleres_corr;
   float eta = nano.Electron_eta()[nano_idx];
   float etasc = nano.Electron_deltaEtaSC()[nano_idx] + nano.Electron_eta()[nano_idx];
@@ -95,7 +95,7 @@ bool ElectronProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma, fl
   float dxy = nano.Electron_dxy()[nano_idx];
   float miniiso = nano.Electron_miniPFRelIso_all()[nano_idx];
   if (isZgamma) {
-    if (pt <= ZgElectronPtCut) return false;
+    if (pt <= ZgElectronPtCut && !skip_pt) return false;
     if (fabs(etasc) > ElectronEtaCut) return false;
     if (fabs(dz) > dzCut) return false;
     if (fabs(dxy) > dxyCut) return false; 
@@ -115,7 +115,7 @@ bool ElectronProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma, fl
     int bitmap = nano.Electron_vidNestedWPBitmap()[nano_idx];
     bool isBarrel = fabs(eta) <= 1.479;
     bool id = idElectron_noIso(bitmap,3);
-    if (pt <= SignalElectronPtCut) return false;
+    if (pt <= SignalElectronPtCut && !skip_pt) return false;
     if (fabs(eta) > ElectronEtaCut) return false;
     if (!idElectron_noIso(bitmap, 1)) return false;
     if ((isBarrel && fabs(dz)>0.10f) || (!isBarrel && fabs(dz)>0.20f)) return false;
@@ -125,7 +125,7 @@ bool ElectronProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma, fl
   return false;
 }
 
-vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, vector<int> &jet_islep_nano_idx, vector<int> &jet_isvlep_nano_idx, vector<int> &sig_el_pico_idx, vector<int> &photon_el_pico_idx, bool isZgamma, bool isFastsim){
+vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, vector<int> &jet_islep_nano_idx, vector<int> &jet_isvlep_nano_idx, vector<int> &sig_el_pico_idx, vector<int> &photon_el_pico_idx, bool isZgamma, bool is_signal_sample, bool isFastsim){
   vector<float> Jet_pt, Jet_mass;
   getJetWithJEC(nano, isFastsim, Jet_pt, Jet_mass);
   vector<int> Electron_photonIdx;
@@ -233,6 +233,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
     float dxy = nano.Electron_dxy()[iel];
     float miniiso = nano.Electron_miniPFRelIso_all()[iel];
     bool isSignal = false;
+    bool isSignal_nopt = false;
     bool id = false;
     if(isZgamma) { // For Zgamma productions
       if (fabs(etasc) > ElectronEtaCut) continue;
@@ -240,6 +241,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
       if (fabs(dxy) > dxyCut) continue; 
       if (scaleres_corr[iel]*pt <= PicoElectronPtCut) continue;
       isSignal = IsSignal(nano, iel, isZgamma, scaleres_corr[iel]);
+      isSignal_nopt = IsSignal(nano, iel, isZgamma, scaleres_corr[iel], true);
     }
     else {
       // Redefine pt and eta to match RA2B ntuples
@@ -277,13 +279,21 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
       pico.out_el_phidx().push_back(Electron_photonIdx[iel]);
       pico.out_el_etPt().push_back(nano.Electron_scEtOverPt()[iel]);
       pico.out_el_eminusp().push_back(nano.Electron_eInvMinusPInv()[iel]);
-      if (!isData) {
+      if (!isData && is_signal_sample) {
         pico.out_sys_el_pt_resup().push_back(pt*smear_syst_up[iel]);
         pico.out_sys_el_pt_resdn().push_back(pt*smear_syst_dn[iel]);
         pico.out_sys_el_pt_scaleup().push_back(pt*scaleres_corr[iel]
                                                *scale_syst_up[iel]);
         pico.out_sys_el_pt_scaledn().push_back(pt*scaleres_corr[iel]
                                                *scale_syst_dn[iel]);
+        pico.out_sys_el_sig_resup().push_back(isSignal_nopt 
+            && (pt*smear_syst_up[iel] > ZgElectronPtCut));
+        pico.out_sys_el_sig_resdn().push_back(isSignal_nopt 
+            && (pt*smear_syst_dn[iel] > ZgElectronPtCut));
+        pico.out_sys_el_sig_scaleup().push_back(isSignal_nopt 
+            && (pt*scaleres_corr[iel]*scale_syst_up[iel] > ZgElectronPtCut));
+        pico.out_sys_el_sig_scaledn().push_back(isSignal_nopt 
+            && (pt*scaleres_corr[iel]*scale_syst_dn[iel] > ZgElectronPtCut));
       }
       if (year=="2016APV"||year=="2016"||year=="2017"||year=="2018") {
         pico.out_el_idmva().push_back(nano.Electron_mvaFall17V2Iso()[iel]);

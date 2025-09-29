@@ -109,7 +109,83 @@ vector<double> ZGammaVarProducer::CalculateAngles(TLorentzVector lplus,
   //pico.out_llphoton_costhj().push_back(cosThetaJeff(lminus,lplus,photon));
 }
 
-void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector<int> sig_jet_nano_idx){
+ZGammaVarProducer::RefitResults ZGammaVarProducer::PerformKinematicRefit(
+    pico_tree &pico, int ll_variation) {
+  //Definitions of variables for the refit
+  TLorentzVector ll_refit(0,0,0,0);
+  std::vector<TLorentzVector> refit_leptons{ll_refit,ll_refit};
+  std::map<unsigned int, TLorentzVector> leptons_map;
+  std::map<unsigned int, double> leptons_pterr_map;
+  std::map<unsigned int, TLorentzVector> fsrphotons_map;
+  TLorentzVector fsrphoton1, fsrphoton2,l1,l2;
+  int status = -5, covmatstatus = -5;
+  float minnll = -5;
+  int idx_l1 = pico.out_ll_i1()[ll_variation];
+  int idx_l2 = pico.out_ll_i2()[ll_variation];
+  float l1_pt = pico.out_ll_l1_pt()[ll_variation];
+  float l2_pt = pico.out_ll_l2_pt()[ll_variation];
+
+  if(pico.out_ll_lepid()[0] == 13){
+    int idx_fsr1, idx_fsr2;
+
+    l1.SetPtEtaPhiM(l1_pt, pico.out_mu_eta()[idx_l1],
+                    pico.out_mu_phi()[idx_l1], mu_m);
+    l2.SetPtEtaPhiM(l2_pt, pico.out_mu_eta()[idx_l2],
+                    pico.out_mu_phi()[idx_l2], mu_m);
+
+    leptons_map[0] = l1;
+    leptons_map[1] = l2;
+    leptons_pterr_map[0] = pico.out_mu_ptErr()[idx_l1];
+    leptons_pterr_map[1] = pico.out_mu_ptErr()[idx_l2];
+   
+    //Loops through FSRphotons to find which leptons are associated with to be used for constrained fit
+    idx_fsr1 = -1; idx_fsr2 = -1;
+    for(size_t idx_fsr = 0; idx_fsr < static_cast<unsigned int>(pico.out_nfsrphoton()); idx_fsr++){
+      if(pico.out_fsrphoton_muonidx()[idx_fsr]==idx_l1){
+        if(idx_fsr1 != -1 && (pico.out_fsrphoton_droveret2()[idx_fsr1] <  pico.out_fsrphoton_droveret2()[idx_fsr])){ continue;}
+        idx_fsr1 = idx_fsr; continue;
+      }
+      if(pico.out_fsrphoton_muonidx()[idx_fsr]==idx_l2){
+        if(idx_fsr2 != -1 && (pico.out_fsrphoton_droveret2()[idx_fsr2] <  pico.out_fsrphoton_droveret2()[idx_fsr])){ continue;}
+        idx_fsr2 = idx_fsr; continue;
+      }
+    }
+
+    //Adds the FSR photons to a map
+    fsrphotons_map.clear();
+    int fsr_cnt = 0;
+    if(idx_fsr1!=-1){
+      fsrphoton1.SetPtEtaPhiM( pico.out_fsrphoton_pt()[idx_fsr1],pico.out_fsrphoton_eta()[idx_fsr1],pico.out_fsrphoton_phi()[idx_fsr1],0 );
+      fsrphotons_map[fsr_cnt] = fsrphoton1;
+      fsr_cnt++;
+    }
+    if(idx_fsr2!=-1){
+      fsrphoton2.SetPtEtaPhiM( pico.out_fsrphoton_pt()[idx_fsr2],pico.out_fsrphoton_eta()[idx_fsr2],pico.out_fsrphoton_phi()[idx_fsr2],0 ); 
+      fsrphotons_map[fsr_cnt] = fsrphoton2;     
+    } 
+  } else {
+    l1.SetPtEtaPhiM(l1_pt, pico.out_el_eta()[idx_l1],
+                    pico.out_el_phi()[idx_l1], el_m);
+    l2.SetPtEtaPhiM(l2_pt, pico.out_el_eta()[idx_l2],
+                    pico.out_el_phi()[idx_l2], el_m);
+
+    leptons_map[0] = l1;
+    leptons_map[1] = l2; 
+    leptons_pterr_map[0] = pico.out_el_energyErr()[idx_l1]*l1.Pt()/l1.P();
+    leptons_pterr_map[1] = pico.out_el_energyErr()[idx_l2]*l2.Pt()/l2.P();
+  }
+
+  kinZfitter->Setup(leptons_map, fsrphotons_map, leptons_pterr_map);
+  kinZfitter->KinRefitZ1();
+  refit_leptons = kinZfitter->GetRefitP4s();
+  RefitResults result = {refit_leptons[0], refit_leptons[1], status, 
+                         covmatstatus, minnll};
+  return result;
+}
+
+void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, 
+                                        vector<int> sig_jet_nano_idx, 
+                                        bool is_signal){
 
   // write dijet variables
   if(sig_jet_nano_idx.size() > 1) {
@@ -286,19 +362,16 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
     pico.out_zg_cutBitMap() = baseBit;
   }
 
-  if (pico.out_ll_pt().size() == 0 || pico.out_nphoton() == 0){
+  if ((pico.out_nll() == 0 || pico.out_nphoton() == 0) && !is_signal){
  
     pico.out_zg_cutBitMap() = baseBit;
     pico.out_zg_categorizationBitMap() = categoryBit;
     return;
   }
 
-
-
-  // loop that produces llphoton candidate for each signal ll and photon pair
-  // first dilepton is one with mass closest to Z, unordered after that
-  // photons pT-ordered
-  for(size_t ill(0); ill < pico.out_ll_pt().size(); ill++){
+  // loop that produces llphoton candidate for each photon pair; photons are 
+  // pT-ordered
+  for(int ill(0); ill < pico.out_nll(); ill++){
     for(size_t igamma(0); igamma < pico.out_photon_pt().size(); igamma++) {
       // skip photons that fail pt/el veto/dr requirement
       if (pico.out_photon_pt()[igamma] < 15.0f 
@@ -426,194 +499,185 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, vector
   }
 
   //Code Executing the kinematic refit
-  if(pico.out_nllphoton() > 0){
+  unsigned n_variations = 1;
+  if (is_signal)
+    n_variations = 9;
+  for (unsigned ivar = 0; ivar < n_variations; ivar++) {
 
-    //Definitions of variables for the refit
-    TLorentzVector ll_refit(0,0,0,0);
-    std::vector<TLorentzVector> refit_leptons{ll_refit,ll_refit};
-    std::map<unsigned int, TLorentzVector> leptons_map;
-    std::map<unsigned int, double> leptons_pterr_map;
-    std::map<unsigned int, TLorentzVector> fsrphotons_map;
-    TLorentzVector fsrphoton1, fsrphoton2,l1,l2,photon;
-    int status, covmatstatus = -5;
-    float minnll = -5;
-    int idx_l1 = pico.out_ll_i1()[0];
-    int idx_l2 = pico.out_ll_i2()[0];
+    // skip if no ll pair
+    if (pico.out_ll_lepid()[ivar] == -1)
+      continue;
 
-    if(pico.out_ll_lepid()[0] == 13){
-      int idx_fsr1, idx_fsr2;
-
-      l1.SetPtEtaPhiM(pico.out_mu_pt()[idx_l1], pico.out_mu_eta()[idx_l1],
-                      pico.out_mu_phi()[idx_l1], mu_m);
-      l2.SetPtEtaPhiM(pico.out_mu_pt()[idx_l2], pico.out_mu_eta()[idx_l2],
-                      pico.out_mu_phi()[idx_l2], mu_m);
-
-      leptons_map[0] = l1;
-      leptons_map[1] = l2;
-      leptons_pterr_map[0] = pico.out_mu_ptErr()[idx_l1];
-      leptons_pterr_map[1] = pico.out_mu_ptErr()[idx_l2];
-     
-      //Loops through FSRphotons to find which leptons are associated with to be used for constrained fit
-      idx_fsr1 = -1; idx_fsr2 = -1;
-      for(size_t idx_fsr = 0; idx_fsr < static_cast<unsigned int>(pico.out_nfsrphoton()); idx_fsr++){
-        if(pico.out_fsrphoton_muonidx()[idx_fsr]==idx_l1){
-          if(idx_fsr1 != -1 && (pico.out_fsrphoton_droveret2()[idx_fsr1] <  pico.out_fsrphoton_droveret2()[idx_fsr])){ continue;}
-          idx_fsr1 = idx_fsr; continue;
-        }
-        if(pico.out_fsrphoton_muonidx()[idx_fsr]==idx_l2){
-          if(idx_fsr2 != -1 && (pico.out_fsrphoton_droveret2()[idx_fsr2] <  pico.out_fsrphoton_droveret2()[idx_fsr])){ continue;}
-          idx_fsr2 = idx_fsr; continue;
-        }
+    // skip redudant refits ex. mu variation on ee pair
+    if (ivar != 0) {
+      if (pico.out_ll_lepid()[ivar] == pico.out_ll_lepid()[0]
+          && pico.out_ll_i1()[ivar] == pico.out_ll_i1()[0]
+          && pico.out_ll_i2()[ivar] == pico.out_ll_i2()[0]
+          && pico.out_ll_l1_pt()[ivar] == pico.out_ll_l1_pt()[0]
+          && pico.out_ll_l2_pt()[ivar] == pico.out_ll_l2_pt()[0]) {
+        pico.out_ll_refit_lep1_pt().push_back(
+            pico.out_ll_refit_lep1_pt()[0]);
+        pico.out_ll_refit_lep1_eta().push_back(
+            pico.out_ll_refit_lep1_eta()[0]);
+        pico.out_ll_refit_lep1_phi().push_back(
+            pico.out_ll_refit_lep1_phi()[0]);
+        pico.out_ll_refit_lep1_m().push_back(
+            pico.out_ll_refit_lep1_m()[0]);
+        pico.out_ll_refit_lep2_pt().push_back(
+            pico.out_ll_refit_lep2_pt()[0]);
+        pico.out_ll_refit_lep2_eta().push_back(
+            pico.out_ll_refit_lep2_eta()[0]);
+        pico.out_ll_refit_lep2_phi().push_back(
+            pico.out_ll_refit_lep2_phi()[0]);
+        pico.out_ll_refit_lep2_m().push_back(
+            pico.out_ll_refit_lep2_m()[0]);
+        continue;
       }
-
-      //Adds the FSR photons to a map
-      fsrphotons_map.clear();
-      int fsr_cnt = 0;
-      if(idx_fsr1!=-1){
-        fsrphoton1.SetPtEtaPhiM( pico.out_fsrphoton_pt()[idx_fsr1],pico.out_fsrphoton_eta()[idx_fsr1],pico.out_fsrphoton_phi()[idx_fsr1],0 );
-        fsrphotons_map[fsr_cnt] = fsrphoton1;
-        fsr_cnt++;
-      }
-      if(idx_fsr2!=-1){
-        fsrphoton2.SetPtEtaPhiM( pico.out_fsrphoton_pt()[idx_fsr2],pico.out_fsrphoton_eta()[idx_fsr2],pico.out_fsrphoton_phi()[idx_fsr2],0 ); 
-        fsrphotons_map[fsr_cnt] = fsrphoton2;     
-      } 
-    } else {
-      l1.SetPtEtaPhiM(pico.out_el_pt()[idx_l1], pico.out_el_eta()[idx_l1],
-                      pico.out_el_phi()[idx_l1], el_m);
-      l2.SetPtEtaPhiM(pico.out_el_pt()[idx_l2], pico.out_el_eta()[idx_l2],
-                      pico.out_el_phi()[idx_l2], el_m);
-
-      leptons_map[0] = l1;
-      leptons_map[1] = l2; 
-      leptons_pterr_map[0] = pico.out_el_energyErr()[idx_l1]*l1.Pt()/l1.P();
-      leptons_pterr_map[1] = pico.out_el_energyErr()[idx_l2]*l2.Pt()/l2.P();
     }
 
-    kinZfitter->Setup(leptons_map, fsrphotons_map, leptons_pterr_map);
-    kinZfitter->KinRefitZ1();
-    refit_leptons = kinZfitter->GetRefitP4s();
-    ll_refit     = refit_leptons[0] + refit_leptons[1];
-    status       = kinZfitter -> GetStatus();
-    covmatstatus = kinZfitter -> GetCovMatStatus();
-    minnll       = kinZfitter -> GetMinNll();
+    RefitResults refit_result = PerformKinematicRefit(pico, ivar);
+    std::vector<TLorentzVector> refit_leptons;
+    refit_leptons.push_back(refit_result.l1);
+    refit_leptons.push_back(refit_result.l2);
+    TLorentzVector ll_refit = refit_leptons[0] + refit_leptons[1];
+    int status = refit_result.status;
+    int covmatstatus = refit_result.covmatstatus;
+    float minnll = refit_result.minnll;
+    pico.out_ll_refit_lep1_pt().push_back(refit_leptons[0].Pt());
+    pico.out_ll_refit_lep1_eta().push_back(refit_leptons[0].Eta());
+    pico.out_ll_refit_lep1_phi().push_back(refit_leptons[0].Phi());
+    pico.out_ll_refit_lep1_m().push_back(refit_leptons[0].M());
+    pico.out_ll_refit_lep2_pt().push_back(refit_leptons[1].Pt());
+    pico.out_ll_refit_lep2_eta().push_back(refit_leptons[1].Eta());
+    pico.out_ll_refit_lep2_phi().push_back(refit_leptons[1].Phi());
+    pico.out_ll_refit_lep2_m().push_back(refit_leptons[1].M());
 
-    //debug statement
-    //cnt_refit++; std::cout << cnt_refit << std::endl;
+    if (ivar == 0 && pico.out_nllphoton()>0) {
 
-    photon.SetPtEtaPhiM(pico.out_photon_pt()[0], pico.out_photon_eta()[0], pico.out_photon_phi()[0], 0);
-    TLorentzVector llg_refit = ll_refit + photon;
+      //debug statement
+      //cnt_refit++; std::cout << cnt_refit << std::endl;
 
-    //Assigns the refit lepton/dilepton quantities
-    pico.out_ll_refit_pt()    = ll_refit.Pt();
-    pico.out_ll_refit_eta()   = ll_refit.Eta();
-    pico.out_ll_refit_phi()   = ll_refit.Phi();
-    pico.out_ll_refit_m()     = ll_refit.M();
-    pico.out_ll_refit_l1_pt() = refit_leptons[0].Pt();
-    pico.out_ll_refit_l2_pt() = refit_leptons[1].Pt();
+      TLorentzVector photon;
+      photon.SetPtEtaPhiM(pico.out_photon_pt()[0], pico.out_photon_eta()[0], 
+                          pico.out_photon_phi()[0], 0);
+      TLorentzVector llg_refit = ll_refit + photon;
 
-    pico.out_ll_refit_status()        = status;
-    pico.out_ll_refit_covmat_status() = covmatstatus;
-    pico.out_ll_refit_minnll()        = minnll;
+      //Assigns the refit lepton/dilepton quantities
+      pico.out_ll_refit_pt()    = ll_refit.Pt();
+      pico.out_ll_refit_eta()   = ll_refit.Eta();
+      pico.out_ll_refit_phi()   = ll_refit.Phi();
+      pico.out_ll_refit_m()     = ll_refit.M();
+      pico.out_ll_refit_l1_pt() = refit_leptons[0].Pt();
+      pico.out_ll_refit_l2_pt() = refit_leptons[1].Pt();
 
-    pico.out_llphoton_refit_pt()   = llg_refit.Pt();
-    pico.out_llphoton_refit_eta()  = llg_refit.Eta();
-    pico.out_llphoton_refit_phi()  = llg_refit.Phi();
-    pico.out_llphoton_refit_m()    = llg_refit.M();
-    pico.out_llphoton_refit_dr()   = dR(ll_refit.Eta(), photon.Eta(),
-                                        ll_refit.Phi(), photon.Phi());
-    pico.out_llphoton_refit_dphi() = DeltaPhi(ll_refit.Phi(), photon.Phi());
-    pico.out_llphoton_refit_deta() = fabs(ll_refit.Eta() - photon.Eta());
+      pico.out_ll_refit_status()        = status;
+      pico.out_ll_refit_covmat_status() = covmatstatus;
+      pico.out_ll_refit_minnll()        = minnll;
 
-    if(sig_jet_nano_idx.size() > 1) {
-      TLorentzVector j1, j2, dijet;
-      j1.SetPtEtaPhiM(nano.Jet_pt()[sig_jet_nano_idx[0]], nano.Jet_eta()[sig_jet_nano_idx[0]], nano.Jet_phi()[sig_jet_nano_idx[0]], nano.Jet_mass()[sig_jet_nano_idx[0]]);
-      j2.SetPtEtaPhiM(nano.Jet_pt()[sig_jet_nano_idx[1]], nano.Jet_eta()[sig_jet_nano_idx[1]], nano.Jet_phi()[sig_jet_nano_idx[1]], nano.Jet_mass()[sig_jet_nano_idx[1]]);
-      dijet = j1 + j2;
-      pico.out_llphoton_refit_dijet_dphi()    = DeltaPhi(llg_refit.Phi(),
-                                                         dijet.Phi());
-      pico.out_llphoton_refit_dijet_balance() = (ll_refit+photon+j1+j2).Pt()/(ll_refit.Pt()+photon.Pt()+j1.Pt()+j2.Pt());
-      pico.out_llphoton_refit_dijet_dr()      = dR(llg_refit.Eta(), 
-          dijet.Eta(), llg_refit.Phi(), dijet.Phi());
+      pico.out_llphoton_refit_pt()   = llg_refit.Pt();
+      pico.out_llphoton_refit_eta()  = llg_refit.Eta();
+      pico.out_llphoton_refit_phi()  = llg_refit.Phi();
+      pico.out_llphoton_refit_m()    = llg_refit.M();
+      pico.out_llphoton_refit_dr()   = dR(ll_refit.Eta(), photon.Eta(),
+                                          ll_refit.Phi(), photon.Phi());
+      pico.out_llphoton_refit_dphi() = DeltaPhi(ll_refit.Phi(), photon.Phi());
+      pico.out_llphoton_refit_deta() = fabs(ll_refit.Eta() - photon.Eta());
 
-    } else if (sig_jet_nano_idx.size() > 0) {
-      TLorentzVector j1;
-      j1.SetPtEtaPhiM(nano.Jet_pt()[sig_jet_nano_idx[0]], nano.Jet_eta()[sig_jet_nano_idx[0]], nano.Jet_phi()[sig_jet_nano_idx[0]], nano.Jet_mass()[sig_jet_nano_idx[0]]);
-      pico.out_llphoton_refit_dijet_dphi()    = DeltaPhi(llg_refit.Phi(),
-                                                         j1.Phi());
-      pico.out_llphoton_refit_dijet_balance() = (ll_refit+photon+j1).Pt()/(ll_refit.Pt()+photon.Pt()+j1.Pt());
-      pico.out_llphoton_refit_dijet_dr()      = dR(llg_refit.Eta(), j1.Eta(),
-                                                   llg_refit.Phi(), j1.Phi());
-    }
-    else {
-      pico.out_llphoton_refit_dijet_balance() = (ll_refit+photon).Pt()/(ll_refit.Pt()+photon.Pt());
-    }
+      if(sig_jet_nano_idx.size() > 1) {
+        TLorentzVector j1, j2, dijet;
+        j1.SetPtEtaPhiM(nano.Jet_pt()[sig_jet_nano_idx[0]], nano.Jet_eta()[sig_jet_nano_idx[0]], nano.Jet_phi()[sig_jet_nano_idx[0]], nano.Jet_mass()[sig_jet_nano_idx[0]]);
+        j2.SetPtEtaPhiM(nano.Jet_pt()[sig_jet_nano_idx[1]], nano.Jet_eta()[sig_jet_nano_idx[1]], nano.Jet_phi()[sig_jet_nano_idx[1]], nano.Jet_mass()[sig_jet_nano_idx[1]]);
+        dijet = j1 + j2;
+        pico.out_llphoton_refit_dijet_dphi()    = DeltaPhi(llg_refit.Phi(),
+                                                           dijet.Phi());
+        pico.out_llphoton_refit_dijet_balance() = (ll_refit+photon+j1+j2).Pt()/(ll_refit.Pt()+photon.Pt()+j1.Pt()+j2.Pt());
+        pico.out_llphoton_refit_dijet_dr()      = dR(llg_refit.Eta(), 
+            dijet.Eta(), llg_refit.Phi(), dijet.Phi());
 
-    //Refit angles and various variables using the kinematic refit quantities
-    TVector3 g_pT = photon.Vect();
-    TVector3 h_pT = llg_refit.Vect();
-    TVector3 z_pT = ll_refit.Vect();
-    g_pT.SetZ(0); h_pT.SetZ(0); z_pT.SetZ(0);
-    pico.out_llphoton_refit_pTt() = h_pT.Cross((z_pT-g_pT).Unit()).Mag();
-    pico.out_llphoton_refit_pTt_an_hig019014() = h_pT.Unit().Cross(z_pT-g_pT).Mag();
-
-    TLorentzVector lminus, lplus;
-    TLorentzVector lep1, lep2;
-    TLorentzVector l1err, l2err, pherr;
-    double ptl1err, ptl2err, ptpherr;
-    double dml1, dml2, dmph;
-    ptpherr = pico.out_photon_energyErr()[0] * photon.Pt() / photon.P();
-    pherr.SetPtEtaPhiM(pico.out_photon_pt()[0] + ptpherr,
-                       pico.out_photon_eta()[0], pico.out_photon_phi()[0], 0);
-    lep1 = refit_leptons[0];
-    lep2 = refit_leptons[1];
-    if(pico.out_ll_lepid()[0] == 11) {
-      int iel1 = pico.out_ll_i1()[0];
-      int iel2 = pico.out_ll_i2()[0];
-      if(pico.out_el_charge()[iel1] < 0) {
-        lminus = lep1;
-        lplus  = lep2;
+      } else if (sig_jet_nano_idx.size() > 0) {
+        TLorentzVector j1;
+        j1.SetPtEtaPhiM(nano.Jet_pt()[sig_jet_nano_idx[0]], nano.Jet_eta()[sig_jet_nano_idx[0]], nano.Jet_phi()[sig_jet_nano_idx[0]], nano.Jet_mass()[sig_jet_nano_idx[0]]);
+        pico.out_llphoton_refit_dijet_dphi()    = DeltaPhi(llg_refit.Phi(),
+                                                           j1.Phi());
+        pico.out_llphoton_refit_dijet_balance() = (ll_refit+photon+j1).Pt()/(ll_refit.Pt()+photon.Pt()+j1.Pt());
+        pico.out_llphoton_refit_dijet_dr()      = dR(llg_refit.Eta(), j1.Eta(),
+                                                     llg_refit.Phi(), j1.Phi());
       }
       else {
-        lminus = lep2;
-        lplus  = lep1;
+        pico.out_llphoton_refit_dijet_balance() = (ll_refit+photon).Pt()/(ll_refit.Pt()+photon.Pt());
       }
-      ptl1err = pico.out_el_energyErr()[iel1] * lep1.Pt() / lep1.P();
-      ptl2err = pico.out_el_energyErr()[iel2] * lep2.Pt() / lep2.P();
-      l1err.SetPtEtaPhiM(lep1.Pt() + ptl1err, lep1.Eta(), lep1.Phi(), el_m);
-      l2err.SetPtEtaPhiM(lep2.Pt() + ptl2err, lep2.Eta(), lep2.Phi(), el_m);
-      dml1 = (l1err + lep2 + photon).M() - (lep1 + lep2 + photon).M();
-      dml2 = (lep1 + l2err + photon).M() - (lep1 + lep2 + photon).M();
-      dmph = (lep1 + lep2 + pherr).M() - (lep1 + lep2 + photon).M();
-    }
-    else {
-      int imu1 = pico.out_ll_i1()[0];
-      int imu2 = pico.out_ll_i2()[0];
-      if(pico.out_mu_charge()[imu1] < 0) {
-        lminus = lep1;
-        lplus  = lep2;
+
+      //Refit angles and various variables using the kinematic refit quantities
+      TVector3 g_pT = photon.Vect();
+      TVector3 h_pT = llg_refit.Vect();
+      TVector3 z_pT = ll_refit.Vect();
+      g_pT.SetZ(0); h_pT.SetZ(0); z_pT.SetZ(0);
+      pico.out_llphoton_refit_pTt() = h_pT.Cross((z_pT-g_pT).Unit()).Mag();
+      pico.out_llphoton_refit_pTt_an_hig019014() = h_pT.Unit().Cross(z_pT-g_pT).Mag();
+
+      TLorentzVector lminus, lplus;
+      TLorentzVector lep1, lep2;
+      TLorentzVector l1err, l2err, pherr;
+      double ptl1err, ptl2err, ptpherr;
+      double dml1, dml2, dmph;
+      ptpherr = pico.out_photon_energyErr()[0] * photon.Pt() / photon.P();
+      pherr.SetPtEtaPhiM(pico.out_photon_pt()[0] + ptpherr,
+                         pico.out_photon_eta()[0], pico.out_photon_phi()[0], 0);
+      lep1 = refit_leptons[0];
+      lep2 = refit_leptons[1];
+      if(pico.out_ll_lepid()[0] == 11) {
+        int iel1 = pico.out_ll_i1()[0];
+        int iel2 = pico.out_ll_i2()[0];
+        if(pico.out_el_charge()[iel1] < 0) {
+          lminus = lep1;
+          lplus  = lep2;
+        }
+        else {
+          lminus = lep2;
+          lplus  = lep1;
+        }
+        ptl1err = pico.out_el_energyErr()[iel1] * lep1.Pt() / lep1.P();
+        ptl2err = pico.out_el_energyErr()[iel2] * lep2.Pt() / lep2.P();
+        l1err.SetPtEtaPhiM(lep1.Pt() + ptl1err, lep1.Eta(), lep1.Phi(), el_m);
+        l2err.SetPtEtaPhiM(lep2.Pt() + ptl2err, lep2.Eta(), lep2.Phi(), el_m);
+        dml1 = (l1err + lep2 + photon).M() - (lep1 + lep2 + photon).M();
+        dml2 = (lep1 + l2err + photon).M() - (lep1 + lep2 + photon).M();
+        dmph = (lep1 + lep2 + pherr).M() - (lep1 + lep2 + photon).M();
       }
       else {
-        lminus = lep2;
-        lplus  = lep1;
+        int imu1 = pico.out_ll_i1()[0];
+        int imu2 = pico.out_ll_i2()[0];
+        if(pico.out_mu_charge()[imu1] < 0) {
+          lminus = lep1;
+          lplus  = lep2;
+        }
+        else {
+          lminus = lep2;
+          lplus  = lep1;
+        }
+        ptl1err = pico.out_mu_ptErr()[imu1];
+        ptl2err = pico.out_mu_ptErr()[imu2];
+        l1err.SetPtEtaPhiM(lep1.Pt() + ptl1err, lep1.Eta(), lep1.Phi(), mu_m);
+        l2err.SetPtEtaPhiM(lep2.Pt() + ptl2err, lep2.Eta(), lep2.Phi(), mu_m);
+        dml1 = (l1err + lep2 + photon).M() - (lep1 + lep2 + photon).M();
+        dml2 = (lep1 + l2err + photon).M() - (lep1 + lep2 + photon).M();
+        dmph = (lep1 + lep2 + pherr).M() - (lep1 + lep2 + photon).M();
       }
-      ptl1err = pico.out_mu_ptErr()[imu1];
-      ptl2err = pico.out_mu_ptErr()[imu2];
-      l1err.SetPtEtaPhiM(lep1.Pt() + ptl1err, lep1.Eta(), lep1.Phi(), mu_m);
-      l2err.SetPtEtaPhiM(lep2.Pt() + ptl2err, lep2.Eta(), lep2.Phi(), mu_m);
-      dml1 = (l1err + lep2 + photon).M() - (lep1 + lep2 + photon).M();
-      dml2 = (lep1 + l2err + photon).M() - (lep1 + lep2 + photon).M();
-      dmph = (lep1 + lep2 + pherr).M() - (lep1 + lep2 + photon).M();
-    }
-    pico.out_llphoton_refit_l1_masserr() = dml1;
-    pico.out_llphoton_refit_l2_masserr() = dml2;
-    pico.out_llphoton_refit_ph_masserr() = dmph;
+      pico.out_llphoton_refit_l1_masserr() = dml1;
+      pico.out_llphoton_refit_l2_masserr() = dml2;
+      pico.out_llphoton_refit_ph_masserr() = dmph;
 
-    vector<double> angles = CalculateAngles(lplus, lminus, photon);
-    pico.out_llphoton_refit_cosTheta() = angles[0];
-    pico.out_llphoton_refit_costheta() = angles[1];
-    pico.out_llphoton_refit_psi() = angles[2];
+      vector<double> angles = CalculateAngles(lplus, lminus, photon);
+      pico.out_llphoton_refit_cosTheta() = angles[0];
+      pico.out_llphoton_refit_costheta() = angles[1];
+      pico.out_llphoton_refit_psi() = angles[2];
+    } // is nominal variation and there is an llphoton object
+  } // loop over variations (refits)
 
+  if (pico.out_nll() == 0 || pico.out_nphoton() == 0){
+    pico.out_zg_cutBitMap() = baseBit;
+    pico.out_zg_categorizationBitMap() = categoryBit;
+    return;
   }
 
   //================Bitmap for zgamma cut flow================//

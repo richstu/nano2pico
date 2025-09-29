@@ -904,7 +904,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
         pico.out_jet_met_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], MET_phi));
         pico.out_jet_puid().push_back(nano.Jet_puId()[ijet]);
         pico.out_jet_puid_disc().push_back(nano.Jet_puIdDisc()[ijet]);
-        if (!isData) {
+        if (!isData && isSignal) {
           pico.out_sys_jet_pt_jesup().push_back(
               Jet_pt[ijet]*jes_up_factor[ijet]);
           pico.out_sys_jet_pt_jesdn().push_back(
@@ -921,6 +921,14 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
               Jet_mass[ijet]*jer_up_factor[ijet]);
           pico.out_sys_jet_m_jerdn().push_back(
               Jet_mass[ijet]*jer_dn_factor[ijet]);
+          pico.out_sys_jet_isgood_jesup().push_back(isgood_nopt
+              && (Jet_pt[ijet]*jes_up_factor[ijet] > min_jet_pt));
+          pico.out_sys_jet_isgood_jesdn().push_back(isgood_nopt
+              && (Jet_pt[ijet]*jes_dn_factor[ijet] > min_jet_pt));
+          pico.out_sys_jet_isgood_jerup().push_back(isgood_nopt
+              && (Jet_pt[ijet]*jer_up_factor[ijet] > min_jet_pt));
+          pico.out_sys_jet_isgood_jerdn().push_back(isgood_nopt
+              && (Jet_pt[ijet]*jer_dn_factor[ijet] > min_jet_pt));
         }
         break;
       case 2022:
@@ -966,6 +974,14 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
               Jet_mass[ijet]*jer_up_factor[ijet]);
           pico.out_sys_jet_m_jerdn().push_back(
               Jet_mass[ijet]*jer_dn_factor[ijet]);
+          pico.out_sys_jet_isgood_jesup().push_back(isgood_nopt
+              && (Jet_pt[ijet]*jes_up_factor[ijet] > min_jet_pt));
+          pico.out_sys_jet_isgood_jesdn().push_back(isgood_nopt
+              && (Jet_pt[ijet]*jes_dn_factor[ijet] > min_jet_pt));
+          pico.out_sys_jet_isgood_jerup().push_back(isgood_nopt
+              && (Jet_pt[ijet]*jer_up_factor[ijet] > min_jet_pt));
+          pico.out_sys_jet_isgood_jerdn().push_back(isgood_nopt
+              && (Jet_pt[ijet]*jer_dn_factor[ijet] > min_jet_pt));
         }
         break;
       default:
@@ -1024,7 +1040,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
     ijet_e24++;
   }
 
-  if (isSignal) {
+  if (isSignal && (nanoaod_version+0.01)<9) {
     for (unsigned ijec(0); ijec < 4; ijec++) {
       for (unsigned ijet(0); ijet < sys_jet_met_dphi[ijec].size(); ijet++) {
         float cut_ = ijet<=1 ? 0.5 : 0.3;

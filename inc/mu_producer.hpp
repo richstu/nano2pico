@@ -29,7 +29,7 @@ public:
   const float MuonHighPt        = 200;
   const float MuonSip3dCut      = 4.0;
 
-  std::vector<int> WriteMuons(nano_tree &nano, pico_tree &pico, std::vector<int> &jet_islep_nano_idx, std::vector<int> &jet_isvlep_nano_idx, std::vector<int> &sig_mu_pico_idx, bool isZgamma, bool isFastsim);
+  std::vector<int> WriteMuons(nano_tree &nano, pico_tree &pico, std::vector<int> &jet_islep_nano_idx, std::vector<int> &jet_isvlep_nano_idx, std::vector<int> &sig_mu_pico_idx, bool isZgamma, bool isSignal_sample, bool isFastsim);
 
 private:
   std::string year;
@@ -40,7 +40,8 @@ private:
   bool run3;
   std::unique_ptr<correction::CorrectionSet> cs_scare_;
 
-  bool IsSignal(nano_tree &nano, int nano_idx, bool isZgamma, float pt);
+  bool IsSignal(nano_tree &nano, int nano_idx, bool isZgamma, float pt, 
+                bool skip_pt=false);
   
 };
 
