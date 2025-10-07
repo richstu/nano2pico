@@ -322,6 +322,10 @@ void EventWeighter::ElectronSF(pico_tree &pico){
       }
       sf_up = (sf+unc)*(sf_reco+unc_reco);
       sf_dn = (sf-unc)*(sf_reco-unc_reco);
+      if (isinf(sf) || isnan(sf)) sf = 1.0;
+      if (isinf(sf_reco) || isnan(sf_reco)) sf_reco = 1.0;
+      if (isinf(sf_up) || isnan(sf_up)) sf_up = 1.0;
+      if (isinf(sf_dn) || isnan(sf_dn)) sf_dn = 1.0;
       sf_tot *= sf*sf_reco;
       sf_tot_up *= sf_up;
       sf_tot_dn *= fmax(sf_dn,0.0);
@@ -420,6 +424,9 @@ void EventWeighter::ElectronMinisoSF(pico_tree &pico){
     sf = data_eff/simu_eff;
     sf_up = data_eff_up/simu_eff_dn;
     sf_dn = data_eff_dn/simu_eff_up;
+    if (isinf(sf) || isnan(sf)) sf = 1.0;
+    if (isinf(sf_up) || isnan(sf_up)) sf_up = 1.0;
+    if (isinf(sf_dn) || isnan(sf_dn)) sf_dn = 1.0;
     sf_tot *= sf;
     sf_tot_up *= sf_up;
     sf_tot_dn *= sf_dn;
