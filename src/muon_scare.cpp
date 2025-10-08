@@ -104,7 +104,7 @@ double get_k(double eta, string var, unique_ptr<correction::CorrectionSet>& cset
 }
 
 
-double pt_resol(double pt, double eta, float nL, unique_ptr<correction::CorrectionSet>& cset) {
+double pt_resol(double pt, double eta, float nL, unique_ptr<correction::CorrectionSet>& cset, double low_pt_threshold = 26) {
 
     // load correction values
     double rndm = static_cast<double>(get_rndm(eta, nL, cset));
@@ -114,8 +114,9 @@ double pt_resol(double pt, double eta, float nL, unique_ptr<correction::Correcti
     // calculate corrected value and return original value if a parameter is nan
     double ptc = pt * ( 1 + k * std * rndm);
     if (isnan(ptc)) ptc = pt;
-    if (ptc / pt > 2 || ptc / pt < 0.1 || ptc < 0)
-        ptc = pt;
+    if(ptc / pt > 2 || ptc / pt < 0.1 || ptc < 0 || pt < low_pt_threshold || pt > 200){
+	ptc = pt;
+    }
     return ptc;
 }
 
@@ -146,7 +147,7 @@ double pt_resol_var(double pt_woresol, double pt_wresol, double eta, string updn
     return pt_var;
 }
 
-double pt_scale(bool is_data, double pt, double eta, double phi, int charge, unique_ptr<correction::CorrectionSet>& cset) {
+double pt_scale(bool is_data, double pt, double eta, double phi, int charge, unique_ptr<correction::CorrectionSet>& cset, double low_pt_threshold = 26) {
         
     // use right correction
     string dtmc = "mc";
@@ -154,6 +155,9 @@ double pt_scale(bool is_data, double pt, double eta, double phi, int charge, uni
 
     double a = cset->at("a_"+dtmc)->evaluate({eta, phi, "nom"});
     double m = cset->at("m_"+dtmc)->evaluate({eta, phi, "nom"});
+    if(pt < low_pt_threshold)
+	   return pt;
+
     return 1. / (m/pt + charge * a);
 }
 
