@@ -195,7 +195,8 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
       if (fabs(eta) > MuonEtaCut) continue;
       isSignal = IsSignal(nano, imu, isZgamma, pt);
     }
-    pico.out_mu_raw_pt().push_back(nano.Muon_pt()[imu]);
+    if(!run3) pico.out_mu_pt_raw().push_back(nano.Muon_pt()[imu]);
+    else pico.out_mu_pt_raw().push_back(nano.Muon_bsConstrainedPt()[imu]);
     pico.out_mu_pt().push_back(pt);
     pico.out_mu_eta().push_back(eta);
     pico.out_mu_phi().push_back(nano.Muon_phi()[imu]);
