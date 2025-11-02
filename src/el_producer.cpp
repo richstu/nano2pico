@@ -167,7 +167,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
         }
       }
       else if ((year=="2022"||year=="2022EE"||year=="2023"||year=="2023BPix")
-               && pt>20) {
+               && pt>15.f) {
         float run = static_cast<float>(nano.run());
         float r9 = fmin(fmax(nano.Electron_r9()[iel],0.0),1.0);
         float seedGain = static_cast<float>(nano.Electron_seedGain()[iel]);
