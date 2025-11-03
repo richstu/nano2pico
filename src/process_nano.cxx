@@ -337,7 +337,7 @@ int main(int argc, char *argv[]){
   ISRTools isr_tools(in_path, year, nanoaod_version, isData);
 
   // Initialize trees
-  gErrorIgnoreLevel=6000; // Turns off ROOT errors due to missing branches
+  //gErrorIgnoreLevel=6000; // Turns off ROOT errors due to missing branches
   nano_tree nano(in_path, nanoaod_version);
   //nano_tree nano(in_path, 9);
   size_t nentries(nent_test>0 ? nent_test : nano.GetEntries());
