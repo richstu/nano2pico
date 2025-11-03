@@ -92,6 +92,7 @@ bool PhotonProducer::IsSignal(nano_tree &nano, pico_tree &pico, int nano_idx,
                               vector<int> &photon_el_pico_idx) {
   float pt = nano.Photon_pt()[nano_idx]*scaleres_corr;
   if (pt < SignalPhotonPtCut) return false;
+  if (fabs(nano.Photon_eta()[nano_idx]) >= 2.5) return false; // previous versions did not include eta cut in definition --> will affect jet signal counting
   if (!(nano.Photon_isScEtaEB()[nano_idx] 
         || nano.Photon_isScEtaEE()[nano_idx])) return false;
   if (!nano.Photon_mvaID_WP80()[nano_idx]) return false;

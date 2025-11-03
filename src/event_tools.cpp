@@ -900,6 +900,7 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
     else if ((year>=2022) && dataset==Dataset::JetMET	   		 && (jetht_trigs || met_trigs) && !doubleeg_trigs && !egamma_trigs) return true;
     else if ((year<=2018) && dataset==Dataset::SingleMuon  && muon_trigs && !jetht_trigs && !met_trigs && !doubleeg_trigs && !egamma_trigs) return true;
     else if ((year>=2022) && dataset==Dataset::Muon	   && muon_trigs && !jetht_trigs && !met_trigs && !doubleeg_trigs && !egamma_trigs) return true;
+    else if (dataset==Dataset::DoubleMuon)	return true; // for sync only, triggers applied later in cutflow
     else return false;
   }  
   else {

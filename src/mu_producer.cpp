@@ -62,8 +62,9 @@ bool MuonProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma, float 
     if (fabs(eta) > MuonEtaCut) return false;
     if (pt > SignalMuonPtCut &&
       nano.Muon_miniPFRelIso_all()[nano_idx] < MuonMiniIsoCut &&
-      fabs(nano.Muon_dz()[nano_idx])<=0.5f && 
-      fabs(nano.Muon_dxy()[nano_idx])<=0.2f)
+      fabs(nano.Muon_dz()[nano_idx])<=0.2f && 
+//      fabs(nano.Muon_dxy()[nano_idx])<=0.2f && //no dxy requirements for syncing
+      fabs(nano.Muon_ip3d()[nano_idx]) < 0.1) // added requirement for sync
       return true;
     return false;
   }
@@ -94,7 +95,7 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
     if (!run3) {
       //Rochester corrections, see https://github.com/cms-nanoAOD/nanoAOD-tools/blob/master/python/postprocessing/modules/common/muonScaleResProducer.py
       float pt = nano.Muon_pt()[imu];
-      float scale_sf = rc.kScaleDT(charge,pt,eta,phi);
+      float scale_sf = 1; // rc.kScaleDT(charge,pt,eta,phi); //for synchronization purposes, ignore Rochester corrections
       if (isData) {
         muon_pt_corr.push_back(pt*scale_sf);
       }
@@ -181,7 +182,6 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
       if (fabs(nano.Muon_dxy()[imu])>dxyCut) continue; 
       isSignal = IsSignal(nano, imu, isZgamma, pt);
       pico.out_mu_sip3d().push_back(nano.Muon_sip3d()[imu]);
-      pico.out_mu_mediumid().push_back(nano.Muon_mediumId()[imu]);
       pico.out_mu_tightid().push_back(nano.Muon_tightId()[imu]);
       pico.out_mu_highptid().push_back(nano.Muon_highPtId()[imu]);
       pico.out_mu_fsrphotonid().push_back(Muon_fsrPhotonIdx[imu]);
@@ -196,6 +196,7 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
     pico.out_mu_pt().push_back(pt);
     pico.out_mu_eta().push_back(eta);
     pico.out_mu_phi().push_back(nano.Muon_phi()[imu]);
+    pico.out_mu_mediumid().push_back(nano.Muon_mediumId()[imu]);
     pico.out_mu_miniso().push_back(nano.Muon_miniPFRelIso_all()[imu]);
     pico.out_mu_reliso().push_back(nano.Muon_pfRelIso03_all()[imu]);
     pico.out_mu_dz().push_back(nano.Muon_dz()[imu]);

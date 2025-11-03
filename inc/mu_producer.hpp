@@ -17,12 +17,12 @@ public:
   explicit MuonProducer(std::string year, bool isData, float nanoaod_version, std::string rocco_file);
   ~MuonProducer();
 
-  const float SignalMuonPtCut  = 20.0;
+  const float SignalMuonPtCut  = 15.0; // 20.0 -> 15.0 for sync
   const float VetoMuonPtCut    = 10.0;
   const float ZgMuonPtCut      =  5.0;
   const float PicoMuonPtCut    =  3.0;
   const float MuonEtaCut        = 2.4;
-  const float MuonMiniIsoCut    = 0.2;
+  const float MuonMiniIsoCut    = 0.1; // 0.2 -> 0.1 for sync
   const float MuonRelIsoCut     = 0.35;
   const float dzCut         = 1.0;
   const float dxyCut        = 0.5;

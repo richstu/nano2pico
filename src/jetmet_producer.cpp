@@ -590,7 +590,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
     MET_pt = pico.out_met();
     MET_phi = pico.out_met_phi();
     for(int ijet(0); ijet<nano.nJet(); ++ijet) {
-      Jet_pt.push_back(nano.Jet_pt()[ijet]*jet_nm_factor[ijet]);
+      Jet_pt.push_back(nano.Jet_pt()[ijet]); //*jet_nm_factor[ijet]); // for sync purposes remove pt corrections
       Jet_mass.push_back(nano.Jet_mass()[ijet]*jet_nm_factor[ijet]);
     }
   }
