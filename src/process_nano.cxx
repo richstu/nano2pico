@@ -216,7 +216,7 @@ int main(int argc, char *argv[]){
     if (is_nanoAODv7_found) nanoaod_version = 7;
   }
   if (Contains(in_dir, "NanoAODv9UCSB")) nanoaod_version = 9.5;
-  if (Contains(in_dir, "NanoAODv12")) nanoaod_version = 12;
+  if (Contains(in_dir, "NanoAODv12") || Contains(in_dir, "NanoAODv13")) nanoaod_version = 12;
   cout<<"Using NanoAOD version: "<<nanoaod_version<<endl;
 
   time_t begtime, endtime;
