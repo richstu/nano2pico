@@ -71,7 +71,7 @@ int main(int argc, char *argv[]){
   bool isZgamma = Contains(out_dir, "zgamma");
   if (isZgamma)
     isSignal = (Contains(in_file, "HtoZG") || Contains(in_file, "HToZG") || 
-                Contains(in_file, "HtoMuMu") || Contains(in_file, "Hto2Mu") ? 
+                Contains(in_file, "HToMuMu") || Contains(in_file, "Hto2Mu") ? 
                 true : false);
   bool isHiggsino = Contains(out_dir, "higgsino");
   int year = -1;
