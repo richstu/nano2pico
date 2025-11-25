@@ -450,7 +450,7 @@ int main(int argc, char *argv[]){
         jet_islep_nano_idx, jet_isvlep_nano_idx, jet_isphoton_nano_idx,
         btag_wpts[year_string], btag_df_wpts[year_string], isFastsim, isSignal, sys_higvars);
     jetmet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year_string][1], isFastsim); // usually w.r.t. medium WP
-    jetmet_producer.WriteFatJets(nano, pico, ddb_wpts[year_string], mdak8_wpts[year_string], pnetmd_wpts[year_string]); // jetmet_producer.SetVerbose(nano.nSubJet()>0);
+    jetmet_producer.WriteFatJets(nano, pico); //, ddb_wpts[year_string], mdak8_wpts[year_string], pnetmd_wpts[year_string]); // jetmet_producer.SetVerbose(nano.nSubJet()>0);
     jetmet_producer.WriteSubJets(nano, pico);
     isr_tools.WriteISRJetMultiplicity(nano, pico);
     
