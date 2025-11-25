@@ -95,7 +95,7 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
     if (!run3) {
       //Rochester corrections, see https://github.com/cms-nanoAOD/nanoAOD-tools/blob/master/python/postprocessing/modules/common/muonScaleResProducer.py
       float pt = nano.Muon_pt()[imu];
-      float scale_sf = 1; // rc.kScaleDT(charge,pt,eta,phi); //for synchronization purposes, ignore Rochester corrections
+      float scale_sf = rc.kScaleDT(charge,pt,eta,phi); //for synchronization purposes, ignore Rochester corrections
       if (isData) {
         muon_pt_corr.push_back(pt*scale_sf);
       }
