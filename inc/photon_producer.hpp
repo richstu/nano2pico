@@ -31,6 +31,8 @@ public:
   bool IsSignal(nano_tree &nano, pico_tree &pico, int nano_idx, 
                 float scaleres_corr, float minLepDR, 
                 std::vector<int> &photon_el_pico_idx);
+  float SCeta(bool isScEtaEB, float eta, float phi, 
+              float pvx, float pvy, float pvz);
 
   std::vector<int> WritePhotons(nano_tree &nano, pico_tree &pico, 
                                 std::vector<int> &jet_isphoton_nano_idx, 
