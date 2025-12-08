@@ -646,7 +646,10 @@ void ZGammaVarProducer::WriteZGammaVars(pico_tree &pico){
   //Category bitmap - checks if the event matches one of the categories and their baselines
   //Bit 0: ggF, bit 1: VBF, bit 2: ttH leptonic, bit 3: VH 3l, bit 4: ttH hadronic, bit 5: ZH ptmiss, bit 6: untagged, bit 7: category specific baseline selection
   //ggF
-  if(pico.out_nlep()==2 && pico.out_njet()<=1 && pico.out_met()<90.f){ categoryBit += 0b10000000; } 
+  float vetomet = pico.out_met();
+  if(pico.out_ishemvetoevt() || pico.out_ismapvetoevt()) vetomet = 0;
+
+  if(pico.out_nlep()==2 && pico.out_njet()<=1 && vetomet<90.f){ categoryBit += 0b10000000; } 
   if(pico.out_nlep()==2 && pico.out_njet()>=2 && pico.out_nbdfm()==0){ categoryBit += 0b01000000; } //VBF
   
   //ttH leptonic
@@ -665,7 +668,7 @@ void ZGammaVarProducer::WriteZGammaVars(pico_tree &pico){
     //Category selections
     float ptom_llgamma = pico.out_llphoton_pt().at(0)/pico.out_llphoton_m().at(0);
     bool pass_miniso = check_miniso(pico,0.15);
-    if(pass_miniso && pico.out_met() > 30.0f && ptom_llgamma > 0.3f){categoryBit+=0b00000001;}
+    if(pass_miniso && vetomet > 30.0f && ptom_llgamma > 0.3f){categoryBit+=0b00000001;}
   }
 
   //ttH hadronic
@@ -678,7 +681,7 @@ void ZGammaVarProducer::WriteZGammaVars(pico_tree &pico){
   }
 
   //ZH ptmiss
-  if(pico.out_nlep()==2 && pico.out_njet()<=1 && pico.out_met()>90.f){ 
+  if(pico.out_nlep()==2 && pico.out_njet()<=1 && vetomet>90.f){ 
     categoryBit += 0b00000100;
 
     //Category selections
