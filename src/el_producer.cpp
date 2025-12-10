@@ -44,41 +44,41 @@ ElectronProducer::ElectronProducer(string year_, bool isData_, float nanoaod_ver
     cs_scale_syst_ = correction::CorrectionSet::from_file(
         "data/zgamma/2022/electronSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
-        "EGMScale_Compound_Ele_2022preEE");
+        "Scale");
     map_smearing_ = cs_scale_syst_->at(
-        "EGMSmearAndSyst_ElePTsplit_2022preEE");
+        "SmearAndSyst");
   }
   else if (year=="2022EE") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
         "data/zgamma/2022EE/electronSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
-        "EGMScale_Compound_Ele_2022postEE");
+        "Scale");
     map_smearing_ = cs_scale_syst_->at(
-        "EGMSmearAndSyst_ElePTsplit_2022postEE");
+        "SmearAndSyst");
   }
   else if (year=="2023") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
         "data/zgamma/2023/electronSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
-        "EGMScale_Compound_Ele_2023preBPIX");
+        "Scale");
     map_smearing_ = cs_scale_syst_->at(
-        "EGMSmearAndSyst_ElePTsplit_2023preBPIX");
+        "SmearAndSyst");
   }
   else if (year=="2023BPix") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
         "data/zgamma/2023BPix/electronSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
-        "EGMScale_Compound_Ele_2023postBPIX");
+        "Scale");
     map_smearing_ = cs_scale_syst_->at(
-        "EGMSmearAndSyst_ElePTsplit_2023postBPIX");
+        "SmearAndSyst");
   }
   else {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
         "data/zgamma/2023BPix/electronSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
-        "EGMScale_Compound_Ele_2023postBPIX");
+        "Scale");
     map_smearing_ = cs_scale_syst_->at(
-        "EGMSmearAndSyst_ElePTsplit_2023postBPIX");
+        "SmearAndSyst");
     std::cout << "WARNING: No dedicated EGM scale/smearing JSONs, defaulting to 2023BPix" << std::endl;
   }
   nanoaod_version = nanoaod_version_;
@@ -174,15 +174,15 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
         if (isData) {
           //scale corrections applied to data
           scaleres_corr.push_back(map_scale_->evaluate({"scale",run,etasc,r9,
-              fabs(etasc),pt,seedGain}));
+              pt,seedGain}));
         }
         else {
           //smearing corrections applied to MC, syst.s also calculated
-          float rho = map_smearing_->evaluate({"smear",pt,r9,fabs(etasc)});
+          float rho = map_smearing_->evaluate({"smear",pt,r9,etasc});
           float err_rho = map_smearing_->evaluate({"esmear",pt,r9,
-                                                   fabs(etasc)});
+                                                   etasc});
           float scale_unc = map_smearing_->evaluate({"escale",pt,r9,
-                                                     fabs(etasc)});
+                                                     etasc});
           float rand = rng_.Gaus();
           scaleres_corr.push_back(1.0f+rand*rho);
           smear_syst_up.push_back(1.0f+rand*(rho+err_rho));

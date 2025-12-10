@@ -45,41 +45,41 @@ PhotonProducer::PhotonProducer(string year_, bool isData_,
     cs_scale_syst_ = correction::CorrectionSet::from_file(
         "data/zgamma/2022/photonSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
-        "EGMScale_Compound_Pho_2022preEE");
+        "Scale");
     map_smearing_ = cs_scale_syst_->at(
-        "EGMSmearAndSyst_PhoPTsplit_2022preEE");
+        "SmearAndSyst");
   }
   else if (year=="2022EE") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
         "data/zgamma/2022EE/photonSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
-        "EGMScale_Compound_Pho_2022postEE");
+        "Scale");
     map_smearing_ = cs_scale_syst_->at(
-        "EGMSmearAndSyst_PhoPTsplit_2022postEE");
+        "SmearAndSyst");
   }
   else if (year=="2023") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
         "data/zgamma/2023/photonSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
-        "EGMScale_Compound_Pho_2023preBPIX");
+        "Scale");
     map_smearing_ = cs_scale_syst_->at(
-        "EGMSmearAndSyst_PhoPTsplit_2023preBPIX");
+        "SmearAndSyst");
   }
   else if (year=="2023BPix") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
         "data/zgamma/2023BPix/photonSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
-        "EGMScale_Compound_Pho_2023postBPIX");
+        "Scale");
     map_smearing_ = cs_scale_syst_->at(
-        "EGMSmearAndSyst_PhoPTsplit_2023postBPIX");
+        "SmearAndSyst");
   }
   else {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
         "data/zgamma/2023BPix/photonSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
-        "EGMScale_Compound_Pho_2023postBPIX");
+        "Scale");
     map_smearing_ = cs_scale_syst_->at(
-        "EGMSmearAndSyst_PhoPTsplit_2023postBPIX");
+        "SmearAndSyst");
     std::cout << "WARNING: No dedicated EGM scale/smearing JSONs, defaulting to 2023BPix" << std::endl;
   }
 }
@@ -186,13 +186,13 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
       if (isData) {
         //scale corrections applied to data
         scaleres_corr.push_back(map_scale_->evaluate({"scale",run,origin_eta,r9,
-            fabs(origin_eta),pt,seedGain}));
+            pt,seedGain}));
       }
       else {
         //smearing corrections applied to MC, syst.s also calculated
-        float rho = map_smearing_->evaluate({"smear",pt,r9,fabs(origin_eta)});
-        float err_rho = map_smearing_->evaluate({"esmear",pt,r9,fabs(origin_eta)});
-        float scale_unc = map_smearing_->evaluate({"escale",pt,r9,fabs(origin_eta)});
+        float rho = map_smearing_->evaluate({"smear",pt,r9,origin_eta});
+        float err_rho = map_smearing_->evaluate({"esmear",pt,r9,origin_eta});
+        float scale_unc = map_smearing_->evaluate({"escale",pt,r9,origin_eta});
         float rand = rng_.Gaus();
         scaleres_corr.push_back(1.0f+rand*rho);
         smear_syst_up.push_back(1.0f+rand*(rho+err_rho));
