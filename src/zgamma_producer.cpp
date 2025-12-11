@@ -506,14 +506,14 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico,
 
     // skip if no ll pair
     if (pico.out_ll_lepid()[ivar] == -1) {
-      //pico.out_ll_refit_lep1_pt().push_back(-999.0);
-      //pico.out_ll_refit_lep1_eta().push_back(-999.0);
-      //pico.out_ll_refit_lep1_phi().push_back(-999.0);
-      //pico.out_ll_refit_lep1_m().push_back(-999.0);
-      //pico.out_ll_refit_lep2_pt().push_back(-999.0);
-      //pico.out_ll_refit_lep2_eta().push_back(-999.0);
-      //pico.out_ll_refit_lep2_phi().push_back(-999.0);
-      //pico.out_ll_refit_lep2_m().push_back(-999.0);
+      pico.out_ll_refit_lep1_pt().push_back(-999.0);
+      pico.out_ll_refit_lep1_eta().push_back(-999.0);
+      pico.out_ll_refit_lep1_phi().push_back(-999.0);
+      pico.out_ll_refit_lep1_m().push_back(-999.0);
+      pico.out_ll_refit_lep2_pt().push_back(-999.0);
+      pico.out_ll_refit_lep2_eta().push_back(-999.0);
+      pico.out_ll_refit_lep2_phi().push_back(-999.0);
+      pico.out_ll_refit_lep2_m().push_back(-999.0);
       continue;
     }
 

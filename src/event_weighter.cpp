@@ -676,12 +676,12 @@ void EventWeighter::MuonMinisoSF(pico_tree &pico){
 
 // Pileup Scale Factors
 void EventWeighter::PileupSF(pico_tree &pico){
-  pico.out_w_pu() = min(map_pileup_->evaluate({float(pico.out_npu_tru()), 
+  pico.out_w_pu() = min(map_pileup_->evaluate({float(pico.out_npu_tru_mean()), 
       "nominal"}),10.0);
   pico.out_sys_pu().resize(2, 1.);
-  pico.out_sys_pu()[0] = min(map_pileup_->evaluate({float(pico.out_npu_tru()), 
+  pico.out_sys_pu()[0] = min(map_pileup_->evaluate({float(pico.out_npu_tru_mean()), 
       "up"}),10.0);
-  pico.out_sys_pu()[1] = min(map_pileup_->evaluate({float(pico.out_npu_tru()), 
+  pico.out_sys_pu()[1] = min(map_pileup_->evaluate({float(pico.out_npu_tru_mean()), 
       "down"}),10.0);
 }
 
