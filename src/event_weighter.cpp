@@ -693,8 +693,8 @@ void EventWeighter::bTaggingSF(pico_tree &pico){
   for (unsigned ijet = 0; ijet < pico.out_jet_pt().size(); ijet++) {
 
     if(pico.out_jet_isgood().at(ijet) 
-       && abs(pico.out_jet_eta().at(ijet)) < 2.4f){
-
+       && abs(pico.out_jet_eta().at(ijet)) < 2.5f){
+      if((year_=="2016APV" || year_=="2016") && abs(pico.out_jet_eta().at(ijet)) > 2.4f) continue;
       //get true flavor
       int jet_flavor = abs(pico.out_jet_hflavor().at(ijet));
       if (jet_flavor != 5 && jet_flavor != 4) jet_flavor = 0;
@@ -1057,11 +1057,11 @@ void EventWeighter::NNLOCorrection(pico_tree &pico){
     for (unsigned int i(0); i<pico.out_mc_pt().size(); i++){
       if (pico.out_mc_id().at(i)==25){
         hidx = i;
-        break;
       }
     }
     if (hidx>=0){
       float h_pt = pico.out_mc_pt().at(hidx);
+      cout<<"gen level higgs pt: "<<h_pt<<endl;
       sf = map_ggf_nnlo_->evaluate({h_pt});
     }
   }
