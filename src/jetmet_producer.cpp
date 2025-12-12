@@ -306,8 +306,6 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
       float jet_l1l2l3_pt = jet_raw_pt*jec;
       float jet_raw_pt_nomu = jet_raw_pt*(1.0-jet_type_muonfactor[ijet]);
       float jet_l1l2l3_pt_nomu = jet_raw_pt_nomu*jec;
-      // jets below 15 GeV considered in unclustered energy
-      if (jet_type == 1 && jet_l1l2l3_pt_nomu < 15.0f) continue;
 
       float indiv_jer_nm(1.0), indiv_jer_up(1.0), indiv_jer_dn(1.0);
       // calculate JER (smearing) factors for MC only
@@ -317,7 +315,7 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
       if (!isData) {
 
         float sigmajer = map_jermc_->evaluate({jet_type_eta[ijet],
-                                               jet_type_pt[ijet],rho});
+                                               jet_l1l2l3_pt,rho});
         float sjer_nom = 1.0f;
         float sjer_up = 1.0f;
         float sjer_dn = 1.0f;
@@ -327,11 +325,11 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
           sjer_dn = map_jersf_->evaluate({jet_type_eta[ijet],"down"});
         }
         else {
-          sjer_nom = map_jersf_->evaluate({jet_type_eta[ijet],jet_type_pt[ijet],
+          sjer_nom = map_jersf_->evaluate({jet_type_eta[ijet],jet_l1l2l3_pt,
                                            "nom"});
-          sjer_up = map_jersf_->evaluate({jet_type_eta[ijet],jet_type_pt[ijet],
+          sjer_up = map_jersf_->evaluate({jet_type_eta[ijet],jet_l1l2l3_pt,
                                           "up"});
-          sjer_dn = map_jersf_->evaluate({jet_type_eta[ijet],jet_type_pt[ijet],
+          sjer_dn = map_jersf_->evaluate({jet_type_eta[ijet],jet_l1l2l3_pt,
                                           "down"});
         }
 
@@ -340,14 +338,14 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
         for (int igen(0); igen<nano.nGenJet(); ++igen) {
           float dr = dR(jet_type_eta[ijet], nano.GenJet_eta()[igen], 
                         jet_type_phi[ijet], nano.GenJet_phi()[igen]);
-          float dpt = jet_type_pt[ijet]-nano.GenJet_pt()[igen];
-          if (dr < 0.2f && fabs(dpt) < 3.0f*sigmajer*jet_type_pt[ijet]) {
+          float dpt = jet_l1l2l3_pt-nano.GenJet_pt()[igen];
+          if (dr < 0.2f && fabs(dpt) < 3.0f*sigmajer*jet_l1l2l3_pt) {
             if (dr > mindr) continue;
             mindr = dr;
             found_genjet = true;
-            indiv_jer_nm = (1.0+(sjer_nom-1.0)*dpt/jet_type_pt[ijet]);
-            indiv_jer_up = (1.0+(sjer_up-1.0)*dpt/jet_type_pt[ijet]);
-            indiv_jer_dn = (1.0+(sjer_dn-1.0)*dpt/jet_type_pt[ijet]);
+            indiv_jer_nm = (1.0+(sjer_nom-1.0)*dpt/jet_l1l2l3_pt);
+            indiv_jer_up = (1.0+(sjer_up-1.0)*dpt/jet_l1l2l3_pt);
+            indiv_jer_dn = (1.0+(sjer_dn-1.0)*dpt/jet_l1l2l3_pt);
           }
         }
 
@@ -356,18 +354,6 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
           indiv_jer_nm = 1.0+rand*sqrt(std::max(sjer_nom*sjer_nom-1.0,0.0));
           indiv_jer_up = 1.0+rand*sqrt(std::max(sjer_up*sjer_up-1.0,0.0));
           indiv_jer_dn = 1.0+rand*sqrt(std::max(sjer_dn*sjer_dn-1.0,0.0));
-        }
-        //turn off smearing for non-gen-jets with pT<50 and 2.5<|eta|<3 in 2017 and onward
-        //this fixes an issue with PU jets in the horn region
-        //roughly modified strategy 2 from VBF SUSY: 
-        //https://indico.cern.ch/event/1046356/contributions/4397877/attachments/2259227/3834282/BrendaFabelaEnriquez_VBFSUSY_METstudies_JERCMeeting_June7_2021.pdf#page=7
-        if (year>=2017) {
-          if (!found_genjet && fabs(jet_type_eta[ijet])>2.5f && 
-              fabs(jet_type_eta[ijet])<3.0f && jet_type_pt[ijet]<50.0f) {
-            indiv_jer_nm = 1.0;
-            indiv_jer_up = 1.0;
-            indiv_jer_dn = 1.0;
-          }
         }
       }
 
@@ -387,7 +373,8 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
           jes_dn_factor.push_back(1.0-jes_unc);
         }
       }
-
+      // jets below 15 GeV considered in unclustered energy
+      if (jet_type == 1 && jet_l1l2l3_pt_nomu*indiv_jer_nm < 15.0f) continue;
       //propagate corrections to MET
       //propagate corrections for jets with pt>15 GeV after subtracting muons
       //(below this threshold, propagate from unclustered energy), and skip
@@ -400,12 +387,12 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
       float jet_sinphi = sin(jet_type_phi[ijet]);
       // Run 2: starting from T1 corrected MET  (i.e. L2L3-L1 applied)
       // Run 3: Apply L2L3-L1 corrections
-      if (jet_l1l2l3_pt_nomu > 15.0f && fabs(jet_type_eta[ijet])<5.2f 
+      if (jet_l1l2l3_pt_nomu*indiv_jer_nm > 15.0f && fabs(jet_type_eta[ijet])<5.2f 
           && emef < 0.9f) {
         float jet_nom_pt = jet_type_pt[ijet]*jet_factor;
         if (year <= 2018) {
-          met_x_nom -= jet_cosphi*jet_type_pt[ijet]*(jet_factor-1.0);
-          met_y_nom -= jet_sinphi*jet_type_pt[ijet]*(jet_factor-1.0);
+          met_x_nom -= jet_cosphi*jet_nom_pt*(jet_factor-1.0);
+          met_y_nom -= jet_sinphi*jet_nom_pt*(jet_factor-1.0);
         }
         else {
           met_x_nom -= jet_cosphi*(jet_nom_pt-jet_l1_pt);
@@ -590,8 +577,10 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
     MET_pt = pico.out_met();
     MET_phi = pico.out_met_phi();
     for(int ijet(0); ijet<nano.nJet(); ++ijet) {
-      Jet_pt.push_back(nano.Jet_pt()[ijet]*jet_nm_factor[ijet]);
-      Jet_mass.push_back(nano.Jet_mass()[ijet]*jet_nm_factor[ijet]);
+      float jet_pt = nano.Jet_pt()[ijet];
+      float jet_mass = nano.Jet_mass()[ijet];
+      Jet_pt.push_back(jet_pt*jet_nm_factor[ijet]);
+      Jet_mass.push_back(jet_mass*jet_nm_factor[ijet]);
     }
   }
   vector<int> Jet_jetId;
