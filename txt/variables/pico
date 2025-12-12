@@ -685,6 +685,12 @@ vector<float> sys_el_pt_scaledn
 vector<float> sys_el_pt_resup
 vector<float> sys_el_pt_resdn
 
+vector<float> sys_el_enerr_scaleup
+vector<float> sys_el_enerr_scaledn
+vector<float> sys_el_enerr_resup
+vector<float> sys_el_enerr_resdn
+
+
 #index matches muon_*
 vector<float> sys_mu_pt_scaleup
 vector<float> sys_mu_pt_scaledn
@@ -696,6 +702,11 @@ vector<float> sys_photon_pt_scaleup
 vector<float> sys_photon_pt_scaledn
 vector<float> sys_photon_pt_resup
 vector<float> sys_photon_pt_resdn
+
+vector<float> sys_photon_enerr_scaleup
+vector<float> sys_photon_enerr_scaledn
+vector<float> sys_photon_enerr_resup
+vector<float> sys_photon_enerr_resdn
 
 # variations have index 0 (JER smearing up), 1 (JER smearing down), 2 (JES up) and 3 (JES down)
 # for met_phi only: indxes 4 (unclustered up) 5 (unclustered down) 6 (lepton photon up) 7 (lepton photon down)
