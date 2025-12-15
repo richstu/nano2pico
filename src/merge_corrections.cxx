@@ -368,40 +368,16 @@ void Normalize(corrections_tree &corr){
   // total weight fixed in FixISR
   // w_lep fixed in Fix0L
   
-  Normalize(corr.out_w_el(), nent);
-  Normalize(corr.out_w_mu(), nent);
-
-  Normalize(corr.out_w_btag(), nent);
-  Normalize(corr.out_w_btag_df(), nent);
-  Normalize(corr.out_w_bhig(), nent);
-  Normalize(corr.out_w_bhig_df(), nent);
 
   // w_isr done in FixISR()
   Normalize(corr.out_w_pu(), nent);
 
-  Normalize(corr.out_w_photon(), nent);
   Normalize(corr.out_w_phshape(), nent);
   Normalize(corr.out_w_nnlo(), nent);
 
-  Normalize(corr.out_w_trig(), nent);
-
-  Normalize(corr.out_sys_el(), nent);
-  Normalize(corr.out_sys_mu(), nent);
-  Normalize(corr.out_sys_photon(), nent);
-  Normalize(corr.out_sys_photon_csev(), nent);
-  Normalize(corr.out_sys_bchig(), nent);
-  Normalize(corr.out_sys_udsghig(), nent);
-  Normalize(corr.out_sys_bchig_uncorr(), nent);
-  Normalize(corr.out_sys_udsghig_uncorr(), nent);
-  Normalize(corr.out_sys_fs_bchig(), nent);
-  Normalize(corr.out_sys_fs_udsghig(), nent);
-  Normalize(corr.out_sys_trig(), nent);
-  Normalize(corr.out_sys_trig_el(), nent);
-  Normalize(corr.out_sys_trig_mu(), nent);
   Normalize(corr.out_sys_pu(), nent);
 
   Normalize(corr.out_sys_murf(), nent);
-  Normalize(corr.out_sys_ps(), nent);
   // Normalize(corr.out_sys_pdf(), nent);
   // Normalize(corr.out_w_pdf(), nent);
 }
