@@ -1061,7 +1061,6 @@ void EventWeighter::NNLOCorrection(pico_tree &pico){
     }
     if (hidx>=0){
       float h_pt = pico.out_mc_pt().at(hidx);
-      cout<<"gen level higgs pt: "<<h_pt<<endl;
       sf = map_ggf_nnlo_->evaluate({h_pt});
     }
   }
