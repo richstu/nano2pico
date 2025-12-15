@@ -182,6 +182,11 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
             "scaledown",eta,nano.Photon_seedGain()[iph]}));
         smear_syst_up.push_back(1.0f+nano.Photon_dEsigmaUp()[iph]);
         smear_syst_dn.push_back(1.0f+nano.Photon_dEsigmaDown()[iph]);
+        energy_err_scale_up.push_back(nano.Photon_energyErr()[iph]);
+        energy_err_scale_dn.push_back(nano.Photon_energyErr()[iph]);
+        energy_err_smear_up.push_back(nano.Photon_energyErr()[iph]);
+        energy_err_smear_dn.push_back(nano.Photon_energyErr()[iph]);
+
       }
     }
     else if ((year=="2022"||year=="2022EE"||year=="2023"||year=="2023BPix") 

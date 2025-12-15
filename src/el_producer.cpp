@@ -170,6 +170,10 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
               "scaledown",etasc,nano.Electron_seedGain()[iel]}));
           smear_syst_up.push_back(1.0f+nano.Electron_dEsigmaUp()[iel]);
           smear_syst_dn.push_back(1.0f+nano.Electron_dEsigmaDown()[iel]);
+          energy_err_scale_up.push_back(nano.Electron_energyErr()[iel]);
+          energy_err_scale_dn.push_back(nano.Electron_energyErr()[iel]);
+          energy_err_smear_up.push_back(nano.Electron_energyErr()[iel]);
+          energy_err_smear_dn.push_back(nano.Electron_energyErr()[iel]);
         }
       }
       else if ((year=="2022"||year=="2022EE"||year=="2023"||year=="2023BPix")
