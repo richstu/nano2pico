@@ -271,7 +271,7 @@ vector<bool>  mu_sig
 vector<int>   mu_charge
 vector<int>   mu_pflavor
 vector<int>   mu_fsrphotonid
-vector<float> mu_raw_pt
+vector<float> mu_pt_raw
 
 int nel
 int nvel
