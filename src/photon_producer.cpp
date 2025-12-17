@@ -227,8 +227,10 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
         energy_err_corr.push_back(new_energy_err);
         energy_err_scale_up.push_back(new_energy_err*scale_up);
         energy_err_scale_dn.push_back(new_energy_err*scale_dn);
-        energy_err_smear_up.push_back(new_energy_err*smear_up);
-        energy_err_smear_dn.push_back(new_energy_err*smear_dn);
+        energy_err_smear_up.push_back(sqrt(pow(nano.Photon_energyErr()[iph],2) 
+                                      + pow((energy * smear_up),2)) * smearing_up);
+        energy_err_smear_dn.push_back(sqrt(pow(nano.Photon_energyErr()[iph],2) 
+                                      + pow((energy * smear_dn),2)) * smearing_dn);
       }
     }
     else {

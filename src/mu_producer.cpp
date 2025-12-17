@@ -98,11 +98,10 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
     if (!run3) {
       //Rochester corrections, see https://github.com/cms-nanoAOD/nanoAOD-tools/blob/master/python/postprocessing/modules/common/muonScaleResProducer.py
       float pt = nano.Muon_pt()[imu];
-      float pterr = nano.Muon_ptErr()[imu];
+      muon_err_corr.push_back(nano.Muon_ptErr()[imu]);
       float scale_sf = rc.kScaleDT(charge,pt,eta,phi);
       if (isData) {
         muon_pt_corr.push_back(pt*scale_sf);
-        muon_err_corr.push_back(pterr*scale_sf);
       }
       else {
         float resolution_sf = 1.0;
@@ -123,7 +122,6 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
               unif_rand)*(resolution_sf > 1.0 ? 1.0 : -1.0);
         }
         muon_pt_corr.push_back(pt*resolution_sf);
-        muon_err_corr.push_back(pterr*resolution_sf);
         muon_pt_scaleup.push_back(pt*resolution_sf
                                   *(scale_sf+scale_unc)/scale_sf);
         muon_pt_scaledn.push_back(pt*resolution_sf
@@ -134,17 +132,16 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
     }
     else {
       float pt = nano.Muon_bsConstrainedPt()[imu];
+      muon_err_corr.push_back(nano.Muon_bsConstrainedPtErr()[imu]);
       if (isData) {
         muon_pt_corr.push_back(scarekit::pt_scale(1, pt, eta, phi,
             charge, cs_scare_, pt_thresh));
-        muon_err_corr.push_back(nano.Muon_bsConstrainedPtErr()[imu]*(muon_pt_corr.back()/pt));
       }
       else {
         float sca_pt = scarekit::pt_scale(0, pt, eta, phi, charge, cs_scare_, pt_thresh);
         float re_pt = scarekit::pt_resol(sca_pt, eta, 
             static_cast<float>(nTrackerLayers), cs_scare_, pt_thresh);
         muon_pt_corr.push_back(re_pt);
-        muon_err_corr.push_back(nano.Muon_bsConstrainedPtErr()[imu]*(muon_pt_corr.back()/pt));
         muon_pt_scaleup.push_back(scarekit::pt_scale_var(re_pt, eta, phi, 
             charge, "up", cs_scare_));
         muon_pt_scaledn.push_back(scarekit::pt_scale_var(re_pt, eta, phi, 
@@ -223,14 +220,6 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
       pico.out_sys_mu_pt_resdn().push_back(muon_pt_resdn[imu]);
     }
     pico.out_mu_ptErr().push_back(pterr);
-    /*
-    if (nanoaod_version > 11.95) {
-      pico.out_mu_ptErr().push_back(nano.Muon_bsConstrainedPtErr()[imu]);
-    }
-    else {
-      pico.out_mu_ptErr().push_back(nano.Muon_ptErr()[imu]);
-    }
-*/
     // veto muon selection
     if (nano.Muon_miniPFRelIso_all()[imu] < MuonMiniIsoCut && 
         fabs(nano.Muon_dz()[imu])<=0.5f &&

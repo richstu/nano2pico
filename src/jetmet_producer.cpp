@@ -403,8 +403,8 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
           && emef < 0.9f) {
         float jet_nom_pt = jet_type_pt[ijet]*jet_factor;
         if (year <= 2018) {
-          met_x_nom -= jet_cosphi*jet_nom_pt*(jet_factor-1.0);
-          met_y_nom -= jet_sinphi*jet_nom_pt*(jet_factor-1.0);
+          met_x_nom -= jet_cosphi*jet_type_pt[ijet]*(jet_factor-1.0);
+          met_y_nom -= jet_sinphi*jet_type_pt[ijet]*(jet_factor-1.0);
         }
         else {
           met_x_nom -= jet_cosphi*(jet_nom_pt-jet_l1_pt);

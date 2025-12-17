@@ -211,12 +211,15 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
           smear_syst_dn.push_back(smearing_dn);
           scale_syst_up.push_back(scale_up);
           scale_syst_dn.push_back(scale_dn);
-          float new_energy_err = sqrt(pow(nano.Electron_energyErr()[iel],2) + pow((energy * smear),2)) * smearing;
+          float new_energy_err = sqrt(pow(nano.Electron_energyErr()[iel],2) + 
+                                 pow((energy * smear),2)) * smearing;
           energy_err_corr.push_back(new_energy_err);
           energy_err_scale_up.push_back(new_energy_err*scale_up);
           energy_err_scale_dn.push_back(new_energy_err*scale_dn);
-          energy_err_smear_up.push_back(new_energy_err*smear_up);
-          energy_err_smear_dn.push_back(new_energy_err*smear_dn);
+          energy_err_smear_up.push_back(sqrt(pow(nano.Electron_energyErr()[iel],2) 
+                                        + pow((energy * smear_up),2)) * smearing_up);
+          energy_err_smear_dn.push_back(sqrt(pow(nano.Electron_energyErr()[iel],2) 
+                                        + pow((energy * smear_dn),2)) * smearing_dn);
         }
       }
       else {
