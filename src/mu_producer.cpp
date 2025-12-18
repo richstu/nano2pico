@@ -70,7 +70,7 @@ bool MuonProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma, float 
   return false;
 }
 
-vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<int> &jet_islep_nano_idx, vector<int> &jet_isvlep_nano_idx, vector<int> &sig_mu_pico_idx, bool isZgamma, bool isSignal_sample, bool isFastsim){
+vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<int> &jet_islep_nano_idx, vector<int> &jet_isvlep_nano_idx, vector<int> &sig_mu_pico_idx, bool isZgamma, bool is_signal_sample, bool isFastsim){
   vector<float> Jet_pt, Jet_mass;
   getJetWithJEC(nano, isFastsim, Jet_pt, Jet_mass);
   vector<int> Muon_fsrPhotonIdx;
@@ -210,7 +210,7 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
     pico.out_mu_id().push_back(nano.Muon_looseId()[imu]);
     pico.out_mu_sig().push_back(isSignal);
     pico.out_mu_charge().push_back(nano.Muon_charge()[imu]);
-    if (!isData && isSignal_sample) {
+    if (!isData && is_signal_sample) {
       pico.out_mu_pflavor().push_back(nano.Muon_genPartFlav()[imu]);
       pico.out_sys_mu_pt_scaleup().push_back(muon_pt_scaleup[imu]);
       pico.out_sys_mu_pt_scaledn().push_back(muon_pt_scaledn[imu]);

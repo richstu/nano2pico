@@ -29,7 +29,7 @@ public:
   const float MuonHighPt        = 200;
   const float MuonSip3dCut      = 4.0;
 
-  std::vector<int> WriteMuons(nano_tree &nano, pico_tree &pico, std::vector<int> &jet_islep_nano_idx, std::vector<int> &jet_isvlep_nano_idx, std::vector<int> &sig_mu_pico_idx, bool isZgamma, bool isSignal_sample, bool isFastsim);
+  std::vector<int> WriteMuons(nano_tree &nano, pico_tree &pico, std::vector<int> &jet_islep_nano_idx, std::vector<int> &jet_isvlep_nano_idx, std::vector<int> &sig_mu_pico_idx, bool isZgamma, bool is_signal_sample, bool isFastsim);
 
 private:
   std::string year;
