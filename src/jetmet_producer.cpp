@@ -638,6 +638,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
 
   //calculate jet quality variables first to order pico list
   vector<bool> jet_pass_jetidFix;
+  vector<bool> jet_pass_PUjetid;
   vector<bool> jet_islep; 
   vector<bool> jet_isvlep; 
   vector<bool> jet_isphoton; 
@@ -649,9 +650,11 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
   for(int ijet(0); ijet<nano.nJet(); ++ijet){
     float jet_abseta = fabs(nano.Jet_eta()[ijet]);
     // jetid applied to only fullsim and data
+    // Unclear if this is the case for PU jet ID, treating it this way for now
     //Check if this is correct for R2
     if (isFastsim) {
       jet_pass_jetidFix.push_back(true);
+      jet_pass_PUjetid.push_back(true);
     }
     else {
       if (year < 2022) {
@@ -667,6 +670,12 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
           jet_pass_jetidFix.push_back((Jet_jetId[ijet] & (0b010)) 
               && (nano.Jet_neEmEF()[ijet] < 0.4f));
         }
+      }
+      if(year == 2016){//PU jet id is applied using JEC corrected jets, but not JES/JER
+                       //https://twiki.cern.ch/twiki/bin/view/CMS/PileupJetIDUL
+        jet_pass_PUjetid.push_back( (nano.Jet_puId()[ijet]& (1 << 0)) || nano.Jet_pt()[ijet] > 50.f);
+      } else{
+        jet_pass_PUjetid.push_back( (nano.Jet_puId()[ijet]& (1 << 2)) || nano.Jet_pt()[ijet] > 50.f);
       }
     }
     // check overlap with signal leptons (or photons)
@@ -684,7 +693,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
     // For studying jetmaps and HEM vetos. Don't include eta veto yet in order 
     // to remove anomalous met events.
     bool isgood_min = !jet_islep.back() && !jet_isphoton.back() 
-        && (jet_abseta < max_jet_eta) && jet_pass_jetidFix.back();
+        && (jet_abseta < max_jet_eta) && jet_pass_jetidFix.back() && jet_pass_PUjetid.back();
     // 2018 HEM veto. JetMET POG gives tighter selection than ours except 
     // 15 GeV cut. Apply our selection, with lower pT cut for veto events.
     bool isvetohem  = false;
