@@ -157,7 +157,9 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
     }
     else {
       float pt = nano.Electron_pt()[iel];
+      float eta = nano.Electron_eta()[iel];
       float etasc = nano.Electron_deltaEtaSC()[iel] + nano.Electron_eta()[iel];
+      float energy = pt*cosh(eta);
       //deal with scale/smearing (systematics only for NanoAODv9 [run 2], full
       //correction for NanoAODv10+ [run3])
       if (year=="2016APV"||year=="2016"||year=="2017"||year=="2018") {
@@ -168,10 +170,14 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
               "scaleup",etasc,nano.Electron_seedGain()[iel]}));
           scale_syst_dn.push_back(map_scale_syst_->evaluate({str_scale_syst_,
               "scaledown",etasc,nano.Electron_seedGain()[iel]}));
-          smear_syst_up.push_back(1.0f+nano.Electron_dEsigmaUp()[iel]);
-          smear_syst_dn.push_back(1.0f+nano.Electron_dEsigmaDown()[iel]);
-          energy_err_scale_up.push_back(nano.Electron_energyErr()[iel]);
-          energy_err_scale_dn.push_back(nano.Electron_energyErr()[iel]);
+          smear_syst_up.push_back(1.0f
+              -nano.Electron_dEsigmaUp()[iel]/cosh(eta)/pt);
+          smear_syst_dn.push_back(1.0f
+              -nano.Electron_dEsigmaDown()[iel]/cosh(eta)/pt);
+          energy_err_scale_up.push_back(nano.Electron_energyErr()[iel]
+                                        *scale_syst_up[iel]);
+          energy_err_scale_dn.push_back(nano.Electron_energyErr()[iel]
+                                        *scale_syst_dn[iel]);
           energy_err_smear_up.push_back(nano.Electron_energyErr()[iel]);
           energy_err_smear_dn.push_back(nano.Electron_energyErr()[iel]);
         }
@@ -180,7 +186,6 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
                && pt>15.f) {
         float run = static_cast<float>(nano.run());
         float r9 = fmin(fmax(nano.Electron_r9()[iel],0.0),1.0);
-        float energy = pt*cosh(nano.Electron_eta()[iel]);
         float seedGain = static_cast<float>(nano.Electron_seedGain()[iel]);
         if (isData) {
           //scale corrections applied to data
