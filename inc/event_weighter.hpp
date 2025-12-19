@@ -32,6 +32,8 @@ public:
 
   void bTaggingSF(pico_tree &pico);
 
+  void jetpuIdSF(pico_tree &pico);
+
   void PhotonShapeSF(pico_tree &pico);
 
   void FakePhotonSF(pico_tree &pico);
@@ -49,6 +51,7 @@ private:
   std::string in_file_pu_;
   std::string in_file_btag_;
   std::string in_file_btag_mceff_;
+  std::string in_file_jetpuid_;
   std::string in_file_electron_iso0p10_;
   std::string in_file_electron_iso0p15_;
   std::string in_file_electron_reco_;
@@ -68,6 +71,7 @@ private:
   std::unique_ptr<correction::CorrectionSet> cs_pileup_;
   std::unique_ptr<correction::CorrectionSet> cs_btag_;
   std::unique_ptr<correction::CorrectionSet> cs_btag_mceff_;
+  std::unique_ptr<correction::CorrectionSet> cs_jetpuid_;
   std::unique_ptr<correction::CorrectionSet> cs_el_iso0p10_;
   std::unique_ptr<correction::CorrectionSet> cs_el_iso0p15_;
   std::unique_ptr<correction::CorrectionSet> cs_el_hole_iso0p10_;
@@ -101,6 +105,7 @@ private:
   correction::Correction::Ref map_pileup_;
   correction::Correction::Ref map_btag_;
   correction::Correction::Ref map_udsgtag_;
+  correction::Correction::Ref map_jetpuid_;
   correction::Correction::Ref map_fakephoton_;
   correction::Correction::Ref map_ggf_nnlo_;
   std::unique_ptr<PhotonShapeWeighter> ph_shape_weighter_;
