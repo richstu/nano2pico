@@ -183,15 +183,13 @@ ZGammaVarProducer::RefitResults ZGammaVarProducer::PerformKinematicRefit(
   return result;
 }
 
-void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico, 
-                                        vector<int> sig_jet_nano_idx, 
-                                        bool is_signal){
+void ZGammaVarProducer::WriteZGammaVars(pico_tree &pico, bool is_signal){
 
   // write dijet variables
-  if(sig_jet_nano_idx.size() > 1) {
+  if(pico.out_njet() > 1) {
     TLorentzVector j1, j2, dijet;
-    j1.SetPtEtaPhiM(nano.Jet_pt()[sig_jet_nano_idx[0]], nano.Jet_eta()[sig_jet_nano_idx[0]], nano.Jet_phi()[sig_jet_nano_idx[0]],nano.Jet_mass()[sig_jet_nano_idx[0]]);
-    j2.SetPtEtaPhiM(nano.Jet_pt()[sig_jet_nano_idx[1]], nano.Jet_eta()[sig_jet_nano_idx[1]], nano.Jet_phi()[sig_jet_nano_idx[1]],nano.Jet_mass()[sig_jet_nano_idx[1]]);
+    j1.SetPtEtaPhiM(pico.out_jet_pt()[0], pico.out_jet_eta()[0], pico.out_jet_phi()[0],pico.out_jet_m()[0]);
+    j2.SetPtEtaPhiM(pico.out_jet_pt()[1], pico.out_jet_eta()[1], pico.out_jet_phi()[1],pico.out_jet_m()[1]);
     dijet = j1 + j2;
     pico.out_dijet_pt()   = dijet.Pt();
     pico.out_dijet_eta()  = dijet.Eta();
@@ -396,19 +394,19 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico,
       pico.out_llphoton_iph().push_back(igamma);
       pico.out_llphoton_ill().push_back(ill);
 
-      if(sig_jet_nano_idx.size() > 1) {
+      if(pico.out_njet() > 1) {
         TLorentzVector j1, j2, dijet;
-        j1.SetPtEtaPhiM(nano.Jet_pt()[sig_jet_nano_idx[0]], nano.Jet_eta()[sig_jet_nano_idx[0]], nano.Jet_phi()[sig_jet_nano_idx[0]], nano.Jet_mass()[sig_jet_nano_idx[0]]);
-        j2.SetPtEtaPhiM(nano.Jet_pt()[sig_jet_nano_idx[1]], nano.Jet_eta()[sig_jet_nano_idx[1]], nano.Jet_phi()[sig_jet_nano_idx[1]], nano.Jet_mass()[sig_jet_nano_idx[1]]);
+        j1.SetPtEtaPhiM(pico.out_jet_pt()[0], pico.out_jet_eta()[0], pico.out_jet_phi()[0],pico.out_jet_m()[0]);
+        j2.SetPtEtaPhiM(pico.out_jet_pt()[1], pico.out_jet_eta()[1], pico.out_jet_phi()[1],pico.out_jet_m()[1]);
         dijet = j1 + j2;
         pico.out_llphoton_dijet_dphi().push_back(DeltaPhi(llg.Phi(),
                                                           dijet.Phi()));
         pico.out_llphoton_dijet_balance().push_back((dilep+photon+j1+j2).Pt()/(dilep.Pt()+photon.Pt()+j1.Pt()+j2.Pt()));
         pico.out_llphoton_dijet_dr().push_back(dR(llg.Eta(), dijet.Eta(), 
                                                   llg.Phi(), dijet.Phi()));
-      } else if (sig_jet_nano_idx.size() > 0) {
+      } else if (pico.out_njet() > 0) {
         TLorentzVector j1;
-              j1.SetPtEtaPhiM(nano.Jet_pt()[sig_jet_nano_idx[0]], nano.Jet_eta()[sig_jet_nano_idx[0]], nano.Jet_phi()[sig_jet_nano_idx[0]], nano.Jet_mass()[sig_jet_nano_idx[0]]);
+              j1.SetPtEtaPhiM(pico.out_jet_pt()[0], pico.out_jet_eta()[0], pico.out_jet_phi()[0],pico.out_jet_m()[0]);
         pico.out_llphoton_dijet_dphi().push_back(DeltaPhi(llg.Phi(),j1.Phi()));
         pico.out_llphoton_dijet_balance().push_back((dilep+photon+j1).Pt()/(dilep.Pt()+photon.Pt()+j1.Pt()));
         pico.out_llphoton_dijet_dr().push_back(dR(llg.Eta(), j1.Eta(), 
@@ -544,6 +542,7 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico,
       }
     }
 
+<<<<<<< HEAD
     RefitResults refit_result = PerformKinematicRefit(pico, ivar);
     std::vector<TLorentzVector> refit_leptons;
     refit_leptons.push_back(refit_result.l1);
@@ -592,10 +591,10 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico,
       pico.out_llphoton_refit_dphi() = DeltaPhi(ll_refit.Phi(), photon.Phi());
       pico.out_llphoton_refit_deta() = fabs(ll_refit.Eta() - photon.Eta());
 
-      if(sig_jet_nano_idx.size() > 1) {
+      if(pico.out_njet() > 1) {
         TLorentzVector j1, j2, dijet;
-        j1.SetPtEtaPhiM(nano.Jet_pt()[sig_jet_nano_idx[0]], nano.Jet_eta()[sig_jet_nano_idx[0]], nano.Jet_phi()[sig_jet_nano_idx[0]], nano.Jet_mass()[sig_jet_nano_idx[0]]);
-        j2.SetPtEtaPhiM(nano.Jet_pt()[sig_jet_nano_idx[1]], nano.Jet_eta()[sig_jet_nano_idx[1]], nano.Jet_phi()[sig_jet_nano_idx[1]], nano.Jet_mass()[sig_jet_nano_idx[1]]);
+        j1.SetPtEtaPhiM(pico.out_jet_pt()[0], pico.out_jet_eta()[0], pico.out_jet_phi()[0],pico.out_jet_m()[0]);
+        j2.SetPtEtaPhiM(pico.out_jet_pt()[1], pico.out_jet_eta()[1], pico.out_jet_phi()[1],pico.out_jet_m()[1]);
         dijet = j1 + j2;
         pico.out_llphoton_refit_dijet_dphi()    = DeltaPhi(llg_refit.Phi(),
                                                            dijet.Phi());
@@ -603,9 +602,9 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico,
         pico.out_llphoton_refit_dijet_dr()      = dR(llg_refit.Eta(), 
             dijet.Eta(), llg_refit.Phi(), dijet.Phi());
 
-      } else if (sig_jet_nano_idx.size() > 0) {
+      } else if (pico.out_njet() > 0) {
         TLorentzVector j1;
-        j1.SetPtEtaPhiM(nano.Jet_pt()[sig_jet_nano_idx[0]], nano.Jet_eta()[sig_jet_nano_idx[0]], nano.Jet_phi()[sig_jet_nano_idx[0]], nano.Jet_mass()[sig_jet_nano_idx[0]]);
+        j1.SetPtEtaPhiM(pico.out_jet_pt()[0], pico.out_jet_eta()[0], pico.out_jet_phi()[0],pico.out_jet_m()[0]);
         pico.out_llphoton_refit_dijet_dphi()    = DeltaPhi(llg_refit.Phi(),
                                                            j1.Phi());
         pico.out_llphoton_refit_dijet_balance() = (ll_refit+photon+j1).Pt()/(ll_refit.Pt()+photon.Pt()+j1.Pt());
@@ -719,7 +718,10 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico,
   //Category bitmap - checks if the event matches one of the categories and their baselines
   //Bit 0: ggF, bit 1: VBF, bit 2: ttH leptonic, bit 3: VH 3l, bit 4: ttH hadronic, bit 5: ZH ptmiss, bit 6: untagged, bit 7: category specific baseline selection
   //ggF
-  if(pico.out_nlep()==2 && pico.out_njet()<=1 && pico.out_met()<90.f){ categoryBit += 0b10000000; } 
+  float vetomet = pico.out_met();
+  if(pico.out_ishemvetoevt() || pico.out_ismapvetoevt()) vetomet = 0;
+
+  if(pico.out_nlep()==2 && pico.out_njet()<=1 && vetomet<90.f){ categoryBit += 0b10000000; } 
   if(pico.out_nlep()==2 && pico.out_njet()>=2 && pico.out_nbdfm()==0){ categoryBit += 0b01000000; } //VBF
   
   //ttH leptonic
@@ -738,7 +740,7 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico,
     //Category selections
     float ptom_llgamma = pico.out_llphoton_pt().at(0)/pico.out_llphoton_m().at(0);
     bool pass_miniso = check_miniso(pico,0.15);
-    if(pass_miniso && pico.out_met() > 30.0f && ptom_llgamma > 0.3f){categoryBit+=0b00000001;}
+    if(pass_miniso && vetomet > 30.0f && ptom_llgamma > 0.3f){categoryBit+=0b00000001;}
   }
 
   //ttH hadronic
@@ -751,7 +753,7 @@ void ZGammaVarProducer::WriteZGammaVars(nano_tree &nano, pico_tree &pico,
   }
 
   //ZH ptmiss
-  if(pico.out_nlep()==2 && pico.out_njet()<=1 && pico.out_met()>90.f){ 
+  if(pico.out_nlep()==2 && pico.out_njet()<=1 && vetomet>90.f){ 
     categoryBit += 0b00000100;
 
     //Category selections

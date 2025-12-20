@@ -44,41 +44,41 @@ ElectronProducer::ElectronProducer(string year_, bool isData_, float nanoaod_ver
     cs_scale_syst_ = correction::CorrectionSet::from_file(
         "data/zgamma/2022/electronSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
-        "EGMScale_Compound_Ele_2022preEE");
+        "Scale");
     map_smearing_ = cs_scale_syst_->at(
-        "EGMSmearAndSyst_ElePTsplit_2022preEE");
+        "SmearAndSyst");
   }
   else if (year=="2022EE") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
         "data/zgamma/2022EE/electronSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
-        "EGMScale_Compound_Ele_2022postEE");
+        "Scale");
     map_smearing_ = cs_scale_syst_->at(
-        "EGMSmearAndSyst_ElePTsplit_2022postEE");
+        "SmearAndSyst");
   }
   else if (year=="2023") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
         "data/zgamma/2023/electronSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
-        "EGMScale_Compound_Ele_2023preBPIX");
+        "Scale");
     map_smearing_ = cs_scale_syst_->at(
-        "EGMSmearAndSyst_ElePTsplit_2023preBPIX");
+        "SmearAndSyst");
   }
   else if (year=="2023BPix") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
         "data/zgamma/2023BPix/electronSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
-        "EGMScale_Compound_Ele_2023postBPIX");
+        "Scale");
     map_smearing_ = cs_scale_syst_->at(
-        "EGMSmearAndSyst_ElePTsplit_2023postBPIX");
+        "SmearAndSyst");
   }
   else {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
         "data/zgamma/2023BPix/electronSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
-        "EGMScale_Compound_Ele_2023postBPIX");
+        "Scale");
     map_smearing_ = cs_scale_syst_->at(
-        "EGMSmearAndSyst_ElePTsplit_2023postBPIX");
+        "SmearAndSyst");
     std::cout << "WARNING: No dedicated EGM scale/smearing JSONs, defaulting to 2023BPix" << std::endl;
   }
   nanoaod_version = nanoaod_version_;
@@ -142,6 +142,11 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
   vector<float> scale_syst_dn;
   vector<float> smear_syst_up;
   vector<float> smear_syst_dn;
+  vector<float> energy_err_corr;
+  vector<float> energy_err_scale_up;
+  vector<float> energy_err_scale_dn;
+  vector<float> energy_err_smear_up;
+  vector<float> energy_err_smear_dn;
   for(int iel(0); iel<nano.nElectron(); ++iel){
     if (!isZgamma) {
       scaleres_corr.push_back(1.0f);
@@ -152,18 +157,29 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
     }
     else {
       float pt = nano.Electron_pt()[iel];
+      float eta = nano.Electron_eta()[iel];
       float etasc = nano.Electron_deltaEtaSC()[iel] + nano.Electron_eta()[iel];
+      float energy = pt*cosh(eta);
       //deal with scale/smearing (systematics only for NanoAODv9 [run 2], full
       //correction for NanoAODv10+ [run3])
       if (year=="2016APV"||year=="2016"||year=="2017"||year=="2018") {
         scaleres_corr.push_back(1.0f);
+        energy_err_corr.push_back(nano.Electron_energyErr()[iel]);
         if (!isData) {
           scale_syst_up.push_back(map_scale_syst_->evaluate({str_scale_syst_,
               "scaleup",etasc,nano.Electron_seedGain()[iel]}));
           scale_syst_dn.push_back(map_scale_syst_->evaluate({str_scale_syst_,
               "scaledown",etasc,nano.Electron_seedGain()[iel]}));
-          smear_syst_up.push_back(1.0f+nano.Electron_dEsigmaUp()[iel]);
-          smear_syst_dn.push_back(1.0f+nano.Electron_dEsigmaDown()[iel]);
+          smear_syst_up.push_back(1.0f
+              -nano.Electron_dEsigmaUp()[iel]/cosh(eta)/pt);
+          smear_syst_dn.push_back(1.0f
+              -nano.Electron_dEsigmaDown()[iel]/cosh(eta)/pt);
+          energy_err_scale_up.push_back(nano.Electron_energyErr()[iel]
+                                        *scale_syst_up[iel]);
+          energy_err_scale_dn.push_back(nano.Electron_energyErr()[iel]
+                                        *scale_syst_dn[iel]);
+          energy_err_smear_up.push_back(nano.Electron_energyErr()[iel]);
+          energy_err_smear_dn.push_back(nano.Electron_energyErr()[iel]);
         }
       }
       else if ((year=="2022"||year=="2022EE"||year=="2023"||year=="2023BPix")
@@ -173,22 +189,42 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
         float seedGain = static_cast<float>(nano.Electron_seedGain()[iel]);
         if (isData) {
           //scale corrections applied to data
+          float scale = map_scale_->evaluate({"scale",run,etasc,r9,
+            pt,seedGain});
+          float smear = map_smearing_->evaluate({"smear",pt*scale,r9,etasc});
           scaleres_corr.push_back(map_scale_->evaluate({"scale",run,etasc,r9,
-              fabs(etasc),pt,seedGain}));
+              pt,seedGain}));
+          energy_err_corr.push_back(sqrt(pow(nano.Electron_energyErr()[iel],2) 
+                                          + pow((energy * smear),2))*scale);
         }
         else {
           //smearing corrections applied to MC, syst.s also calculated
-          float rho = map_smearing_->evaluate({"smear",pt,r9,fabs(etasc)});
-          float err_rho = map_smearing_->evaluate({"esmear",pt,r9,
-                                                   fabs(etasc)});
-          float scale_unc = map_smearing_->evaluate({"escale",pt,r9,
-                                                     fabs(etasc)});
+          float smear = map_smearing_->evaluate({"smear",pt,r9,etasc});
+          float scale_up = map_scale_->evaluate({"scale_up",run,etasc,r9,
+              pt,seedGain});
+          float scale_dn = map_scale_->evaluate({"scale_down",run,etasc,r9,
+              pt,seedGain});
+          float smear_up = map_smearing_->evaluate({"smear_up",pt,r9,etasc});
+          float smear_dn = map_smearing_->evaluate({"smear_down",pt,r9,etasc});
           float rand = rng_.Gaus();
-          scaleres_corr.push_back(1.0f+rand*rho);
-          smear_syst_up.push_back(1.0f+rand*(rho+err_rho));
-          smear_syst_dn.push_back(1.0f+rand*(rho-err_rho));
-          scale_syst_up.push_back(1.0f+scale_unc);
-          scale_syst_dn.push_back(1.0f-scale_unc);
+          float smearing = 1.0f+rand*smear;
+          float smearing_up = 1.0f+rand*smear_up;
+          float smearing_dn = 1.0f+rand*smear_dn;
+
+          scaleres_corr.push_back(smearing);
+          smear_syst_up.push_back(smearing_up);
+          smear_syst_dn.push_back(smearing_dn);
+          scale_syst_up.push_back(scale_up);
+          scale_syst_dn.push_back(scale_dn);
+          float new_energy_err = sqrt(pow(nano.Electron_energyErr()[iel],2) + 
+                                 pow((energy * smear),2)) * smearing;
+          energy_err_corr.push_back(new_energy_err);
+          energy_err_scale_up.push_back(new_energy_err*scale_up);
+          energy_err_scale_dn.push_back(new_energy_err*scale_dn);
+          energy_err_smear_up.push_back(sqrt(pow(nano.Electron_energyErr()[iel],2) 
+                                        + pow((energy * smear_up),2)) * smearing_up);
+          energy_err_smear_dn.push_back(sqrt(pow(nano.Electron_energyErr()[iel],2) 
+                                        + pow((energy * smear_dn),2)) * smearing_dn);
         }
       }
       else {
@@ -197,6 +233,11 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
         scale_syst_dn.push_back(1.0f);
         smear_syst_up.push_back(1.0f);
         smear_syst_dn.push_back(1.0f);
+        energy_err_corr.push_back(nano.Electron_energyErr()[iel]);
+        energy_err_scale_up.push_back(nano.Electron_energyErr()[iel]);
+        energy_err_scale_dn.push_back(nano.Electron_energyErr()[iel]);
+        energy_err_smear_up.push_back(nano.Electron_energyErr()[iel]);
+        energy_err_smear_dn.push_back(nano.Electron_energyErr()[iel]);
       }
     }
   }
@@ -232,6 +273,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
     float dz = nano.Electron_dz()[iel];
     float dxy = nano.Electron_dxy()[iel];
     float miniiso = nano.Electron_miniPFRelIso_all()[iel];
+    float energy_err = energy_err_corr[iel];
     bool isSignal = false;
     bool isSignal_nopt = false;
     bool id = false;
@@ -258,7 +300,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
     }
     pico.out_el_pt().push_back(scaleres_corr[iel]*pt);
     pico.out_el_pt_raw().push_back(pt);
-    pico.out_el_energyErr().push_back(nano.Electron_energyErr()[iel]);
+    pico.out_el_energyErr().push_back(energy_err);
     pico.out_el_eta().push_back(eta);
     pico.out_el_etasc().push_back(etasc);
     pico.out_el_phi().push_back(phi);
@@ -294,6 +336,10 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
             && (pt*scaleres_corr[iel]*scale_syst_up[iel] > ZgElectronPtCut));
         pico.out_sys_el_sig_scaledn().push_back(isSignal_nopt 
             && (pt*scaleres_corr[iel]*scale_syst_dn[iel] > ZgElectronPtCut));
+        pico.out_sys_el_enerr_resup().push_back(energy_err_smear_up[iel]);
+        pico.out_sys_el_enerr_resdn().push_back(energy_err_smear_dn[iel]);
+        pico.out_sys_el_enerr_scaleup().push_back(energy_err_scale_up[iel]);
+        pico.out_sys_el_enerr_scaledn().push_back(energy_err_scale_dn[iel]);
       }
       if (year=="2016APV"||year=="2016"||year=="2017"||year=="2018") {
         pico.out_el_idmva().push_back(nano.Electron_mvaFall17V2Iso()[iel]);

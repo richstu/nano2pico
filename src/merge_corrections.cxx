@@ -111,19 +111,11 @@ int main(int argc, char *argv[]){
 void Initialize(corrections_tree &wgt_sums, corrections_tree &corr){
   corr.out_weight() = 0.;
   corr.out_w_lumi() = 0.;
-  corr.out_w_el() = 0.;
-  corr.out_w_mu() = 0.;
   corr.out_w_lep() = 0.;
   corr.out_w_fs_lep() = 0.;
-  corr.out_w_btag() = 0.;
-  corr.out_w_btag_df() = 0.;
-  corr.out_w_bhig() = 0.;
-  corr.out_w_bhig_df() = 0.;
   corr.out_w_isr() = 0.;
   corr.out_w_pu() = 0.;
-  corr.out_w_photon() = 0.;
   corr.out_w_phshape() = 0.;
-  corr.out_w_trig() = 0.;
   corr.out_w_nnlo() = 0.;
   corr.out_w_zvtx_pass() = 0.;
   corr.out_w_zvtx_fail() = 0.;
@@ -138,27 +130,12 @@ void Initialize(corrections_tree &wgt_sums, corrections_tree &corr){
   corr.out_tot_weight_l0() = 0.;
   corr.out_tot_weight_l1() = 0.;
 
-  CopySize(wgt_sums.sys_el(),                 corr.out_sys_el());
-  CopySize(wgt_sums.sys_mu(),                 corr.out_sys_mu());
   CopySize(wgt_sums.sys_lep(),                corr.out_sys_lep());
-  CopySize(wgt_sums.sys_photon(),             corr.out_sys_photon());
-  CopySize(wgt_sums.sys_photon_csev(),        corr.out_sys_photon_csev());
   CopySize(wgt_sums.sys_fs_lep(),             corr.out_sys_fs_lep());
-  CopySize(wgt_sums.sys_bchig(),              corr.out_sys_bchig());
-  CopySize(wgt_sums.sys_udsghig(),            corr.out_sys_udsghig());
-  CopySize(wgt_sums.sys_bchig_uncorr(),       corr.out_sys_bchig_uncorr());
-  CopySize(wgt_sums.sys_udsghig_uncorr(),     corr.out_sys_udsghig_uncorr());
-  CopySize(wgt_sums.sys_fs_bchig(),           corr.out_sys_fs_bchig());
-  CopySize(wgt_sums.sys_fs_udsghig(),         corr.out_sys_fs_udsghig());
-  CopySize(wgt_sums.sys_trig(),               corr.out_sys_trig());
-  CopySize(wgt_sums.sys_trig_el(),            corr.out_sys_trig_el());
-  CopySize(wgt_sums.sys_trig_mu(),            corr.out_sys_trig_mu());
   CopySize(wgt_sums.sys_isr(),                corr.out_sys_isr());
   CopySize(wgt_sums.sys_pu(),                 corr.out_sys_pu());
   CopySize(wgt_sums.sys_murf(),               corr.out_sys_murf());
   CopySize(wgt_sums.sys_ps(),                 corr.out_sys_ps());
-  // CopySize(wgt_sums.sys_pdf(),                corr.out_sys_pdf());
-  // CopySize(wgt_sums.w_pdf(),                  corr.out_w_pdf());
 }
 
 
@@ -173,42 +150,19 @@ void AddEntry(corrections_tree &wgt_sums, corrections_tree &corr){
   corr.out_tot_weight_l1() += wgt_sums.tot_weight_l1();
 
   corr.out_weight()            += wgt_sums.weight();
-  corr.out_w_el()              += wgt_sums.w_el();
-  corr.out_w_mu()              += wgt_sums.w_mu();
   corr.out_w_lep()             += wgt_sums.w_lep();
   corr.out_w_fs_lep()          += wgt_sums.w_fs_lep();
-  corr.out_w_bhig()            += wgt_sums.w_bhig();
-  corr.out_w_btag()            += wgt_sums.w_btag();
-  corr.out_w_bhig_df()         += wgt_sums.w_bhig_df();
-  corr.out_w_btag_df()         += wgt_sums.w_btag_df();
-  corr.out_w_trig()            += wgt_sums.w_trig();
   corr.out_w_isr()             += wgt_sums.w_isr();
   corr.out_w_pu()              += wgt_sums.w_pu();
-  corr.out_w_photon()          += wgt_sums.w_photon();
   corr.out_w_phshape()         += wgt_sums.w_phshape();
   corr.out_w_nnlo()            += wgt_sums.w_nnlo();
 
-  VecAdd(wgt_sums.sys_el(),             corr.out_sys_el());
-  VecAdd(wgt_sums.sys_mu(),             corr.out_sys_mu());
   VecAdd(wgt_sums.sys_lep(),            corr.out_sys_lep());
-  VecAdd(wgt_sums.sys_photon(),         corr.out_sys_photon());
-  VecAdd(wgt_sums.sys_photon_csev(),    corr.out_sys_photon_csev());
   VecAdd(wgt_sums.sys_fs_lep(),         corr.out_sys_fs_lep());
-  VecAdd(wgt_sums.sys_bchig(),          corr.out_sys_bchig());
-  VecAdd(wgt_sums.sys_udsghig(),        corr.out_sys_udsghig());
-  VecAdd(wgt_sums.sys_bchig_uncorr(),   corr.out_sys_bchig_uncorr());
-  VecAdd(wgt_sums.sys_udsghig_uncorr(), corr.out_sys_udsghig_uncorr());
-  VecAdd(wgt_sums.sys_fs_bchig(),       corr.out_sys_fs_bchig());
-  VecAdd(wgt_sums.sys_fs_udsghig(),     corr.out_sys_fs_udsghig());
   VecAdd(wgt_sums.sys_isr(),            corr.out_sys_isr());
-  VecAdd(wgt_sums.sys_trig(),           corr.out_sys_trig());
-  VecAdd(wgt_sums.sys_trig_el(),        corr.out_sys_trig_el());
-  VecAdd(wgt_sums.sys_trig_mu(),        corr.out_sys_trig_mu());
   VecAdd(wgt_sums.sys_pu(),             corr.out_sys_pu());
   VecAdd(wgt_sums.sys_murf(),           corr.out_sys_murf());
   VecAdd(wgt_sums.sys_ps(),             corr.out_sys_ps());
-  // VecAdd(wgt_sums.sys_pdf(),           corr.out_sys_pdf());
-  // VecAdd(wgt_sums.w_pdf(),             corr.out_w_pdf());
 }
 
 int GetHiggsinoMass(const string &path){
@@ -368,37 +322,14 @@ void Normalize(corrections_tree &corr){
 
   // total weight fixed in FixISR
   // w_lep fixed in Fix0L
-  
-  Normalize(corr.out_w_el(), nent);
-  Normalize(corr.out_w_mu(), nent);
-
-  Normalize(corr.out_w_btag(), nent);
-  Normalize(corr.out_w_btag_df(), nent);
-  Normalize(corr.out_w_bhig(), nent);
-  Normalize(corr.out_w_bhig_df(), nent);
+    
 
   // w_isr done in FixISR()
   Normalize(corr.out_w_pu(), nent);
 
-  Normalize(corr.out_w_photon(), nent);
   Normalize(corr.out_w_phshape(), nent);
   Normalize(corr.out_w_nnlo(), nent);
 
-  Normalize(corr.out_w_trig(), nent);
-
-  Normalize(corr.out_sys_el(), nent);
-  Normalize(corr.out_sys_mu(), nent);
-  Normalize(corr.out_sys_photon(), nent);
-  Normalize(corr.out_sys_photon_csev(), nent);
-  Normalize(corr.out_sys_bchig(), nent);
-  Normalize(corr.out_sys_udsghig(), nent);
-  Normalize(corr.out_sys_bchig_uncorr(), nent);
-  Normalize(corr.out_sys_udsghig_uncorr(), nent);
-  Normalize(corr.out_sys_fs_bchig(), nent);
-  Normalize(corr.out_sys_fs_udsghig(), nent);
-  Normalize(corr.out_sys_trig(), nent);
-  Normalize(corr.out_sys_trig_el(), nent);
-  Normalize(corr.out_sys_trig_mu(), nent);
   Normalize(corr.out_sys_pu(), nent);
 
   Normalize(corr.out_sys_murf(), nent);

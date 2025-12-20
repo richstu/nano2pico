@@ -15,8 +15,7 @@ public:
   explicit ZGammaVarProducer(int year);
   ~ZGammaVarProducer();
 
-  void WriteZGammaVars(nano_tree &nano, pico_tree &pico, 
-      std::vector<int> sig_jet_nano_idx, bool is_signal);
+  void WriteZGammaVars(pico_tree &pico, bool is_signal);
 
   struct RefitResults {
     TLorentzVector l1;

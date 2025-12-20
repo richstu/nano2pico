@@ -465,7 +465,7 @@ int main(int argc, char *argv[]){
     if (debug) cout<<"INFO:: Writing analysis specific variables"<<endl;
     // might need as input sig_el_nano_idx, sig_mu_nano_idx, sig_ph_nano_idx
     if(isZgamma)
-      zgamma_producer.WriteZGammaVars(nano, pico, sig_jet_nano_idx, isSignal);
+      zgamma_producer.WriteZGammaVars(pico, isSignal);
   
     if (isHiggsino) gammagamma_producer.WriteGammaGammaVars(pico);
     if (isHiggsino) bb_producer.WriteBBVars(pico, /*doDeepFlav*/false);
@@ -524,6 +524,7 @@ int main(int argc, char *argv[]){
         event_weighter.MuonMinisoSF(pico);
         event_weighter.PileupSF(pico);
         event_weighter.bTaggingSF(pico);
+        event_weighter.jetpuIdSF(pico);
         event_weighter.PhotonSF(pico);
         event_weighter.PhotonShapeSF(pico);
         event_weighter.FakePhotonSF(pico);
@@ -626,7 +627,8 @@ int main(int argc, char *argv[]){
     // note: will be set again in Step 3
     if (isZgamma) {
       pico.out_weight() = pico.out_w_lumi() * pico.out_w_lep() * 
-                          pico.out_w_btag_df() * pico.out_w_photon()  *
+                          pico.out_w_btag_df() * pico.out_w_jetpuid() *
+                          pico.out_w_photon()  *
                           pico.out_w_isr() * pico.out_w_pu() * 
                           pico.out_w_trig() * pico.out_w_phshape() * 
                           pico.out_w_prefire() * pico.out_w_fakephoton() *

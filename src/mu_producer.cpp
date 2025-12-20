@@ -82,6 +82,7 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
 
   //scale+resolution corrections
   vector<float> muon_pt_corr;
+  vector<float> muon_err_corr;
   vector<float> muon_pt_scaleup;
   vector<float> muon_pt_scaledn;
   vector<float> muon_pt_resup;
@@ -97,6 +98,7 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
     if (!run3) {
       //Rochester corrections, see https://github.com/cms-nanoAOD/nanoAOD-tools/blob/master/python/postprocessing/modules/common/muonScaleResProducer.py
       float pt = nano.Muon_pt()[imu];
+      muon_err_corr.push_back(nano.Muon_ptErr()[imu]);
       float scale_sf = rc.kScaleDT(charge,pt,eta,phi);
       if (isData) {
         muon_pt_corr.push_back(pt*scale_sf);
@@ -130,6 +132,7 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
     }
     else {
       float pt = nano.Muon_bsConstrainedPt()[imu];
+      muon_err_corr.push_back(nano.Muon_bsConstrainedPtErr()[imu]);
       if (isData) {
         muon_pt_corr.push_back(scarekit::pt_scale(1, pt, eta, phi,
             charge, cs_scare_, pt_thresh));
@@ -175,6 +178,7 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
   int pico_idx = 0;
   for(int imu : ordered_nano_indices){
     float pt = muon_pt_corr[imu];
+    float pterr = muon_err_corr[imu];
     float eta = nano.Muon_eta()[imu];
     bool isSignal = false;
     bool isSignal_nopt = false;
@@ -225,13 +229,7 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
       pico.out_sys_mu_sig_resdn().push_back(isSignal_nopt 
           && (muon_pt_resdn[imu] > ZgMuonPtCut));
     }
-    if (nanoaod_version > 11.95) {
-      pico.out_mu_ptErr().push_back(nano.Muon_bsConstrainedPtErr()[imu]);
-    }
-    else {
-      pico.out_mu_ptErr().push_back(nano.Muon_ptErr()[imu]);
-    }
-
+    pico.out_mu_ptErr().push_back(pterr);
     // veto muon selection
     if (nano.Muon_miniPFRelIso_all()[imu] < MuonMiniIsoCut && 
         fabs(nano.Muon_dz()[imu])<=0.5f &&
