@@ -994,9 +994,19 @@ void EventWeighter::jetpuIdSF(pico_tree &pico){
   if(year_ == "2016APV" || year_ == "2016" || year_ == "2017" || year_ == "2018"){
     for (unsigned ijet = 0; ijet < pico.out_jet_pt().size(); ijet++) {
       if(pico.out_jet_isgood_min().at(ijet)){
-        float pt = pico.out_jet_nanopt().at(ijet);//may change
-        if(pt > 50.f) continue;
+        float pt = pico.out_jet_nanopt().at(ijet);
         float eta = pico.out_jet_eta().at(ijet);
+        float phi = pico.out_jet_phi().at(ijet);
+        if(pt > 50.f) continue;
+        bool genMatched = false;
+        for(unsigned genidx(0); genidx < pico.out_genjet_pt().size(); genidx++){
+          if (dR(eta, pico.out_genjet_eta().at(genidx), 
+                 phi, pico.out_genjet_phi().at(genidx)) < 0.4f){
+            genMatched = true;
+            break;
+          }
+        }
+        if (genMatched == false) continue;
 
         //calculate probability to be in loose WP in data and MC.
         //This is done by combining SFs (data/MC) with MC efficiencies
@@ -1004,7 +1014,7 @@ void EventWeighter::jetpuIdSF(pico_tree &pico){
         float sf_nm = (*jetpuid_map)->evaluate({eta, pt, "nom", wp_string});
         float sf_up = (*jetpuid_map)->evaluate({eta, pt, "up", wp_string});
         float sf_dn = (*jetpuid_map)->evaluate({eta, pt, "down", wp_string});
-        float mc_eff = (*jetpuid_map)->evaluate({eta, pt, "MCEff", wp_string});//Should this use the generator pT? Doesn't seem like it.
+        float mc_eff = (*jetpuid_map)->evaluate({eta, pt, "MCEff", wp_string});
         //total SF is product of per-jet SFs
  
         if (isinf(sf_nm)||isnan(sf_nm)) sf_nm = 1.0;
@@ -1015,10 +1025,15 @@ void EventWeighter::jetpuIdSF(pico_tree &pico){
           sf_tot_up *= sf_up;
           sf_tot_dn *= sf_dn;
         }else{
-          sf_tot_nm *= (1.0f-sf_nm)/(1.0f-mc_eff);
-          sf_tot_up *= (1.0f-sf_up)/(1.0f-mc_eff);
-          sf_tot_dn *= (1.0f-sf_dn)/(1.0f-mc_eff);
+          if(mc_eff!=1.0f){
+            sf_tot_nm *= (1.0f-sf_nm*mc_eff)/(1.0f-mc_eff);
+            sf_tot_up *= (1.0f-sf_up*mc_eff)/(1.0f-mc_eff);
+            sf_tot_dn *= (1.0f-sf_dn*mc_eff)/(1.0f-mc_eff);
+          }else{//No physically justified default value here. Skipping.
+            continue;
+          }
         }
+        
       } //jet is good
     } //loop over jets
   }//conditional year
