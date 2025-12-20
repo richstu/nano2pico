@@ -180,10 +180,14 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
             "scaleup",eta,nano.Photon_seedGain()[iph]}));
         scale_syst_dn.push_back(map_scale_syst_->evaluate({str_scale_syst_,
             "scaledown",eta,nano.Photon_seedGain()[iph]}));
-        smear_syst_up.push_back(1.0f+nano.Photon_dEsigmaUp()[iph]);
-        smear_syst_dn.push_back(1.0f+nano.Photon_dEsigmaDown()[iph]);
-        energy_err_scale_up.push_back(nano.Photon_energyErr()[iph]);
-        energy_err_scale_dn.push_back(nano.Photon_energyErr()[iph]);
+        smear_syst_up.push_back(1.0f
+                                -nano.Photon_dEsigmaUp()[iph]/cosh(eta)/pt);
+        smear_syst_dn.push_back(1.0f
+                                -nano.Photon_dEsigmaDown()[iph]/cosh(eta)/pt);
+        energy_err_scale_up.push_back(nano.Photon_energyErr()[iph]
+                                      *scale_syst_up[iph]);
+        energy_err_scale_dn.push_back(nano.Photon_energyErr()[iph]
+                                      *scale_syst_dn[iph]);
         energy_err_smear_up.push_back(nano.Photon_energyErr()[iph]);
         energy_err_smear_dn.push_back(nano.Photon_energyErr()[iph]);
 
