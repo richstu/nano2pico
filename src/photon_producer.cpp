@@ -89,9 +89,9 @@ PhotonProducer::~PhotonProducer(){
 
 bool PhotonProducer::IsSignal(nano_tree &nano, pico_tree &pico, int nano_idx, 
                               float scaleres_corr, float minLepDR, 
-                              vector<int> &photon_el_pico_idx) {
+                              vector<int> &photon_el_pico_idx, bool skip_pt) {
   float pt = nano.Photon_pt()[nano_idx]*scaleres_corr;
-  if (pt < SignalPhotonPtCut) return false;
+  if (pt < SignalPhotonPtCut && !skip_pt) return false;
   if (!(nano.Photon_isScEtaEB()[nano_idx] 
         || nano.Photon_isScEtaEE()[nano_idx])) return false;
   if (!nano.Photon_mvaID_WP80()[nano_idx]) return false;
@@ -131,7 +131,10 @@ float PhotonProducer::SCeta(bool isScEtaEB, float eta, float phi,
   return origin_eta;
 }
 
-vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vector<int> &jet_isphoton_nano_idx, vector<int> &sig_el_nano_idx, vector<int> &sig_mu_nano_idx, vector<int> &photon_el_pico_idx){
+vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, 
+    vector<int> &jet_isphoton_nano_idx, vector<int> &sig_el_nano_idx, 
+    vector<int> &sig_mu_nano_idx, vector<int> &photon_el_pico_idx, 
+    bool is_signal_sample) {
   pico.out_nphoton() = 0;
   // pico.out_nfsrphoton() = 0;
   vector<int> sig_photon_nano_idx;
@@ -307,6 +310,8 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
 
     bool isSignal = IsSignal(nano, pico, iph, scaleres_corr[iph], 
                              photon_drmin[iph], photon_el_pico_idx);
+    bool isSignal_nopt = IsSignal(nano, pico, iph, scaleres_corr[iph], 
+                                  photon_drmin[iph], photon_el_pico_idx, true);
 
     //some logic to save highest pt photon passing HIG-19-014 selection
     bool isSignalhig019014 = (((nano.Photon_isScEtaEB()[iph] && mva > -0.4f) 
@@ -380,14 +385,24 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
     if (!isData) {
       pico.out_photon_pflavor().push_back(nano.Photon_genPartFlav()[iph]);
       pico.out_photon_hardprocess().push_back(hardprocess);
-      pico.out_sys_photon_pt_resup().push_back(raw_pt*smear_syst_up[iph]);
-      pico.out_sys_photon_pt_resdn().push_back(raw_pt*smear_syst_dn[iph]);
-      pico.out_sys_photon_pt_scaleup().push_back(pt*scale_syst_up[iph]);
-      pico.out_sys_photon_pt_scaledn().push_back(pt*scale_syst_dn[iph]);
-      pico.out_sys_photon_enerr_resup().push_back(energy_err_smear_up[iph]);
-      pico.out_sys_photon_enerr_resdn().push_back(energy_err_smear_dn[iph]);
-      pico.out_sys_photon_enerr_scaleup().push_back(energy_err_scale_up[iph]);
-      pico.out_sys_photon_enerr_scaledn().push_back(energy_err_scale_dn[iph]);
+      if (is_signal_sample) {
+        pico.out_sys_photon_pt_resup().push_back(raw_pt*smear_syst_up[iph]);
+        pico.out_sys_photon_pt_resdn().push_back(raw_pt*smear_syst_dn[iph]);
+        pico.out_sys_photon_pt_scaleup().push_back(pt*scale_syst_up[iph]);
+        pico.out_sys_photon_pt_scaledn().push_back(pt*scale_syst_dn[iph]);
+        pico.out_sys_photon_enerr_resup().push_back(energy_err_smear_up[iph]);
+        pico.out_sys_photon_enerr_resdn().push_back(energy_err_smear_dn[iph]);
+        pico.out_sys_photon_enerr_scaleup().push_back(energy_err_scale_up[iph]);
+        pico.out_sys_photon_enerr_scaledn().push_back(energy_err_scale_dn[iph]);
+        pico.out_sys_photon_sig_resup().push_back(isSignal_nopt 
+            && (raw_pt*smear_syst_up[iph] > SignalPhotonPtCut));
+        pico.out_sys_photon_sig_resdn().push_back(isSignal_nopt 
+            && (raw_pt*smear_syst_dn[iph] > SignalPhotonPtCut));
+        pico.out_sys_photon_sig_scaleup().push_back(isSignal_nopt 
+            && (pt*scale_syst_up[iph] > SignalPhotonPtCut));
+        pico.out_sys_photon_sig_scaledn().push_back(isSignal_nopt 
+            && (pt*scale_syst_dn[iph] > SignalPhotonPtCut));
+      }
     }
     if (year=="2016APV"||year=="2016"||year=="2017"||year=="2018") {
       pico.out_photon_ecorr().push_back(nano.Photon_eCorr()[iph]);

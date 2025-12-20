@@ -34,7 +34,8 @@ public:
                                   std::vector<int> &jet_isvlep_nano_idx, 
                                   std::vector<int> &sig_el_pico_idx, 
                                   std::vector<int> &photon_el_pico_idx, 
-                                  bool isZgamma, bool isFastsim);
+                                  bool isZgamma, bool is_signal_sample, 
+                                  bool isFastsim);
 
   float ConvertMVA(float mva_mini);
   bool HzzId_WP2022(float pt, float etasc, float hzzmvaid);
@@ -51,7 +52,7 @@ private:
   float nanoaod_version;
 
   bool IsSignal(nano_tree& nano, int nano_idx, bool isZgamma, 
-                float scalres_corr=1.0f);
+                float scalres_corr=1.0f, bool skip_pt=false);
   bool idElectron_noIso(int bitmap, int level);
   bool EcalDriven(int bitmap);
 };
