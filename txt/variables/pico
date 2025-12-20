@@ -159,6 +159,7 @@ bool ismapvetoevt
 bool ishemvetoevt
 
 vector<float> jet_pt
+vector<float> jet_nanopt
 vector<float> jet_eta
 vector<float> jet_phi
 vector<float> jet_m
@@ -170,6 +171,7 @@ vector<float> jet_btagpnetb
 vector<float> jet_btagak4b
 vector<int>   jet_puid
 vector<float> jet_puid_disc
+vector<bool>  jet_puid_pass
 vector<float> jet_ne_emef
 vector<float> jet_qgl
 vector<bool>  jet_islep
@@ -460,6 +462,7 @@ float w_btag
 float w_btag_df
 float w_bhig
 float w_bhig_df
+float w_jetpuid
 float w_isr
 float w_btag_dc
 float w_pu
@@ -653,6 +656,8 @@ vector<float> sys_fs_udsghig
 vector<float> sys_bchig_uncorr
 vector<float> sys_udsghig_uncorr
 
+vector<float> sys_jetpuid
+
 vector<float> sys_trig
 vector<float> sys_trig_mu
 vector<float> sys_trig_el
@@ -685,6 +690,12 @@ vector<float> sys_el_pt_scaledn
 vector<float> sys_el_pt_resup
 vector<float> sys_el_pt_resdn
 
+vector<float> sys_el_enerr_scaleup
+vector<float> sys_el_enerr_scaledn
+vector<float> sys_el_enerr_resup
+vector<float> sys_el_enerr_resdn
+
+
 #index matches muon_*
 vector<float> sys_mu_pt_scaleup
 vector<float> sys_mu_pt_scaledn
@@ -696,6 +707,11 @@ vector<float> sys_photon_pt_scaleup
 vector<float> sys_photon_pt_scaledn
 vector<float> sys_photon_pt_resup
 vector<float> sys_photon_pt_resdn
+
+vector<float> sys_photon_enerr_scaleup
+vector<float> sys_photon_enerr_scaledn
+vector<float> sys_photon_enerr_resup
+vector<float> sys_photon_enerr_resdn
 
 # variations have index 0 (JER smearing up), 1 (JER smearing down), 2 (JES up) and 3 (JES down)
 # for met_phi only: indxes 4 (unclustered up) 5 (unclustered down) 6 (lepton photon up) 7 (lepton photon down)

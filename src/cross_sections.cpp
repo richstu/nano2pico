@@ -496,20 +496,21 @@ namespace xsec{
     if(file.Contains("ttHtoGG"))              xsec = HToGG * xs_tth; 
     if(file.Contains("VHtoGG"))               xsec = HToGG * 2.556; //XSDB
 
-    if(file.Contains("GluGluHToMuMu"))        xsec = HToMM * xs_ggh ;
-    if(file.Contains("VBFHToMuMu"))           xsec = HToMM * xs_vbf ;
-    if(file.Contains("WminusH_HToMuMu"))      xsec = HToMM * xs_wmh ;
-    if(file.Contains("WminusHToMuMu"))        xsec = HToMM * xs_wmh ;
-    if(file.Contains("WplusH_HToMuMu"))       xsec = HToMM * xs_wph ;
-    if(file.Contains("WplusHToMuMu"))         xsec = HToMM * xs_wph ;
-    if(file.Contains("ZH_HToMuMu"))           xsec = HToMM * xs_z_h ;
-    if(file.Contains("ZHToMuMu"))             xsec = HToMM * xs_z_h ;
-    if(file.Contains("ttHToMuMu"))            xsec = HToMM * xs_tth ;
-    if(file.Contains("GluGluHto2Mu"))         xsec = HToMM * xs_ggh ;
-    if(file.Contains("VBFHto2Mu_M-125_TuneCP5_withDipoleRecoil_13p6TeV")) xsec = 4.18;
-    if(file.Contains("VBFHto2Mu_M-125")) xsec = 4.18;
-    if(file.Contains("WplusH_Hto2Mu_WtoAll_M-125_TuneCP5_13p6TeV"))       xsec = 0.9227;
-    if(file.Contains("ZH_Hto2Mu_ZtoAll_M-125_TuneCP5_13p6TeV"))           xsec = 0.5478;
+    if(file.Contains("GluGluHToMuMu"))        xsec = HToMM * xs_ggh;
+    if(file.Contains("VBFHToMuMu"))           xsec = HToMM * xs_vbf;
+    if(file.Contains("WminusH_HToMuMu"))      xsec = HToMM * xs_wmh;
+    if(file.Contains("WminusHToMuMu"))        xsec = HToMM * xs_wmh;
+    if(file.Contains("WplusH_HToMuMu"))       xsec = HToMM * xs_wph;
+    if(file.Contains("WplusHToMuMu"))         xsec = HToMM * xs_wph;
+    if(file.Contains("ZH_HToMuMu"))           xsec = HToMM * xs_z_h;
+    if(file.Contains("ZHToMuMu"))             xsec = HToMM * xs_z_h;
+    if(file.Contains("ttHToMuMu"))            xsec = HToMM * xs_tth;
+    if(file.Contains("GluGluHto2Mu"))         xsec = HToMM * xs_ggh;
+    if(file.Contains("VBFHto2Mu_M-125_TuneCP5_withDipoleRecoil_13p6TeV")) xsec = HToMM * xs_vbf;
+    if(file.Contains("VBFHto2Mu_M-125"))                                  xsec = HToMM * xs_vbf;
+    if(file.Contains("WplusH_Hto2Mu_WtoAll_M-125_TuneCP5_13p6TeV"))       xsec = HToMM * xs_wph;
+    if(file.Contains("WminusH_Hto2Mu_WtoAll_M-125_TuneCP5_13p6TeV"))      xsec = HToMM * xs_wmh;
+    if(file.Contains("ZH_Hto2Mu_ZtoAll_M-125_TuneCP5_13p6TeV"))           xsec = HToMM * xs_z_h;
 
     if(file.Contains("GluGluHToZZTo2L2Nu"))   xsec = HToZZ * ZToLL * ZToNuNu * xs_ggh;
     if(file.Contains("GluGluHToZZTo2L2Q"))    xsec = HToZZ * ZToLL * ZToQQ * xs_ggh ;

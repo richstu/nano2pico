@@ -15,7 +15,7 @@ public:
   explicit ZGammaVarProducer(int year);
   ~ZGammaVarProducer();
 
-  void WriteZGammaVars(nano_tree &nano, pico_tree &pico, std::vector<int> sig_jet_nano_idx);
+  void WriteZGammaVars(pico_tree &pico);
 
   // calculates kinematic angles {cosTheta, costheta, phi}
   std::vector<double> CalculateAngles(TLorentzVector lplus, 
