@@ -542,7 +542,6 @@ void ZGammaVarProducer::WriteZGammaVars(pico_tree &pico, bool is_signal){
       }
     }
 
-<<<<<<< HEAD
     RefitResults refit_result = PerformKinematicRefit(pico, ivar);
     std::vector<TLorentzVector> refit_leptons;
     refit_leptons.push_back(refit_result.l1);

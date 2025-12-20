@@ -970,6 +970,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
         pico.out_jet_id().push_back(Jet_jetId[ijet]);
         pico.out_jet_mht_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], mht_vec.Phi()));
         pico.out_jet_met_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], MET_phi));
+        pico.out_jet_puid_pass().push_back(true);
         //pico.out_jet_puid().push_back(nano.Jet_puId()[ijet]);
         //pico.out_jet_puid_disc().push_back(nano.Jet_puIdDisc()[ijet]);
         if (!isData) {
