@@ -684,6 +684,31 @@ Below are examples
 ./scripts/validate_unit_test_cross_section.py --output_filename validate_unit_test_cross_section.log --golden_cross_section_log OLD_CODE/unit_test_cross_section.log --validate_cross_section_log NEW_CODE/unit_test_cross_section.log
 ~~~
 
+# Setup with el9
+
+~~~~bash
+# Create CMSSW 
+. /cvmfs/cms.cern.ch/cmsset_default.sh
+cmsrel CMSSW_15_0_17
+cd CMSSW_15_0_17/src
+cmsenv
+cd -
+
+# This will install scons into ~/.local/lib/python3.*/site-packages
+pip3 install scons
+
+# Get nano2pico
+git clone --recurse-submodules https://github.com/richstu/nano2pico.git
+cd nano2pico/
+
+# Modify set_env.sh for your CMSSW
+# Comment out from line 6 to 12 in set_env.sh
+# Put the below in line 13 of set_env.sh
+cd /path/to/CMSSW_15_0_17/src
+
+source set_env.sh
+~~~~
+
 ## Changelog
 
 Changelog for `htozgamma_lassen_v0` to `htozgamma_pinnacles_v0`
