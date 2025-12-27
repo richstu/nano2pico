@@ -19,6 +19,7 @@ using std::cout;
 using std::endl;
 using std::string;
 using std::vector;
+using std::isnan;
 
 float bound(float value, float upper, float lower) {
   if (value>upper)
