@@ -30,6 +30,7 @@
 #include "TLorentzVector.h"
 
 #include "nano_tree.hpp"
+#include "pico_tree.hpp"
 
 using namespace std;
 
@@ -444,4 +445,15 @@ void getGenJet_partonFlavour(nano_tree & nano, float nanoaod_version, vector<int
     if (nanoaod_version+0.01 > 12) GenJet_partonFlavour[ipart] = nano.GenJet_partonFlavour_12p0()[ipart];
     else GenJet_partonFlavour[ipart] = nano.GenJet_partonFlavour()[ipart];
   }
+}
+
+
+bool check_miniso(pico_tree & pico, float miniso_comp) {
+  for(int iel(0); iel<pico.out_nel(); ++iel){
+    if(pico.out_el_sig().at(iel)&&pico.out_el_miniso().at(iel) > miniso_comp){ return false;}
+  }
+  for(int imu(0); imu<pico.out_nmu(); ++imu){
+    if(pico.out_mu_sig().at(imu)&&pico.out_mu_miniso().at(imu) > miniso_comp){ return false;}
+  }
+  return true;
 }

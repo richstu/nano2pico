@@ -1,0 +1,230 @@
+{
+  "schema_version": 2,
+  "description": "",
+  "corrections": [
+    {
+      "name": "sf_pass",
+      "version": 1,
+      "inputs": [
+        {
+          "name": "pt",
+          "type": "real",
+          "description": "pt"
+        },
+        {
+          "name": "eta",
+          "type": "real",
+          "description": "eta"
+        }
+      ],
+      "output": {
+        "name": "sf",
+        "type": "real",
+        "description": "data-MC SF"
+      },
+      "data": {
+        "nodetype": "multibinning",
+        "inputs": [
+          "pt",
+          "eta"
+        ],
+        "edges": [
+          [
+            15.0,
+            20.0
+          ],
+          [
+            -2.5,
+            -2.0,
+            -1.5,
+            -0.8,
+            0.0,
+            0.8,
+            1.5,
+            2.0,
+            2.5
+          ]
+        ],
+        "content": [
+          0.9285812754096276,
+          1.0339806085618999,
+          0.9610075707366368,
+          0.9631877412261108,
+          1.0046065422234682,
+          1.0217023475344034,
+          0.9611024969289972,
+          0.9499203568038671
+        ],
+        "flow": "clamp"
+      }
+    },
+    {
+      "name": "unc_pass",
+      "version": 1,
+      "inputs": [
+        {
+          "name": "pt",
+          "type": "real",
+          "description": "pt"
+        },
+        {
+          "name": "eta",
+          "type": "real",
+          "description": "eta"
+        }
+      ],
+      "output": {
+        "name": "sf",
+        "type": "real",
+        "description": "data-MC unc"
+      },
+      "data": {
+        "nodetype": "multibinning",
+        "inputs": [
+          "pt",
+          "eta"
+        ],
+        "edges": [
+          [
+            15.0,
+            20.0
+          ],
+          [
+            -2.5,
+            -2.0,
+            -1.5,
+            -0.8,
+            0.0,
+            0.8,
+            1.5,
+            2.0,
+            2.5
+          ]
+        ],
+        "content": [
+          0.04911706926032179,
+          0.031113013460069006,
+          0.02750195620332511,
+          0.06933610703574046,
+          0.01332771262041876,
+          0.020068494268413603,
+          0.03345777443797099,
+          0.0607243254203619
+        ],
+        "flow": "clamp"
+      }
+    },
+    {
+      "name": "sf_fail",
+      "version": 1,
+      "inputs": [
+        {
+          "name": "pt",
+          "type": "real",
+          "description": "pt"
+        },
+        {
+          "name": "eta",
+          "type": "real",
+          "description": "eta"
+        }
+      ],
+      "output": {
+        "name": "sf",
+        "type": "real",
+        "description": "data-MC SF"
+      },
+      "data": {
+        "nodetype": "multibinning",
+        "inputs": [
+          "pt",
+          "eta"
+        ],
+        "edges": [
+          [
+            15.0,
+            20.0
+          ],
+          [
+            -2.5,
+            -2.0,
+            -1.5,
+            -0.8,
+            0.0,
+            0.8,
+            1.5,
+            2.0,
+            2.5
+          ]
+        ],
+        "content": [
+          1.3690933970619903,
+          0.8979370999676594,
+          1.1627555236944658,
+          1.248132746431878,
+          0.9690851995285417,
+          0.9137491261701439,
+          1.1156632360862162,
+          1.2645235937513208
+        ],
+        "flow": "clamp"
+      }
+    },
+    {
+      "name": "unc_fail",
+      "version": 1,
+      "inputs": [
+        {
+          "name": "pt",
+          "type": "real",
+          "description": "pt"
+        },
+        {
+          "name": "eta",
+          "type": "real",
+          "description": "eta"
+        }
+      ],
+      "output": {
+        "name": "sf",
+        "type": "real",
+        "description": "data-MC unc"
+      },
+      "data": {
+        "nodetype": "multibinning",
+        "inputs": [
+          "pt",
+          "eta"
+        ],
+        "edges": [
+          [
+            15.0,
+            20.0
+          ],
+          [
+            -2.5,
+            -2.0,
+            -1.5,
+            -0.8,
+            0.0,
+            0.8,
+            1.5,
+            2.0,
+            2.5
+          ]
+        ],
+        "content": [
+          0.2344408817434173,
+          0.0870105349428606,
+          0.10749428055433068,
+          0.46549056292786156,
+          0.0916712639487781,
+          0.07840027362491692,
+          0.10724166198381434,
+          0.27371789417608333
+        ],
+        "flow": "clamp"
+      }
+    }
+  ]
+}

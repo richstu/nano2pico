@@ -160,17 +160,19 @@ def processSteps(process_commands, YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG
 
   return FIRST_COMMAND
 
-def processMc(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, NANOAOD_VERSION, FIRST_COMMAND, notify_script):
+def processMc(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, NANOAOD_VERSION, FIRST_COMMAND, notify_script, dataset_list=''):
   print("[Info] pico dir: "+PICO_DIR)
   print("[Info] step file: "+STEP_FILEBASENAME)
   print("[Info] log file: "+LOG_FILENAME)
   YEAR = str(YEAR)
+  if dataset_list=='':
+    dataset_list = ('txt/datasets/'+NANOAOD_VERSION+'_htozgamma_'+YEAR+'_mc_dataset_paths')
   mc_tag=PRODUCTION_NAME+'_'+YEAR+'_mc'
   # Add mc commands
   process_commands = [
     #0
     [notify_script+' "Start process nano '+mc_tag+'"',
-    './scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/mc/ --production '+PRODUCTION_NAME+' --dataset_list txt/datasets/'+NANOAOD_VERSION+'_htozgamma_'+YEAR+'_mc_dataset_paths --tag '+mc_tag,
+    './scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/mc/ --production '+PRODUCTION_NAME+' --dataset_list '+dataset_list+' --tag '+mc_tag,
     'auto_submit_jobs.py process_nano_cmds_'+mc_tag+'.json -c scripts/check_process_nano_job.py -f',
     notify_script+' "Finished process nano '+mc_tag+'"'], 
     
@@ -214,18 +216,20 @@ def processMc(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, 
   ]
   return processSteps(process_commands, YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, NANOAOD_VERSION, FIRST_COMMAND, NO_RUN, mc_tag)
 
-def processData(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, NANOAOD_VERSION, FIRST_COMMAND, notify_script):
+def processData(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, NANOAOD_VERSION, FIRST_COMMAND, notify_script, dataset_list=''):
   YEAR = str(YEAR)
   # Add signal commands
   data_tag=PRODUCTION_NAME+'_'+YEAR+'_data'
   print("[Info] pico dir: "+PICO_DIR)
   print("[Info] step file: "+STEP_FILEBASENAME)
   print("[Info] log file: "+LOG_FILENAME)
+  if dataset_list=='':
+    dataset_list = ('txt/datasets/'+NANOAOD_VERSION+'_htozgamma_'+YEAR+'_data_dataset_paths')
   process_commands = [
     # signal
     #0
     [notify_script+' "Started process nano '+data_tag+'"',
-    './scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/data/ --production '+PRODUCTION_NAME+' --dataset_list txt/datasets/'+NANOAOD_VERSION+'_htozgamma_'+YEAR+'_data_dataset_paths --data --tag '+data_tag,
+    './scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/data/ --production '+PRODUCTION_NAME+' --dataset_list '+dataset_list+' --data --tag '+data_tag,
     'auto_submit_jobs.py process_nano_cmds_'+data_tag+'.json -c scripts/check_data_process_nano_job.py -f',
     notify_script+' "Finished process nano '+data_tag+'"',
     'ln -s '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/raw_pico '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/unskimmed'],
@@ -297,7 +301,9 @@ Pico files: BASE_FOLDERNAME/NANOAOD_VERSION/TAG_NAME/(2016,2017,2018)/(data,mc,s
   parser.add_argument('-n','--nanoaod_version', required=True, help='Nanoaod version for production')
   parser.add_argument('-b','--base_foldername', required=True, help='Base folder for ntuple files. Ex) /net/cms17/cms17r0/pico')
   parser.add_argument('-d','--data', default='mc,data', help='Data type for production. Example: --data mc,data')
+  parser.add_argument('-l','--dataset_list', default='', help='Datasets to process')
   parser.add_argument('-f', '--fake_run', action="store_true", help='Do not run commands. Only print commands to run.')
+  parser.add_argument('-u', '--untagged', action="store_true", help='Do not use git tag')
   parser.add_argument('--use_telegram', action="store_true", help='Uses telegram script to notify about steps. Requires telegram setup.')
   parser.add_argument('--email', help='Uses email to notify about steps. Type in your email.')
   
@@ -312,14 +318,15 @@ Pico files: BASE_FOLDERNAME/NANOAOD_VERSION/TAG_NAME/(2016,2017,2018)/(data,mc,s
   datas = args.data.split(',')
 
   # Check if dataset_list (nanoaod files to process) exist
-  dataset_list_files = []
-  for year in years:
-    if 'mc' in datas: dataset_list_files.append(f'txt/datasets/{args.nanoaod_version}_htozgamma_{year}_mc_dataset_paths')
-    if 'data' in datas: dataset_list_files.append(f'txt/datasets/{args.nanoaod_version}_htozgamma_{year}_data_dataset_paths')
-  for dataset_list_file in dataset_list_files:
-    if not os.path.exists(dataset_list_file): 
-      print('[Error] '+dataset_list_file+' does not exist. Existing.')
-      sys.exit()
+  if args.dataset_list=='':
+    dataset_list_files = []
+    for year in years:
+      if 'mc' in datas: dataset_list_files.append(f'txt/datasets/{args.nanoaod_version}_htozgamma_{year}_mc_dataset_paths')
+      if 'data' in datas: dataset_list_files.append(f'txt/datasets/{args.nanoaod_version}_htozgamma_{year}_data_dataset_paths')
+    for dataset_list_file in dataset_list_files:
+      if not os.path.exists(dataset_list_file): 
+        print('[Error] '+dataset_list_file+' does not exist. Existing.')
+        sys.exit()
 
   if not os.path.exists('logs'): 
     print('Creating logs directory')
@@ -335,26 +342,27 @@ Pico files: BASE_FOLDERNAME/NANOAOD_VERSION/TAG_NAME/(2016,2017,2018)/(data,mc,s
       print('[Error] '+slim_rule_file+' does not exist. Existing.')
       sys.exit()
 
-  # Search if tag exists and is pushed.
-  output, error = runCommand('git tag -l '+args.tag_name)
-  if args.tag_name not in output:
-    print("[Error] tag_name: "+args.tag_name+" does not exist. Exiting.")
-    sys.exit()
-  #output, error = runCommand('git ls-remote origin refs/tags/'+args.tag_name)
-  #if args.tag_name not in output:
-  #  print("[Error] tag_name: "+args.tag_name+" does not exist on github. Exiting.")
-  #  sys.exit()
-  
-  # Checkout tag
-  output, error = runCommand('git checkout '+args.tag_name)
-  if 'Aborting' in error:
-    print("[Error] Could not checkout "+args.tag_name+". Exiting.")
-    sys.exit()
+  if not args.untagged:
+    # Search if tag exists and is pushed.
+    output, error = runCommand('git tag -l '+args.tag_name)
+    if args.tag_name not in output:
+      print("[Error] tag_name: "+args.tag_name+" does not exist. Exiting.")
+      sys.exit()
+    #output, error = runCommand('git ls-remote origin refs/tags/'+args.tag_name)
+    #if args.tag_name not in output:
+    #  print("[Error] tag_name: "+args.tag_name+" does not exist on github. Exiting.")
+    #  sys.exit()
+    
+    # Checkout tag
+    output, error = runCommand('git checkout '+args.tag_name)
+    if 'Aborting' in error:
+      print("[Error] Could not checkout "+args.tag_name+". Exiting.")
+      sys.exit()
 
-  # Do compile after checkout
-  if os.system('scons') != 0:
-    print("[Error] Could not compile. Existing")
-    sys.exit()
+    # Do compile after checkout
+    if os.system('scons') != 0:
+      print("[Error] Could not compile. Existing")
+      sys.exit()
 
   # Make output BASE_FOLDERNAME/NANOAOD_VERSION/TAG_NAME folder
   print("[Info] Trying to make "+args.base_foldername+'/'+args.nanoaod_version+'/'+args.tag_name)
@@ -390,11 +398,11 @@ Pico files: BASE_FOLDERNAME/NANOAOD_VERSION/TAG_NAME/(2016,2017,2018)/(data,mc,s
   # Step is the step that is running. Will run the next step.
   if 'mc' in datas:
     for year in years:
-      FIRST_COMMAND = processMc(YEAR=year, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.'+year+'.mc.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.'+year+'.mc.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
+      FIRST_COMMAND = processMc(YEAR=year, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.'+year+'.mc.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.'+year+'.mc.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script,dataset_list=args.dataset_list)
 
   if 'data' in datas:
     for year in years:
-      FIRST_COMMAND = processData(YEAR=year, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.'+year+'.data.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.'+year+'.data.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
+      FIRST_COMMAND = processData(YEAR=year, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.'+year+'.data.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.'+year+'.data.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script,dataset_list=args.dataset_list)
 
   # Change permission of directories
   os.system("find "+PICO_DIR+"/"+NANOAOD_VERSION+'/'+PRODUCTION_NAME+" -type d -exec chmod 775 {} \;")

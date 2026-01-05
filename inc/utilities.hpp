@@ -22,6 +22,8 @@
 #include "TLorentzVector.h"
 
 #include "nano_tree.hpp"
+#include "pico_tree.hpp"
+
 
 #define ERROR(x) do{throw std::runtime_error(std::string("Error in file ")+__FILE__+" at line "+std::to_string(__LINE__)+" (in "+__func__+"): "+x);}while(false)
 #define DBG(x) do{std::cerr << "In " << __FILE__ << " at line " << __LINE__ << " (in function " << __func__ << "): " << x << std::endl;}while(false)
@@ -128,4 +130,5 @@ void getJet_partonFlavour(nano_tree & nano, float nanoaod_version, std::vector<i
 void getGenPart_genPartIdxMother(nano_tree & nano, float nanoaod_version, std::vector<int> & GenPart_genPartIdxMother);
 void getGenPart_statusFlags(nano_tree & nano, float nanoaod_version, std::vector<int> & GenPart_statusFlags);
 void getGenJet_partonFlavour(nano_tree & nano, float nanoaod_version, std::vector<int> & GenJet_partonFlavour);
+bool check_miniso(pico_tree & pico, float miniso_comp);
 #endif

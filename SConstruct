@@ -3,17 +3,22 @@ import os
 import subprocess
 import sys
 
+DEBUG = False
+
 # envDict: { key: value }
 def findEnviornment(scriptname, envDict):
   if not os.path.isfile(scriptname):
     print ("[Error] Can't find script:"+scriptname)
 
-  command = ['env', '-i', 'bash', '-c', 'source '+scriptname+' && env']
-  proc = subprocess.Popen(command, stdout = subprocess.PIPE, shell=True)
-  for line in proc.stdout:
-    if '{' in line.decode('utf-8'): continue
-    if '}' in line.decode('utf-8'): continue
-    t_array= line.decode('utf-8').split("=",1)
+  command = ['env', '-i', 'bash', '-c', 'source '+scriptname+' && env -0']
+  proc = subprocess.Popen(command, stdout = subprocess.PIPE)
+
+  for line in proc.stdout.read().split(b'\0'):
+    line_dec = line.decode('utf-8')
+    if not line_dec: continue
+    if '=' not in line_dec: continue
+    t_array= line_dec.split("=",1)
+
     key=t_array[0]
     value=t_array[1].rstrip('\n')
     envDict[key] = value
@@ -26,7 +31,8 @@ def returnEnviornment(scriptname):
 
 def addRootEnv(_env):
   _env.Append (CCFLAGS = '-isystem `root-config --incdir`' )
-  #_env.Append (CCFLAGS = '-g' )
+  if DEBUG:
+    _env.Append (CCFLAGS = '-g' )
   _env.Append (CCFLAGS = '`root-config --cflags`' )
   _env.Append (LINKFLAGS = '`root-config --glibs`') 
   _env.Append (LINKFLAGS = '`root-config --ldflags`')
@@ -48,10 +54,11 @@ def addWarningEnv(_env):
                          ])
 
 def addExternalEnv(_env):
-  _env.Append (CCFLAGS = '-isystem external_inc -std=c++17' )
+  _env.Append (CCFLAGS = '-isystem external_inc' )
 
 def addBasicEnv(_env):
-  _env.Append (CCFLAGS = '-O2')
+  if not DEBUG:
+    _env.Append (CCFLAGS = '-O2')
 
 def addKernelEnv(_env):
   _env['kernel'] = getKernel()

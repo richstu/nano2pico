@@ -9,8 +9,7 @@ public:
   explicit DileptonProducer(int year);
   ~DileptonProducer();
 
-  void WriteDileptons(pico_tree &pico, 
-                      std::vector<int> sig_el_pico_idx, std::vector<int> sig_mu_pico_idx);
+  void WriteDileptons(pico_tree &pico, bool is_signal);
 
 private:
   int year;

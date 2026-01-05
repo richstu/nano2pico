@@ -1,10 +1,12 @@
 #ifndef ElectroWeakAnalysis_RoccoR
 #define ElectroWeakAnalysis_RoccoR
 
+#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
 #include "RoccoR.hpp"
+#include "TString.h"
 
 const double CrystalBall::pi = 3.14159;
 const double CrystalBall::sqrtPiOver2 = sqrt(CrystalBall::pi/2.0);
@@ -75,7 +77,7 @@ double RocRes::kSmear(double pt, double eta, TYPE type, double v, double u) cons
 
 double RocRes::kSmear(double pt, double eta, TYPE type, double w, double u, int n) const{
     int H = etaBin(fabs(eta));
-    int F = n>NMIN ? n-NMIN : 0;
+    int F = n-NMIN;
     if(type==Data) F = trkBin(rndm(H, F, w), H, Data);
     const ResParams &rp = resol[H];
     double x = rp.kRes[type] * Sigma(pt, H, F) * rp.cb[F].invcdf(u);
@@ -132,108 +134,122 @@ void RoccoR::init(std::string filename){
     std::vector<double> BETA;
 
     std::string tag;
-    int type, sys, mem, var, bin; 
+    int type, sys, mem, var, bin;	
     std::string s;
+    double dKdX = 0;
     while(std::getline(in, s)){
-  std::stringstream ss(s); 
-  std::string first4=s.substr(0,4);
-  if(first4=="NSET"){
-      ss >> tag >> nset;
-      nmem.resize(nset);
-      tvar.resize(nset);
-      RC.resize(nset);
-  }
-  else if(first4=="NMEM") {
-      ss >> tag;
-      for(int i=0; i<nset; ++i) {
-    ss >> nmem[i];
-    RC[i].resize(nmem[i]);
-      }
-  }
-  else if(first4=="TVAR") {
-      ss >> tag;
-      for(int i=0; i<nset; ++i) ss >> tvar[i];
-  }
-  else if(first4=="RMIN") ss >> tag >> RMIN;
-  else if(first4=="RTRK") ss >> tag >> RTRK;
-  else if(first4=="RETA") {
-      ss >> tag >> RETA;
-      BETA.resize(RETA+1);
-      for(auto &h: BETA) ss >> h;
+	std::stringstream ss(s); 
+	if(s.substr(0,7)=="VERSION") {
+	    ss >> s >> s;
+	    std::cout << Form("%-8s %s", "RoccoR:", s.c_str()) << std::endl; 
+	    continue;
+	}
+	std::string first4=s.substr(0,4);
+	if(first4=="NSET"){
+	    ss >> tag >> nset;
+	    nmem.resize(nset);
+	    tvar.resize(nset);
+	    RC.resize(nset);
+	}
+	else if(first4=="NMEM") {
+	    ss >> tag;
+	    for(int i=0; i<nset; ++i) {
+		ss >> nmem[i];
+		RC[i].resize(nmem[i]);
+	    }
+	}
+	else if(first4=="TVAR") {
+	    ss >> tag;
+	    for(int i=0; i<nset; ++i) ss >> tvar[i];
+	}
+	else if(first4=="RMIN") ss >> tag >> RMIN;
+	else if(first4=="RTRK") ss >> tag >> RTRK;
+	else if(first4=="RETA") {
+	    ss >> tag >> RETA;
+	    BETA.resize(RETA+1);
+	    for(auto &h: BETA) ss >> h;
 
-  }
-  else if(first4=="CPHI") {
-      ss >> tag >> NPHI; 
-      DPHI=2*CrystalBall::pi/NPHI;
-  }
-  else if(first4=="CETA")  {
-      ss >> tag >> NETA;
-      etabin.resize(NETA+1);
-      for(auto& h: etabin) ss >> h;
-  }
-  else{ 
-      ss >> sys >> mem >> tag;
-      auto &rc = RC[sys][mem]; 
-      rc.RR.NETA=RETA;
-      rc.RR.NTRK=RTRK;
-      rc.RR.NMIN=RMIN;
-      auto &resol = rc.RR.resol;
-      if(resol.empty()){
-    resol.resize(RETA);
-    for(size_t ir=0; ir<resol.size(); ++ir){
-        auto &r = resol[ir];
-        r.eta = BETA[ir];
-        r.cb.resize(RTRK);
-        for(auto i:{0,1})r.nTrk[i].resize(RTRK+1);
-        for(auto i:{0,1,2})r.rsPar[i].resize(RTRK);
-    }
-      }
-      auto &cp = rc.CP;
-      for(TYPE T:{MC,DT}){
-    if(cp[T].empty()){
-        cp[T].resize(NETA);
-        for(auto &i: cp[T]) i.resize(NPHI);
-    }
-      }
+	}
+	else if(first4=="CPHI") {
+	    ss >> tag >> NPHI; 
+	    DPHI=2*CrystalBall::pi/NPHI;
+	}
+	else if(first4=="CETA")  {
+	    ss >> tag >> NETA;
+	    etabin.resize(NETA+1);
+	    for(auto& h: etabin) ss >> h;
+	}
+	else{ 
+	    ss >> sys >> mem >> tag;
+	    auto &rc = RC[sys][mem]; 
+	    rc.RR.NETA=RETA;
+	    rc.RR.NTRK=RTRK;
+	    rc.RR.NMIN=RMIN;
+	    auto &resol = rc.RR.resol;
+	    if(resol.empty()){
+		resol.resize(RETA);
+		for(size_t ir=0; ir<resol.size(); ++ir){
+		    auto &r = resol[ir];
+		    r.eta = BETA[ir];
+		    r.cb.resize(RTRK);
+		    for(auto i:{0,1})r.nTrk[i].resize(RTRK+1);
+		    for(auto i:{0,1,2})r.rsPar[i].resize(RTRK);
+		}
+	    }
+	    auto &cp = rc.CP;
+	    for(TYPE T:{MC,DT}){
+		if(cp[T].empty()){
+		    cp[T].resize(NETA);
+		    for(auto &i: cp[T]) i.resize(NPHI);
+		}
+	    }
 
-      if(tag=="R"){
-    ss >> var >> bin; 
-    for(int i=0; i<RTRK; ++i) {
-        switch(var){
-      case 0: ss >> resol[bin].rsPar[var][i]; break;
-      case 1: ss >> resol[bin].rsPar[var][i]; break;
-      case 2: ss >> resol[bin].rsPar[var][i]; resol[bin].rsPar[var][i]/=100; break; 
-      case 3: ss >> resol[bin].cb[i].s; break; 
-      case 4: ss >> resol[bin].cb[i].a; break; 
-      case 5: ss >> resol[bin].cb[i].n; break; 
-      default: break;
-        }
-    }
-      }
-      else if(tag=="T") {
-    ss >> type >> bin; 
-    for(int i=0; i<RTRK+1; ++i) ss >> resol[bin].nTrk[type][i];
-      }
-      else if(tag=="F") {
-    ss >> type; 
-    for(int i=0; i<RETA; ++i) ss >> resol[i].kRes[type];
+	    if(tag=="R"){
+		ss >> var >> bin; 
+		for(int i=0; i<RTRK; ++i) {
+		    switch(var){
+			case 0: ss >> resol[bin].rsPar[var][i]; break;
+			case 1: ss >> resol[bin].rsPar[var][i]; break;
+			case 2: ss >> resol[bin].rsPar[var][i]; resol[bin].rsPar[var][i]/=100; break; 
+			case 3: ss >> resol[bin].cb[i].s; break; 
+			case 4: ss >> resol[bin].cb[i].a; break; 
+			case 5: ss >> resol[bin].cb[i].n; break; 
+			default: break;
+		    }
+		}
+	    }
+	    else if(tag=="T") {
+		ss >> type >> bin; 
+		for(int i=0; i<RTRK+1; ++i) ss >> resol[bin].nTrk[type][i];
+	    }
+	    else if(tag=="F") {
+		ss >> type; 
+		for(int i=0; i<RETA; ++i) ss >> resol[i].kRes[type];
 
-      }
-      else if(tag=="C") {
-    ss >> type >> var >> bin; 
-    for(int i=0; i<NPHI; ++i){
-        auto &x = cp[type][bin][i];
-        if(var==0) { ss >> x.M; x.M = 1.0+x.M/100;}
-        else if(var==1){ ss >> x.A; x.A/=100; }
-    }
-      }
-  }
+	    }
+	    else if(tag=="C") {
+		ss >> type >> var >> bin; 
+		for(int i=0; i<NPHI; ++i){
+		    auto &x = cp[type][bin][i];
+		    if(var==0) { ss >> x.M; x.M = 1.0+x.M/100;}
+		    else if(var==1){ ss >> x.A; x.A/=100; }
+		}
+	    }
+	    else if(tag=="X"){
+		ss >> type >> dKdX;
+		for(int i=0; i<NETA; ++i){
+		    for(int j=0; j<NPHI; ++j){
+			cp[type][i][j].X = dKdX;
+		    }
+		}
+	    }
+	}
     }
 
     for(auto &rcs: RC)
-  for(auto &rcm: rcs)
-      for(auto &r: rcm.RR.resol)
-    for(auto &i: r.cb) i.init();
+	for(auto &rcm: rcs)
+	    for(auto &r: rcm.RR.resol)
+		for(auto &i: r.cb) i.init();
 
     in.close();
 }
@@ -255,20 +271,20 @@ int RoccoR::phiBin(double x) const{
 double RoccoR::kScaleDT(int Q, double pt, double eta, double phi, int s, int m) const{
     int H = etaBin(eta);
     int F = phiBin(phi);
-    return 1.0/(RC[s][m].CP[DT][H][F].M + Q*RC[s][m].CP[DT][H][F].A*pt);
+    return RC[s][m].CP[DT][H][F].k(Q, pt);
 }
 
 double RoccoR::kScaleMC(int Q, double pt, double eta, double phi, int s, int m) const{
     int H = etaBin(eta);
     int F = phiBin(phi);
-    return 1.0/(RC[s][m].CP[MC][H][F].M + Q*RC[s][m].CP[MC][H][F].A*pt);
+    return RC[s][m].CP[MC][H][F].k(Q, pt);
 }
 
 double RoccoR::kSpreadMC(int Q, double pt, double eta, double phi, double gt, int s, int m) const{
     const auto& rc=RC[s][m];
     int H = etaBin(eta);
     int F = phiBin(phi);
-    double k=1.0/(rc.CP[MC][H][F].M + Q*rc.CP[MC][H][F].A*pt);
+    double k = rc.CP[MC][H][F].k(Q, pt);
     return k*rc.RR.kSpread(gt, k*pt, eta);
 }
 
@@ -276,28 +292,13 @@ double RoccoR::kSmearMC(int Q, double pt, double eta, double phi, int n, double 
     const auto& rc=RC[s][m];
     int H = etaBin(eta);
     int F = phiBin(phi);
-    double k=1.0/(rc.CP[MC][H][F].M + Q*rc.CP[MC][H][F].A*pt);
-    return k*rc.RR.kExtra(k*pt, eta, n, u);
+    double k = rc.CP[MC][H][F].k(Q, pt);
+    return k * rc.RR.kExtra(k*pt, eta, n, u);
 }
 
-
-double RoccoR::kScaleFromGenMC(int Q, double pt, double eta, double phi, int n, double gt, double w, int s, int m) const{
-    const auto& rc=RC[s][m];
-    int H = etaBin(eta);
-    int F = phiBin(phi);
-    double k=1.0/(rc.CP[MC][H][F].M + Q*rc.CP[MC][H][F].A*pt);
-    return k*rc.RR.kSpread(gt, k*pt, eta, n, w);
-}
-
-double RoccoR::kScaleAndSmearMC(int Q, double pt, double eta, double phi, int n, double u, double w, int s, int m) const{
-    const auto& rc=RC[s][m];
-    int H = etaBin(eta);
-    int F = phiBin(phi);
-    double k=1.0/(rc.CP[MC][H][F].M + Q*rc.CP[MC][H][F].A*pt);
-    return k*rc.RR.kExtra(k*pt, eta, n, u, w);
-}
 
 double RoccoR::kGenSmear(double pt, double eta, double v, double u, RocRes::TYPE TT, int s, int m) const{
+    if(empty()) return 1.0;
     return RC[s][m].RR.kSmear(pt, eta, TT, v, u);
 }
 
@@ -305,10 +306,10 @@ template <typename T>
 double RoccoR::error(T f) const{
     double sum=0;
     for(int s=0; s<nset; ++s){
-  for(int i=0; i<nmem[s]; ++i) {
-      double d = f(s,i) - f(0,0); 
-      sum += d*d/nmem[s];
-  }
+	for(int i=0; i<nmem[s]; ++i) {
+	    double d = f(s,i) - f(0,0); 
+	    sum += d*d/nmem[s];
+	}
     }
     return sqrt(sum);
 }
@@ -325,12 +326,5 @@ double RoccoR::kSmearMCerror(int Q, double pt, double eta, double phi, int n, do
     return error([this, Q, pt, eta, phi, n, u](int s, int m){return kSmearMC(Q, pt, eta, phi, n, u, s, m);});
 }
 
-double RoccoR::kScaleFromGenMCerror(int Q, double pt, double eta, double phi, int n, double gt, double w) const{
-    return error([this, Q, pt, eta, phi, n, gt, w](int s, int m) {return kScaleFromGenMC(Q, pt, eta, phi, n, gt, w, s, m);});
-}
-
-double RoccoR::kScaleAndSmearMCerror(int Q, double pt, double eta, double phi, int n, double u, double w) const{
-    return error([this, Q, pt, eta, phi, n, u, w](int s, int m) {return kScaleAndSmearMC(Q, pt, eta, phi, n, u, w, s, m);});
-}
-
 #endif
+

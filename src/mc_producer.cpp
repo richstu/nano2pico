@@ -77,7 +77,7 @@ int GenParticleProducer::GetMotherIdx(nano_tree & nano, int imc, map<int, int> &
   return GetFirstCopyIdxOrInterestingIdx(nano, mc_mom_index, mc_index_to_interested_index);
 }
 
-void GenParticleProducer::WriteGenParticles(nano_tree &nano, pico_tree &pico){
+void GenParticleProducer::WriteGenParticles(nano_tree &nano, pico_tree &pico, bool isDY){
 
   // Saves if isPrompt and isFirstCopy
   //                               H, Z,  W, gamma, gluon, b, t, d, u, s, c
@@ -108,6 +108,8 @@ void GenParticleProducer::WriteGenParticles(nano_tree &nano, pico_tree &pico){
     bool lepton_interesting = IsInteresting(interested_lepton_ids, {}, mc_id);
     bool save_index = false;
     bool is_tauDecayProduct = false;
+    // for HZg, save all gen photons for DY sample
+    if (isDY && mc_id == 22) save_index = true;
     if (is_interesting) {
       // 0: isPrompt, 12: isFirstCopy, 
       if (mc_statusFlags[0]==1 && mc_statusFlags[12]==1) save_index = true;

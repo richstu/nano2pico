@@ -120,14 +120,14 @@ int GetArrayLength(const std::string var_name){
   if      (var_type == "Electron") return 60;
   else if (var_type == "Muon") return 60;
   else if (var_type == "Tau") return 30;
-  else if (var_type == "IsoTrack") return 60;
+  else if (var_type == "IsoTrack") return 80;
   else if (var_type == "Photon") return 200;
   else if (var_type == "FsrPhoton") return 200;
   else if (var_type == "Jet") return 200;
   else if (var_type == "SoftActivityJet") return 30;
   else if (var_type == "FatJet") return 30;
   else if (var_type == "SubJet") return 60;
-  else if (var_type == "CorrT1METJet") return 40;
+  else if (var_type == "CorrT1METJet") return 60;
   else if (var_type == "GenPart") return 500;
   else if (var_type == "GenDressedLepton") return 20;
   else if (var_type == "GenVisTau") return 20;
