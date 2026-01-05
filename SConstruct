@@ -10,12 +10,15 @@ def findEnviornment(scriptname, envDict):
   if not os.path.isfile(scriptname):
     print ("[Error] Can't find script:"+scriptname)
 
-  command = ['env', '-i', 'bash', '-c', 'source '+scriptname+' && env']
-  proc = subprocess.Popen(command, stdout = subprocess.PIPE, shell=True)
-  for line in proc.stdout:
-    if '{' in line.decode('utf-8'): continue
-    if '}' in line.decode('utf-8'): continue
-    t_array= line.decode('utf-8').split("=",1)
+  command = ['env', '-i', 'bash', '-c', 'source '+scriptname+' && env -0']
+  proc = subprocess.Popen(command, stdout = subprocess.PIPE)
+
+  for line in proc.stdout.read().split(b'\0'):
+    line_dec = line.decode('utf-8')
+    if not line_dec: continue
+    if '=' not in line_dec: continue
+    t_array= line_dec.split("=",1)
+
     key=t_array[0]
     value=t_array[1].rstrip('\n')
     envDict[key] = value
@@ -51,7 +54,7 @@ def addWarningEnv(_env):
                          ])
 
 def addExternalEnv(_env):
-  _env.Append (CCFLAGS = '-isystem external_inc -std=c++17' )
+  _env.Append (CCFLAGS = '-isystem external_inc' )
 
 def addBasicEnv(_env):
   if not DEBUG:

@@ -319,6 +319,19 @@ vector<float> ll_deta
 vector<int>   ll_lepid
 vector<int>   ll_i1
 vector<int>   ll_i2
+vector<float> ll_l1_pt
+vector<float> ll_l2_pt
+
+#temporary for signal-only production
+#should replace ll_refit_l* below if another production is ever run
+vector<float> ll_refit_lep1_pt
+vector<float> ll_refit_lep1_eta
+vector<float> ll_refit_lep1_phi
+vector<float> ll_refit_lep1_m
+vector<float> ll_refit_lep2_pt
+vector<float> ll_refit_lep2_eta
+vector<float> ll_refit_lep2_phi
+vector<float> ll_refit_lep2_m
 
 float ll_refit_pt
 float ll_refit_eta
@@ -683,12 +696,20 @@ vector<float> sys_jet_m_jesup
 vector<float> sys_jet_m_jesdn
 vector<float> sys_jet_m_jerup
 vector<float> sys_jet_m_jerdn
+vector<float> sys_jet_isgood_jesup
+vector<float> sys_jet_isgood_jesdn
+vector<float> sys_jet_isgood_jerup
+vector<float> sys_jet_isgood_jerdn
 
 #index matches electron_*
 vector<float> sys_el_pt_scaleup
 vector<float> sys_el_pt_scaledn
 vector<float> sys_el_pt_resup
 vector<float> sys_el_pt_resdn
+vector<bool>  sys_el_sig_scaleup
+vector<bool>  sys_el_sig_scaledn
+vector<bool>  sys_el_sig_resup
+vector<bool>  sys_el_sig_resdn
 
 vector<float> sys_el_enerr_scaleup
 vector<float> sys_el_enerr_scaledn
@@ -701,12 +722,20 @@ vector<float> sys_mu_pt_scaleup
 vector<float> sys_mu_pt_scaledn
 vector<float> sys_mu_pt_resup
 vector<float> sys_mu_pt_resdn
+vector<bool>  sys_mu_sig_scaleup
+vector<bool>  sys_mu_sig_scaledn
+vector<bool>  sys_mu_sig_resup
+vector<bool>  sys_mu_sig_resdn
 
 #index matches photon_*
 vector<float> sys_photon_pt_scaleup
 vector<float> sys_photon_pt_scaledn
 vector<float> sys_photon_pt_resup
 vector<float> sys_photon_pt_resdn
+vector<bool>  sys_photon_sig_scaleup
+vector<bool>  sys_photon_sig_scaledn
+vector<bool>  sys_photon_sig_resup
+vector<bool>  sys_photon_sig_resdn
 
 vector<float> sys_photon_enerr_scaleup
 vector<float> sys_photon_enerr_scaledn
@@ -714,7 +743,7 @@ vector<float> sys_photon_enerr_resup
 vector<float> sys_photon_enerr_resdn
 
 # variations have index 0 (JER smearing up), 1 (JER smearing down), 2 (JES up) and 3 (JES down)
-# for met_phi only: indxes 4 (unclustered up) 5 (unclustered down) 6 (lepton photon up) 7 (lepton photon down)
+# for met_phi only: indices 4 (unclustered up) 5 (unclustered down) 6 (lepton photon up) 7 (lepton photon down)
 vector<float> sys_ht
 vector<int>   sys_njet
 vector<int>   sys_nbl

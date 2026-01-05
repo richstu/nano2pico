@@ -136,7 +136,7 @@ int main(int argc, char *argv[]){
 
     pico.out_weight() = static_cast<float>(corr.weight()) * pico.out_w_lumi() *
                      pico.out_w_lep() * pico.out_w_fs_lep() * //post-corr values in order for 0l to be correct
-                     btag_weight * pico.out_w_jetpuid() * pico.out_w_trig() * 
+                     btag_weight * pico.w_jetpuid() * pico.out_w_trig() * 
                      pico.out_w_isr() * pico.out_w_pu() * pico.w_prefire() * 
                      pico.w_photon() *  pico.out_w_phshape() * pico.w_fakephoton() * 
                      pico.out_w_nnlo();

@@ -69,6 +69,10 @@ int main(int argc, char *argv[]){
   bool isFastsim = Contains(in_file, "Fast") ? true : false;
   bool isSignal = Contains(in_file, "TChiHH") || Contains(in_file, "T5qqqqZH") ? true : false;
   bool isZgamma = Contains(out_dir, "zgamma");
+  if (isZgamma)
+    isSignal = (Contains(in_file, "HtoZG") || Contains(in_file, "HToZG") || 
+                Contains(in_file, "HToMuMu") || Contains(in_file, "Hto2Mu") ? 
+                true : false);
   bool isHiggsino = Contains(out_dir, "higgsino");
   int year = -1;
   int isAPV = false;
@@ -380,8 +384,8 @@ int main(int argc, char *argv[]){
     vector<int> sig_mu_pico_idx = vector<int>();
     vector<int> photon_el_pico_idx = vector<int>();
     
-    vector<int> sig_el_nano_idx = el_producer.WriteElectrons(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, sig_el_pico_idx, photon_el_pico_idx, isZgamma, isFastsim);
-    vector<int> sig_mu_nano_idx = mu_producer.WriteMuons(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, sig_mu_pico_idx, isZgamma, isFastsim);
+    vector<int> sig_el_nano_idx = el_producer.WriteElectrons(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, sig_el_pico_idx, photon_el_pico_idx, isZgamma, isSignal, isFastsim);
+    vector<int> sig_mu_nano_idx = mu_producer.WriteMuons(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, sig_mu_pico_idx, isZgamma, isSignal, isFastsim);
     // save a separate vector with just signal leptons ordered by pt
     struct SignalLepton{ float pt; float eta; float phi; int pdgid;};
     vector<SignalLepton> sig_leps;
@@ -402,12 +406,12 @@ int main(int argc, char *argv[]){
     }
     vector<int> jet_isphoton_nano_idx = vector<int>();
     if(isZgamma || isHiggsino) 
-      vector<int> sig_ph_nano_idx = photon_producer.WritePhotons(nano, pico, jet_isphoton_nano_idx,
-                                                                 sig_el_nano_idx, sig_mu_nano_idx,
-                                                                 photon_el_pico_idx);
+      vector<int> sig_ph_nano_idx = photon_producer.WritePhotons(nano, pico, 
+          jet_isphoton_nano_idx, sig_el_nano_idx, sig_mu_nano_idx,
+          photon_el_pico_idx, isSignal);
     event_tools.WriteStitch(nano, pico);
     tk_producer.WriteIsoTracks(nano, pico, sig_el_nano_idx, sig_mu_nano_idx, isFastsim, is_preUL);
-    dilep_producer.WriteDileptons(pico, sig_el_pico_idx, sig_mu_pico_idx);
+    dilep_producer.WriteDileptons(pico, isSignal);
 
     if (debug) cout<<"INFO:: Writing gen particles"<<endl;
 
@@ -419,7 +423,8 @@ int main(int argc, char *argv[]){
     vector<HiggsConstructionVariables> sys_higvars;
     vector<int> sig_jet_nano_idx = jetmet_producer.WriteJetMet(nano, pico, 
         jet_islep_nano_idx, jet_isvlep_nano_idx, jet_isphoton_nano_idx,
-        btag_wpts[year_string], btag_df_wpts[year_string], isFastsim, isSignal, sys_higvars);
+        btag_wpts[year_string], btag_df_wpts[year_string], isFastsim, isSignal,
+        sys_higvars);
     jetmet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year_string][1], isFastsim); // usually w.r.t. medium WP
     jetmet_producer.WriteFatJets(nano, pico); // jetmet_producer.SetVerbose(nano.nSubJet()>0);
     jetmet_producer.WriteSubJets(nano, pico);
@@ -460,7 +465,7 @@ int main(int argc, char *argv[]){
     if (debug) cout<<"INFO:: Writing analysis specific variables"<<endl;
     // might need as input sig_el_nano_idx, sig_mu_nano_idx, sig_ph_nano_idx
     if(isZgamma)
-      zgamma_producer.WriteZGammaVars(pico);
+      zgamma_producer.WriteZGammaVars(pico, isSignal);
   
     if (isHiggsino) gammagamma_producer.WriteGammaGammaVars(pico);
     if (isHiggsino) bb_producer.WriteBBVars(pico, /*doDeepFlav*/false);
@@ -468,8 +473,12 @@ int main(int argc, char *argv[]){
     if (isHiggsino) bbgammagamma_producer.WriteBBGammaGammaVars(pico);
 
     //save higgs variables using DeepCSV and DeepFlavor
-    hig_producer.WriteHigVars(pico, false, isSignal, sys_higvars, nanoaod_version);
-    hig_producer.WriteHigVars(pico, true, isSignal, sys_higvars, nanoaod_version);
+    if (!isZgamma) {
+      hig_producer.WriteHigVars(pico, false, isSignal, sys_higvars, 
+                                nanoaod_version);
+      hig_producer.WriteHigVars(pico, true, isSignal, sys_higvars, 
+                                nanoaod_version);
+    }
 
     if (debug) cout<<"INFO:: Writing triggers"<<endl;
 

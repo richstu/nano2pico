@@ -17,7 +17,8 @@ void CopySize(const vector<T> &wgt_sums, vector<U> &corr){
 template<typename T, typename U>
 void VecAdd(const vector<T> &wgt_sums, vector<U> &corr){
   for(size_t i = 0; i < wgt_sums.size(); ++i){
-    corr.at(i) += wgt_sums.at(i);
+    if ((!isnan(wgt_sums.at(i))) && (!isinf(wgt_sums.at(i))))
+      corr.at(i) += wgt_sums.at(i);
   }
 }
 

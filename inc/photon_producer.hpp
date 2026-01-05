@@ -30,7 +30,8 @@ public:
 
   bool IsSignal(nano_tree &nano, pico_tree &pico, int nano_idx, 
                 float scaleres_corr, float minLepDR, 
-                std::vector<int> &photon_el_pico_idx);
+                std::vector<int> &photon_el_pico_idx, bool skip_pt=false);
+
   float SCeta(bool isScEtaEB, float eta, float phi, 
               float pvx, float pvy, float pvz);
 
@@ -38,7 +39,8 @@ public:
                                 std::vector<int> &jet_isphoton_nano_idx, 
                                 std::vector<int> &sig_el_nano_idx, 
                                 std::vector<int> &sig_mu_nano_idx,
-                                std::vector<int> &photon_el_pico_idx);
+                                std::vector<int> &photon_el_pico_idx,
+                                bool is_signal_sample);
 
 private:
   std::string year;
