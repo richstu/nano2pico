@@ -51,8 +51,6 @@ std::vector< std::vector<int> > MakeVRunLumi(std::string input){
   if(VRunLumi.size() == 0){
     std::cout<<"No Lumiblock found in JSON file\n";
   }
-
-  for (unsigned int i(0); i<VRunLumi.size();i++) cout<<VRunLumi[i]<<" ";
   std::vector< std::vector<int> > VVRunLumi;
   for(unsigned int i = 0; i+2 < VRunLumi.size();){
     if(VRunLumi[i] > 130000){
