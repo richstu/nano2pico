@@ -4,7 +4,7 @@
 
 #include "trigger_weighter.hpp"
 
-#include "correction.hpp"
+#include "correction.h"
 #include "pico_tree.hpp"
 #include "utilities.hpp"
 

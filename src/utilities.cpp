@@ -256,8 +256,12 @@ void getJetWithJEC(nano_tree & nano, bool isFastsim, vector<float> & Jet_pt, vec
 void getJetId(nano_tree & nano, float nanoaod_version, vector<int> & Jet_jetId) {
   Jet_jetId.resize(nano.nJet());
   for(int ijet(0); ijet<nano.nJet(); ++ijet){
-    if (nanoaod_version+0.01 > 11.9) Jet_jetId[ijet] = nano.Jet_jetId_11p9()[ijet];
-    else Jet_jetId[ijet] = nano.Jet_jetId()[ijet];
+    if (nanoaod_version+0.01 > 11.9 && nanoaod_version+0.01 < 13) Jet_jetId[ijet] = nano.Jet_jetId_11p9()[ijet];
+    else if (nanoaod_version+0.01 < 11.9) Jet_jetId[ijet] = nano.Jet_jetId()[ijet];
+    else{
+      cout<<"ERROR: Jet_jetId not available after NanoAODv13. Exit."<<endl;
+      exit(0);
+    }
   }
 }
 
@@ -265,7 +269,11 @@ void getFatJet_btagDDBvL(nano_tree & nano, float nanoaod_version, vector<float> 
   FatJet_btagDDBvL.resize(nano.nFatJet());
   for(int ijet(0); ijet<nano.nFatJet(); ++ijet){
     if (nanoaod_version+0.01 < 9) FatJet_btagDDBvL[ijet] = nano.FatJet_btagDDBvL()[ijet];
-    else FatJet_btagDDBvL[ijet] = nano.FatJet_btagDDBvLV2()[ijet];
+    else if(nanoaod_version < 13.1) FatJet_btagDDBvL[ijet] = nano.FatJet_btagDDBvLV2()[ijet];
+    else{
+      cout<<"ERROR: FatJet_btagDDBvL not available after NanoAODv13. Exit."<<endl;
+      exit(0);
+    }
   }
 }
 
@@ -275,7 +283,7 @@ void getFatJet_particleNetWithMass_WvsQCD(nano_tree & nano, float nanoaod_versio
   for(int ijet(0); ijet<nano.nFatJet(); ++ijet){
     if (nanoaod_version+0.01 < 11.9) 
       FatJet_particleNetWithMass_WvsQCD[ijet] = nano.FatJet_particleNet_WvsQCD()[ijet];
-    else 
+    else
       FatJet_particleNetWithMass_WvsQCD[ijet] = nano.FatJet_particleNetWithMass_WvsQCD()[ijet];
   }
 }

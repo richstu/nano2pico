@@ -58,7 +58,6 @@ void GetOptions(int argc, char *argv[]);
 
 int main(int argc, char *argv[]){
   GetOptions(argc, argv);
-
   if(in_file=="" || in_dir=="" || out_dir == "") {
     cout<<"ERROR: Input file, sum-of-weights and/or output directory not specified. Exit."<<endl;
     exit(1);
@@ -100,6 +99,8 @@ int main(int argc, char *argv[]){
     else if (Contains(in_file, "Run2018")) year = 2018;
     else if (Contains(in_file, "Run2022")) year = 2022;
     else if (Contains(in_file, "Run2023")) year = 2023;
+    else if (Contains(in_file, "Run2024")) year = 2024;
+    else if (Contains(in_file, "Run2025")) year = 2025;
   }
   if (year < 0) {
     cout<<"ERROR: Add code for new year!"<<endl;
@@ -142,6 +143,8 @@ int main(int argc, char *argv[]){
   else if (year == 2022 && !is2022preEE)   year_string = "2022EE";
   else if (year == 2023 && is2023preBPix)  year_string = "2023";
   else if (year == 2023 && !is2023preBPix) year_string = "2023BPix";
+  else if (year == 2024)                   year_string = "2024";
+  else if (year == 2025)                   year_string = "2025";
   else {
     cout << "ERROR: unknown year";
     exit(1);
@@ -195,6 +198,12 @@ int main(int argc, char *argv[]){
       case 2023:
         if (Contains(in_file, "2023")) VVRunLumi = MakeVRunLumi("golden2023");
         break;
+      case 2024:
+        if (Contains(in_file, "2024")) VVRunLumi = MakeVRunLumi("golden2024");
+        break;
+      case 2025:
+        if (Contains(in_file, "2025")) VVRunLumi = MakeVRunLumi("golden2025");
+        break;
       default:
         cout << "ERROR: no golden cert for given year" << endl;
         exit(1);
@@ -228,6 +237,7 @@ int main(int argc, char *argv[]){
   // B-tag working points
   // Updated Values May-28-2024 from https://btv-wiki.docs.cern.ch/ScaleFactors/
   // btag_df: WPs for deepJet (DeepFlavourB)
+  cout<<"B tag weighting using temporary values for 2024 and 2025"<<endl;
   map<string, vector<float>> btag_df_wpts{
     {"2016APV", vector<float>({0.0508, 0.2598, 0.6502})},
     {"2016", vector<float>({0.0480, 0.2489, 0.6377})},
@@ -236,7 +246,9 @@ int main(int argc, char *argv[]){
     {"2022", vector<float>({0.0583, 0.3086, 0.7183})},
     {"2022EE", vector<float>({0.0614, 0.3196, 0.73})},
     {"2023", vector<float>({0.0479, 0.2431, 0.6553})},
-    {"2023BPix", vector<float>({0.048, 0.2435, 0.6563})}
+    {"2023BPix", vector<float>({0.048, 0.2435, 0.6563})},
+    {"2024", vector<float>({0.048, 0.2435, 0.6563})},
+    {"2025", vector<float>({0.048, 0.2435, 0.6563})}
   };
   // WPs for Run 3 values are for PNet, Run 2 values are for deepCSV (DeepB)
   map<string, vector<float>> btag_wpts{
@@ -247,7 +259,9 @@ int main(int argc, char *argv[]){
     {"2022", vector<float>({0.047,  0.245,  0.6734})},
     {"2022EE", vector<float>({0.0499, 0.2605, 0.6915})},  
     {"2023", vector<float>({0.0358, 0.1917, 0.6172})},
-    {"2023BPix", vector<float>({0.0359, 0.1919, 0.6133})}
+    {"2023BPix", vector<float>({0.0359, 0.1919, 0.6133})},
+    {"2024", vector<float>({0.0359, 0.1919, 0.6133})},
+    {"2025", vector<float>({0.0359, 0.1919, 0.6133})},
   };
 
   // Rochester corrections
@@ -289,7 +303,6 @@ int main(int argc, char *argv[]){
   GammaGammaVarProducer gammagamma_producer(year);
   BBVarProducer bb_producer(year);
   BBGammaGammaVarProducer bbgammagamma_producer(year);
-
   //Initialize scale factor tools
   const string ctr = "central";
   const vector<string> updn = {"up","down"};
@@ -305,7 +318,6 @@ int main(int argc, char *argv[]){
   EventWeighter event_weighter(year_string, btag_df_wpts[year_string]);
   TriggerWeighter trigger_weighter(year_string);
   //cout<<"Is APV: "<<isAPV<<endl;
-
   // Other tools
   EventTools event_tools(in_path, year, isData, nanoaod_version);
   int event_type = event_tools.GetEventType();
@@ -343,7 +355,6 @@ int main(int argc, char *argv[]){
       cout<<"Processing event: "<<entry<<endl;
     }
     //skip events that are data but not in the golden json
-
     if (isData) {
       if(!inJSON(VVRunLumi, nano.run(), nano.luminosityBlock())) continue; 
     }
@@ -731,9 +742,8 @@ int main(int argc, char *argv[]){
 
   cout<<endl;
   time(&endtime); 
-  cout<<"Time passed: "<<hoursMinSec(difftime(endtime, begtime))<<endl<<endl;  
+  cout<<"Time passed: "<<hoursMinSec(difftime(endtime, begtime))<<endl<<endl; 
 }
-
 void Initialize(corrections_tree &wgt_sums){
   wgt_sums.out_neff()              = 0;
   wgt_sums.out_nent_zlep()         = 0;
@@ -784,7 +794,6 @@ void Initialize(corrections_tree &wgt_sums){
   wgt_sums.out_sys_ps().resize(4,0);
   //wgt_sums.out_sys_pdf().resize(102,0);
 }
-
 void GetOptions(int argc, char *argv[]){
   while(true){
     static struct option long_options[] = {
