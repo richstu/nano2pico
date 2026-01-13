@@ -4,12 +4,11 @@
 #include <string>
 #include <vector>
 
-#include "correction.hpp"
 #include "hig_producer.hpp"
 #include "met_producer.hpp"
 #include "nano_tree.hpp"
 #include "pico_tree.hpp"
-#include "correction.hpp"
+#include "correction.h"
 
 #include "TLorentzVector.h"
 #include "TRandom3.h"
@@ -73,8 +72,12 @@ private:
   std::vector<unsigned int> jec_run_start_;
   std::vector<unsigned int> jec_run_end_;
   std::string in_file_jetveto_;
+  std::string in_file_jetid_;
   std::unique_ptr<correction::CorrectionSet> cs_jetveto_;
+  std::unique_ptr<correction::CorrectionSet> cs_jetid_;
   correction::Correction::Ref map_jetveto_;
+  correction::Correction::Ref map_jetid_tight_;
+  correction::Correction::Ref map_jetid_tightlepveto_;
 };
 
 #endif
