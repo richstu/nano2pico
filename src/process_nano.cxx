@@ -91,6 +91,7 @@ int main(int argc, char *argv[]){
       else if (regex_search(in_file, std::regex("RunIIAutumn18"))) year = 2018;
       else if (regex_search(in_file, std::regex("Run3Summer22"))) year = 2022;
       else if (regex_search(in_file, std::regex("Run3Summer23"))) year = 2023;
+      else if (regex_search(in_file, std::regex("RunIII2024Summer24"))) year = 2024;
     }
   } else { // Data
     if (Contains(in_file, "HIPM")) isAPV = true;
@@ -347,7 +348,6 @@ int main(int argc, char *argv[]){
   cout << "Writing sum-of-weights to: " << wgt_sums_path << endl;
   Initialize(wgt_sums);
   wgt_sums.out_nent() = nentries;
-
   for(size_t entry(0); entry<nentries; ++entry){
     if (debug) cout << "GetEntry: " << entry <<" event = "<<pico.out_event()<< endl;
     nano.GetEntry(entry);
@@ -358,7 +358,6 @@ int main(int argc, char *argv[]){
     if (isData) {
       if(!inJSON(VVRunLumi, nano.run(), nano.luminosityBlock())) continue; 
     }
-
     bool passed_trig = event_tools.SaveTriggerDecisions(nano, pico, isZgamma);
     if (isData && !passed_trig) {
       continue;
@@ -381,7 +380,6 @@ int main(int argc, char *argv[]){
     //pileup energy density
     if (nanoaod_version >= 11 || nanoaod_version == 9.5)
       pico.out_rho() = nano.fixedGridRhoAll();
-
     // ----------------------------------------------------------------------------------------------
     //            *** Writing physics objects ***
     // N.B. Order in which producers are called matters! E.g. jets are not counted if overlapping 
