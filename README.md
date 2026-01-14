@@ -9,16 +9,18 @@ If you are not on one of the UCSB servers, prerequisites that must be installed 
 If you are using one of the UCSB servers that supports CMSSW (e.g. cms1,cms3,cms4,cms5...), you can use the following commands to install nano2pico and set up the environment:
 
 ~~~~bash
-# Setup git version for SL6.5
-. /cvmfs/cms.cern.ch/cmsset_default.sh;cd /net/cms29/cms29r0/pico/CMSSW_10_2_11_patch1/src;eval `scramv1 runtime -sh`;cd -
+# Setup git version for SL7
+. /cvmfs/cms.cern.ch/cmsset_default.sh
 # Clone git
 git clone --recurse-submodules git@github.com:richstu/nano2pico.git
 # If did not use recurse at clone, use following command: git submodule update --init --remote --recursive
 # Setup environemnt
+cd nano2pico
+pip3 install --target lib/python3.9/site-packages/ scons
 source set_env.sh
 ~~~~
 
-You can then compile via `scons` or `compile.sh`.
+You can then compile via `scons`. `compile.sh` is outdated, but may work.
 
 ## How does nano2pico work?
 
@@ -30,7 +32,7 @@ This package is used to do the Nano -> pico conversion in three steps in order t
 
 At this point, various skims can be made as defined in [scripts/skim_file.py](scripts/skim_file.py).
 
-*Note:* The input path in which the input NanoAOD files are stored as well as the output path are analyzed to determine the behavior of nano2pico. To run with settings for the Higgs to Z gamma analysis, the 'out_dir' should contian "zgamma" in its name. To run on custom NanoAODv9 files, the input directory must contain "NanoAODv9UCSB" in its name.
+*Note:* The input path in which the input NanoAOD files are stored as well as the output path are analyzed to determine the behavior of nano2pico. To run with settings for the Higgs to Z gamma analysis, the 'out_dir' should contain "zgamma" in its name. To run on custom NanoAODv9 files, the input directory must contain "NanoAODv9UCSB" in its name.
 
 ## Interactive test usage
 
@@ -684,7 +686,7 @@ Below are examples
 ./scripts/validate_unit_test_cross_section.py --output_filename validate_unit_test_cross_section.log --golden_cross_section_log OLD_CODE/unit_test_cross_section.log --validate_cross_section_log NEW_CODE/unit_test_cross_section.log
 ~~~
 
-# Setup with el9
+# Setup with el9 (possibly deprecated
 
 ~~~~bash
 # Create CMSSW 
