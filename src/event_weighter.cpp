@@ -195,6 +195,27 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
         "data/zgamma/2023BPix/hzg_eliso0p15_2023BPixHole_efficiencies.json");
     ph_shape_weighter_        = make_unique<rw_mmp_r3>();
     zgbkg_isr_weighter_       = make_unique<kinr3_weighter>();
+  } else if (year=="2024"){
+    cout<<"2024 has not been fully implemented in event_weighter. Defaulting to 2023"<<endl;
+    in_file_electron_         = "data/zgamma/2023/hzg_elid_2023_scalefactors.json";
+    in_file_electron_reco_    = "data/zgamma/2023/electron_recoSF2023.json";
+    in_file_photon_           = "data/zgamma/2023/photon.json";
+    in_file_photon_low_       = "data/zgamma/2022EE/hzg_phidvalidate_2022EE_scalefactors.json";
+    in_file_photon_mceff_     = "data/zgamma/2023/photon_wp80mceff_2023.json";
+    in_file_muon_             = "data/zgamma/2023/hzg_muid_2023_scalefactors.json";
+    in_file_pu_               = "data/zgamma/2024/puweights_BCDEFGHI.json";
+    in_file_btag_             = "data/zgamma/2023/btagging.json";
+    in_file_btag_mceff_       = "data/zgamma/2023/btag_mceff.json";
+    in_file_electron_iso0p10_ = "data/zgamma/2023/hzg_eliso0p1_2023_efficiencies.json";
+    in_file_electron_iso0p15_ = "data/zgamma/2023/hzg_eliso0p15_2023_efficiencies.json";
+    in_file_muon_iso0p10_     = "data/zgamma/2023/hzg_muiso0p1_2023_efficiencies.json";
+    in_file_muon_iso0p15_     = "data/zgamma/2023/hzg_muiso0p15_2023_efficiencies.json";
+    in_file_ggf_nnlo_         = "data/zgamma/GluGluHToZG_NNLO_reweight_run3.json";
+    key_                      = "2023PromptC";
+    puName_                   = "Collisions24_BCDEFGHI_goldenJSON";
+    btag_lightname            = "deepJet_light";
+    ph_shape_weighter_        = make_unique<rw_mmp_r3>();
+    zgbkg_isr_weighter_       = make_unique<kinr3_weighter>();
   } else {
     cout<<"Year has not been implemented in event_weighter. Defaulting to 2023"<<endl;
     in_file_electron_         = "data/zgamma/2023/hzg_elid_2023_scalefactors.json";

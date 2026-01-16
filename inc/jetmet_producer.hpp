@@ -32,7 +32,8 @@ public:
                                std::vector<int> jet_isvlep_nano_idx, 
                                std::vector<int> jet_isphoton_nano_idx,
                                const std::vector<float> &btag_wpts, 
-                               const std::vector<float> &btag_df_wpts, 
+                               const std::vector<float> &btag_df_wpts,
+                               const std::vector<float> &btag_upt_wpts, 
                                bool isFastsim, 
                                bool isSignal,
                                std::vector<HiggsConstructionVariables> &sys_higvars);

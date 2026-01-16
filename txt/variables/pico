@@ -155,6 +155,10 @@ int nbdfl
 int nbdfm
 int nbdft
 
+int nbuptl
+int nbuptm
+int nbuptt
+
 bool ismapvetoevt
 bool ishemvetoevt
 
@@ -169,6 +173,7 @@ vector<float> jet_deepcsv
 vector<float> jet_deepflav
 vector<float> jet_btagpnetb
 vector<float> jet_btagak4b
+vector<float> jet_btaguptb
 vector<int>   jet_puid
 vector<float> jet_puid_disc
 vector<bool>  jet_puid_pass

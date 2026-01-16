@@ -43,12 +43,12 @@ export INDIR=/net/cms29/cms29r0/pico/NanoAODv5/nano/2016/TChiHH/
 export INFILE=SMS-TChiHH_mChi-1000_mLSP-1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISummer16NanoAODv5__PUSummer16v3Fast_94X_mcRun2_asymptotic_v3-v1.root
 ~~~~
 
-Step 1. Make an output directory out/ with subdirectories `wgt_sums` and `raw_pico`. Produce raw pico ntuple from a nano input file:
+Step 1. Make an output directory `out/` (or another name containing `zgamma` if processing for Higgs to Z gamma) with subdirectories `wgt_sums` and `raw_pico`. Produce raw pico ntuple from a nano input file:
 
 ~~~~bash
 ./compile.sh && ./run/process_nano.exe --in_file $INFILE --in_dir $INDIR --out_dir out/ --nent 10000
 ~~~~
-
+`nent` can be set to `-1` to process all events in a file.
 :bangbang: Code functionality relies on the input NanoAOD filename! Specifically, `INFILE` is parsed for:
 
 * flag `isData = infile.Contains("Run201") ? true : false;`
@@ -58,14 +58,13 @@ Step 1. Make an output directory out/ with subdirectories `wgt_sums` and `raw_pi
 * output branch `type` is set based on the presence of dataset name substrings (see event_tools.cpp)
 * branches related on ISR also depend on the presence of dataset name substrings
 
-Step 2. If you are using data, you are done! If you are using MC, for each dataset, add up the sums of weights obtained for each file in step 1 and calculate the corrections needed to normalize each individual weight as well as the total weight. Note that the order of options is fixed with the arguments after the first being the input files. This is to allow arbitrary number of input files. Note that again functionality depends on the naming, e.g. correction file name is used to decide what cross-section to use.
-Make subdirectory `corrections` in `out`.
+Step 2. If you are using data, you are done! If you are using MC, for each dataset, it is necessary to add up the sums of weights obtained for each file in step 1 and calculate the corrections needed to normalize each individual weight as well as the total weight. Note that the order of options is fixed with the arguments after the first being the input files. This is to allow arbitrary number of input files. Note that again functionality depends on the naming, e.g. correction file name is used to decide what cross-section to use. To perform this process, make subdirectory `corrections` in `out`. Then:
 
 ~~~~bash
 ./compile.sh && ./run/merge_corrections.exe out/corrections/corr_$INFILE out/wgt_sums/wgt_sums_$INFILE
 ~~~~
 
-Step 3. Make subdirectory `unskimmed in `out`. Using the pico file from step 1 and the corrections file from step 2 as input, we can renormalize the weight branches as follows:
+Step 3. Make subdirectory `unskimmed` in `out`. Using the pico file from step 1 and the corrections file from step 2 as input, we can renormalize the weight branches using the following command:
 
 ~~~~bash
 ./compile.sh && ./run/apply_corrections.exe --in_file raw_pico_$INFILE --in_dir out/raw_pico/ --corr_file corr_$INFILE
@@ -686,7 +685,7 @@ Below are examples
 ./scripts/validate_unit_test_cross_section.py --output_filename validate_unit_test_cross_section.log --golden_cross_section_log OLD_CODE/unit_test_cross_section.log --validate_cross_section_log NEW_CODE/unit_test_cross_section.log
 ~~~
 
-# Setup with el9 (possibly deprecated
+# Setup with el9
 
 ~~~~bash
 # Create CMSSW 

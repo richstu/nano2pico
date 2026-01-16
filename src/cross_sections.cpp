@@ -532,39 +532,46 @@ namespace xsec{
     if(file.Contains("ZH_HToZZ_2LFilter"))            xsec = HToZZ * 2 * ZToLL * xs_z_h;
     if(file.Contains("ttH_HToZZ_2LOSSFFilter_M125"))  xsec = HToZZ * 2 * ZToLL * xs_tth;
 
-
-    // Zgamma signal
-    if(!(year == 2022 || year == 2023)){
-        if(file.Contains("GluGluHToZG"))          xsec = HToZG * ZToLL * xs_ggh / HToZG_onshellfrac;
-        if(file.Contains("GluGluHtoZG"))          xsec = HToZG * ZToLL * xs_ggh / HToZG_onshellfrac;
-        if(file.Contains("VBFHToZG"))             xsec = HToZG * ZToLL * xs_vbf / HToZG_onshellfrac;
-        if(file.Contains("VBFHtoZG"))             xsec = HToZG * ZToLL * xs_vbf / HToZG_onshellfrac;
-        if(file.Contains("WplusH_HToZG"))         xsec = HToZG * xs_wph / HToZG_onshellfrac; // CERNYellowReportPageAt13TeV mH=125.
-        if(file.Contains("WminusH_HToZG"))        xsec = HToZG * xs_wmh / HToZG_onshellfrac; // CERNYellowReportPageAt13TeV mH=125.
-        if(file.Contains("ZH_HToZG"))             xsec = HToZG * xs_z_h / HToZG_onshellfrac;
-        if(file.Contains("ZH_ZToAll_HToZG"))      xsec = HToZG * xs_z_h / HToZG_onshellfrac;
-        if(file.Contains("ttHToZG"))              xsec = HToZG * xs_tth / HToZG_onshellfrac;
-
-        if(file.Contains("WplusH_HToZG_WToAll_ZToLL"))  xsec = HToZG * xs_wph * ZToLL / HToZG_onshellfrac;
-        if(file.Contains("WminusH_HToZG_WToAll_ZToLL")) xsec = HToZG * xs_wmh * ZToLL / HToZG_onshellfrac;
-        if(file.Contains("ZH_HToZG_ZToAll_ZToLL"))      xsec = HToZG * xs_z_h * ZToLL / HToZG_onshellfrac; //correct samples now 2024-11-19
-        if(file.Contains("ttHToZG_ZToLL"))              xsec = HToZG * xs_tth * ZToLL / HToZG_onshellfrac;
-    } else {
-        if(file.Contains("GluGluHtoZG"))          xsec = HToZG * ZToLL * xs_ggh / HToZG_onshellfrac;
-        if(file.Contains("VBFHtoZG"))             xsec = HToZG * ZToLL * xs_vbf / HToZG_onshellfrac;
-        if(file.Contains("WplusH_HtoZG"))         xsec = HToZG * xs_wph / HToZG_onshellfrac;
-        if(file.Contains("WminusH_HtoZG"))        xsec = HToZG * xs_wmh / HToZG_onshellfrac;
-        if(file.Contains("ZH_HtoZG"))             xsec = HToZG * xs_z_h / HToZG_onshellfrac;
-        if(file.Contains("ZH_ZtoAll_HtoZGto2LG")) xsec = HToZG * xs_z_h * ZToLL / HToZG_onshellfrac;
-        if(file.Contains("ttHToZG"))              xsec = HToZG * xs_tth / HToZG_onshellfrac;
-
-        if(file.Contains("WplusH_HtoZG_WtoAll_Zto2L"))  xsec = HToZG * xs_wph * ZToLL / HToZG_onshellfrac;
-        if(file.Contains("WminusH_HtoZG_WtoAll_Zto2L")) xsec = HToZG * xs_wmh * ZToLL / HToZG_onshellfrac;
-
-        if(file.Contains("ttHtoZG_Zto2L"))              xsec = HToZG * xs_tth * ZToLL / HToZG_onshellfrac;
-
-    }
-
+    
+    // Zgamma signal. CERNYellowReportPageAt13TeV mH=125.
+    if(file.Contains("GluGluHToZG") ||                   //ggF
+       file.Contains("GluGluHtoZG") ||
+       file.Contains("GluGluH-HtoZG")) 
+                                       xsec = HToZG * ZToLL * xs_ggh / HToZG_onshellfrac;
+    if(file.Contains("VBFHToZG") ||                      //VBF
+       file.Contains("VBFHtoZG") ||
+       file.Contains("VBFH-HtoZG"))
+                                       xsec = HToZG * ZToLL * xs_vbf / HToZG_onshellfrac;
+    if(file.Contains("WplusH_HToZG") ||                     //Wplus Z to all
+       file.Contains("WplusH_HtoZG"))
+                                       xsec = HToZG * xs_wph / HToZG_onshellfrac;
+    if(file.Contains("WplusH_HToZG_WToAll_ZToLL") ||     //Wplus Z to ll
+       file.Contains("WplusH_HtoZG_WtoAll_Zto2L") ||
+       file.Contains("WplusH-HToZGto2LG"))
+                                       xsec = HToZG * xs_wph * ZToLL / HToZG_onshellfrac;
+    if(file.Contains("WminusH_HToZG") ||                 //Wminus Z to all
+       file.Contains("WminusH_HtoZG"))
+                                       xsec = HToZG * xs_wmh / HToZG_onshellfrac;                             
+    if(file.Contains("WminusH_HToZG_WToAll_ZToLL") ||    //Wminus Z to ll
+       file.Contains("WminusH_HtoZG_WtoAll_Zto2L") ||
+       file.Contains("WminusH-HtoZGto2LG"))
+                                       xsec = HToZG * xs_wmh * ZToLL / HToZG_onshellfrac;
+    if(file.Contains("ZH_HToZG") ||                      //ZH second Z to all
+       file.Contains("ZH_ZToAll_HToZG") ||
+       file.Contains("ZH_HtoZG"))
+                                       xsec = HToZG * xs_z_h / HToZG_onshellfrac;
+    if(file.Contains("ZH_ZtoAll_HtoZGto2LG") ||            //ZH second Z to ll
+       file.Contains("ZH_HToZG_ZToAll_ZToLL") ||
+       file.Contains("ZH-HtoZGto2LG"))
+                                       xsec = HToZG * xs_z_h * ZToLL / HToZG_onshellfrac;
+    if(file.Contains("ttHToZG") ||                       //ttH Z to all
+       file.Contains("ttHToZG"))
+                                       xsec = HToZG * xs_tth / HToZG_onshellfrac;
+    if(file.Contains("ttHToZG_ZToLL") ||                 //ttH Z to ll
+       file.Contains("ttHtoZG_Zto2L"))
+                                       xsec = HToZG * xs_tth * ZToLL / HToZG_onshellfrac;   
+                                       
+    //Left as is, but will need updating for 2024 and 2025
     double H120ToZG = 0.00110; double H130ToZG = 0.001941;
     if(file.Contains("GluGluHToZG_ZToLL_M-120"))          xsec = H120ToZG * ZToLL / HToZG_onshellfrac * 52.22;
     if(file.Contains("GluGluHtoZG_Zto2L_M-120"))          xsec = H120ToZG * ZToLL / HToZG_onshellfrac * 56.11;
@@ -612,8 +619,6 @@ namespace xsec{
     if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-50to100_TuneCP5_13p6TeV_amcatnloFXFX-pythia8")) xsec = 2.092;
     if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-100to200_TuneCP5_13p6TeV_amcatnloFXFX-pythia8")) xsec = 0.3477;
     if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-200_TuneCP5_13p6TeV_amcatnloFXFX-pythia8")) xsec = 0.04752;
-
-
 
 
     if(xsec<=0) std::cout<<"ERROR:: Cross section not found for "<<file<<std::endl;

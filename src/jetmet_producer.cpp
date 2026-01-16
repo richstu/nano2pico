@@ -597,14 +597,16 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
     vector<int> jet_isvlep_nano_idx,  
     vector<int> jet_isphoton_nano_idx,
     const vector<float> &btag_wpts, 
-    const vector<float> &btag_df_wpts, 
+    const vector<float> &btag_df_wpts,
+    const vector<float> &btag_upt_wpts, 
     bool isFastsim, 
     bool isSignal,
     vector<HiggsConstructionVariables> &sys_higvars){
   vector<int> sig_jet_nano_idx;
   pico.out_njet() = 0; pico.out_ht() = 0; pico.out_ht5() = 0; 
   pico.out_nbl() = 0; pico.out_nbm() = 0; pico.out_nbt() = 0; 
-  pico.out_nbdfl() = 0; pico.out_nbdfm() = 0; pico.out_nbdft() = 0; 
+  pico.out_nbdfl() = 0; pico.out_nbdfm() = 0; pico.out_nbdft() = 0;
+  pico.out_nbuptl() = 0; pico.out_nbuptm() = 0; pico.out_nbuptt() = 0; 
   pico.out_ngenjet() = 0;
   pico.out_ismapvetoevt() = false;
   pico.out_ishemvetoevt() = false;
@@ -1020,6 +1022,8 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
         if (nanoaod_version > 11.5) pico.out_jet_btagpnetb().push_back(nano.Jet_btagPNetB()[ijet]);
         if (nanoaod_version > 11.95 && nanoaod_version < 14.9) 
            pico.out_jet_btagak4b().push_back(nano.Jet_btagRobustParTAK4B()[ijet]);
+        if(nanoaod_version+0.01 > 15)
+           pico.out_jet_btaguptb().push_back(nano.Jet_btagUParTAK4B()[ijet]);
         pico.out_jet_deepflav().push_back(nano.Jet_btagDeepFlavB()[ijet]);
         pico.out_jet_ne_emef().push_back(nano.Jet_neEmEF()[ijet]);
         //pico.out_jet_qgl().push_back(nano.Jet_qgl()[ijet]);
@@ -1097,7 +1101,12 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
       }
       if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[0]) pico.out_nbdfl()++; 
       if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[1]) pico.out_nbdfm()++; 
-      if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[2]) pico.out_nbdft()++; 
+      if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[2]) pico.out_nbdft()++;
+      if ((nanoaod_version+0.01)>15){
+        if (nano.Jet_btagUParTAK4B()[ijet] > btag_upt_wpts[0]) pico.out_nbuptl()++;
+        if (nano.Jet_btagUParTAK4B()[ijet] > btag_upt_wpts[1]) pico.out_nbuptm()++;
+        if (nano.Jet_btagUParTAK4B()[ijet] > btag_upt_wpts[2]) pico.out_nbuptt()++;
+      } 
     }
   } // end jet loop
   pico.out_low_dphi_mht_e5() = false;

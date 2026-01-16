@@ -237,6 +237,7 @@ int main(int argc, char *argv[]){
 
   // B-tag working points
   // Updated Values May-28-2024 from https://btv-wiki.docs.cern.ch/ScaleFactors/
+  // 2024 values from https://indico.cern.ch/event/1556659/contributions/6559758/attachments/3083466/5458488/BTag_250610_Summer24WPs.pdf
   // btag_df: WPs for deepJet (DeepFlavourB)
   cout<<"B tag weighting using temporary values for 2024 and 2025"<<endl;
   map<string, vector<float>> btag_df_wpts{
@@ -248,7 +249,7 @@ int main(int argc, char *argv[]){
     {"2022EE", vector<float>({0.0614, 0.3196, 0.73})},
     {"2023", vector<float>({0.0479, 0.2431, 0.6553})},
     {"2023BPix", vector<float>({0.048, 0.2435, 0.6563})},
-    {"2024", vector<float>({0.048, 0.2435, 0.6563})},
+    {"2024", vector<float>({0.0485, 0.2480, 0.6708})},
     {"2025", vector<float>({0.048, 0.2435, 0.6563})}
   };
   // WPs for Run 3 values are for PNet, Run 2 values are for deepCSV (DeepB)
@@ -261,8 +262,12 @@ int main(int argc, char *argv[]){
     {"2022EE", vector<float>({0.0499, 0.2605, 0.6915})},  
     {"2023", vector<float>({0.0358, 0.1917, 0.6172})},
     {"2023BPix", vector<float>({0.0359, 0.1919, 0.6133})},
-    {"2024", vector<float>({0.0359, 0.1919, 0.6133})},
+    {"2024", vector<float>({0.0365, 0.1990, 0.6373})},
     {"2025", vector<float>({0.0359, 0.1919, 0.6133})},
+  };
+  // WPs for Particle Transformer (UParT) in NanoAODv15
+  map<string, vector<float>> btag_upt_wpts{
+    {"2024", vector<float>({0.0246, 0.1272, 0.4648})}
   };
 
   // Rochester corrections
@@ -432,8 +437,8 @@ int main(int argc, char *argv[]){
     vector<HiggsConstructionVariables> sys_higvars;
     vector<int> sig_jet_nano_idx = jetmet_producer.WriteJetMet(nano, pico, 
         jet_islep_nano_idx, jet_isvlep_nano_idx, jet_isphoton_nano_idx,
-        btag_wpts[year_string], btag_df_wpts[year_string], isFastsim, isSignal,
-        sys_higvars);
+        btag_wpts[year_string], btag_df_wpts[year_string], btag_upt_wpts[year_string],
+        isFastsim, isSignal, sys_higvars);
     jetmet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year_string][1], isFastsim); // usually w.r.t. medium WP
     jetmet_producer.WriteFatJets(nano, pico); // jetmet_producer.SetVerbose(nano.nSubJet()>0);
     jetmet_producer.WriteSubJets(nano, pico);
