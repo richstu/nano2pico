@@ -91,10 +91,14 @@ bool PhotonProducer::IsSignal(nano_tree &nano, pico_tree &pico, int nano_idx,
                               float scaleres_corr, float minLepDR, 
                               vector<int> &photon_el_pico_idx) {
   float pt = nano.Photon_pt()[nano_idx]*scaleres_corr;
+  float eta = nano.Photon_eta()[nano_idx];
+  float mva = nano.Photon_mvaID()[nano_idx];
   if (pt < SignalPhotonPtCut) return false;
   if (!(nano.Photon_isScEtaEB()[nano_idx] 
         || nano.Photon_isScEtaEE()[nano_idx])) return false;
 //  if (!nano.Photon_mvaID_WP80()[nano_idx]) return false;
+  if (!((fabs(eta) < 1.4442 && mva > -0.4) ||
+                   (fabs(eta) > 1.566 && fabs(eta) < 2.5 && mva > -0.58))) return false;
   if (!nano.Photon_electronVeto()[nano_idx]) return false;
   if (!(minLepDR > 0.3f)) return false;
   if (!(photon_el_pico_idx[nano_idx]==-1 || !(pico.out_el_sig()[photon_el_pico_idx[nano_idx]]))) return false;
