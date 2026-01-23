@@ -161,6 +161,7 @@ int nbuptt
 
 bool ismapvetoevt
 bool ishemvetoevt
+bool isetavetoevt
 
 vector<float> jet_pt
 vector<float> jet_nanopt
@@ -186,6 +187,7 @@ vector<bool>  jet_isgood
 vector<bool>  jet_isgood_min
 vector<bool>  jet_isvetomap
 vector<bool>  jet_isvetohem
+vector<bool>  jet_isvetoeta
 vector<int>   jet_id
 vector<int>   jet_hflavor
 vector<int>   jet_pflavor

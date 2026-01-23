@@ -610,6 +610,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
   pico.out_ngenjet() = 0;
   pico.out_ismapvetoevt() = false;
   pico.out_ishemvetoevt() = false;
+  pico.out_isetavetoevt() = false;
   //add smearing to jets and calculate uncertainties
   vector<float> Jet_pt, Jet_mass;
   vector<float> jet_nm_factor;
@@ -757,7 +758,8 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
         jet_isphoton_nano_idx.end(), ijet) != jet_isphoton_nano_idx.end()); 
     // eta horn veto
     jet_inetahornveto.push_back(year >=2017 && Jet_pt[ijet] < 50.0f 
-        && jet_abseta > 2.5f && jet_abseta < 3.0f); 
+        && jet_abseta > 2.5f && jet_abseta < 3.0f);
+    if(jet_inetahornveto.back()) pico.out_isetavetoevt() = true;
     // For studying jetmaps and HEM vetos. Don't include eta veto yet in order 
     // to remove anomalous met events.
     bool isgood_min = !jet_islep.back() && !jet_isphoton.back() 
@@ -974,6 +976,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
         pico.out_jet_isgood_min().push_back(jet_isgood_min[ijet]);
         pico.out_jet_isvetomap().push_back(jet_invetomap[ijet]);
         pico.out_jet_isvetohem().push_back(jet_inhemveto[ijet]);
+        pico.out_jet_isvetoeta().push_back(jet_inetahornveto[ijet]);
         pico.out_jet_id().push_back(Jet_jetId[ijet]);
         pico.out_jet_mht_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], mht_vec.Phi()));
         pico.out_jet_met_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], MET_phi));
@@ -1034,6 +1037,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
         pico.out_jet_isgood_min().push_back(jet_isgood_min[ijet]);
         pico.out_jet_isvetomap().push_back(jet_invetomap[ijet]);
         pico.out_jet_isvetohem().push_back(jet_inhemveto[ijet]);
+        pico.out_jet_isvetoeta().push_back(jet_inetahornveto[ijet]);
         pico.out_jet_id().push_back(Jet_jetId[ijet]);
         if (nanoaod_version >= 15) 
            pico.out_jet_puid_disc().push_back(nano.Jet_puIdDisc()[ijet]);
