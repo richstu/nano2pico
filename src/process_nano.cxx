@@ -368,12 +368,15 @@ int main(int argc, char *argv[]){
     //skip events that are data but not in the golden json
 
     if (isData) {
-      if(!inJSON(VVRunLumi, nano.run(), nano.luminosityBlock())) continue; 
+      if(!inJSON(VVRunLumi, nano.run(), nano.luminosityBlock())) 
+	{//cout<<"not in golden json"<<endl;
+	continue; }
     }
 
     bool passed_trig = event_tools.SaveTriggerDecisions(nano, pico, isZgamma, isHiggsino);
     if (isData && !passed_trig) {
-      continue;
+      	//cout<<"trigger not pass"<<endl;
+	continue;
     }
     // event info
     pico.out_event()     = nano.event();

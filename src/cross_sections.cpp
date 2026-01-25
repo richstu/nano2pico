@@ -635,7 +635,7 @@ namespace xsec{
     if(file.Contains("GG-Box-2B-2Jets_MGG-80_13p6TeV_sherpa")) xsec = 11.67; //using run2 xsec, change this to (11.67)
     if(file.Contains("GJet_PT-20to40_DoubleEMEnriched_MGG-80_TuneCP5_13p6TeV_pythia8")) xsec = 242.5; // from XSDB
     if(file.Contains("GJet_PT-40_DoubleEMEnriched_MGG-80_TuneCP5_13p6TeV_pythia8")) xsec = 919.1; // from XSDB
-    if(file.Contains("TTto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8")) xsec = 58.3; // from XSDB
+    if(file.Contains("TTto2L2Nu-3Jets_TuneCP5_13p6TeV_madgraphMLM-pythia8")) xsec = 58.3; // from XSDB
     if(file.Contains("TTG-1Jets_PTG-10to100_TuneCP5_13p6TeV_amcatnloFXFXold-pythia8"))  xsec = 4.216; // from XSDB
     if(file.Contains("TTG-1Jets_PTG-100to200_TuneCP5_13p6TeV_amcatnloFXFXold-pythia8"))  xsec = 0.4114; // from XSDB
     if(file.Contains("TTG-1Jets_PTG-200_TuneCP5_13p6TeV_amcatnloFXFXold-pythia8"))  xsec = 0.1284; // from XSDB
@@ -744,16 +744,16 @@ namespace xsec{
     if(file.Contains("ZZ_TuneCP5") && !file.Contains("ZZZ") && !file.Contains("WZZ")) 	xsec=12.23; //XSDB
 
     // 4b backgrounds at 13.6TeV (all from XSDB unless specified)
-    // TT+Jets
-    if(file.Contains("TTtoLplusNu2Q-3Jets_TuneCP5_13p6TeV_madgraphMLM-pythia8"))			xsec=833.9*0.219;
-    if(file.Contains("TTtoLminusNu2Q-3Jets_TuneCP5_13p6TeV_madgraphMLM-pythia8"))			xsec=833.9*0.219;
-    if(file.Contains("TTto2L2Nu-3Jets_TuneCP5_13p6TeV_madgraphMLM-pythia8"))				xsec=833.9*0.105;
+    // TT+Jets already there in bbgg above
+    //if(file.Contains("TTtoLplusNu2Q-3Jets_TuneCP5_13p6TeV_madgraphMLM-pythia8"))			xsec=833.9*0.219;
+    //if(file.Contains("TTtoLminusNu2Q-3Jets_TuneCP5_13p6TeV_madgraphMLM-pythia8"))			xsec=833.9*0.219;
+    //if(file.Contains("TTto2L2Nu-3Jets_TuneCP5_13p6TeV_madgraphMLM-pythia8"))				xsec=833.9*0.105;
     // (need to add genMET samples)
 
     // TT+X
-    if(file.Contains("TTG-1Jets_PTG-10to100_TuneCP5_13p6TeV_amcatnloFXFXold-pythia8"))			xsec=4.126;
-    if(file.Contains("TTG-1Jets_PTG-100to200_TuneCP5_13p6TeV_amcatnloFXFXold-pythia8"))			xsec=0.4114;
-    if(file.Contains("TTG-1Jets_PTG-200_TuneCP5_13p6TeV_amcatnloFXFXold-pythia8"))			xsec=0.1284;           
+    //if(file.Contains("TTG-1Jets_PTG-10to100_TuneCP5_13p6TeV_amcatnloFXFXold-pythia8"))			xsec=4.126;
+    //if(file.Contains("TTG-1Jets_PTG-100to200_TuneCP5_13p6TeV_amcatnloFXFXold-pythia8"))			xsec=0.4114;
+    //if(file.Contains("TTG-1Jets_PTG-200_TuneCP5_13p6TeV_amcatnloFXFXold-pythia8"))			xsec=0.1284;           
     if(file.Contains("TTLL_MLL-4to50_TuneCP5_13p6TeV_amcatnlo-pythia8"))				xsec=0.03949;
     if(file.Contains("TTLL_MLL-50_TuneCP5_13p6TeV_amcatnlo-pythia8"))					xsec=0.08646;
     if(file.Contains("TTZ-ZtoQQ-1Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8"))				xsec=0.6603;
