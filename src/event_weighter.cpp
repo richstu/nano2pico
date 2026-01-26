@@ -520,7 +520,7 @@ void EventWeighter::PhotonSF(pico_tree &pico){
       ev_sfdn = map_photon_csev_->evaluate({key_, "sfdown", "MVA", category});
     }
     else if (year_=="2022" || year_=="2022EE" 
-             || year_=="2023" || year_=="2023BPix" || year_ == "2024" || year_ == "2025") {
+             || year_=="2023" || year_=="2023BPix" || year_ == "2024" || year_ == "2025" || year_ == "2026") {
       ev_sf = map_photon_csev_->evaluate({key_, "sf", "MVA80", eta, r9});
       ev_sfup = map_photon_csev_->evaluate({key_, "sfup", "MVA80", eta, r9});
       ev_sfdn = map_photon_csev_->evaluate({key_, "sfdown", "MVA80", eta, r9});
@@ -531,13 +531,13 @@ void EventWeighter::PhotonSF(pico_tree &pico){
     float id_sf = 1.0;
     float id_sfup = 1.0;
     float id_sfdn = 1.0;
-    if (!(year_ == "2023" || year_ == "2023BPix" || year_ == "2024" || year_ == "2025") && pt < 20.0f) {
+    if (!(year_ == "2023" || year_ == "2023BPix" || year_ == "2024" || year_ == "2025" || year_ == "2026") && pt < 20.0f) {
       id_sf = (map_photon_id_low_pass_->evaluate({pt, eta}));
       float id_unc = map_photon_id_low_pass_unc_->evaluate({pt, eta});
       id_sfup = id_sf+id_unc;
       id_sfdn = id_sf-id_unc;
     }
-    else if (year_=="2023"||year_=="2023BPix" || year_ == "2024" || year_ == "2025") {
+    else if (year_=="2023"||year_=="2023BPix" || year_ == "2024" || year_ == "2025" || year_ == "2026") {
       id_sf = map_photon_id_->evaluate({key_, "sf", wpstring, eta, pt, phi});
       id_sfup = map_photon_id_->evaluate({key_, "sfup", wpstring, eta, pt, phi});
       id_sfdn = map_photon_id_->evaluate({key_, "sfdown", wpstring, eta, pt, phi});

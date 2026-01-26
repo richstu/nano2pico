@@ -236,7 +236,7 @@ float JetMetProducer::GetJEC(float jet_area, float jet_eta, float jet_phi,
        return map_jec_l1_[era_idx]->evaluate({jet_area, jet_eta, jet_pt, rho});
      }
    }
-   else if (year_string == "2024" || year_string == "2025"){
+   else if (year_string == "2024" || year_string == "2025" || year_string == "2026"){
      if (jec_type == JECType::L1L2L3) {
        if (isData)
          return map_jec_[0]->evaluate({jet_area, jet_eta, jet_pt, rho,
@@ -1014,6 +1014,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
       case 2023:
       case 2024:
       case 2025:
+      case 2026:
         pico.out_jet_pt().push_back(Jet_pt[ijet]);
         pico.out_jet_nanopt().push_back(nano.Jet_pt()[ijet]);
         pico.out_jet_eta().push_back(nano.Jet_eta()[ijet]);
@@ -1039,7 +1040,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
         pico.out_jet_isvetohem().push_back(jet_inhemveto[ijet]);
         pico.out_jet_isvetoeta().push_back(jet_inetahornveto[ijet]);
         pico.out_jet_id().push_back(Jet_jetId[ijet]);
-        if (nanoaod_version >= 15) 
+        if (nanoaod_version + 0.01 > 15) 
            pico.out_jet_puid_disc().push_back(nano.Jet_puIdDisc()[ijet]);
         pico.out_jet_mht_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], mht_vec.Phi()));
         pico.out_jet_met_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], MET_phi));

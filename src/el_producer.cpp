@@ -190,7 +190,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
           energy_err_smear_dn.push_back(nano.Electron_energyErr()[iel]);
         }
       }
-      else if ((year=="2022"||year=="2022EE"||year=="2023"||year=="2023BPix"||year=="2024"||year=="2025")
+      else if ((year=="2022"||year=="2022EE"||year=="2023"||year=="2023BPix"||year=="2024"||year=="2025"||year =="2026")
                && pt>15.f) {
         float run = static_cast<float>(nano.run());
         float r9 = fmin(fmax(nano.Electron_r9()[iel],0.0),1.0);
@@ -355,7 +355,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
         pico.out_el_id90().push_back(nano.Electron_mvaFall17V2Iso_WP90()[iel]);
         pico.out_el_idLoose().push_back(nano.Electron_mvaFall17V2Iso_WPL()[iel]);
       }
-      else if (year=="2022"||year=="2022EE"||year=="2023"||year=="2023BPix"||year=="2024"||year=="2025") {
+      else if (year=="2022"||year=="2022EE"||year=="2023"||year=="2023BPix"||year=="2024"||year=="2025"||year=="2026") {
         bool hzz_wp2022 = HzzId_WP2022(scaleres_corr[iel]*pt,etasc,
                                        nano.Electron_mvaHZZIso()[iel]);
         pico.out_el_idmva().push_back(nano.Electron_mvaIso()[iel]);

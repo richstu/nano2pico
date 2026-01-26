@@ -146,6 +146,7 @@ int main(int argc, char *argv[]){
   else if (year == 2023 && !is2023preBPix) year_string = "2023BPix";
   else if (year == 2024)                   year_string = "2024";
   else if (year == 2025)                   year_string = "2025";
+  else if (year == 2026)                   year_string = "2026";
   else {
     cout << "ERROR: unknown year";
     exit(1);
@@ -239,7 +240,7 @@ int main(int argc, char *argv[]){
   // Updated Values May-28-2024 from https://btv-wiki.docs.cern.ch/ScaleFactors/
   // 2024 values from https://indico.cern.ch/event/1556659/contributions/6559758/attachments/3083466/5458488/BTag_250610_Summer24WPs.pdf
   // btag_df: WPs for deepJet (DeepFlavourB)
-  cout<<"B tag weighting using temporary values for 2024 and 2025"<<endl;
+  cout<<"B tag weighting using temporary values for 2024, 2025, 2026"<<endl;
   map<string, vector<float>> btag_df_wpts{
     {"2016APV", vector<float>({0.0508, 0.2598, 0.6502})},
     {"2016", vector<float>({0.0480, 0.2489, 0.6377})},
@@ -250,7 +251,8 @@ int main(int argc, char *argv[]){
     {"2023", vector<float>({0.0479, 0.2431, 0.6553})},
     {"2023BPix", vector<float>({0.048, 0.2435, 0.6563})},
     {"2024", vector<float>({0.0485, 0.2480, 0.6708})},
-    {"2025", vector<float>({0.048, 0.2435, 0.6563})}
+    {"2025", vector<float>({0.048, 0.2435, 0.6563})},
+    {"2026", vector<float>({0.048, 0.2435, 0.6563})}
   };
   // WPs for Run 3 values are for PNet, Run 2 values are for deepCSV (DeepB)
   map<string, vector<float>> btag_wpts{
@@ -264,6 +266,7 @@ int main(int argc, char *argv[]){
     {"2023BPix", vector<float>({0.0359, 0.1919, 0.6133})},
     {"2024", vector<float>({0.0365, 0.1990, 0.6373})},
     {"2025", vector<float>({0.0359, 0.1919, 0.6133})},
+    {"2026", vector<float>({0.0359, 0.1919, 0.6133})}
   };
   // WPs for Particle Transformer (UParT) in NanoAODv15
   map<string, vector<float>> btag_upt_wpts{

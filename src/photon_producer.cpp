@@ -204,7 +204,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico,
 
       }
     }
-    else if ((year=="2022"||year=="2022EE"||year=="2023"||year=="2023BPix"||year=="2024"||year=="2025") 
+    else if ((year=="2022"||year=="2022EE"||year=="2023"||year=="2023BPix"||year=="2024"||year=="2025"||year=="2026") 
              && pt>15.f) {
       float run = static_cast<float>(nano.run());
       float r9 = fmin(fmax(nano.Photon_r9()[iph],0.0),1.0);
@@ -417,7 +417,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico,
       pico.out_photon_reliso().push_back(nano.Photon_pfRelIso03_all()[iph]);
       pico.out_photon_pudisc().push_back(photon_puid_disc);
     }
-    else if (year=="2022"||year=="2022EE"||year=="2023"||year=="2023BPix"||year=="2024"||year=="2025") {
+    else if (year=="2022"||year=="2022EE"||year=="2023"||year=="2023BPix"||year=="2024"||year=="2025"||year=="2026") {
       pico.out_photon_reliso().push_back(nano.Photon_pfRelIso03_all_quadratic()[iph]);
       pico.out_photon_phiso().push_back(nano.Photon_pfPhoIso03()[iph]);
       pico.out_photon_chiso().push_back(nano.Photon_pfChargedIsoPFPV()[iph]);

@@ -318,7 +318,7 @@ void ZGammaVarProducer::WriteZGammaVars(pico_tree &pico, bool is_signal){
     }
   }
 
-  if (year==2018 || year==2022 || year==2023 || year==2024 || year==2025) {
+  if (year==2018 || year==2022 || year==2023 || year==2024 || year==2025 || year == 2026) {
     if(pico.out_nel() > 1){
       if((pico.out_trig_double_el() && pico.out_el_pt().at(0)>25.f && pico.out_el_pt().at(1)>15.f) || (pico.out_trig_single_el() && pico.out_el_pt().at(0)>35.f)){
         pico.out_trig_el_pt() = true;
