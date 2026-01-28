@@ -384,6 +384,11 @@ namespace xsec{
 
         if(file.Contains("DYJetsToLL_M-50_TuneCP5"))      xsec = 5558.0;
         if(file.Contains("DYto2L-2Jets_MLL-50_TuneCP5"))  xsec = 6688.0;
+	//2024
+	if(file.Contains("DYto2E-2Jets_Bin-MLL-50_TuneCP5_13p6TeV"))  xsec = 2213.0;
+	if(file.Contains("DYto2Mu-2Jets_Bin-MLL-50_TuneCP5_13p6TeV"))  xsec = 2221.0;
+	if(file.Contains("DYto2Tau-2Jets_Bin-MLL-50_TuneCP5_13p6TeV"))  xsec = 1965.0;
+	if(file.Contains("DYGto2LG-1Jets_Bin-MLL-50_TuneCP5_13p6TeV"))  xsec = 126.7; //not in XSDB, ran genXsecAnalyzer script on miniAOD files
 
         if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-10to100_TuneCP5_13p6TeV"))  xsec = 126.6;
         if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-100to200_TuneCP5_13p6TeV")) xsec = 0.3493;
@@ -531,7 +536,6 @@ namespace xsec{
     if(file.Contains("WplusH_HToZZTo2L2X"))           xsec = HToZZ * ZToLL * xs_wph;
     if(file.Contains("ZH_HToZZ_2LFilter"))            xsec = HToZZ * 2 * ZToLL * xs_z_h;
     if(file.Contains("ttH_HToZZ_2LOSSFFilter_M125"))  xsec = HToZZ * 2 * ZToLL * xs_tth;
-
     
     // Zgamma signal. CERNYellowReportPageAt13TeV mH=125.
     if(file.Contains("GluGluHToZG") ||                   //ggF
@@ -571,7 +575,7 @@ namespace xsec{
        file.Contains("ttHtoZG_Zto2L"))
                                        xsec = HToZG * xs_tth * ZToLL / HToZG_onshellfrac;   
                                        
-    //Left as is, but will need updating for 2024 and 2025
+
     double H120ToZG = 0.00110; double H130ToZG = 0.001941;
     if(file.Contains("GluGluHToZG_ZToLL_M-120"))          xsec = H120ToZG * ZToLL / HToZG_onshellfrac * 52.22;
     if(file.Contains("GluGluHtoZG_Zto2L_M-120"))          xsec = H120ToZG * ZToLL / HToZG_onshellfrac * 56.11;
