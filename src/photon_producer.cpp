@@ -7,7 +7,7 @@
 
 #include "TRandom3.h"
 
-#include "correction.hpp"
+#include "correction.h"
 #include "utilities.hpp"
 
 using namespace std;
@@ -68,6 +68,14 @@ PhotonProducer::PhotonProducer(string year_, bool isData_,
   else if (year=="2023BPix") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
         "data/zgamma/2023BPix/photonSS_EtDependent.json");
+    map_scale_ = cs_scale_syst_->compound().at(
+        "Scale");
+    map_smearing_ = cs_scale_syst_->at(
+        "SmearAndSyst");
+  }
+  else if (year=="2024") {
+    cs_scale_syst_ = correction::CorrectionSet::from_file(
+        "data/zgamma/2024/photonSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
         "Scale");
     map_smearing_ = cs_scale_syst_->at(
@@ -196,7 +204,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico,
 
       }
     }
-    else if ((year=="2022"||year=="2022EE"||year=="2023"||year=="2023BPix") 
+    else if ((year=="2022"||year=="2022EE"||year=="2023"||year=="2023BPix"||year=="2024"||year=="2025"||year=="2026") 
              && pt>15.f) {
       float run = static_cast<float>(nano.run());
       float r9 = fmin(fmax(nano.Photon_r9()[iph],0.0),1.0);
@@ -409,7 +417,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico,
       pico.out_photon_reliso().push_back(nano.Photon_pfRelIso03_all()[iph]);
       pico.out_photon_pudisc().push_back(photon_puid_disc);
     }
-    else if (year=="2022"||year=="2022EE"||year=="2023"||year=="2023BPix") {
+    else if (year=="2022"||year=="2022EE"||year=="2023"||year=="2023BPix"||year=="2024"||year=="2025"||year=="2026") {
       pico.out_photon_reliso().push_back(nano.Photon_pfRelIso03_all_quadratic()[iph]);
       pico.out_photon_phiso().push_back(nano.Photon_pfPhoIso03()[iph]);
       pico.out_photon_chiso().push_back(nano.Photon_pfChargedIsoPFPV()[iph]);

@@ -6,7 +6,7 @@
 
 #include "TRandom3.h"
 
-#include "correction.hpp"
+#include "correction.h"
 #include "nano_tree.hpp"
 #include "pico_tree.hpp"
 #include "RoccoR.hpp"

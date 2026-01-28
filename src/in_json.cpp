@@ -7,8 +7,10 @@
 #include <vector>
 #include "utilities.hpp"
 #include "in_json.hpp"
+#include "json.hpp"
 
 using namespace std;
+using json = nlohmann::json;
 
 std::vector< std::vector<int> > MakeVRunLumi(std::string input){
   std::ifstream orgJSON;
@@ -20,45 +22,34 @@ std::vector< std::vector<int> > MakeVRunLumi(std::string input){
   } else if(input == "golden2018"){
     fullpath = "txt/json/golden_Cert_314472-325175_13TeV_PromptReco_Collisions18.json";
   } else if(input == "goldenUL2016") {
-    fullpath = "txt/json/golden_Cert_271036-284044_13TeV_Legacy2016_Collisions16_JSON.txt";
+    fullpath = "txt/json/golden_Cert_271036-284044_13TeV_Legacy2016_Collisions16_JSON.json";
   } else if(input == "goldenUL2017") {
-    fullpath = "txt/json/golden_Cert_294927-306462_13TeV_UL2017_Collisions17_GoldenJSON.txt";
+    fullpath = "txt/json/golden_Cert_294927-306462_13TeV_UL2017_Collisions17_GoldenJSON.json";
   } else if(input == "goldenUL2018") {
-    fullpath = "txt/json/golden_Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt";
+    fullpath = "txt/json/golden_Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.json";
   } else if(input == "golden2022") {
     fullpath = "txt/json/Cert_Collisions2022_355100_362760_Golden.json";
   } else if(input == "golden2023") {
     fullpath = "txt/json/Cert_Collisions2023_366442_370790_Golden.json";
+  } else if(input == "golden2024") {
+    fullpath = "txt/json/Cert_Collisions2024_378981_386951_Golden.json";
+  } else if(input == "golden2025") {
+    fullpath = "txt/json/Cert_Collisions2025_391658_398903_Golden.json";
   } else{
     fullpath = input;
   }
-  orgJSON.open(fullpath.c_str());
+
+  ifstream in_json_stream(fullpath);
+  json golden_json = json::parse(in_json_stream);
   std::vector<int> VRunLumi;
-  if(orgJSON.is_open()){
-    char inChar;
-    int inInt;
-    std::string str;
-    while(!orgJSON.eof()){
-      char next = orgJSON.peek();
-      if( next == '1' || next == '2' || next == '3' ||
-          next == '4' || next == '5' || next == '6' ||
-          next == '7' || next == '8' || next == '9' || 
-          next == '0'){     
-        orgJSON >>inInt;
-        VRunLumi.push_back(inInt);        
-      }
-      else if(next == ' '){
-        getline(orgJSON,str,' ');
-      }
-      else{
-        orgJSON>>inChar;
-      }
+  for(auto& [key, val] : golden_json.items()){
+    VRunLumi.push_back(std::stoi(key));
+    auto lumi_secs = golden_json[key];
+    for(unsigned int i(0); i<lumi_secs.size(); i++){
+      VRunLumi.push_back(lumi_secs[i].front());
+      VRunLumi.push_back(lumi_secs[i].back());
     }
-  }//check if the file opened.
-  else{
-    std::cout<<"Invalid JSON File:"<<fullpath<<"!\n";
   }
-  orgJSON.close();
   if(VRunLumi.size() == 0){
     std::cout<<"No Lumiblock found in JSON file\n";
   }

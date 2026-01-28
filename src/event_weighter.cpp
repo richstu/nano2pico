@@ -195,8 +195,48 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
         "data/zgamma/2023BPix/hzg_eliso0p15_2023BPixHole_efficiencies.json");
     ph_shape_weighter_        = make_unique<rw_mmp_r3>();
     zgbkg_isr_weighter_       = make_unique<kinr3_weighter>();
+  } else if (year=="2024"){
+    cout<<"2024 has not been fully implemented in event_weighter. Defaulting to 2023"<<endl;
+    in_file_electron_         = "data/zgamma/2023/hzg_elid_2023_scalefactors.json";
+    in_file_electron_reco_    = "data/zgamma/2023/electron_recoSF2023.json";
+    in_file_photon_           = "data/zgamma/2023/photon.json";
+    in_file_photon_low_       = "data/zgamma/2022EE/hzg_phidvalidate_2022EE_scalefactors.json";
+    in_file_photon_mceff_     = "data/zgamma/2023/photon_wp80mceff_2023.json";
+    in_file_muon_             = "data/zgamma/2023/hzg_muid_2023_scalefactors.json";
+    in_file_pu_               = "data/zgamma/2024/puweights_BCDEFGHI.json";
+    in_file_btag_             = "data/zgamma/2023/btagging.json";
+    in_file_btag_mceff_       = "data/zgamma/2023/btag_mceff.json";
+    in_file_electron_iso0p10_ = "data/zgamma/2023/hzg_eliso0p1_2023_efficiencies.json";
+    in_file_electron_iso0p15_ = "data/zgamma/2023/hzg_eliso0p15_2023_efficiencies.json";
+    in_file_muon_iso0p10_     = "data/zgamma/2023/hzg_muiso0p1_2023_efficiencies.json";
+    in_file_muon_iso0p15_     = "data/zgamma/2023/hzg_muiso0p15_2023_efficiencies.json";
+    in_file_ggf_nnlo_         = "data/zgamma/GluGluHToZG_NNLO_reweight_run3.json";
+    key_                      = "2023PromptC";
+    puName_                   = "Collisions24_BCDEFGHI_goldenJSON";
+    btag_lightname            = "deepJet_light";
+    ph_shape_weighter_        = make_unique<rw_mmp_r3>();
+    zgbkg_isr_weighter_       = make_unique<kinr3_weighter>();
   } else {
-    cout<<"Year has not been implemented in event_weighter"<<endl;
+    cout<<"Year has not been implemented in event_weighter. Defaulting to 2023"<<endl;
+    in_file_electron_         = "data/zgamma/2023/hzg_elid_2023_scalefactors.json";
+    in_file_electron_reco_    = "data/zgamma/2023/electron_recoSF2023.json";
+    in_file_photon_           = "data/zgamma/2023/photon.json";
+    in_file_photon_low_       = "data/zgamma/2022EE/hzg_phidvalidate_2022EE_scalefactors.json";
+    in_file_photon_mceff_     = "data/zgamma/2023/photon_wp80mceff_2023.json";
+    in_file_muon_             = "data/zgamma/2023/hzg_muid_2023_scalefactors.json";
+    in_file_pu_               = "data/zgamma/2023/puWeights.json";
+    in_file_btag_             = "data/zgamma/2023/btagging.json";
+    in_file_btag_mceff_       = "data/zgamma/2023/btag_mceff.json";
+    in_file_electron_iso0p10_ = "data/zgamma/2023/hzg_eliso0p1_2023_efficiencies.json";
+    in_file_electron_iso0p15_ = "data/zgamma/2023/hzg_eliso0p15_2023_efficiencies.json";
+    in_file_muon_iso0p10_     = "data/zgamma/2023/hzg_muiso0p1_2023_efficiencies.json";
+    in_file_muon_iso0p15_     = "data/zgamma/2023/hzg_muiso0p15_2023_efficiencies.json";
+    in_file_ggf_nnlo_         = "data/zgamma/GluGluHToZG_NNLO_reweight_run3.json";
+    key_                      = "2023PromptC";
+    puName_                   = "Collisions2023_366403_369802_eraBC_GoldenJson";
+    btag_lightname            = "deepJet_light";
+    ph_shape_weighter_        = make_unique<rw_mmp_r3>();
+    zgbkg_isr_weighter_       = make_unique<kinr3_weighter>();
   }
   cs_electron_              = correction::CorrectionSet::from_file(in_file_electron_);
   cs_electron_reco_         = correction::CorrectionSet::from_file(in_file_electron_reco_);
@@ -473,14 +513,14 @@ void EventWeighter::PhotonSF(pico_tree &pico){
     else
       category += "LowR9";
     float ev_sf(1.0), ev_sfup(1.0), ev_sfdn(1.0);
-    if (year_=="2016APV" || year_=="2016" 
+    if (year_=="2016APV" || year_=="2016"
         || year_=="2017" || year_=="2018") {
       ev_sf = map_photon_csev_->evaluate({key_, "sf", "MVA", category});
       ev_sfup = map_photon_csev_->evaluate({key_, "sfup", "MVA", category});
       ev_sfdn = map_photon_csev_->evaluate({key_, "sfdown", "MVA", category});
     }
     else if (year_=="2022" || year_=="2022EE" 
-             || year_=="2023" || year_=="2023BPix") {
+             || year_=="2023" || year_=="2023BPix" || year_ == "2024" || year_ == "2025" || year_ == "2026") {
       ev_sf = map_photon_csev_->evaluate({key_, "sf", "MVA80", eta, r9});
       ev_sfup = map_photon_csev_->evaluate({key_, "sfup", "MVA80", eta, r9});
       ev_sfdn = map_photon_csev_->evaluate({key_, "sfdown", "MVA80", eta, r9});
@@ -491,13 +531,13 @@ void EventWeighter::PhotonSF(pico_tree &pico){
     float id_sf = 1.0;
     float id_sfup = 1.0;
     float id_sfdn = 1.0;
-    if (!(year_ == "2023" || year_ == "2023BPix") && pt < 20.0f) {
+    if (!(year_ == "2023" || year_ == "2023BPix" || year_ == "2024" || year_ == "2025" || year_ == "2026") && pt < 20.0f) {
       id_sf = (map_photon_id_low_pass_->evaluate({pt, eta}));
       float id_unc = map_photon_id_low_pass_unc_->evaluate({pt, eta});
       id_sfup = id_sf+id_unc;
       id_sfdn = id_sf-id_unc;
     }
-    else if (year_=="2023"||year_=="2023BPix") {
+    else if (year_=="2023"||year_=="2023BPix" || year_ == "2024" || year_ == "2025" || year_ == "2026") {
       id_sf = map_photon_id_->evaluate({key_, "sf", wpstring, eta, pt, phi});
       id_sfup = map_photon_id_->evaluate({key_, "sfup", wpstring, eta, pt, phi});
       id_sfdn = map_photon_id_->evaluate({key_, "sfdown", wpstring, eta, pt, phi});

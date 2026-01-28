@@ -9,16 +9,18 @@ If you are not on one of the UCSB servers, prerequisites that must be installed 
 If you are using one of the UCSB servers that supports CMSSW (e.g. cms1,cms3,cms4,cms5...), you can use the following commands to install nano2pico and set up the environment:
 
 ~~~~bash
-# Setup git version for SL6.5
-. /cvmfs/cms.cern.ch/cmsset_default.sh;cd /net/cms29/cms29r0/pico/CMSSW_10_2_11_patch1/src;eval `scramv1 runtime -sh`;cd -
+# Setup git version for SL7
+. /cvmfs/cms.cern.ch/cmsset_default.sh
 # Clone git
 git clone --recurse-submodules git@github.com:richstu/nano2pico.git
 # If did not use recurse at clone, use following command: git submodule update --init --remote --recursive
 # Setup environemnt
+cd nano2pico
+pip3 install --target lib/python3.9/site-packages/ scons
 source set_env.sh
 ~~~~
 
-You can then compile via `scons` or `compile.sh`.
+You can then compile via `scons`. `compile.sh` is outdated, but may work.
 
 ## How does nano2pico work?
 
@@ -30,7 +32,7 @@ This package is used to do the Nano -> pico conversion in three steps in order t
 
 At this point, various skims can be made as defined in [scripts/skim_file.py](scripts/skim_file.py).
 
-*Note:* The input path in which the input NanoAOD files are stored as well as the output path are analyzed to determine the behavior of nano2pico. To run with settings for the Higgs to Z gamma analysis, the 'out_dir' should contian "zgamma" in its name. To run on custom NanoAODv9 files, the input directory must contain "NanoAODv9UCSB" in its name.
+*Note:* The input path in which the input NanoAOD files are stored as well as the output path are analyzed to determine the behavior of nano2pico. To run with settings for the Higgs to Z gamma analysis, the 'out_dir' should contain "zgamma" in its name. To run on custom NanoAODv9 files, the input directory must contain "NanoAODv9UCSB" in its name.
 
 ## Interactive test usage
 
@@ -41,12 +43,12 @@ export INDIR=/net/cms29/cms29r0/pico/NanoAODv5/nano/2016/TChiHH/
 export INFILE=SMS-TChiHH_mChi-1000_mLSP-1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISummer16NanoAODv5__PUSummer16v3Fast_94X_mcRun2_asymptotic_v3-v1.root
 ~~~~
 
-Step 1. Make an output directory out/ with subdirectories `wgt_sums` and `raw_pico`. Produce raw pico ntuple from a nano input file:
+Step 1. Make an output directory `out/` (or another name containing `zgamma` if processing for Higgs to Z gamma) with subdirectories `wgt_sums` and `raw_pico`. Produce raw pico ntuple from a nano input file:
 
 ~~~~bash
 ./compile.sh && ./run/process_nano.exe --in_file $INFILE --in_dir $INDIR --out_dir out/ --nent 10000
 ~~~~
-
+`nent` can be set to `-1` to process all events in a file.
 :bangbang: Code functionality relies on the input NanoAOD filename! Specifically, `INFILE` is parsed for:
 
 * flag `isData = infile.Contains("Run201") ? true : false;`
@@ -56,14 +58,13 @@ Step 1. Make an output directory out/ with subdirectories `wgt_sums` and `raw_pi
 * output branch `type` is set based on the presence of dataset name substrings (see event_tools.cpp)
 * branches related on ISR also depend on the presence of dataset name substrings
 
-Step 2. If you are using data, you are done! If you are using MC, for each dataset, add up the sums of weights obtained for each file in step 1 and calculate the corrections needed to normalize each individual weight as well as the total weight. Note that the order of options is fixed with the arguments after the first being the input files. This is to allow arbitrary number of input files. Note that again functionality depends on the naming, e.g. correction file name is used to decide what cross-section to use.
-Make subdirectory `corrections` in `out`.
+Step 2. If you are using data, you are done! If you are using MC, for each dataset, it is necessary to add up the sums of weights obtained for each file in step 1 and calculate the corrections needed to normalize each individual weight as well as the total weight. Note that the order of options is fixed with the arguments after the first being the input files. This is to allow arbitrary number of input files. Note that again functionality depends on the naming, e.g. correction file name is used to decide what cross-section to use. To perform this process, make subdirectory `corrections` in `out`. Then:
 
 ~~~~bash
 ./compile.sh && ./run/merge_corrections.exe out/corrections/corr_$INFILE out/wgt_sums/wgt_sums_$INFILE
 ~~~~
 
-Step 3. Make subdirectory `unskimmed in `out`. Using the pico file from step 1 and the corrections file from step 2 as input, we can renormalize the weight branches as follows:
+Step 3. Make subdirectory `unskimmed` in `out`. Using the pico file from step 1 and the corrections file from step 2 as input, we can renormalize the weight branches using the following command:
 
 ~~~~bash
 ./compile.sh && ./run/apply_corrections.exe --in_file raw_pico_$INFILE --in_dir out/raw_pico/ --corr_file corr_$INFILE

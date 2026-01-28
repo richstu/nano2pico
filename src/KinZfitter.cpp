@@ -8,6 +8,7 @@
 
 /// KinFitter header
 #include "KinZfitter.hpp"
+#include "RooHelpers.h"
 
 KinZfitter::KinZfitter() {
 
@@ -341,7 +342,6 @@ vector<TLorentzVector> KinZfitter::GetP4s()
 
 void KinZfitter::KinRefitZ1()
 {
-
   double l1, l2, lph1, lph2;
   l1 = 1.0; l2 = 1.0; lph1 = 1.0; lph2 = 1.0;
 
@@ -369,7 +369,9 @@ float KinZfitter::GetMinNll()
 
 int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double & lph2)
 {
-
+  RooHelpers::LocalChangeMsgLevel changeMsgLvl(RooFit::ERROR);
+  //Temporarily suppressing warnings to test n2p overall
+  //KinZFitter needs some reworking to avoid sigma going negative
   l1= 1.0; l2 = 1.0;
   lph1 = 1.0; lph2 = 1.0;
 
