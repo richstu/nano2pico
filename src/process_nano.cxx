@@ -674,7 +674,7 @@ int main(int argc, char *argv[]){
     if (!isData) {
       wgt_sums.out_weight() += pico.out_weight();
       
-      if (Contains(in_path, "DiPhotonJetsBox")){
+      if (Contains(in_path, "DiPhotonJetsBox") || Contains(in_path,"GG-Box")){
         wgt_sums.out_neff() += nano.Generator_weight(); //changed neff to double instead of int
       }
       else{
