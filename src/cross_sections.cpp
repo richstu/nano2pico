@@ -641,6 +641,9 @@ namespace xsec{
     if(file.Contains("TTG-1Jets_PTG-200_TuneCP5_13p6TeV_amcatnloFXFXold-pythia8"))  xsec = 0.1284; // from XSDB
     if(file.Contains("TTtoLplusNu2Q-3Jets_TuneCP5_13p6TeV_madgraphMLM-pythia8"))  xsec = 117.5; // from XSDB
     if(file.Contains("TTtoLminusNu2Q-3Jets_TuneCP5_13p6TeV_madgraphMLM-pythia8"))  xsec = 117.5; // from XSDB
+    if(file.Contains("TTtoLminusNu2Q-2Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8"))  xsec = 190.4; // from XSDB
+    if(file.Contains("TTtoLplusNu2Q-2Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8"))  xsec = 190.4; // from XSDB
+    if(file.Contains("TTto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8"))  xsec = 762.1; // from XSDB
 
     // updated 4b background cross sections at 13 TeV
     // TTJets background from https://pdg.lbl.gov/2024/reviews/rpp2024-rev-top-quark.pdf
