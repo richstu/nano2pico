@@ -47,8 +47,8 @@ namespace xsec{
         double mtt_1000_eff=(11.16/670.3);
         if(file.Contains("TTJets_Mtt-1000toInf")) xsec = 815.96*mtt_1000_eff;
 
-        if(file.Contains("TTToSemiLeptonic")) xsec = 357.4;
-        if(file.Contains("TTJets_DiLept") || file.Contains("TTTo2L2Nu")) xsec = 831.8*0.105; //source: PDG XS*BR http://pdg.lbl.gov/2019/reviews/rpp2018-rev-top-quark.pdf ; 85.66 in Humboldtv3+earlier
+        if(file.Contains("TTToSemiLeptonic")) xsec = 365.34;
+        if(file.Contains("TTJets_DiLept") || file.Contains("TTTo2L2Nu")) xsec = 88.29; //source: PDG XS*BR http://pdg.lbl.gov/2019/reviews/rpp2018-rev-top-quark.pdf ; 85.66 in Humboldtv3+earlier
         if(file.Contains("TTJets_SingleLept")) xsec = 831.8*0.219; //source: PDG XS*BR http://pdg.lbl.gov/2019/reviews/rpp2018-rev-top-quark.pdf ; 178.7 in Humboldtv3+earlier
 
         if(file.Contains("TTJets_DiLept_genMET-150")) xsec = 3.638*1.627; //XSDB*XSDB/GenXSecAnalyzer K-Factor; 0.0676543*85.66 in Humboldtv3+earlier
@@ -167,7 +167,7 @@ namespace xsec{
         if(file.Contains("TTJets_Tune") || file.Contains("TT_"))  xsec = 815.96;
         if(file.Contains("TTJets_Tune") && file.Contains("amcatnloFXFX"))  xsec = 833.9;
 
-        if(file.Contains("TTJets_DiLept") || file.Contains("TTTo2L2Nu")) xsec = 831.8*0.105; //source: PDG XS*BR http://pdg.lbl.gov/2019/reviews/rpp2018-rev-top-quark.pdf ; 85.66 in Humboldtv3+earlier
+        if(file.Contains("TTJets_DiLept") || file.Contains("TTTo2L2Nu")) xsec = 88.29; //source: PDG XS*BR http://pdg.lbl.gov/2019/reviews/rpp2018-rev-top-quark.pdf ; 85.66 in Humboldtv3+earlier
         if(file.Contains("TTJets_SingleLept")) xsec = 831.8*0.219; //source: PDG XS*BR http://pdg.lbl.gov/2019/reviews/rpp2018-rev-top-quark.pdf ; 178.7 in Humboldtv3+earlier
 
         if(file.Contains("TTJets_DiLept_genMET-150")) xsec = 3.655*1.679; //XSDB*XSDB/GenXSecAnalyzer K-Factor; 0.0676543*85.66 in Humboldtv3+earlier
@@ -615,18 +615,14 @@ namespace xsec{
 
     //bbgammagamma cross sections at 13 TeV
     //Background samples
-    if(file.Contains("DiPhotonJets_MGG-80toInf"))                  xsec = 126.7; // from XSDB
-    if(file.Contains("DiPhotonJetsBox_MGG-80toInf"))                  xsec = 82.51; 
-    if(file.Contains("DiPhotonJetsBox1BJet_MGG-80toInf"))             xsec = 0.8185;
-    if(file.Contains("DiPhotonJetsBox2BJets_MGG-80toInf"))            xsec = 0.4874;
-    if(file.Contains("GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf"))  xsec = 219.2;
-    if(file.Contains("GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf")) xsec = 862.4;
-    if(file.Contains("TTGG_0Jets"))                                   xsec = 0.01731;
-    if(file.Contains("TTGJets"))                                      xsec = 3.795;
-    if(file.Contains("TTTo2L2Nu"))                                    xsec = 831.8 * 0.105; 
-    if(file.Contains("QCD_Pt-30to40_DoubleEMEnriched_MGG-80toInf"))   xsec = 22180;
-    if(file.Contains("QCD_Pt-40toInf_DoubleEMEnriched_MGG-80toInf"))  xsec = 113100;
-    if(file.Contains("QCD_Pt-40ToInf_DoubleEMEnriched_MGG-80toInf"))  xsec = 113100;
+    if(file.Contains("DiPhotonJetsBox_MGG-80toInf"))                  xsec = 86.96; 
+    if(file.Contains("DiPhotonJetsBox1BJet_MGG-80toInf"))             xsec = 0.8167;
+    if(file.Contains("DiPhotonJetsBox2BJets_MGG-80toInf"))            xsec = 0.4853;
+    if(file.Contains("GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf"))  xsec = 233.4;
+    if(file.Contains("GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf")) xsec = 874.2;
+    if(file.Contains("TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8")) xsec = 3.774;
+    if(file.Contains("TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8"))       xsec = 88.29; 
+    if(file.Contains("TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8")) xsec = 365.34; 
 
     //bbgammagamma cross sections at 13.6 TeV
     //Background samples
@@ -641,9 +637,6 @@ namespace xsec{
     if(file.Contains("TTG-1Jets_PTG-200_TuneCP5_13p6TeV_amcatnloFXFXold-pythia8"))  xsec = 0.1284; // from XSDB
     if(file.Contains("TTtoLplusNu2Q-3Jets_TuneCP5_13p6TeV_madgraphMLM-pythia8"))  xsec = 117.5; // from XSDB
     if(file.Contains("TTtoLminusNu2Q-3Jets_TuneCP5_13p6TeV_madgraphMLM-pythia8"))  xsec = 117.5; // from XSDB
-    if(file.Contains("TTtoLminusNu2Q-2Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8"))  xsec = 190.4; // from XSDB
-    if(file.Contains("TTtoLplusNu2Q-2Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8"))  xsec = 190.4; // from XSDB
-    if(file.Contains("TTto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8"))  xsec = 762.1; // from XSDB
 
     // updated 4b background cross sections at 13 TeV
     // TTJets background from https://pdg.lbl.gov/2024/reviews/rpp2024-rev-top-quark.pdf
