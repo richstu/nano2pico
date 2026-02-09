@@ -91,8 +91,8 @@ bool PhotonProducer::IsSignal(nano_tree &nano, pico_tree &pico, int nano_idx,
                               float scaleres_corr, float minLepDR, 
                               vector<int> &photon_el_pico_idx) {
   float pt = nano.Photon_pt()[nano_idx]*scaleres_corr;
-  float eta = nano.Photon_eta()[nano_idx];
-  float mva = nano.Photon_mvaID()[nano_idx];
+  //float eta = nano.Photon_eta()[nano_idx];
+  //float mva = nano.Photon_mvaID()[nano_idx];
   if (pt < SignalPhotonPtCut) return false;
   if (!(nano.Photon_isScEtaEB()[nano_idx] 
         || nano.Photon_isScEtaEE()[nano_idx])) return false;
