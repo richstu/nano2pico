@@ -9,6 +9,75 @@
 /// KinFitter header
 #include "KinZfitter.hpp"
 #include "RooHelpers.h"
+#include <chrono>
+
+void KinZfitter::set_consts(double ptl1, double ptl2,
+                              double phil1, double phil2,
+                              double etal1, double etal2,
+                              double sigmal1, double sigmal2,
+                              double ml1, double ml2){
+  bw_mass_   = 91.1848692039;//bw mass 
+  bw_width_  = 2.54488597758;//bw width
+  pTl1_      = ptl1;
+  pTl2_      = ptl2;
+  phil1_     = phil1;
+  phil2_     = phil2;
+  etal1_     = etal1;
+  etal2_     = etal2;
+  sigmal1_   = sigmal1;
+  sigmal2_   = sigmal2;
+  ml1_       = ml1;
+  ml2_       = ml2;
+}
+
+double KinZfitter::NLL_0(const double *pTs){
+  double pTl1r = pTs[0];
+  double pTl2r = pTs[1];
+  
+  double En1, En2, mll, gamma, k, fbw, gauss1, gauss2, NLL;
+  En1 = sqrt(pow(pTl1r,2)*(1+pow(sinh(etal1_),2))+pow(ml1_,2));
+  En2 = sqrt(pow(pTl2r,2)*(1+pow(sinh(etal2_),2))+pow(ml2_,2));
+
+  mll = pow((En1+En2),2)-pow((pTl1r*cos(phil1_)+pTl2r*cos(phil2_)),2)-
+               pow((pTl1r*sin(phil1_) + pTl2r*sin(phil2_)),2) - pow((pTl1r*sinh(etal1_) + pTl2r*sinh(etal2_)),2);
+  gamma = sqrt(pow(bw_mass_,2)*(pow(bw_mass_,2) + pow(bw_width_,2)));
+  k = (2*sqrt(2)*bw_mass_*bw_width_*gamma)/(PI*sqrt(pow(bw_mass_,2) + gamma));
+  fbw = k/(pow(pow(mll,2)-pow(bw_mass_,2),2)+pow(bw_mass_,2)*pow(bw_width_,2));
+
+  gauss1 = exp(-0.5*pow(pTl1r - pTl1_,2)/pow(sigmal1_,2))/(sigmal1_*sqrt(2*PI));
+  gauss2 = exp(-0.5*pow(pTl2r - pTl2_,2)/pow(sigmal2_,2))/(sigmal2_*sqrt(2*PI));
+  NLL = -log(gauss1*gauss2*fbw);
+  return NLL;
+}
+
+double KinZfitter::gradNLL_0(const double *pTs, unsigned int dim){
+  double pTl1r = pTs[0];
+  double pTl2r = pTs[1];
+
+  double En1, En2, mll, dmll_dpTl1r, dmll_dpTl2r, dNLL_dpTl1r, dNLL_dpTl2r, out;
+  En1 = sqrt(pow(pTl1r,2)*(1+pow(sinh(etal1_),2))+pow(ml1_,2));
+  En2 = sqrt(pow(pTl2r,2)*(1+pow(sinh(etal2_),2))+pow(ml2_,2));
+
+  mll = pow((En1+En2),2)-pow((pTl1r*cos(phil1_)+pTl2r*cos(phil2_)),2)-
+               pow((pTl1r*sin(phil1_) + pTl2r*sin(phil2_)),2) - pow((pTl1r*sinh(etal1_) + pTl2r*sinh(etal2_)),2);
+
+  dmll_dpTl1r = (1/mll)*((En1+En2)*((pTl1r)/(En1))*(1+pow(sinh(etal1_),2)) - 
+                                 cos(phil1_) *(pTl1r*cos(phil1_)  + pTl2r*cos(phil2_)) - 
+                                 sin(phil1_) *(pTl1r*sin(phil1_)  + pTl2r*sin(phil2_)) - 
+                                 sinh(etal1_)*(pTl1r*sinh(etal1_) + pTl2r*sinh(etal2_)));
+  dmll_dpTl2r = (1/mll)*((En1+En2)*((pTl2r)/(En2))*(1+pow(sinh(etal2_),2)) -
+                                 cos(phil2_) *(pTl1r*cos(phil1_)  + pTl2r*cos(phil2_)) -
+                                 sin(phil2_) *(pTl1r*sin(phil1_)  + pTl2r*sin(phil2_)) -
+                                 sinh(etal2_)*(pTl1r*sinh(etal1_) + pTl2r*sinh(etal2_)));
+  dNLL_dpTl1r = (pTl1r - pTl1_)/(pow(sigmal1_,2)) + 
+                (4*mll*(pow(mll,2)+pow(bw_mass_,2)))/(pow((pow(mll,2)-pow(bw_mass_,2)),2)+pow(bw_mass_,2)*pow(bw_width_,2)) * dmll_dpTl1r;
+  dNLL_dpTl2r = (pTl2r - pTl2_)/(pow(sigmal2_,2)) +
+                (4*mll*(pow(mll,2)+pow(bw_mass_,2)))/(pow((pow(mll,2)-pow(bw_mass_,2)),2)+pow(bw_mass_,2)*pow(bw_width_,2)) * dmll_dpTl2r;
+  out = 0;
+  if (dim == 0) out = dNLL_dpTl1r;
+  else if (dim == 1) out = dNLL_dpTl2r;
+  return out;
+}
 
 KinZfitter::KinZfitter() {
 
@@ -655,6 +724,54 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
   RooDataSet* pTs = new RooDataSet("pTs", "pTs", *rastmp);
   pTs->add(*rastmp);
 
+
+  //auto startTime = std::chrono::steady_clock::now();
+  set_consts(Z1_1.Pt(), Z1_2.Pt(),
+             Z1_1.Phi(), Z1_2.Phi(),
+             Z1_1.Eta(), Z1_2.Eta(),
+             pTerrZ1_1, pTerrZ1_2,
+             Z1_1.M(), Z1_2.M());
+
+  ROOT::Math::Minimizer* minimum =
+    ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
+ 
+   // set tolerance , etc...
+  minimum->SetMaxFunctionCalls(1000); // for Minuit/Minuit2
+  minimum->SetMaxIterations(200);  // for GSL
+  minimum->SetTolerance(0.1);
+  minimum->SetPrintLevel(-1);
+ 
+  // create function wrapper for minimizer
+  // a IMultiGenFunction type
+  ROOT::Math::GradFunctor f(this,&KinZfitter::NLL_0,&KinZfitter::gradNLL_0,2);
+  double step[2] = {0.01,0.01};
+  // starting point
+ 
+  double variable[2] = {Z1_1.Pt(),Z1_2.Pt()};
+ 
+  minimum->SetFunction(f);
+ 
+  // Set the free variables to be minimized !
+  minimum->SetVariable(0,"x",variable[0], step[0]);
+  minimum->SetVariable(1,"y",variable[1], step[1]);
+ 
+  // do the minimization
+  minimum->Minimize();
+  //minimum->Hesse();
+ 
+  const double *xs = minimum->X();
+  const double *errs = minimum->Errors();
+  //std::cout << "Minimum: f(" << xs[0] << "," << xs[1] << "): "
+  //          << minimum->MinValue()  << std::endl;
+
+  int status_my = minimum->Status();
+  int covstatus_my = minimum->CovMatrixStatus();
+  double minnll_my = minimum->MinValue();
+
+  //auto endTime = std::chrono::steady_clock::now();
+  //auto duration = std::chrono::duration<double>(endTime - startTime);
+  //std::cout << "My fitter took " << duration.count() << " seconds.\n";
+  bool use_my = true;
   //RooAbsReal* nll;
   //nll = model->createNLL(*pTs);
   //RooMinuit(*nll).migrad();
@@ -662,17 +779,27 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
   //This code is used to time the refit
   //cout << "Before fit: " << static_cast<float>(clock())/CLOCKS_PER_SEC - time_start<< endl;
 
-
+  //auto startTime2 = std::chrono::steady_clock::now();
+  /*
   RooFitResult* r = model->fitTo(*pTs, RooFit::Save(), RooFit::PrintLevel(-1));//,RooFit::Timer(true));
   const TMatrixDSym& covMatrix = r->covarianceMatrix();
   status_ = r->status();
   covmat_status_ = r->covQual();
   minnll_ = r -> minNll();
+  */
+  //auto endTime2 = std::chrono::steady_clock::now();
+  //auto duration2 = std::chrono::duration<double>(endTime2 - startTime2);
+  //std::cout << "Existing fitter took " << duration2.count() << " seconds.\n";
 
+  if(use_my == true){
+    status_ = status_my;
+    covmat_status_ = covstatus_my;
+    minnll_ = minnll_my;
+  }
   //This code is used to time the refit
   //cout << "After fit: " << static_cast<float>(clock())/CLOCKS_PER_SEC - time_start<< endl;
 
-
+/*
   const RooArgList& finalPars = r->floatParsFinal();
   for (int i=0 ; i<finalPars.getSize(); i++) {
 //    TString name = dynamic_cast<TString>( dynamic_cast<RooRealVar*>(finalPars.at(i)->GetName()) );
@@ -681,21 +808,32 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
     if(debug_) cout<<"name list of RooRealVar for covariance matrix "<<name<<endl;
 
   }
-
+*/
+/*
   int size = covMatrix.GetNcols();
   //TMatrixDSym covMatrixTest_(size);
   covMatrixZ1_.ResizeTo(size, size);
   covMatrixZ1_ = covMatrix;
-
+*/
   if(debug_) cout<<"save the covariance matrix"<<endl;
-
-  l1 = pT1->getVal()/RECOpT1;
-  l2 = pT2->getVal()/RECOpT2;
+  //cout<<"Old refit pT1: "<<pT1->getVal()<<" pT2: "<<pT2->getVal()<<endl;
+  if(use_my == true){
+    l1 = xs[0]/RECOpT1;
+    l2 = xs[1]/RECOpT2;
+  } else{
+    l1 = pT1->getVal()/RECOpT1;
+    l2 = pT2->getVal()/RECOpT2;
+  }
   double pTerrZ1REFIT1 = pT1->getError();
   double pTerrZ1REFIT2 = pT2->getError();
 
-  pTerrsZ1REFIT_.push_back(pTerrZ1REFIT1);
-  pTerrsZ1REFIT_.push_back(pTerrZ1REFIT2);
+  if(use_my == true){
+    pTerrsZ1REFIT_.push_back(errs[0]);
+    pTerrsZ1REFIT_.push_back(errs[1]);
+  }else{
+    pTerrsZ1REFIT_.push_back(pTerrZ1REFIT1);
+    pTerrsZ1REFIT_.push_back(pTerrZ1REFIT2);
+  }
 
   double pTerrZ1phREFIT1;
   double pTerrZ1phREFIT2;
@@ -730,7 +868,7 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
   //delete nll;
   delete pTs;
   delete rastmp;
-  delete r;
+  //delete r;
   delete singleCB; delete gaussShape1; delete CBplusGauss; delete gaussShape2; delete CBplusGaussplusGauss; delete gaussShape3; delete CBplusGaussplusGaussplusGauss;
   delete VoiToFit; delete VoiPDF;
   delete model;

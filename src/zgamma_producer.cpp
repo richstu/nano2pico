@@ -174,7 +174,8 @@ ZGammaVarProducer::RefitResults ZGammaVarProducer::PerformKinematicRefit(
     leptons_pterr_map[0] = pico.out_el_energyErr()[idx_l1]*l1.Pt()/l1.P();
     leptons_pterr_map[1] = pico.out_el_energyErr()[idx_l2]*l2.Pt()/l2.P();
   }
-
+  //for testing purposes, remove fsr photons:
+  fsrphotons_map.clear();
   kinZfitter->Setup(leptons_map, fsrphotons_map, leptons_pterr_map);
   kinZfitter->KinRefitZ1();
   refit_leptons = kinZfitter->GetRefitP4s();
