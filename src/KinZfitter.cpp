@@ -11,11 +11,11 @@
 #include "RooHelpers.h"
 #include <chrono>
 
-void KinZfitter::set_consts(double ptl1, double ptl2,
-                              double phil1, double phil2,
-                              double etal1, double etal2,
-                              double sigmal1, double sigmal2,
-                              double ml1, double ml2){
+void KinZfitter::set_consts(double ptl1, double phil1, double etal1, double sigmal1, double ml1,
+                            double ptl2, double phil2, double etal2, double sigmal2, double ml2,
+                            unsigned int nfsrph,
+                            double ptg3, double phig3, double etag3, double sigmag3,
+                            double ptg4, double phig4, double etag4, double sigmag4){
   bw_mass_   = 91.1848692039;//bw mass 
   bw_width_  = 2.54488597758;//bw width
   pTl1_      = ptl1;
@@ -28,6 +28,18 @@ void KinZfitter::set_consts(double ptl1, double ptl2,
   sigmal2_   = sigmal2;
   ml1_       = ml1;
   ml2_       = ml2;
+  if(nfsrph>0){
+    pTg3_    = ptg3;
+    phig3_   = phig3;
+    etag3_   = etag3;
+    sigmag3_ = sigmag3;
+  }
+  if(nfsrph>1){
+    pTg4_    = ptg4;
+    phig4_   = phig4;
+    etag4_   = etag4;
+    sigmag4_ = sigmag4;
+  }
 }
 
 double KinZfitter::NLL_0(const double *pTs){
@@ -35,18 +47,71 @@ double KinZfitter::NLL_0(const double *pTs){
   double pTl2r = pTs[1];
   
   double En1, En2, mll, gamma, k, fbw, gauss1, gauss2, NLL;
-  En1 = sqrt(pow(pTl1r,2)*(1+pow(sinh(etal1_),2))+pow(ml1_,2));
-  En2 = sqrt(pow(pTl2r,2)*(1+pow(sinh(etal2_),2))+pow(ml2_,2));
+  En1 = sqrt(pow(pTl1r,2)*(1 + pow(sinh(etal1_),2)) + pow(ml1_,2));
+  En2 = sqrt(pow(pTl2r,2)*(1 + pow(sinh(etal2_),2)) + pow(ml2_,2));
 
-  mll = pow((En1+En2),2)-pow((pTl1r*cos(phil1_)+pTl2r*cos(phil2_)),2)-
-               pow((pTl1r*sin(phil1_) + pTl2r*sin(phil2_)),2) - pow((pTl1r*sinh(etal1_) + pTl2r*sinh(etal2_)),2);
+  mll = sqrt(pow((En1 + En2),2) - pow((pTl1r*cos(phil1_) + pTl2r*cos(phil2_)),2) - 
+               pow((pTl1r*sin(phil1_) + pTl2r*sin(phil2_)),2) - pow((pTl1r*sinh(etal1_) + pTl2r*sinh(etal2_)),2));
   gamma = sqrt(pow(bw_mass_,2)*(pow(bw_mass_,2) + pow(bw_width_,2)));
   k = (2*sqrt(2)*bw_mass_*bw_width_*gamma)/(PI*sqrt(pow(bw_mass_,2) + gamma));
-  fbw = k/(pow(pow(mll,2)-pow(bw_mass_,2),2)+pow(bw_mass_,2)*pow(bw_width_,2));
+  fbw = k/(pow(pow(mll,2) - pow(bw_mass_,2),2) + pow(bw_mass_,2)*pow(bw_width_,2));
 
   gauss1 = exp(-0.5*pow(pTl1r - pTl1_,2)/pow(sigmal1_,2))/(sigmal1_*sqrt(2*PI));
   gauss2 = exp(-0.5*pow(pTl2r - pTl2_,2)/pow(sigmal2_,2))/(sigmal2_*sqrt(2*PI));
   NLL = -log(gauss1*gauss2*fbw);
+  return NLL;
+}
+
+double KinZfitter::NLL_1(const double *pTs){
+  double pTl1r = pTs[0];
+  double pTl2r = pTs[1];
+  double pTg3r = pTs[2];
+
+  double En1, En2, En3, mll, gamma, k, fbw, gauss1, gauss2, gauss3, NLL;
+  En1 = sqrt(pow(pTl1r,2)*(1 + pow(sinh(etal1_),2)) + pow(ml1_,2));
+  En2 = sqrt(pow(pTl2r,2)*(1 + pow(sinh(etal2_),2)) + pow(ml2_,2));
+  En3 = sqrt(pow(pTg3r,2)*(1 + pow(sinh(etag3_),2)));
+
+  mll = sqrt(pow((En1 + En2 + En3),2) - pow((pTl1r*cos(phil1_) + pTl2r*cos(phil2_) + pTg3r*cos(phig3_)),2)
+                                      - pow((pTl1r*sin(phil1_) + pTl2r*sin(phil2_) + pTg3r*sin(phig3_)),2)
+                                      - pow((pTl1r*sinh(etal1_) + pTl2r*sinh(etal2_) + pTg3r*sinh(etag3_)),2));
+
+  gamma = sqrt(pow(bw_mass_,2)*(pow(bw_mass_,2) + pow(bw_width_,2)));
+  k = (2*sqrt(2)*bw_mass_*bw_width_*gamma)/(PI*sqrt(pow(bw_mass_,2) + gamma));
+  fbw = k/(pow(pow(mll,2) - pow(bw_mass_,2),2) + pow(bw_mass_,2)*pow(bw_width_,2));
+
+  gauss1 = exp(-0.5*pow(pTl1r - pTl1_,2)/pow(sigmal1_,2))/(sigmal1_*sqrt(2*PI));
+  gauss2 = exp(-0.5*pow(pTl2r - pTl2_,2)/pow(sigmal2_,2))/(sigmal2_*sqrt(2*PI));
+  gauss3 = exp(-0.5*pow(pTg3r - pTg3_,2)/pow(sigmag3_,2))/(sigmag3_*sqrt(2*PI));
+  NLL = -log(gauss1*gauss2*gauss3*fbw);
+  return NLL;
+}
+
+double KinZfitter::NLL_2(const double *pTs){
+  double pTl1r = pTs[0];
+  double pTl2r = pTs[1];
+  double pTg3r = pTs[2];
+  double pTg4r = pTs[3];
+
+  double En1, En2, En3, En4, mll, gamma, k, fbw, gauss1, gauss2, gauss3, gauss4, NLL;
+  En1 = sqrt(pow(pTl1r,2)*(1 + pow(sinh(etal1_),2)) + pow(ml1_,2));
+  En2 = sqrt(pow(pTl2r,2)*(1 + pow(sinh(etal2_),2)) + pow(ml2_,2));
+  En3 = sqrt(pow(pTg3r,2)*(1 + pow(sinh(etag3_),2)));
+  En4 = sqrt(pow(pTg4r,2)*(1 + pow(sinh(etag4_),2)));
+
+  mll = sqrt(pow((En1 + En2 + En3 + En4),2) - pow((pTl1r*cos(phil1_) + pTl2r*cos(phil2_) + pTg3r*cos(phig3_) + pTg4r*cos(phig4_)),2)
+                                            - pow((pTl1r*sin(phil1_) + pTl2r*sin(phil2_) + pTg3r*sin(phig3_) + pTg4r*sin(phig4_)),2) 
+                                            - pow((pTl1r*sinh(etal1_) + pTl2r*sinh(etal2_) + pTg3r*sinh(etag3_) + pTg4r*sinh(etag4_)),2));
+
+  gamma = sqrt(pow(bw_mass_,2)*(pow(bw_mass_,2) + pow(bw_width_,2)));
+  k = (2*sqrt(2)*bw_mass_*bw_width_*gamma)/(PI*sqrt(pow(bw_mass_,2) + gamma));
+  fbw = k/(pow(pow(mll,2) - pow(bw_mass_,2),2) + pow(bw_mass_,2)*pow(bw_width_,2));
+
+  gauss1 = exp(-0.5*pow(pTl1r - pTl1_,2)/pow(sigmal1_,2))/(sigmal1_*sqrt(2*PI));
+  gauss2 = exp(-0.5*pow(pTl2r - pTl2_,2)/pow(sigmal2_,2))/(sigmal2_*sqrt(2*PI));
+  gauss3 = exp(-0.5*pow(pTg3r - pTg3_,2)/pow(sigmag3_,2))/(sigmag3_*sqrt(2*PI));
+  gauss4 = exp(-0.5*pow(pTg4r - pTg4_,2)/pow(sigmag4_,2))/(sigmag4_*sqrt(2*PI));
+  NLL = -log(gauss1*gauss2*gauss3*gauss4*fbw);
   return NLL;
 }
 
@@ -55,29 +120,125 @@ double KinZfitter::gradNLL_0(const double *pTs, unsigned int dim){
   double pTl2r = pTs[1];
 
   double En1, En2, mll, dmll_dpTl1r, dmll_dpTl2r, dNLL_dpTl1r, dNLL_dpTl2r, out;
-  En1 = sqrt(pow(pTl1r,2)*(1+pow(sinh(etal1_),2))+pow(ml1_,2));
-  En2 = sqrt(pow(pTl2r,2)*(1+pow(sinh(etal2_),2))+pow(ml2_,2));
+  En1 = sqrt(pow(pTl1r,2)*(1 + pow(sinh(etal1_),2)) + pow(ml1_,2));
+  En2 = sqrt(pow(pTl2r,2)*(1 + pow(sinh(etal2_),2)) + pow(ml2_,2));
 
-  mll = pow((En1+En2),2)-pow((pTl1r*cos(phil1_)+pTl2r*cos(phil2_)),2)-
-               pow((pTl1r*sin(phil1_) + pTl2r*sin(phil2_)),2) - pow((pTl1r*sinh(etal1_) + pTl2r*sinh(etal2_)),2);
+  mll = sqrt(pow((En1 + En2),2) - pow((pTl1r*cos(phil1_) + pTl2r*cos(phil2_)),2) -
+               pow((pTl1r*sin(phil1_) + pTl2r*sin(phil2_)),2) - pow((pTl1r*sinh(etal1_) + pTl2r*sinh(etal2_)),2));
 
-  dmll_dpTl1r = (1/mll)*((En1+En2)*((pTl1r)/(En1))*(1+pow(sinh(etal1_),2)) - 
+  dmll_dpTl1r = (1/mll)*((En1 + En2)*((pTl1r)/(En1))*(1 + pow(sinh(etal1_),2)) - 
                                  cos(phil1_) *(pTl1r*cos(phil1_)  + pTl2r*cos(phil2_)) - 
                                  sin(phil1_) *(pTl1r*sin(phil1_)  + pTl2r*sin(phil2_)) - 
                                  sinh(etal1_)*(pTl1r*sinh(etal1_) + pTl2r*sinh(etal2_)));
-  dmll_dpTl2r = (1/mll)*((En1+En2)*((pTl2r)/(En2))*(1+pow(sinh(etal2_),2)) -
+  dmll_dpTl2r = (1/mll)*((En1 + En2)*((pTl2r)/(En2))*(1 + pow(sinh(etal2_),2)) -
                                  cos(phil2_) *(pTl1r*cos(phil1_)  + pTl2r*cos(phil2_)) -
                                  sin(phil2_) *(pTl1r*sin(phil1_)  + pTl2r*sin(phil2_)) -
                                  sinh(etal2_)*(pTl1r*sinh(etal1_) + pTl2r*sinh(etal2_)));
   dNLL_dpTl1r = (pTl1r - pTl1_)/(pow(sigmal1_,2)) + 
-                (4*mll*(pow(mll,2)+pow(bw_mass_,2)))/(pow((pow(mll,2)-pow(bw_mass_,2)),2)+pow(bw_mass_,2)*pow(bw_width_,2)) * dmll_dpTl1r;
+                ((4*mll*(pow(mll,2) - pow(bw_mass_,2)))*dmll_dpTl1r)/(pow((pow(mll,2) - pow(bw_mass_,2)),2) 
+                                                                   + pow(bw_mass_,2)*pow(bw_width_,2));
   dNLL_dpTl2r = (pTl2r - pTl2_)/(pow(sigmal2_,2)) +
-                (4*mll*(pow(mll,2)+pow(bw_mass_,2)))/(pow((pow(mll,2)-pow(bw_mass_,2)),2)+pow(bw_mass_,2)*pow(bw_width_,2)) * dmll_dpTl2r;
+                ((4*mll*(pow(mll,2) - pow(bw_mass_,2)))*dmll_dpTl2r)/(pow((pow(mll,2) - pow(bw_mass_,2)),2) 
+                                                                   + pow(bw_mass_,2)*pow(bw_width_,2));
+  out = 0;
+  if (dim==0) out = dNLL_dpTl1r;
+  if (dim==1) out = dNLL_dpTl2r;
+  return out;
+}
+
+double KinZfitter::gradNLL_1(const double *pTs, unsigned int dim){
+  double pTl1r = pTs[0];
+  double pTl2r = pTs[1];
+  double pTg3r = pTs[2];
+
+  double En1, En2, En3, mll, dmll_dpTl1r, dmll_dpTl2r, dmll_dpTg3r, dNLL_dpTl1r, dNLL_dpTl2r, dNLL_dpTg3r, out;
+  En1 = sqrt(pow(pTl1r,2)*(1 + pow(sinh(etal1_),2)) + pow(ml1_,2));
+  En2 = sqrt(pow(pTl2r,2)*(1 + pow(sinh(etal2_),2)) + pow(ml2_,2));
+  En3 = sqrt(pow(pTg3r,2)*(1 + pow(sinh(etag3_),2))); 
+
+  mll = sqrt(pow((En1 + En2 + En3),2) - pow((pTl1r*cos(phil1_) + pTl2r*cos(phil2_) + pTg3r*cos(phig3_)),2)
+                                      - pow((pTl1r*sin(phil1_) + pTl2r*sin(phil2_) + pTg3r*sin(phig3_)),2)
+                                      - pow((pTl1r*sinh(etal1_) + pTl2r*sinh(etal2_) + pTg3r*sinh(etag3_)),2));
+  dmll_dpTl1r = (1/mll)*((En1 + En2 + En3)*((pTl1r)/(En1))*(1 + pow(sinh(etal1_),2)) -
+                                 cos(phil1_) *(pTl1r*cos(phil1_)  + pTl2r*cos(phil2_) + pTg3r*cos(phig3_)) -
+                                 sin(phil1_) *(pTl1r*sin(phil1_)  + pTl2r*sin(phil2_) + pTg3r*sin(phig3_)) -
+                                 sinh(etal1_)*(pTl1r*sinh(etal1_) + pTl2r*sinh(etal2_) + pTg3r*sinh(etag3_)));
+  dmll_dpTl2r = (1/mll)*((En1 + En2 + En3)*((pTl2r)/(En2))*(1 + pow(sinh(etal2_),2)) -
+                                 cos(phil2_) *(pTl1r*cos(phil1_)  + pTl2r*cos(phil2_) + pTg3r*cos(phig3_)) -
+                                 sin(phil2_) *(pTl1r*sin(phil1_)  + pTl2r*sin(phil2_) + pTg3r*sin(phig3_)) -
+                                 sinh(etal2_)*(pTl1r*sinh(etal1_) + pTl2r*sinh(etal2_) + pTg3r*sinh(etag3_)));
+  dmll_dpTg3r = (1/mll)*((En1 + En2 + En3)*((pTg3r)/(En3))*(1 + pow(sinh(etag3_),2)) - 
+                                 cos(phig3_) *(pTl1r*cos(phil1_)  + pTl2r*cos(phil2_) + pTg3r*cos(phig3_)) -
+                                 sin(phig3_) *(pTl1r*sin(phil1_)  + pTl2r*sin(phil2_) + pTg3r*sin(phig3_)) -
+                                 sinh(etag3_)*(pTl1r*sinh(etal1_) + pTl2r*sinh(etal2_) + pTg3r*sinh(etag3_)));
+
+
+  dNLL_dpTl1r = (pTl1r - pTl1_)/(pow(sigmal1_,2)) +
+                (4*mll*(pow(mll,2) - pow(bw_mass_,2)))*dmll_dpTl1r/(pow((pow(mll,2)-pow(bw_mass_,2)),2)+pow(bw_mass_,2)*pow(bw_width_,2));
+  dNLL_dpTl2r = (pTl2r - pTl2_)/(pow(sigmal2_,2)) +
+                (4*mll*(pow(mll,2) - pow(bw_mass_,2)))*dmll_dpTl2r/(pow((pow(mll,2)-pow(bw_mass_,2)),2)+pow(bw_mass_,2)*pow(bw_width_,2));
+  dNLL_dpTg3r = (pTg3r - pTg3_)/(pow(sigmag3_,2)) +
+                (4*mll*(pow(mll,2) - pow(bw_mass_,2)))*dmll_dpTg3r/(pow((pow(mll,2)-pow(bw_mass_,2)),2)+pow(bw_mass_,2)*pow(bw_width_,2));
+
   out = 0;
   if (dim == 0) out = dNLL_dpTl1r;
   else if (dim == 1) out = dNLL_dpTl2r;
+  else if (dim == 2) out = dNLL_dpTg3r;
   return out;
 }
+
+double KinZfitter::gradNLL_2(const double *pTs, unsigned int dim){
+  double pTl1r = pTs[0];
+  double pTl2r = pTs[1];
+  double pTg3r = pTs[2];
+  double pTg4r = pTs[3];
+
+  double En1, En2, En3, En4, mll, dmll_dpTl1r, dmll_dpTl2r, dmll_dpTg3r, dmll_dpTg4r, dNLL_dpTl1r, dNLL_dpTl2r, dNLL_dpTg3r, dNLL_dpTg4r, out;
+  En1 = sqrt(pow(pTl1r,2)*(1+pow(sinh(etal1_),2))+pow(ml1_,2));
+  En2 = sqrt(pow(pTl2r,2)*(1+pow(sinh(etal2_),2))+pow(ml2_,2));
+  En3 = sqrt(pow(pTg3r,2)*(1+pow(sinh(etag3_),2)));
+  En4 = sqrt(pow(pTg4r,2)*(1+pow(sinh(etag4_),2)));
+
+  mll = sqrt(pow((En1+En2+En3+En4),2) - pow((pTl1r*cos(phil1_) + pTl2r*cos(phil2_) + pTg3r*cos(phig3_) + pTg4r*cos(phig4_)),2)
+                                      - pow((pTl1r*sin(phil1_) + pTl2r*sin(phil2_) + pTg3r*sin(phig3_) + pTg4r*sin(phig4_)),2)
+                                      - pow((pTl1r*sinh(etal1_) + pTl2r*sinh(etal2_) + pTg3r*sinh(etag3_) + pTg4r*sinh(etag4_)),2));
+
+  dmll_dpTl1r = (1/mll)*((En1+En2+En3+En4)*((pTl1r)/(En1))*(1+pow(sinh(etal1_),2)) -
+                                 cos(phil1_) *(pTl1r*cos(phil1_)  + pTl2r*cos(phil2_) + pTg3r*cos(phig3_) + pTg4r*cos(phig4_)) -
+                                 sin(phil1_) *(pTl1r*sin(phil1_)  + pTl2r*sin(phil2_) + pTg3r*sin(phig3_) + pTg4r*sin(phig4_)) -
+                                 sinh(etal1_)*(pTl1r*sinh(etal1_) + pTl2r*sinh(etal2_) + pTg3r*sinh(etag3_) + pTg4r*sinh(etag4_)));
+  dmll_dpTl2r = (1/mll)*((En1+En2+En3+En4)*((pTl2r)/(En2))*(1+pow(sinh(etal2_),2)) -
+                                 cos(phil2_) *(pTl1r*cos(phil1_)  + pTl2r*cos(phil2_) + pTg3r*cos(phig3_) + pTg4r*cos(phig4_)) -
+                                 sin(phil2_) *(pTl1r*sin(phil1_)  + pTl2r*sin(phil2_) + pTg3r*sin(phig3_) + pTg4r*sin(phig4_)) -
+                                 sinh(etal2_)*(pTl1r*sinh(etal1_) + pTl2r*sinh(etal2_) + pTg3r*sinh(etag3_) + pTg4r*sinh(etag4_)));
+  dmll_dpTg3r = (1/mll)*((En1+En2+En3+En4)*((pTg3r)/(En3))*(1+pow(sinh(etag3_),2)) -
+                                 cos(phig3_) *(pTl1r*cos(phil1_)  + pTl2r*cos(phil2_) + pTg3r*cos(phig3_) + pTg4r*cos(phig4_)) -
+                                 sin(phig3_) *(pTl1r*sin(phil1_)  + pTl2r*sin(phil2_) + pTg3r*sin(phig3_) + pTg4r*sin(phig4_)) -
+                                 sinh(etag3_)*(pTl1r*sinh(etal1_) + pTl2r*sinh(etal2_) + pTg3r*sinh(etag3_) + pTg4r*sinh(etag4_)));
+  dmll_dpTg4r = (1/mll)*((En1+En2+En3+En4)*((pTg4r)/(En4))*(1+pow(sinh(etag4_),2)) -
+                                 cos(phig4_) *(pTl1r*cos(phil1_)  + pTl2r*cos(phil2_) + pTg3r*cos(phig3_) + pTg4r*cos(phig4_)) -
+                                 sin(phig4_) *(pTl1r*sin(phil1_)  + pTl2r*sin(phil2_) + pTg3r*sin(phig3_) + pTg4r*sin(phig4_)) -
+                                 sinh(etag4_)*(pTl1r*sinh(etal1_) + pTl2r*sinh(etal2_) + pTg3r*sinh(etag3_) + pTg4r*sinh(etag4_)));
+
+
+  dNLL_dpTl1r = (pTl1r - pTl1_)/(pow(sigmal1_,2)) +
+                (4*mll*(pow(mll,2) - pow(bw_mass_,2)))*dmll_dpTl1r/(pow((pow(mll,2)-pow(bw_mass_,2)),2)+pow(bw_mass_,2)*pow(bw_width_,2));
+  dNLL_dpTl2r = (pTl2r - pTl2_)/(pow(sigmal2_,2)) +
+                (4*mll*(pow(mll,2) - pow(bw_mass_,2)))*dmll_dpTl2r/(pow((pow(mll,2)-pow(bw_mass_,2)),2)+pow(bw_mass_,2)*pow(bw_width_,2));
+  dNLL_dpTg3r = (pTg3r - pTg3_)/(pow(sigmag3_,2)) +
+                (4*mll*(pow(mll,2) - pow(bw_mass_,2)))*dmll_dpTg3r/(pow((pow(mll,2)-pow(bw_mass_,2)),2)+pow(bw_mass_,2)*pow(bw_width_,2));
+  dNLL_dpTg4r = (pTg4r - pTg4_)/(pow(sigmag4_,2)) +
+                (4*mll*(pow(mll,2) - pow(bw_mass_,2)))*dmll_dpTg4r/(pow((pow(mll,2)-pow(bw_mass_,2)),2)+pow(bw_mass_,2)*pow(bw_width_,2));
+
+
+  out = 0;
+  if (dim == 0) out = dNLL_dpTl1r;
+  else if (dim == 1) out = dNLL_dpTl2r;
+  else if (dim == 2) out = dNLL_dpTg3r;
+  else if (dim == 3) out = dNLL_dpTg4r;
+  return out;
+}
+
 
 KinZfitter::KinZfitter() {
 
@@ -243,7 +404,7 @@ void KinZfitter::Setup(std::map<unsigned int, TLorentzVector> selectedLeptons, s
   pTerrsZ1REFIT_.clear();
   pTerrsZ1phREFIT_.clear();
 
-  gErrorIgnoreLevel = kWarning;
+  //gErrorIgnoreLevel = kWarning;
   RooMsgService::instance().setStreamStatus(1,false);
   initZs(selectedLeptons, selectedFsrPhotons, errorLeptons);
   if(debug_){ cout << "Setup complete" << endl;} 
@@ -726,47 +887,99 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
 
 
   //auto startTime = std::chrono::steady_clock::now();
-  set_consts(Z1_1.Pt(), Z1_2.Pt(),
-             Z1_1.Phi(), Z1_2.Phi(),
-             Z1_1.Eta(), Z1_2.Eta(),
-             pTerrZ1_1, pTerrZ1_2,
-             Z1_1.M(), Z1_2.M());
-
+  //Set global fit constants
+  if(p4sZ1ph_.size()==0){
+    set_consts(Z1_1.Pt(), Z1_1.Phi(), Z1_1.Eta(), pTerrZ1_1, Z1_1.M(),
+               Z1_2.Pt(), Z1_2.Phi(), Z1_2.Eta(), pTerrZ1_2, Z1_2.M(),
+               p4sZ1ph_.size());
+  } else if(p4sZ1ph_.size()==1){
+    set_consts(Z1_1.Pt(), Z1_1.Phi(), Z1_1.Eta(), pTerrZ1_1, Z1_1.M(),
+               Z1_2.Pt(), Z1_2.Phi(), Z1_2.Eta(), pTerrZ1_2, Z1_2.M(),
+               p4sZ1ph_.size(),
+               Z1_ph1.Pt(), Z1_ph1.Phi(), Z1_ph1.Eta(), pTerrZ1_ph1);
+  } else if(p4sZ1ph_.size()==2){
+    set_consts(Z1_1.Pt(), Z1_1.Phi(), Z1_1.Eta(), pTerrZ1_1, Z1_1.M(),
+               Z1_2.Pt(), Z1_2.Phi(), Z1_2.Eta(), pTerrZ1_2, Z1_2.M(),
+               p4sZ1ph_.size(),
+               Z1_ph1.Pt(), Z1_ph1.Phi(), Z1_ph1.Eta(), pTerrZ1_ph1,
+               Z1_ph2.Pt(), Z1_ph2.Phi(), Z1_ph2.Eta(), pTerrZ1_ph2);
+  }
+  int status_my = -1;
+  int covstatus_my = -1;
+  double minnll_my = 1;
+  const double *xs;
+  const double *errs;
+  xs = 0; //dodging -Werror=maybe-uninitialized, these will not be used unless redefined later
+  errs = 0;
   ROOT::Math::Minimizer* minimum =
-    ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
- 
-   // set tolerance , etc...
-  minimum->SetMaxFunctionCalls(1000); // for Minuit/Minuit2
-  minimum->SetMaxIterations(200);  // for GSL
-  minimum->SetTolerance(0.1);
-  minimum->SetPrintLevel(-1);
- 
-  // create function wrapper for minimizer
-  // a IMultiGenFunction type
-  ROOT::Math::GradFunctor f(this,&KinZfitter::NLL_0,&KinZfitter::gradNLL_0,2);
-  double step[2] = {0.01,0.01};
-  // starting point
- 
-  double variable[2] = {Z1_1.Pt(),Z1_2.Pt()};
- 
-  minimum->SetFunction(f);
- 
-  // Set the free variables to be minimized !
-  minimum->SetVariable(0,"x",variable[0], step[0]);
-  minimum->SetVariable(1,"y",variable[1], step[1]);
- 
-  // do the minimization
-  minimum->Minimize();
-  //minimum->Hesse();
- 
-  const double *xs = minimum->X();
-  const double *errs = minimum->Errors();
-  //std::cout << "Minimum: f(" << xs[0] << "," << xs[1] << "): "
-  //          << minimum->MinValue()  << std::endl;
+      ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
 
-  int status_my = minimum->Status();
-  int covstatus_my = minimum->CovMatrixStatus();
-  double minnll_my = minimum->MinValue();
+  //Do the fits
+  if(p4sZ1ph_.size()==0){
+    minimum->SetMaxFunctionCalls(10000); // for Minuit/Minuit2
+    minimum->SetTolerance(0.1);
+    minimum->SetPrintLevel(-1);
+ 
+    // create gradfunctor
+    ROOT::Math::GradFunctor f(this,&KinZfitter::NLL_0,&KinZfitter::gradNLL_0,2);
+    //ROOT::Math::Functor f(this, &KinZfitter::NLL_0,2);
+    double step[2] = {0.5,0.5};
+    double variable[2] = {Z1_1.Pt(),Z1_2.Pt()};
+    minimum->SetFunction(f);
+ 
+    minimum->SetVariable(0,"pt1",variable[0], step[0]);
+    minimum->SetVariable(1,"pt2",variable[1], step[1]);
+    minimum->Minimize();
+    minimum->Hesse();
+    xs = minimum->X();
+    errs = minimum->Errors();
+    status_my = minimum->Status();
+    covstatus_my = minimum->CovMatrixStatus();
+    minnll_my = minimum->MinValue();
+  } else if(p4sZ1ph_.size()==1){
+    minimum->SetMaxFunctionCalls(10000); // for Minuit/Minuit2
+    minimum->SetTolerance(0.1);
+    minimum->SetPrintLevel(-1);
+    // create gradfunctor
+    ROOT::Math::GradFunctor f(this,&KinZfitter::NLL_1,&KinZfitter::gradNLL_1,3);
+    double step[3] = {0.5,0.5,0.5};
+    double variable[3] = {Z1_1.Pt(),Z1_2.Pt(),Z1_ph1.Pt()};
+    minimum->SetFunction(f);
+
+    minimum->SetVariable(0,"pt1",variable[0], step[0]);
+    minimum->SetVariable(1,"pt2",variable[1], step[1]);
+    minimum->SetVariable(2,"pt3",variable[2], step[2]);
+    minimum->Minimize();
+    minimum->Hesse();
+    xs = minimum->X();
+    errs = minimum->Errors();
+    status_my = minimum->Status();
+    covstatus_my = minimum->CovMatrixStatus();
+    minnll_my = minimum->MinValue();
+  } else if(p4sZ1ph_.size()==2){
+    minimum->SetMaxFunctionCalls(10000); // for Minuit/Minuit2
+    minimum->SetTolerance(0.1);
+    minimum->SetPrintLevel(-1);
+  
+    // create gradfunctor
+    ROOT::Math::GradFunctor f(this,&KinZfitter::NLL_2,&KinZfitter::gradNLL_2,4);
+    double step[4] = {0.5,0.5,0.5,0.5};
+    double variable[4] = {Z1_1.Pt(),Z1_2.Pt(),Z1_ph1.Pt(),Z1_ph2.Pt()};
+    minimum->SetFunction(f);
+  
+    minimum->SetVariable(0,"pt1",variable[0], step[0]);
+    minimum->SetVariable(1,"pt2",variable[1], step[1]);
+    minimum->SetVariable(2,"pt3",variable[2], step[2]);
+    minimum->SetVariable(3,"pt4",variable[3], step[3]);
+    minimum->Minimize();
+    minimum->Hesse();
+    xs = minimum->X();
+    errs = minimum->Errors();
+    status_my = minimum->Status();
+    covstatus_my = minimum->CovMatrixStatus();
+    minnll_my = minimum->MinValue();
+  }
+
 
   //auto endTime = std::chrono::steady_clock::now();
   //auto duration = std::chrono::duration<double>(endTime - startTime);
@@ -817,41 +1030,49 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
 */
   if(debug_) cout<<"save the covariance matrix"<<endl;
   //cout<<"Old refit pT1: "<<pT1->getVal()<<" pT2: "<<pT2->getVal()<<endl;
+  double pTerrZ1REFIT1;
+  double pTerrZ1REFIT2;
   if(use_my == true){
     l1 = xs[0]/RECOpT1;
     l2 = xs[1]/RECOpT2;
+    pTerrZ1REFIT1 = errs[0];
+    pTerrZ1REFIT2 = errs[1];
   } else{
     l1 = pT1->getVal()/RECOpT1;
     l2 = pT2->getVal()/RECOpT2;
+    pTerrZ1REFIT1 = pT1->getError();
+    pTerrZ1REFIT2 = pT2->getError();
+    
   }
-  double pTerrZ1REFIT1 = pT1->getError();
-  double pTerrZ1REFIT2 = pT2->getError();
 
-  if(use_my == true){
-    pTerrsZ1REFIT_.push_back(errs[0]);
-    pTerrsZ1REFIT_.push_back(errs[1]);
-  }else{
-    pTerrsZ1REFIT_.push_back(pTerrZ1REFIT1);
-    pTerrsZ1REFIT_.push_back(pTerrZ1REFIT2);
-  }
+  pTerrsZ1REFIT_.push_back(pTerrZ1REFIT1);
+  pTerrsZ1REFIT_.push_back(pTerrZ1REFIT2);
 
   double pTerrZ1phREFIT1;
   double pTerrZ1phREFIT2;
   if(p4sZ1ph_.size()>=1) {
 
     if(debug_) cout<<"set refit result for Z1 fsr photon 1"<<endl;
-
-    lph1 = pTph1->getVal()/RECOpTph1;
-    pTerrZ1phREFIT1 = pTph1->getError();
+    if(use_my == true){
+      lph1 = xs[2]/RECOpTph1;
+      pTerrZ1phREFIT1 = errs[2];
+    } else{
+      lph1 = pTph1->getVal()/RECOpTph1;
+      pTerrZ1phREFIT1 = pTph1->getError();
+    }
     if(debug_) cout<<"scale "<<lph1<<" pterr "<<pTerrZ1phREFIT1<<endl;
 
     pTerrsZ1phREFIT_.push_back(pTerrZ1phREFIT1);
 
   }
   if(p4sZ1ph_.size()==2){
-
-    lph2 = pTph2->getVal()/RECOpTph2;
-    pTerrZ1phREFIT2 = pTph2->getError();
+    if(use_my == true){
+      lph2 = xs[3]/RECOpTph2;
+      pTerrZ1phREFIT2 = errs[3];
+    } else{
+      lph2 = pTph2->getVal()/RECOpTph2;
+      pTerrZ1phREFIT2 = pTph2->getError();
+    }
     pTerrsZ1phREFIT_.push_back(pTerrZ1phREFIT2);
 
   }
