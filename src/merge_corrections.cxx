@@ -56,7 +56,6 @@ int main(int argc, char *argv[]){
   
   string output_path = argv[optind];
   vector<string> input_paths(argv+optind+1, argv+argc);
-
   int year = 2018;
   if      (Contains(input_paths[0], "RunIISummer20UL16")) year = 2016;
   else if (Contains(input_paths[0], "RunIISummer20UL17")) year = 2017;
@@ -274,6 +273,7 @@ void FixLumi(corrections_tree &corr, const string &corr_path, int year){
     xsec = xsec::crossSection(corr_path, year);
   }
   corr.out_w_lumi() = xsec*lumi/corr.out_neff();
+  cout << corr.out_w_lumi() << ", " << corr.out_neff() << endl;
 }
 
 void FixISR(corrections_tree &corr, const string &corr_path, int year, bool is_zgamma){

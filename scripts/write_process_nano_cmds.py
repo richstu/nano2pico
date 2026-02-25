@@ -67,7 +67,8 @@ if args['dataset_list']!='':
       if len(ds)<2: #in case of empty lines
         continue
       #remember to skip newline characters
-      in_file_paths = in_file_paths + glob(os.path.join(in_dir,ds[0:-1]))
+      in_file_paths = in_file_paths + glob(os.path.join(in_dir,ds[0:-1]+"*.root"))
+      print(os.path.join(in_dir,ds[0:-1]))
 else:
   in_file_paths = all_file_paths
 

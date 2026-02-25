@@ -131,14 +131,14 @@ int GetArrayLength(const std::string var_name){
   else if (var_type == "GenPart") return 500;
   else if (var_type == "GenDressedLepton") return 20;
   else if (var_type == "GenVisTau") return 20;
-  else if (var_type == "GenJet") return 50;
+  else if (var_type == "GenJet") return 100;
   else if (var_type == "GenJetAK8") return 50;
   else if (var_type == "SubGenJetAK8") return 100;
   else if (var_type == "LHEPart") return 40;
   else if (var_type == "LHEPdfWeight") return 100;
   else if (var_type == "LHEReweightingWeight") return 100;
   else if (var_type == "LHEScaleWeight") return 10;
-  else if (var_type == "PSWeight") return 20;
+  else if (var_type == "PSWeight") return 50;
   else if (var_type == "OtherPV") return 20;
   else if (var_type == "SV") return 40;
   else if (var_type == "TrigObj") return 100;

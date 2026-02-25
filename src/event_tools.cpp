@@ -629,7 +629,7 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
 
 bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZgamma, bool isHiggsino){
 
-  bool egamma_trigs = nano.HLT_Ele25_WPTight_Gsf() || nano.HLT_Ele27_WPTight_Gsf() || 
+  bool egamma_trigs = nano.HLT_Ele25_WPTight_Gsf()|| nano.HLT_Ele27_WPTight_Gsf() || 
                       nano.HLT_Ele28_WPTight_Gsf() || nano.HLT_Ele30_WPTight_Gsf() || nano.HLT_Ele32_WPTight_Gsf() ||
                       nano.HLT_Ele32_WPTight_Gsf_L1DoubleEG() || nano.HLT_Ele35_WPTight_Gsf() || 
                       nano.HLT_Ele20_WPLoose_Gsf() || nano.HLT_Ele45_WPLoose_Gsf() ||
@@ -764,7 +764,6 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
   pico.out_HLT_PFMET100_PFMHT100_IDTight_CaloBTagCSV_3p1() = nano.HLT_PFMET100_PFMHT100_IDTight_CaloBTagCSV_3p1();
   pico.out_HLT_PFMET110_PFMHT110_IDTight_CaloBTagCSV_3p1() = nano.HLT_PFMET110_PFMHT110_IDTight_CaloBTagCSV_3p1();
   pico.out_HLT_PFMET110_PFMHT110_IDTight_CaloBTagDeepCSV_3p1() = nano.HLT_PFMET110_PFMHT110_IDTight_CaloBTagDeepCSV_3p1();
-
   // Jet/HT trigger
   bool jetht_trigs = nano.HLT_PFJet500() || nano.HLT_PFHT125() || nano.HLT_PFHT200() || nano.HLT_PFHT300() || 
                                             nano.HLT_PFHT400() || nano.HLT_PFHT475() || nano.HLT_PFHT600() || 
@@ -901,6 +900,7 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
     else if ((year<=2018) && dataset==Dataset::SingleMuon  && muon_trigs && !jetht_trigs && !met_trigs && !doubleeg_trigs && !egamma_trigs) return true;
     else if ((year>=2022) && dataset==Dataset::Muon	   && muon_trigs && !jetht_trigs && !met_trigs && !doubleeg_trigs && !egamma_trigs) return true;
     else return false;
+    return true;
   }  
   else {
     // this assumes that we process either all the datasets or at least an ordered subset starting with the MET 
@@ -912,7 +912,6 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
     else if (dataset==Dataset::JetHT         && jetht_trigs && !muon_trigs && !egamma_trigs && !met_trigs) return true;
     else return false;
   }
-
   return false;
 }
 

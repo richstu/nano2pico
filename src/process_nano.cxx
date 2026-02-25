@@ -372,7 +372,6 @@ int main(int argc, char *argv[]){
     if (isData) {
       if(!inJSON(VVRunLumi, nano.run(), nano.luminosityBlock())) continue; 
     }
-    
     bool passed_trig = event_tools.SaveTriggerDecisions(nano, pico, isZgamma, isHiggsino);
     if (isData && !passed_trig) {
       continue;
@@ -388,8 +387,8 @@ int main(int argc, char *argv[]){
     pico.out_npv_good() = nano.PV_npvsGood();
     // number of pileup in mc
     if (!isData) {
-      pico.out_npu_tru() = nano.Pileup_nPU();
-      pico.out_npu_tru_mean() = nano.Pileup_nTrueInt();
+      pico.out_npu_tru() = 1; //nano.Pileup_nPU();
+      pico.out_npu_tru_mean() = 1; //nano.Pileup_nTrueInt();
     }
     
     //pileup energy density
@@ -807,7 +806,7 @@ void Initialize(corrections_tree &wgt_sums){
   wgt_sums.out_sys_trig_el().resize(2,0);
   wgt_sums.out_sys_trig_mu().resize(2,0);
   wgt_sums.out_sys_murf().resize(9,0);
-  wgt_sums.out_sys_ps().resize(4,0);
+  wgt_sums.out_sys_ps().resize(50,0);
   //wgt_sums.out_sys_pdf().resize(102,0);
 }
 
