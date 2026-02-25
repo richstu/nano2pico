@@ -1954,7 +1954,7 @@ namespace xsec{
       // note: from https://twiki.cern.ch/twiki/bin/view/LHCPhysics/SUSYCrossSections13x6TeVhinosplit
       // xsec binning is not as fine as before, unavailable mass points are commented out
       //if(hig_mass == 127) { xsec = 1.44725; xsec_unc = 0.0395277; return;}
-      else if(hig_mass == 150) { xsec = 0.8046; xsec_unc = 0.034986; return;}
+      if(hig_mass == 150) { xsec = 0.8046; xsec_unc = 0.034986; return;}
       //else if(hig_mass == 175) { xsec = 0.419059; xsec_unc = 0.0453279; return;}
       else if(hig_mass == 200) { xsec = 0.2761; xsec_unc = 0.036401; return;}
       //else if(hig_mass == 225) { xsec = 0.156286; xsec_unc = 0.0502876; return;}
@@ -2075,7 +2075,7 @@ namespace xsec{
     if((year == 2022 || year == 2023)){ // note: these are 2D xsecs from https://twiki.cern.ch/twiki/bin/view/LHCPhysics/SUSYCrossSections13x6TeVhinosplit
       // xsec binning is not as fine as before, unavailable mass points are commented out
       //if(hig_mass ==127) { xsec = 7.6022; xsec_unc = 0.0393921; return;}
-      else if(hig_mass ==150) { xsec = 0.80460; xsec_unc = 0.040361; return;}
+      if(hig_mass ==150) { xsec = 0.80460; xsec_unc = 0.040361; return;}
       //else if(hig_mass ==175) { xsec = 2.26794; xsec_unc = 0.044299; return;}
       else if(hig_mass ==200) { xsec = 0.2761; xsec_unc = 0.034986; return;}
       //else if(hig_mass ==225) { xsec = 0.860597; xsec_unc = 0.0504217; return;}
