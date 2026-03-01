@@ -894,10 +894,10 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
     else if (dataset==Dataset::EGamma                      	     					                 && doubleeg_trigs) return true;
     else if ((year>=2018) && dataset==Dataset::EGamma               		  			   		   && egamma_trigs) return true;
     else if ((year==2016||year==2017) && dataset==Dataset::SingleElectron 				    		   && egamma_trigs) return true;
-    else if ((year<=2018) && dataset==Dataset::MET 			 	          && met_trigs && !doubleeg_trigs && !egamma_trigs) return true;
-    else if ((year<=2018) && dataset==Dataset::JetHT 	    		  && jetht_trigs && !met_trigs && !doubleeg_trigs && !egamma_trigs) return true;
+    else if ((year<=2022) && dataset==Dataset::MET 			 	          && met_trigs && !doubleeg_trigs && !egamma_trigs) return true;
+    else if ((year<=2022) && dataset==Dataset::JetHT 	    		  && jetht_trigs && !met_trigs && !doubleeg_trigs && !egamma_trigs) return true;
     else if ((year>=2022) && dataset==Dataset::JetMET	   		 && (jetht_trigs || met_trigs) && !doubleeg_trigs && !egamma_trigs) return true;
-    else if ((year<=2018) && dataset==Dataset::SingleMuon  && muon_trigs && !jetht_trigs && !met_trigs && !doubleeg_trigs && !egamma_trigs) return true;
+    else if ((year<=2022) && dataset==Dataset::SingleMuon  && muon_trigs && !jetht_trigs && !met_trigs && !doubleeg_trigs && !egamma_trigs) return true;
     else if ((year>=2022) && dataset==Dataset::Muon	   && muon_trigs && !jetht_trigs && !met_trigs && !doubleeg_trigs && !egamma_trigs) return true;
     else return false;
     return true;
