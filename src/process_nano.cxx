@@ -387,8 +387,8 @@ int main(int argc, char *argv[]){
     pico.out_npv_good() = nano.PV_npvsGood();
     // number of pileup in mc
     if (!isData) {
-      pico.out_npu_tru() = 1; //nano.Pileup_nPU();
-      pico.out_npu_tru_mean() = 1; //nano.Pileup_nTrueInt();
+      pico.out_npu_tru() = nano.Pileup_nPU();
+      pico.out_npu_tru_mean() = nano.Pileup_nTrueInt();
     }
     
     //pileup energy density
