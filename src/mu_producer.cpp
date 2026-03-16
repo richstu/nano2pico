@@ -18,7 +18,8 @@ MuonProducer::MuonProducer(string year_, bool isData_, float nanoaod_version_, s
   rng(4357),
   nanoaod_version(nanoaod_version_),
   run3(false){
-  if (year=="2022") {
+  if(year == "2016" || year == "2017" || year == "2018");
+  else if (year=="2022") {
     cs_scare_ = correction::CorrectionSet::from_file(
         "data/zgamma/2022/muon_scalesmearing.json");
     run3 = true;
