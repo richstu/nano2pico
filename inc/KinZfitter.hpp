@@ -60,7 +60,7 @@ class KinZfitter {
   KinZfitter(TString pdf_filename);
 
   /// Kinematic fit of lepton momenta
-  void Setup(std::map<unsigned int, TLorentzVector> selectedLeptons, std::map<unsigned int, TLorentzVector> selectedFsrPhotons, std::map<unsigned int, double> errorLeptons);
+  void Setup(std::map<unsigned int, TLorentzVector> selectedLeptons, std::map<unsigned int, TLorentzVector> selectedFsrPhotons, std::map<unsigned int, double> errorLeptons, int lepid);
 
   ///
   void KinRefitZ1();
@@ -70,13 +70,14 @@ class KinZfitter {
                   unsigned int nfsrph,
                   double ptg3 = 0, double phig3 = 0, double etag3 = 0, double sigmag3 = 1,
                   double ptg4 = 0, double phig4 = 0, double etag4 = 0, double sigmag4 = 1);
+  void setEs(double pT1, double pT2, unsigned int nfsrph, double pT3 = 0, double pT4 = 0);
+  void setmZ(double pT1, double pT2, unsigned int nfsrph, double pT3 = 0, double pT4 = 0);
+  double gaussian(double x, double mu, double sigma);
+  void evaluateShape(double pT1, double pT2, unsigned int nfsrph, double pT3 = 0, double pT4 = 0);
+
   double NLL_0(const double *pTs);
   double NLL_1(const double *pTs);
   double NLL_2(const double *pTs);
-  double gradNLL_0(const double *pTs, unsigned int dim);
-  double gradNLL_1(const double *pTs, unsigned int dim);
-  double gradNLL_2(const double *pTs, unsigned int dim);
-  
 
 
   int  PerZ1Likelihood(double & l1, double & l2, double & lph1, double & lph2);
@@ -129,11 +130,13 @@ class KinZfitter {
   std::vector<TLorentzVector> p4sZ1_, p4sZ1ph_;
   std::vector<TLorentzVector> p4sZ1REFIT_, p4sZ1phREFIT_;
 
-  double bw_mass_, bw_width_, pTl1_, pTl2_, pTg3_, pTg4_, 
-                              phil1_, phil2_, phig3_, phig4_, 
-                              etal1_, etal2_, etag3_, etag4_,
-                              sigmal1_, sigmal2_, sigmag3_, sigmag4_,
-                              ml1_, ml2_;
+  int lepid_;
+  double pTl1_, pTl2_, pTg3_, pTg4_, 
+         phil1_, phil2_, phig3_, phig4_, 
+         etal1_, etal2_, etag3_, etag4_,
+         sigmal1_, sigmal2_, sigmag3_, sigmag4_,
+         ml1_, ml2_;
+  double En1_, En2_, En3_, En4_, mll_, shapeEval_;
   const long double PI = acos(-1.L);
   /// pTerr vector
   std::vector<double> pTerrsZ1_, pTerrsZ1ph_;
