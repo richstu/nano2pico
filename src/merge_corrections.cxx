@@ -67,6 +67,7 @@ int main(int argc, char *argv[]){
   else if (Contains(input_paths[0], "RunIIAutumn18")) year = 2017;
   else if (Contains(input_paths[0], "Run3Summer22")) year = 2022;
   else if (Contains(input_paths[0], "Run3Summer23")) year = 2023;
+  else if (Contains(input_paths[0], "RunIII2024Summer24")) year = 2024;
 
   bool is_zgamma = Contains(output_path, "zgamma");
   //if (Contains(input_paths[0], "RunIISummer20")) {
@@ -220,7 +221,7 @@ void FixLumi(corrections_tree &corr, const string &corr_path, int year){
     int mglu = GetGluinoMass(corr_path);
     xsec::gluinoCrossSection(mglu, xsec, exsec);
   }else{
-    xsec = xsec::crossSection(corr_path, year);  
+    xsec = xsec::crossSection(corr_path, year);
   }
 
   corr.out_w_lumi() = xsec*lumi/corr.out_neff();

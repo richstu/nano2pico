@@ -58,7 +58,6 @@ void GetOptions(int argc, char *argv[]);
 
 int main(int argc, char *argv[]){
   GetOptions(argc, argv);
-
   if(in_file=="" || in_dir=="" || out_dir == "") {
     cout<<"ERROR: Input file, sum-of-weights and/or output directory not specified. Exit."<<endl;
     exit(1);
@@ -92,6 +91,7 @@ int main(int argc, char *argv[]){
       else if (regex_search(in_file, std::regex("RunIIAutumn18"))) year = 2018;
       else if (regex_search(in_file, std::regex("Run3Summer22"))) year = 2022;
       else if (regex_search(in_file, std::regex("Run3Summer23"))) year = 2023;
+      else if (regex_search(in_file, std::regex("RunIII2024Summer24"))) year = 2024;
     }
   } else { // Data
     if (Contains(in_file, "HIPM")) isAPV = true;
@@ -100,6 +100,8 @@ int main(int argc, char *argv[]){
     else if (Contains(in_file, "Run2018")) year = 2018;
     else if (Contains(in_file, "Run2022")) year = 2022;
     else if (Contains(in_file, "Run2023")) year = 2023;
+    else if (Contains(in_file, "Run2024")) year = 2024;
+    else if (Contains(in_file, "Run2025")) year = 2025;
   }
   if (year < 0) {
     cout<<"ERROR: Add code for new year!"<<endl;
@@ -142,6 +144,9 @@ int main(int argc, char *argv[]){
   else if (year == 2022 && !is2022preEE)   year_string = "2022EE";
   else if (year == 2023 && is2023preBPix)  year_string = "2023";
   else if (year == 2023 && !is2023preBPix) year_string = "2023BPix";
+  else if (year == 2024)                   year_string = "2024";
+  else if (year == 2025)                   year_string = "2025";
+  else if (year == 2026)                   year_string = "2026";
   else {
     cout << "ERROR: unknown year";
     exit(1);
@@ -195,6 +200,12 @@ int main(int argc, char *argv[]){
       case 2023:
         if (Contains(in_file, "2023")) VVRunLumi = MakeVRunLumi("golden2023");
         break;
+      case 2024:
+        if (Contains(in_file, "2024")) VVRunLumi = MakeVRunLumi("golden2024");
+        break;
+      case 2025:
+        if (Contains(in_file, "2025")) VVRunLumi = MakeVRunLumi("golden2025");
+        break;
       default:
         cout << "ERROR: no golden cert for given year" << endl;
         exit(1);
@@ -227,7 +238,9 @@ int main(int argc, char *argv[]){
 
   // B-tag working points
   // Updated Values May-28-2024 from https://btv-wiki.docs.cern.ch/ScaleFactors/
+  // 2024 values from https://indico.cern.ch/event/1556659/contributions/6559758/attachments/3083466/5458488/BTag_250610_Summer24WPs.pdf
   // btag_df: WPs for deepJet (DeepFlavourB)
+  cout<<"B tag weighting using temporary values for 2024, 2025, 2026"<<endl;
   map<string, vector<float>> btag_df_wpts{
     {"2016APV", vector<float>({0.0508, 0.2598, 0.6502})},
     {"2016", vector<float>({0.0480, 0.2489, 0.6377})},
@@ -236,7 +249,10 @@ int main(int argc, char *argv[]){
     {"2022", vector<float>({0.0583, 0.3086, 0.7183})},
     {"2022EE", vector<float>({0.0614, 0.3196, 0.73})},
     {"2023", vector<float>({0.0479, 0.2431, 0.6553})},
-    {"2023BPix", vector<float>({0.048, 0.2435, 0.6563})}
+    {"2023BPix", vector<float>({0.048, 0.2435, 0.6563})},
+    {"2024", vector<float>({0.0485, 0.2480, 0.6708})},
+    {"2025", vector<float>({0.048, 0.2435, 0.6563})},
+    {"2026", vector<float>({0.048, 0.2435, 0.6563})}
   };
   // WPs for Run 3 values are for PNet, Run 2 values are for deepCSV (DeepB)
   map<string, vector<float>> btag_wpts{
@@ -247,7 +263,14 @@ int main(int argc, char *argv[]){
     {"2022", vector<float>({0.047,  0.245,  0.6734})},
     {"2022EE", vector<float>({0.0499, 0.2605, 0.6915})},  
     {"2023", vector<float>({0.0358, 0.1917, 0.6172})},
-    {"2023BPix", vector<float>({0.0359, 0.1919, 0.6133})}
+    {"2023BPix", vector<float>({0.0359, 0.1919, 0.6133})},
+    {"2024", vector<float>({0.0365, 0.1990, 0.6373})},
+    {"2025", vector<float>({0.0359, 0.1919, 0.6133})},
+    {"2026", vector<float>({0.0359, 0.1919, 0.6133})}
+  };
+  // WPs for Particle Transformer (UParT) in NanoAODv15
+  map<string, vector<float>> btag_upt_wpts{
+    {"2024", vector<float>({0.0246, 0.1272, 0.4648})}
   };
 
   // Rochester corrections
@@ -289,7 +312,6 @@ int main(int argc, char *argv[]){
   GammaGammaVarProducer gammagamma_producer(year);
   BBVarProducer bb_producer(year);
   BBGammaGammaVarProducer bbgammagamma_producer(year);
-
   //Initialize scale factor tools
   const string ctr = "central";
   const vector<string> updn = {"up","down"};
@@ -305,7 +327,6 @@ int main(int argc, char *argv[]){
   EventWeighter event_weighter(year_string, btag_df_wpts[year_string]);
   TriggerWeighter trigger_weighter(year_string);
   //cout<<"Is APV: "<<isAPV<<endl;
-
   // Other tools
   EventTools event_tools(in_path, year, isData, nanoaod_version);
   int event_type = event_tools.GetEventType();
@@ -335,7 +356,6 @@ int main(int argc, char *argv[]){
   cout << "Writing sum-of-weights to: " << wgt_sums_path << endl;
   Initialize(wgt_sums);
   wgt_sums.out_nent() = nentries;
-
   for(size_t entry(0); entry<nentries; ++entry){
     if (debug) cout << "GetEntry: " << entry <<" event = "<<pico.out_event()<< endl;
     nano.GetEntry(entry);
@@ -343,11 +363,9 @@ int main(int argc, char *argv[]){
       cout<<"Processing event: "<<entry<<endl;
     }
     //skip events that are data but not in the golden json
-
     if (isData) {
       if(!inJSON(VVRunLumi, nano.run(), nano.luminosityBlock())) continue; 
     }
-
     bool passed_trig = event_tools.SaveTriggerDecisions(nano, pico, isZgamma);
     if (isData && !passed_trig) {
       continue;
@@ -370,7 +388,6 @@ int main(int argc, char *argv[]){
     //pileup energy density
     if (nanoaod_version >= 11 || nanoaod_version == 9.5)
       pico.out_rho() = nano.fixedGridRhoAll();
-
     // ----------------------------------------------------------------------------------------------
     //            *** Writing physics objects ***
     // N.B. Order in which producers are called matters! E.g. jets are not counted if overlapping 
@@ -423,8 +440,8 @@ int main(int argc, char *argv[]){
     vector<HiggsConstructionVariables> sys_higvars;
     vector<int> sig_jet_nano_idx = jetmet_producer.WriteJetMet(nano, pico, 
         jet_islep_nano_idx, jet_isvlep_nano_idx, jet_isphoton_nano_idx,
-        btag_wpts[year_string], btag_df_wpts[year_string], isFastsim, isSignal,
-        sys_higvars);
+        btag_wpts[year_string], btag_df_wpts[year_string], btag_upt_wpts[year_string],
+        isFastsim, isSignal, sys_higvars);
     jetmet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year_string][1], isFastsim); // usually w.r.t. medium WP
     jetmet_producer.WriteFatJets(nano, pico); // jetmet_producer.SetVerbose(nano.nSubJet()>0);
     jetmet_producer.WriteSubJets(nano, pico);
@@ -731,9 +748,8 @@ int main(int argc, char *argv[]){
 
   cout<<endl;
   time(&endtime); 
-  cout<<"Time passed: "<<hoursMinSec(difftime(endtime, begtime))<<endl<<endl;  
+  cout<<"Time passed: "<<hoursMinSec(difftime(endtime, begtime))<<endl<<endl; 
 }
-
 void Initialize(corrections_tree &wgt_sums){
   wgt_sums.out_neff()              = 0;
   wgt_sums.out_nent_zlep()         = 0;
@@ -784,7 +800,6 @@ void Initialize(corrections_tree &wgt_sums){
   wgt_sums.out_sys_ps().resize(4,0);
   //wgt_sums.out_sys_pdf().resize(102,0);
 }
-
 void GetOptions(int argc, char *argv[]){
   while(true){
     static struct option long_options[] = {

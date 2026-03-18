@@ -40,14 +40,14 @@ def addRootEnv(_env):
 
 def addWarningEnv(_env):
   _env.Append (CCFLAGS = ['-pedantic', 
-                          '-Wall', '-Wextra', '-Werror', '-Wold-style-cast', 
+                          '-Wall', '-Wextra', '-Werror', 
                           '-Wcast-align', '-Wcast-qual', '-Wdisabled-optimization', 
                           '-Wformat=2', '-Wformat-nonliteral', '-Wformat-security', 
-                          '-Wformat-y2k', '-Winit-self', '-Winvalid-pch', '-Wlong-long', 
+                          '-Wformat-y2k', '-Winit-self', '-Winvalid-pch', 
                           '-Wmissing-format-attribute', '-Wmissing-include-dirs',
                           '-Wpacked', '-Wpointer-arith', '-Wredundant-decls', '-Wstack-protector', 
                           '-Wundef', '-Wvariadic-macros', '-Wmissing-noreturn', 
-                          '-Wwrite-strings', '-Wctor-dtor-privacy', '-Wnon-virtual-dtor', '-Wsign-promo', '-Wsign-compare', 
+                          '-Wwrite-strings', '-Wnon-virtual-dtor', '-Wsign-promo', '-Wsign-compare', 
                           '-Wunreachable-code', 
                           '-Woverloaded-virtual', '-Wshadow', '-Wswitch-default', '-Wswitch-enum', '-Wunused', 
                           #'-Wsign-conversion', '-Wfloat-equal', '-Wunsafe-loop-optimizations', 
@@ -55,6 +55,11 @@ def addWarningEnv(_env):
 
 def addExternalEnv(_env):
   _env.Append (CCFLAGS = '-isystem external_inc' )
+  _env.Append (CCFLAGS = '-I/cvmfs/cms.cern.ch/slc7_amd64_gcc12/external/boost/1.80.0-8fff1263a7a313628bebc28367c90c82/include') #up to date boost
+  _env.Append (CCFLAGS = '-I/cvmfs/cms.cern.ch/slc7_amd64_gcc12/external/py3-correctionlib/2.6.4-b0957bf077f48ecce521a0a7ef6562c4/lib/python3.9/site-packages/correctionlib/include') #correctionlib associated with CMSSW_14_2_2
+  _env.Append (LINKFLAGS = '-L/cvmfs/cms.cern.ch/slc7_amd64_gcc12/external/py3-correctionlib/2.6.4-b0957bf077f48ecce521a0a7ef6562c4/lib/python3.9/site-packages/correctionlib/lib')
+  _env.Append (LINKFLAGS = '-lcorrectionlib')
+
 
 def addBasicEnv(_env):
   if not DEBUG:

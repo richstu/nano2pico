@@ -5,7 +5,7 @@
 #include <utility>
 #include <vector>
 
-#include "correction.hpp"
+#include "correction.h"
 #include "pico_tree.hpp"
 
 enum class LeptonHLTStatus {fail_all=0, pass_lowerdilep=1, pass_upperdilep=2, pass_singlelep=3};

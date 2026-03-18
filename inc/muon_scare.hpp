@@ -5,7 +5,7 @@
 #include <memory>
 #include <string>
 
-#include "correction.hpp"
+#include "correction.h"
 
 namespace scarekit {
 

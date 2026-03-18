@@ -9,7 +9,7 @@
 #include "TH2D.h"
 #include "TH2F.h"
 
-#include "correction.hpp"
+#include "correction.h"
 #include "zgbkg_isr_weighter.hpp"
 #include "photon_shape_weighter.hpp"
 #include "pico_tree.hpp"

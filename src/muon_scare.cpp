@@ -1,6 +1,7 @@
 #include "muon_scare.hpp"
 
 #include <boost/math/special_functions/erf.hpp>
+#include <iostream>
 #include <memory>
 #include "TRandom3.h"
 

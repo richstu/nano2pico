@@ -371,7 +371,8 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
   vector<float> Jet_pt, Jet_mass;
   getJetWithJEC(nano, isFastsim, Jet_pt, Jet_mass);
   vector<int> Jet_jetId;
-  getJetId(nano, nanoaod_version, Jet_jetId);
+  
+  if  ((nanoaod_version+0.01) < 13) getJetId(nano, nanoaod_version, Jet_jetId);
 
   // jet quality filter
   pico.out_pass_jets() = true;
@@ -393,13 +394,13 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
         }
       }
     }
-  } else { // Fullsim: require just loosest possible ID for now (for all jets, not just central!)
+  } else if ((nanoaod_version+0.01) < 13){ // Fullsim: require just loosest possible ID for now (for all jets, not just central!)
+                                           // Jet Id doesn't exist for NanoAODv15
     for(int ijet(0); ijet<nano.nJet(); ++ijet){
       if (Jet_pt[ijet] > min_jet_pt && Jet_jetId[ijet] < 1) 
         pico.out_pass_jets() = false;
     } 
   }
-
   // RA2b filters  
   pico.out_pass_muon_jet() = true; 
   for (auto &idx: sig_jet_nano_idx){
@@ -747,26 +748,26 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
                                 nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ() ||
                                 nano.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ();
   }
-  if (year==2017) {
+  else if (year==2017) {
     pico.out_trig_single_el() = pico.out_HLT_Ele32_WPTight_Gsf_Emu();
     pico.out_trig_double_el() = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL();
     pico.out_trig_single_mu() = nano.HLT_IsoMu27();
     pico.out_trig_double_mu() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8() || 
                                 nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8();
   }
-  if (year==2018) {
+  else if (year==2018) {
     pico.out_trig_single_el() = nano.HLT_Ele32_WPTight_Gsf();
     pico.out_trig_double_el() = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL();
     pico.out_trig_single_mu() = nano.HLT_IsoMu24();
     pico.out_trig_double_mu() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8();
   }
-  if (year==2022) {
+  else if (year==2022) {
     pico.out_trig_single_el() = nano.HLT_Ele30_WPTight_Gsf(); 
     pico.out_trig_double_el() = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL();
     pico.out_trig_single_mu() = nano.HLT_IsoMu24();
     pico.out_trig_double_mu() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8();
   }
-  if (year==2023) {
+  else if (year==2023) {
     //Ele30 is enabled & unprescaled in some of 2023, but it is unclear from
     //POG presentations whether it was enabled until the LHC RQX.L8 incident
     pico.out_trig_single_el() = nano.HLT_Ele30_WPTight_Gsf(); 
@@ -774,7 +775,13 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
     pico.out_trig_single_mu() = nano.HLT_IsoMu24();
     pico.out_trig_double_mu() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8();
   }
-
+  else {
+    pico.out_trig_single_el() = nano.HLT_Ele30_WPTight_Gsf();
+    pico.out_trig_double_el() = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL();
+    pico.out_trig_single_mu() = nano.HLT_IsoMu24();
+    pico.out_trig_double_mu() = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8();
+    //std::cout << "WARNING: No triggers chosen for given year, defaulting to 2023BPix" << std::endl;
+  }
   //overlap removal performed based on trigger decisions
   if (isZgamma) {
     // this assumes that we process all the single and dileptondatasets

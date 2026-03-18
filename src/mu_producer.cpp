@@ -1,7 +1,7 @@
 #include "mu_producer.hpp"
 
 
-#include "correction.hpp"
+#include "correction.h"
 #include "muon_scare.hpp"
 #include "utilities.hpp"
 
@@ -20,23 +20,34 @@ MuonProducer::MuonProducer(string year_, bool isData_, float nanoaod_version_, s
   run3(false){
   if (year=="2022") {
     cs_scare_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2022/2022_Summer22.json");
+        "data/zgamma/2022/muon_scalesmearing.json");
     run3 = true;
   }
   else if (year=="2022EE") {
     cs_scare_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2022EE/2022_Summer22EE.json");
+        "data/zgamma/2022EE/muon_scalesmearing.json");
     run3 = true;
   }
   else if (year=="2023") {
     cs_scare_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2023/2023_Summer23.json");
+        "data/zgamma/2023/muon_scalesmearing.json");
     run3 = true;
   }
   else if (year=="2023BPix") {
     cs_scare_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2023BPix/2023_Summer23BPix.json");
+        "data/zgamma/2023BPix/muon_scalesmearing.json");
     run3 = true;
+  }
+  else if (year=="2024") {
+    cs_scare_ = correction::CorrectionSet::from_file(
+        "data/zgamma/2024/muon_scalesmearing.json");
+    run3 = true;
+  }
+  else {
+    cs_scare_ = correction::CorrectionSet::from_file(
+        "data/zgamma/2023BPix/muon_scalesmearing.json");
+    run3 = true;
+    std::cout << "WARNING: No dedicated ScaRe correction jsons for chosen year, defaulting to 2023BPix" << std::endl;
   }
 }
 
