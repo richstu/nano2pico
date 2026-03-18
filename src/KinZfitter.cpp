@@ -9,8 +9,44 @@
 /// KinFitter header
 #include "KinZfitter.hpp"
 #include "RooHelpers.h"
+#include <chrono>
+
+void KinZfitter::set_consts(double ptl1, double phil1, double etal1, double sigmal1, double ml1,
+                            double ptl2, double phil2, double etal2, double sigmal2, double ml2,
+                            unsigned int nfsrph,
+                            double ptg3, double phig3, double etag3, double sigmag3,
+                            double ptg4, double phig4, double etag4, double sigmag4){
+  pTl1_      = ptl1;
+  pTl2_      = ptl2;
+  phil1_     = phil1;
+  phil2_     = phil2;
+  etal1_     = etal1;
+  etal2_     = etal2;
+  if(lepid_ == 11){//Left in place in case we want to investigate lepton split refit in future.
+    sigmal1_   = sigmal1;
+    sigmal2_   = sigmal2;
+  }else {
+    sigmal1_   = sigmal1;
+    sigmal2_   = sigmal2;
+  }
+  ml1_       = ml1;
+  ml2_       = ml2;
+  if(nfsrph>0){
+    pTg3_    = ptg3;
+    phig3_   = phig3;
+    etag3_   = etag3;
+    sigmag3_ = sigmag3;
+  }
+  if(nfsrph>1){
+    pTg4_    = ptg4;
+    phig4_   = phig4;
+    etag4_   = etag4;
+    sigmag4_ = sigmag4;
+  }
+}
 
 KinZfitter::KinZfitter() {
+
 
   //Default values drawn from HZg_Crystal_ball_and_3Gaussian_fit.txt
   PDFName_ = "./txt/constrained_fit_input/HZg_Crystal_ball_and_3Gaussian_fit.txt";
@@ -29,6 +65,7 @@ KinZfitter::KinZfitter() {
   f3_          = 0.648225;
   threegauss_  = true;
 
+
   //This flag will bypass the section that reads a text file for the input values
   debug_ = false;
   if(debug_) std::cout << "KinZfitter. The debug flag is ON with "<<PDFName_<< std::endl;
@@ -36,9 +73,9 @@ KinZfitter::KinZfitter() {
 
 //This constructor takes a .txt file with the probability distribution function
 KinZfitter::KinZfitter(TString pdf_txtfile){
+
   PDFName_ = pdf_txtfile;
   debug_ = false;
-
   std::ifstream input(PDFName_);
   std::string line;
   if(debug_) cout<<"PDFName_ in "<<PDFName_<<endl;
@@ -79,9 +116,128 @@ KinZfitter::KinZfitter(TString pdf_txtfile){
       }
     }
   }
-  input.close(); 
-
+  input.close();
   if(debug_) std::cout << "KinZfitter. The debug flag is ON with "<<PDFName_<< std::endl;
+}
+
+
+void KinZfitter::setEs(double pT1, double pT2, unsigned int nfsrph, double pT3, double pT4){
+  En1_ = sqrt(pow(pT1,2)*(1 + pow(sinh(etal1_),2)) + pow(ml1_,2));
+  En2_ = sqrt(pow(pT2,2)*(1 + pow(sinh(etal2_),2)) + pow(ml2_,2));
+  En3_ = 0;
+  En4_ = 0;
+  if(nfsrph>0) En3_ = sqrt(pow(pT3,2)*(1 + pow(sinh(etag3_),2)));
+  if(nfsrph>1) En4_ = sqrt(pow(pT4,2)*(1 + pow(sinh(etag4_),2)));
+}
+
+void KinZfitter::setmZ(double pT1, double pT2, unsigned int nfsrph, double pT3, double pT4){
+  mll_ = 0;
+  if(nfsrph == 0){
+    mll_ = sqrt(pow((En1_ + En2_),2) - pow((pT1*cos(phil1_) + pT2*cos(phil2_)),2) 
+          - pow((pT1*sin(phil1_) + pT2*sin(phil2_)),2) - pow((pT1*sinh(etal1_) + pT2*sinh(etal2_)),2));
+  } else if (nfsrph == 1){
+    mll_ = sqrt(pow((En1_ + En2_ + En3_),2) - pow((pT1*cos(phil1_) + pT2*cos(phil2_) + pT3*cos(phig3_)),2)
+                                            - pow((pT1*sin(phil1_) + pT2*sin(phil2_) + pT3*sin(phig3_)),2)
+                                            - pow((pT1*sinh(etal1_) + pT2*sinh(etal2_) + pT3*sinh(etag3_)),2));
+  } else if (nfsrph ==2){
+    mll_ = sqrt(pow((En1_ + En2_ + En3_ + En4_),2) - pow((pT1*cos(phil1_) + pT2*cos(phil2_) + pT3*cos(phig3_) + pT4*cos(phig4_)),2)
+                                                   - pow((pT1*sin(phil1_) + pT2*sin(phil2_) + pT3*sin(phig3_) + pT4*sin(phig4_)),2)
+                                                   - pow((pT1*sinh(etal1_) + pT2*sinh(etal2_) + pT3*sinh(etag3_) + pT4*sinh(etag4_)),2));
+  }
+}
+
+double KinZfitter::gaussian(double x, double mu, double sigma){
+  return exp(-0.5*pow(x - mu,2)/pow(sigma,2))/(sigma*sqrt(2*PI));
+}
+
+void KinZfitter::evaluateShape(double pT1, double pT2, unsigned int nfsrph, double pT3, double pT4){
+  if(nfsrph == 0){
+    setEs(pT1, pT2, 0);
+    setmZ(pT1, pT2, 0);
+  } else if (nfsrph == 1){
+    setEs(pT1, pT2, 1, pT3);
+    setmZ(pT1, pT2, 1, pT3);
+  } else if (nfsrph == 2){
+    setEs(pT1, pT2, 2, pT3, pT4);
+    setmZ(pT1, pT2, 2, pT3, pT4);
+  }
+  double mll = mll_;
+  double gausst1, gausst2, gausst3;
+  gausst1 = gaussian(mll, meanGauss1_, sigmaGauss1_);
+  gausst2 = gaussian(mll, meanGauss2_, sigmaGauss2_);
+  gausst3 = gaussian(mll, meanGauss3_, sigmaGauss3_);
+  double CBA = pow(nCB_/alphaCB_,nCB_)*exp(-pow(alphaCB_,2)/2);
+  double CBB = nCB_/alphaCB_ - alphaCB_; 
+  double CBC = (nCB_/alphaCB_)*(1/(nCB_-1))*exp(-pow(alphaCB_,2)/2);
+  double CBD = sqrt(PI/2)*(1+erf(alphaCB_/sqrt(2)));
+
+  double CBt = 0;
+  if(mll - meanCB_ > -1*alphaCB_ * sigmaCB_){
+    CBt = 1*exp(-0.5*pow(mll - meanCB_,2)/pow(sigmaCB_,2));
+  } else if(mll - meanCB_ <= -1*alphaCB_ * sigmaCB_){
+    CBt = 1*CBA*pow((CBB - (mll-meanCB_)/sigmaCB_),-1*nCB_);
+  }
+  CBt = CBt/(sigmaCB_*(CBC+CBD));
+  shapeEval_ = (((f1_*CBt + (1-f1_)*gausst1)*f2_ + (1-f2_)*gausst2)*f3_ + (1-f3_)*gausst3);
+}
+
+double KinZfitter::NLL_0(const double *pTs){
+  double pTl1r = pTs[0];
+  double pTl2r = pTs[1];
+  double gauss1, gauss2, full, NLL;
+  setEs(pTl1r, pTl2r, 0);
+  setmZ(pTl1r, pTl2r, 0);
+
+  gauss1 = gaussian(pTl1r, pTl1_, sigmal1_);
+  gauss2 = gaussian(pTl2r, pTl2_, sigmal2_);
+  
+  evaluateShape(pTl1r, pTl2r, 0); 
+
+  full = gauss1*gauss2*shapeEval_;//Normalized
+  NLL = -log(full);
+  return NLL;
+}
+
+double KinZfitter::NLL_1(const double *pTs){
+  double pTl1r = pTs[0];
+  double pTl2r = pTs[1];
+  double pTg3r = pTs[2];
+
+  double gauss1, gauss2, gauss3, full, NLL;
+  setEs(pTl1r, pTl2r, 1, pTg3r);
+  setmZ(pTl1r, pTl2r, 1, pTg3r);
+
+  gauss1 = gaussian(pTl1r, pTl1_, sigmal1_);
+  gauss2 = gaussian(pTl2r, pTl2_, sigmal2_);
+  gauss3 = gaussian(pTg3r, pTg3_, sigmag3_);
+
+  evaluateShape(pTl1r, pTl2r, 1, pTg3r);
+
+  full = gauss1*gauss2*gauss3*shapeEval_;//Normalized
+  NLL = -log(full);
+  return NLL;
+}
+
+double KinZfitter::NLL_2(const double *pTs){
+  double pTl1r = pTs[0];
+  double pTl2r = pTs[1];
+  double pTg3r = pTs[2];
+  double pTg4r = pTs[3];
+
+  double gauss1, gauss2, gauss3, gauss4, full, NLL;
+  setEs(pTl1r, pTl2r, 2, pTg3r, pTg4r);
+  setmZ(pTl1r, pTl2r, 2, pTg3r, pTg4r);
+
+  gauss1 = gaussian(pTl1r, pTl1_, sigmal1_);
+  gauss2 = gaussian(pTl2r, pTl2_, sigmal2_);
+  gauss3 = gaussian(pTg3r, pTg3_, sigmag3_);
+  gauss4 = gaussian(pTg4r, pTg4_, sigmag4_);
+
+  evaluateShape(pTl1r, pTl2r, 2, pTg3r, pTg4r);
+  
+  full = gauss1*gauss2*gauss3*gauss4*shapeEval_;//Normalized
+  NLL = -log(full);
+  return NLL;
 }
 
 
@@ -161,7 +317,7 @@ double KinZfitter::pterr(TLorentzVector ph){
 }
 
 
-void KinZfitter::Setup(std::map<unsigned int, TLorentzVector> selectedLeptons, std::map<unsigned int, TLorentzVector> selectedFsrPhotons, std::map<unsigned int, double> errorLeptons) {
+void KinZfitter::Setup(std::map<unsigned int, TLorentzVector> selectedLeptons, std::map<unsigned int, TLorentzVector> selectedFsrPhotons, std::map<unsigned int, double> errorLeptons, int lepid) {
 
   // reset everything for each event
   p4sZ1_.clear();
@@ -177,6 +333,7 @@ void KinZfitter::Setup(std::map<unsigned int, TLorentzVector> selectedLeptons, s
   gErrorIgnoreLevel = kWarning;
   RooMsgService::instance().setStreamStatus(1,false);
   initZs(selectedLeptons, selectedFsrPhotons, errorLeptons);
+  lepid_ = lepid;
   if(debug_){ cout << "Setup complete" << endl;} 
 }
 
@@ -388,7 +545,6 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
 
   double RECOpT1 = Z1_1.Pt();
   double RECOpT2 = Z1_2.Pt();
-
   double pTerrZ1_1 = pTerrsZ1_[0];
   double pTerrZ1_2 = pTerrsZ1_[1];
 
@@ -417,283 +573,145 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
     Z1_ph2 = p4sZ1ph_[1]; pTerrZ1_ph2 = pTerrsZ1ph_[1];
     RECOpTph2 = Z1_ph2.Pt();
   }
+
   double RECOpTph1min = max(0.0, RECOpTph1-3*pTerrZ1_ph1);
   double RECOpTph2min = max(0.0, RECOpTph2-3*pTerrZ1_ph2);
   double RECOpTph1max = RECOpTph1 < 2 ? RECOpTph1min : RECOpTph1+3*pTerrZ1_ph1;
   double RECOpTph2max = RECOpTph2 < 2 ? RECOpTph2min : RECOpTph2+3*pTerrZ1_ph2;
-
-  RooRealVar* pTph1RECO = new RooRealVar("pTph1RECO", "pTph1RECO", RECOpTph1, 2, 1200);
-  RooRealVar* pTph2RECO = new RooRealVar("pTph2RECO", "pTph2RECO", RECOpTph2, 2, 1200);
-
-  RooRealVar* pTph1 = new RooRealVar("pTph1", "pTph1FIT", RECOpTph1, RECOpTph1min, RECOpTph1max);
-  RooRealVar* pTph2 = new RooRealVar("pTph2", "pTph2FIT", RECOpTph2, RECOpTph2min, RECOpTph2max);
-
-  RooRealVar* pT1RECO = new RooRealVar("pT1RECO", "pT1RECO", RECOpT1, 5, 1200);
-  RooRealVar* pT2RECO = new RooRealVar("pT2RECO", "pT2RECO", RECOpT2, 5, 1200);
-
   double RECOpT1min = max(5.0, RECOpT1-3*pTerrZ1_1);
   double RECOpT2min = max(5.0, RECOpT2-3*pTerrZ1_2);
+  double RECOpT1max = RECOpT1+3*pTerrZ1_1;//why??
+  double RECOpT2max = RECOpT2+3*pTerrZ1_2;
 
-  // observables pT1,2,ph1,ph2
-  RooRealVar* pT1 = new RooRealVar("pT1", "pT1FIT", RECOpT1, RECOpT1min, RECOpT1+3*pTerrZ1_1 );
-  RooRealVar* pT2 = new RooRealVar("pT2", "pT2FIT", RECOpT2, RECOpT2min, RECOpT2+3*pTerrZ1_2 );
-
-  RooRealVar* m1 = new RooRealVar("m1", "m1", Z1_1.M());
-  RooRealVar* m2 = new RooRealVar("m2", "m2", Z1_2.M());
-
-  if(debug_) cout<<"m1 "<<m1->getVal()<<" m2 "<<m2->getVal()<<endl;
-
-  double Vtheta1, Vphi1, Vtheta2, Vphi2;
-  Vtheta1 = (Z1_1).Theta(); Vtheta2 = (Z1_2).Theta();
-  Vphi1 = (Z1_1).Phi(); Vphi2 = (Z1_2).Phi();
-
-  RooRealVar* theta1 = new RooRealVar("theta1", "theta1", Vtheta1);
-  RooRealVar* phi1   = new RooRealVar("phi1", "phi1", Vphi1);
-  RooRealVar* theta2 = new RooRealVar("theta2", "theta2", Vtheta2);
-  RooRealVar* phi2   = new RooRealVar("phi2", "phi2", Vphi2);
-
-  // dot product to calculate (p1+p2+ph1+ph2).M()
-  RooFormulaVar E1("E1", "TMath::Sqrt((@0*@0)/((TMath::Sin(@1))*(TMath::Sin(@1)))+@2*@2)",
-       RooArgList(*pT1, *theta1, *m1));
-  RooFormulaVar E2("E2", "TMath::Sqrt((@0*@0)/((TMath::Sin(@1))*(TMath::Sin(@1)))+@2*@2)",
-       RooArgList(*pT2, *theta2, *m2));
-  if(debug_) cout<<"E1 "<<E1.getVal()<<"; E2 "<<E2.getVal()<<endl;
-
-  /////
-
-  //This code is used to time the refit
-  //cout << "After variable def: " << static_cast<float>(clock())/CLOCKS_PER_SEC - time_start<< endl;
-
-  double Vthetaph1, Vphiph1, Vthetaph2, Vphiph2;
-  Vthetaph1 = (Z1_ph1).Theta(); Vthetaph2 = (Z1_ph2).Theta();
-  Vphiph1 = (Z1_ph1).Phi(); Vphiph2 = (Z1_ph2).Phi();
-
-  RooRealVar* thetaph1 = new RooRealVar("thetaph1", "thetaph1", Vthetaph1);
-  RooRealVar* phiph1   = new RooRealVar("phiph1", "phiph1", Vphiph1);
-  RooRealVar* thetaph2 = new RooRealVar("thetaph2", "thetaph2", Vthetaph2);
-  RooRealVar* phiph2   = new RooRealVar("phiph2", "phi2", Vphiph2);
-
-  RooFormulaVar Eph1("Eph1", "TMath::Sqrt((@0*@0)/((TMath::Sin(@1))*(TMath::Sin(@1))))",
-         RooArgList(*pTph1, *thetaph1));
-  RooFormulaVar Eph2("Eph2", "TMath::Sqrt((@0*@0)/((TMath::Sin(@1))*(TMath::Sin(@1))))",
-         RooArgList(*pTph2, *thetaph2));
-
-  //// dot products of 4-vectors
-
-  // 3-vector DOT
-  RooFormulaVar* p1v3D2 = new RooFormulaVar("p1v3D2",
-              "@0*@1*( ((TMath::Cos(@2))*(TMath::Cos(@3)))/((TMath::Sin(@2))*(TMath::Sin(@3)))+(TMath::Cos(@4-@5)))",
-              RooArgList(*pT1, *pT2, *theta1, *theta2, *phi1, *phi2));
-  if(debug_) cout<<"p1 DOT p2 is "<<p1v3D2->getVal()<<endl;
-  // 4-vector DOT metric 1 -1 -1 -1
-  RooFormulaVar p1D2("p1D2", "@0*@1-@2", RooArgList(E1, E2, *p1v3D2));
-
-  //lep DOT fsrPhoton1
-
-  // 3-vector DOT
-  RooFormulaVar* p1v3Dph1 = new RooFormulaVar("p1v3Dph1",
-                "@0*@1*( (TMath::Cos(@2)*TMath::Cos(@3))/(TMath::Sin(@2)*TMath::Sin(@3))+TMath::Cos(@4-@5))",
-                RooArgList(*pT1, *pTph1, *theta1, *thetaph1, *phi1, *phiph1));
-
-  // 4-vector DOT metric 1 -1 -1 -1
-  RooFormulaVar p1Dph1("p1Dph1", "@0*@1-@2", RooArgList(E1, Eph1, *p1v3Dph1));
-
-  // 3-vector DOT
-  RooFormulaVar* p2v3Dph1 = new RooFormulaVar("p2v3Dph1",
-                "@0*@1*( (TMath::Cos(@2)*TMath::Cos(@3))/(TMath::Sin(@2)*TMath::Sin(@3))+TMath::Cos(@4-@5))",
-                RooArgList(*pT2, *pTph1, *theta2, *thetaph1, *phi2, *phiph1));
-  // 4-vector DOT metric 1 -1 -1 -1
-  RooFormulaVar p2Dph1("p2Dph1", "@0*@1-@2", RooArgList(E2, Eph1, *p2v3Dph1));
-
-  // lep DOT fsrPhoton2
-
-  // 3-vector DOT
-  RooFormulaVar* p1v3Dph2 = new RooFormulaVar("p1v3Dph2",
-                "@0*@1*( (TMath::Cos(@2)*TMath::Cos(@3))/(TMath::Sin(@2)*TMath::Sin(@3))+TMath::Cos(@4-@5))",
-                RooArgList(*pT1, *pTph2, *theta1, *thetaph2, *phi1, *phiph2));
-
-  // 4-vector DOT metric 1 -1 -1 -1
-  RooFormulaVar p1Dph2("p1Dph2", "@0*@1-@2", RooArgList(E1, Eph2, *p1v3Dph2));
-
-  // 3-vector DOT
-  RooFormulaVar* p2v3Dph2 = new RooFormulaVar("p2v3Dph2",
-                "@0*@1*( (TMath::Cos(@2)*TMath::Cos(@3))/(TMath::Sin(@2)*TMath::Sin(@3))+TMath::Cos(@4-@5))",
-                RooArgList(*pT2, *pTph2, *theta2, *thetaph2, *phi2, *phiph2));
-  // 4-vector DOT metric 1 -1 -1 -1
-  RooFormulaVar p2Dph2("p2Dph2", "@0*@1-@2", RooArgList(E2, Eph2, *p2v3Dph2));
-
-  // fsrPhoton1 DOT fsrPhoton2
-
-  // 3-vector DOT
-  RooFormulaVar* ph1v3Dph2 = new RooFormulaVar("ph1v3Dph2",
-                 "@0*@1*( (TMath::Cos(@2)*TMath::Cos(@3))/(TMath::Sin(@2)*TMath::Sin(@3))+TMath::Cos(@4-@5))",
-                 RooArgList(*pTph1, *pTph2, *thetaph1, *thetaph2, *phiph1, *phiph2));
-  // 4-vector DOT metric 1 -1 -1 -1
-  RooFormulaVar ph1Dph2("ph1Dph2", "@0*@1-@2", RooArgList(Eph1, Eph2, *ph1v3Dph2));
-
-  //This code is used to time the refit
-  //cout << "After dot products: " << static_cast<float>(clock())/CLOCKS_PER_SEC - time_start<< endl;
-
-
-  // mZ1
-  RooFormulaVar* mZ1;
+  //auto startTime = std::chrono::steady_clock::now();
+  //Set global fit constants
   if(p4sZ1ph_.size()==0){
-    mZ1 = new RooFormulaVar("mZ1", "TMath::Sqrt(2*@0+@1*@1+@2*@2)", RooArgList(p1D2, *m1, *m2));
-  } else if(p4sZ1ph_.size()==1) {
-    mZ1 = new RooFormulaVar("mZ1", "TMath::Sqrt(2*@0+2*@1+2*@2+@3*@3+@4*@4)",
-          RooArgList(p1D2, p1Dph1, p2Dph1, *m1, *m2));
-  } else {
-    mZ1 = new RooFormulaVar("mZ1", "TMath::Sqrt(2*@0+2*@1+2*@2+2*@3+2*@4+2*@5+@6*@6+@7*@7)",
-          RooArgList(p1D2, p1Dph1, p2Dph1, p1Dph2, p2Dph2, ph1Dph2, *m1, *m2));
+    set_consts(Z1_1.Pt(), Z1_1.Phi(), Z1_1.Eta(), pTerrZ1_1, Z1_1.M(),
+               Z1_2.Pt(), Z1_2.Phi(), Z1_2.Eta(), pTerrZ1_2, Z1_2.M(),
+               p4sZ1ph_.size());
+    setEs(Z1_1.Pt(), Z1_2.Pt(), 0);
+    setmZ(Z1_1.Pt(), Z1_2.Pt(), 0);
+  } else if(p4sZ1ph_.size()==1){
+    set_consts(Z1_1.Pt(), Z1_1.Phi(), Z1_1.Eta(), pTerrZ1_1, Z1_1.M(),
+               Z1_2.Pt(), Z1_2.Phi(), Z1_2.Eta(), pTerrZ1_2, Z1_2.M(),
+               p4sZ1ph_.size(),
+               Z1_ph1.Pt(), Z1_ph1.Phi(), Z1_ph1.Eta(), pTerrZ1_ph1);
+    setEs(Z1_1.Pt(), Z1_2.Pt(), 1, Z1_ph1.Pt());
+    setmZ(Z1_1.Pt(), Z1_2.Pt(), 1, Z1_ph1.Pt());
+  } else if(p4sZ1ph_.size()==2){
+    set_consts(Z1_1.Pt(), Z1_1.Phi(), Z1_1.Eta(), pTerrZ1_1, Z1_1.M(),
+               Z1_2.Pt(), Z1_2.Phi(), Z1_2.Eta(), pTerrZ1_2, Z1_2.M(),
+               p4sZ1ph_.size(),
+               Z1_ph1.Pt(), Z1_ph1.Phi(), Z1_ph1.Eta(), pTerrZ1_ph1,
+               Z1_ph2.Pt(), Z1_ph2.Phi(), Z1_ph2.Eta(), pTerrZ1_ph2);
+    setEs(Z1_1.Pt(), Z1_2.Pt(), 1, Z1_ph1.Pt(), Z1_ph2.Pt());
+    setmZ(Z1_1.Pt(), Z1_2.Pt(), 1, Z1_ph1.Pt(), Z1_ph2.Pt());
   }
 
   //If mll is outside the bounds of the fit return mll without a fit
-  if(mZ1 -> getVal() < 60 || mZ1 -> getVal() > 120){return mZ1 -> getVal();}
+  if(mll_ < 60 || mll_ > 120) return mll_;
 
+  int status_my = -1;
+  int covstatus_my = -1;
+  double minnll_my = 1;
+  const double *xs;
+  const double *errs;
+  xs = 0; //dodging -Werror=maybe-uninitialized, these will not be used unless redefined later
+  errs = 0;
+  ROOT::Math::Minimizer* minimum =
+      ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
 
-  if(debug_) cout<<"mZ1 is "<<mZ1->getVal()<<endl;
-
-  // pTerrs, 1, 2, ph1, ph2
-  RooRealVar sigmaZ1_1("sigmaZ1_1", "sigmaZ1_1", pTerrZ1_1);
-  RooRealVar sigmaZ1_2("sigmaZ1_2", "sigmaZ1_2", pTerrZ1_2);
-
-  RooRealVar sigmaZ1_ph1("sigmaZ1_ph1", "sigmaZ1_ph1", pTerrZ1_ph1);
-  RooRealVar sigmaZ1_ph2("sigmaZ1_ph2", "sigmaZ1_ph2", pTerrZ1_ph2);
-
-  // resolution for decay products
-  RooGaussian gauss1("gauss1", "gaussian PDF", *pT1RECO, *pT1, sigmaZ1_1);
-  RooGaussian gauss2("gauss2", "gaussian PDF", *pT2RECO, *pT2, sigmaZ1_2);
-
-  RooGaussian gaussph1("gaussph1", "gaussian PDF", *pTph1RECO, *pTph1, sigmaZ1_ph1);
-  RooGaussian gaussph2("gaussph2", "gaussian PDF", *pTph2RECO, *pTph2, sigmaZ1_ph2);
-
-  RooProdPdf *model;
-
-  //3 Gaussian Declarations
-  RooCBShape* singleCB; RooGaussian* gaussShape1; RooAddPdf* CBplusGauss; RooGaussian* gaussShape2; 
-  RooAddPdf* CBplusGaussplusGauss; RooGaussian* gaussShape3; RooAddPdf* CBplusGaussplusGaussplusGauss;
-
-  //Voigtian Declarations
-  RooVoigtian* VoiToFit; RooAddPdf* VoiPDF;
-
-  //Variable declarations here to prevent scope issues from if statements below
-  RooRealVar meanCB("meanCB", "", meanCB_);
-  RooRealVar sigmaCB("sigmaCB", "", sigmaCB_);
-  RooRealVar alphaCB("alphaCB", "", alphaCB_);
-  RooRealVar nCB("nCB", "", nCB_);
-  RooRealVar meanGauss1("meanGauss1", "", meanGauss1_);
-  RooRealVar sigmaGauss1("sigmaGauss1", "", sigmaGauss1_);
-  RooRealVar f1("f1", "", f1_);
-  RooRealVar meanGauss2("meanGauss2", "", meanGauss2_);
-  RooRealVar sigmaGauss2("sigmaGauss2", "", sigmaGauss2_);
-  RooRealVar f2("f2", "", f2_);
-  RooRealVar meanGauss3("meanGauss3", "", meanGauss3_);
-  RooRealVar sigmaGauss3("sigmaGauss3", "", sigmaGauss3_);
-  RooRealVar f3("f3", "", f3_);
-  RooRealVar BWMean("BWMean", "", BWmean_);
-  RooRealVar BWGamma("BWGamma", "", BWgamma_);
-  RooRealVar meanGauss("meanGauss", "", sigmaValG_);
-
-  //This code is used to time the refit
-  //cout << "Before model creation: " << static_cast<float>(clock())/CLOCKS_PER_SEC - time_start<< endl;
-
-
-  if(threegauss_==true){
-
-  singleCB = new RooCBShape("singleCB", "", *mZ1, meanCB, sigmaCB, alphaCB, nCB);
-  gaussShape1 = new RooGaussian("gaussShape1", "", *mZ1, meanGauss1, sigmaGauss1);
-  CBplusGauss = new RooAddPdf("CBplusGauss", "", *singleCB, *gaussShape1, f1);
-  gaussShape2 = new RooGaussian("gaussShape2", "", *mZ1, meanGauss2, sigmaGauss2);
-  CBplusGaussplusGauss = new RooAddPdf("CBplusGaussplusGauss", "", *CBplusGauss, *gaussShape2, f2);
-  gaussShape3 = new RooGaussian("gaussShape3", "", *mZ1, meanGauss3, sigmaGauss3);
-  CBplusGaussplusGaussplusGauss = new RooAddPdf("CBplusGaussplusGaussplusGauss", "", *CBplusGaussplusGauss, *gaussShape3, f3);
-
+  //Do the fits
   if(p4sZ1ph_.size()==0){
-    model = new RooProdPdf("model", "model", RooArgList(gauss1, gauss2, *CBplusGaussplusGaussplusGauss) );
-  } else if(p4sZ1ph_.size()==1) {
-    model = new RooProdPdf("model", "model", RooArgList(gauss1, gauss2, gaussph1, *CBplusGaussplusGaussplusGauss) );
-  } else {
-    model = new RooProdPdf("model", "model", RooArgList(gauss1, gauss2, gaussph1, gaussph2, *CBplusGaussplusGaussplusGauss) );
-  }
-  VoiToFit = nullptr; VoiPDF = nullptr;
+    minimum->SetMaxFunctionCalls(1000); // for Minuit/Minuit2
+    minimum->SetTolerance(1);
+    minimum->SetPrintLevel(-1);
+ 
+    // create gradfunctor
+    //ROOT::Math::GradFunctor f(this,&KinZfitter::NLL_0,&KinZfitter::gradNLL_0,2);
+    ROOT::Math::Functor f(this, &KinZfitter::NLL_0,2);
+    double step[2] = {0.5,0.5};
+    double variable[2] = {Z1_1.Pt(),Z1_2.Pt()};
+    minimum->SetFunction(f);
+ 
+    minimum->SetVariable(0,"pt1",variable[0], step[0]);
+    minimum->SetVariable(1,"pt2",variable[1], step[1]);
+    minimum->SetVariableLimits(0,RECOpT1min,RECOpT1max);
+    minimum->SetVariableLimits(1,RECOpT2min,RECOpT2max);
+    minimum->Minimize();
+    minimum->Hesse();
+    xs = minimum->X();
+    errs = minimum->Errors();
+    status_my = minimum->Status();
+    covstatus_my = minimum->CovMatrixStatus();
+    minnll_my = minimum->MinValue();
+  } else if(p4sZ1ph_.size()==1){
+    minimum->SetMaxFunctionCalls(1000); // for Minuit/Minuit2
+    minimum->SetTolerance(1);
+    minimum->SetPrintLevel(-1);
+    // create gradfunctor
+    //ROOT::Math::GradFunctor f(this,&KinZfitter::NLL_1,&KinZfitter::gradNLL_1,3);
+    ROOT::Math::Functor f(this, &KinZfitter::NLL_1,3);
+    double step[3] = {0.5,0.5,0.5};
+    double variable[3] = {Z1_1.Pt(),Z1_2.Pt(),Z1_ph1.Pt()};
+    minimum->SetFunction(f);
 
-
-  } else {
-
-  VoiToFit = new RooVoigtian("VoiToFit","Voigtian Fit to m_{ll}", *mZ1, BWMean, BWGamma, meanGauss);
-  VoiPDF = new RooAddPdf("VoiShape","",*VoiToFit);
+    minimum->SetVariable(0,"pt1",variable[0], step[0]);
+    minimum->SetVariable(1,"pt2",variable[1], step[1]);
+    minimum->SetVariable(2,"pt3",variable[2], step[2]);
+    minimum->SetVariableLimits(0,RECOpT1min,RECOpT1max);
+    minimum->SetVariableLimits(1,RECOpT2min,RECOpT2max);
+    minimum->SetVariableLimits(2,RECOpTph1min,RECOpTph1max);
+    
+    minimum->Minimize();
+    minimum->Hesse();
+    xs = minimum->X();
+    errs = minimum->Errors();
+    status_my = minimum->Status();
+    covstatus_my = minimum->CovMatrixStatus();
+    minnll_my = minimum->MinValue();
+  } else if(p4sZ1ph_.size()==2){
+    minimum->SetMaxFunctionCalls(1000); // for Minuit/Minuit2
+    minimum->SetTolerance(1);
+    minimum->SetPrintLevel(-1);
   
-  if(p4sZ1ph_.size()==0){
-    model = new RooProdPdf("model", "model", RooArgList(gauss1, gauss2, *VoiPDF) );
-  } else if(p4sZ1ph_.size()==1) {
-    model = new RooProdPdf("model", "model", RooArgList(gauss1, gauss2, gaussph1, *VoiPDF) );
-  } else {
-    model = new RooProdPdf("model", "model", RooArgList(gauss1, gauss2, gaussph1, gaussph2, *VoiPDF) );
+    // create gradfunctor
+    //ROOT::Math::GradFunctor f(this,&KinZfitter::NLL_2,&KinZfitter::gradNLL_2,4);
+    ROOT::Math::Functor f(this, &KinZfitter::NLL_2,4);
+    double step[4] = {0.5,0.5,0.5,0.5};
+    double variable[4] = {Z1_1.Pt(),Z1_2.Pt(),Z1_ph1.Pt(),Z1_ph2.Pt()};
+    minimum->SetFunction(f);
+  
+    minimum->SetVariable(0,"pt1",variable[0], step[0]);
+    minimum->SetVariable(1,"pt2",variable[1], step[1]);
+    minimum->SetVariable(2,"pt3",variable[2], step[2]);
+    minimum->SetVariable(3,"pt4",variable[3], step[3]);
+    minimum->SetVariableLimits(0,RECOpT1min,RECOpT1max);
+    minimum->SetVariableLimits(1,RECOpT2min,RECOpT2max);
+    minimum->SetVariableLimits(2,RECOpTph1min,RECOpTph1max);
+    minimum->SetVariableLimits(3,RECOpTph2min,RECOpTph2max);
+
+    minimum->Minimize();
+    minimum->Hesse();
+    xs = minimum->X();
+    errs = minimum->Errors();
+    status_my = minimum->Status();
+    covstatus_my = minimum->CovMatrixStatus();
+    minnll_my = minimum->MinValue();
   }
 
-
-  singleCB = nullptr; gaussShape1 = nullptr; CBplusGauss = nullptr; gaussShape2 = nullptr; 
-  CBplusGaussplusGauss = nullptr; gaussShape3 = nullptr; CBplusGaussplusGaussplusGauss = nullptr;
-
-  }
-
-
-  //This code is used to time the refit
-  //cout << "After Model creation: " << static_cast<float>(clock())/CLOCKS_PER_SEC - time_start<< endl;
-
-
-  // observable set
-  RooArgSet *rastmp;
-  if(p4sZ1ph_.size()==0){
-    rastmp = new RooArgSet(*pT1RECO, *pT2RECO);
-  } else if(p4sZ1ph_.size()==1) {
-    rastmp = new RooArgSet(*pT1RECO, *pT2RECO, *pTph1RECO);
-  } else {
-    rastmp = new RooArgSet(*pT1RECO, *pT2RECO, *pTph1RECO, *pTph2RECO);
-  }
-
-  RooDataSet* pTs = new RooDataSet("pTs", "pTs", *rastmp);
-  pTs->add(*rastmp);
-
-  //RooAbsReal* nll;
-  //nll = model->createNLL(*pTs);
-  //RooMinuit(*nll).migrad();
-
-  //This code is used to time the refit
-  //cout << "Before fit: " << static_cast<float>(clock())/CLOCKS_PER_SEC - time_start<< endl;
-
-
-  RooFitResult* r = model->fitTo(*pTs, RooFit::Save(), RooFit::PrintLevel(-1));//,RooFit::Timer(true));
-  const TMatrixDSym& covMatrix = r->covarianceMatrix();
-  status_ = r->status();
-  covmat_status_ = r->covQual();
-  minnll_ = r -> minNll();
-
-  //This code is used to time the refit
-  //cout << "After fit: " << static_cast<float>(clock())/CLOCKS_PER_SEC - time_start<< endl;
-
-
-  const RooArgList& finalPars = r->floatParsFinal();
-  for (int i=0 ; i<finalPars.getSize(); i++) {
-//    TString name = dynamic_cast<TString>( dynamic_cast<RooRealVar*>(finalPars.at(i)->GetName()) );
-    TString name = static_cast<TString>( finalPars.at(i)->GetName() );
-
-    if(debug_) cout<<"name list of RooRealVar for covariance matrix "<<name<<endl;
-
-  }
-
-  int size = covMatrix.GetNcols();
-  //TMatrixDSym covMatrixTest_(size);
-  covMatrixZ1_.ResizeTo(size, size);
-  covMatrixZ1_ = covMatrix;
-
+  status_ = status_my;
+  covmat_status_ = covstatus_my;
+  minnll_ = minnll_my;
   if(debug_) cout<<"save the covariance matrix"<<endl;
+  double pTerrZ1REFIT1;
+  double pTerrZ1REFIT2;
+  l1 = xs[0]/RECOpT1;
+  l2 = xs[1]/RECOpT2;
+  pTerrZ1REFIT1 = errs[0];
+  pTerrZ1REFIT2 = errs[1];
 
-  l1 = pT1->getVal()/RECOpT1;
-  l2 = pT2->getVal()/RECOpT2;
-  double pTerrZ1REFIT1 = pT1->getError();
-  double pTerrZ1REFIT2 = pT2->getError();
-
+  //cout<<"l1,l2: "<<xs[0]<<", "<<xs[1]<<endl;
   pTerrsZ1REFIT_.push_back(pTerrZ1REFIT1);
   pTerrsZ1REFIT_.push_back(pTerrZ1REFIT2);
 
@@ -702,45 +720,19 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
   if(p4sZ1ph_.size()>=1) {
 
     if(debug_) cout<<"set refit result for Z1 fsr photon 1"<<endl;
-
-    lph1 = pTph1->getVal()/RECOpTph1;
-    pTerrZ1phREFIT1 = pTph1->getError();
+    lph1 = xs[2]/RECOpTph1;
+    pTerrZ1phREFIT1 = errs[2];
     if(debug_) cout<<"scale "<<lph1<<" pterr "<<pTerrZ1phREFIT1<<endl;
 
     pTerrsZ1phREFIT_.push_back(pTerrZ1phREFIT1);
 
   }
   if(p4sZ1ph_.size()==2){
-
-    lph2 = pTph2->getVal()/RECOpTph2;
-    pTerrZ1phREFIT2 = pTph2->getError();
+    lph2 = xs[3]/RECOpTph2;
+    pTerrZ1phREFIT2 = errs[3];
     pTerrsZ1phREFIT_.push_back(pTerrZ1phREFIT2);
 
   }
-
-  //This code is used to time the refit
-  //cout << "Before delete statements: " << static_cast<float>(clock())/CLOCKS_PER_SEC - time_start<< endl;
-
-
- // delete pT1; delete pT2;delete pTph1; delete pTph2;
- //delete pT1RECO; delete pT2RECO; delete pTph1RECO; delete pTph2RECO;  delete m1; delete m2; delete theta1; 
- // delete p1v3D2; delete p1v3Dph1; delete p2v3Dph2; delete p2v3Dph2; delete ph1v3Dph2; delete mZ1;
-  //delete model; delete rastmp; delete pTs; delete r;
-   
-  //delete nll;
-  delete pTs;
-  delete rastmp;
-  delete r;
-  delete singleCB; delete gaussShape1; delete CBplusGauss; delete gaussShape2; delete CBplusGaussplusGauss; delete gaussShape3; delete CBplusGaussplusGaussplusGauss;
-  delete VoiToFit; delete VoiPDF;
-  delete model;
-  delete mZ1;
-  delete ph1v3Dph2; delete p2v3Dph2; delete p1v3Dph2; delete p2v3Dph1; delete p1v3Dph1; delete p1v3D2;
-  delete thetaph1; delete phiph1; delete thetaph2; delete phiph2; delete pTph1; delete pTph2;
-
-  delete theta1; delete phi1; delete theta2; delete phi2;
-  delete m1; delete m2; delete pTph1RECO; delete pTph2RECO;
-  delete pT1; delete pT2;  delete pT1RECO; delete pT2RECO;
 
   //This code is used to time the refit
   //cout << "After delete statements: " << static_cast<float>(clock())/CLOCKS_PER_SEC - time_start<< endl;
