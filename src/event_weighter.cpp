@@ -184,7 +184,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     in_file_muon_iso0p10_     = "data/zgamma/2023BPix/hzg_muiso0p1_2023BPix_efficiencies.json";
     in_file_muon_iso0p15_     = "data/zgamma/2023BPix/hzg_muiso0p15_2023BPix_efficiencies.json";
     in_file_ggf_nnlo_         = "data/zgamma/GluGluHToZG_NNLO_reweight_run3.json";
-    key_                      = "2023PromptD";
+    key_                      = "2024Prompt";
     puName_                   = "Collisions2023_369803_370790_eraD_GoldenJson";
     btag_lightname            = "deepJet_light";
     cs_electron_bpixhole_     = correction::CorrectionSet::from_file(
@@ -199,7 +199,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     cout<<"2024 has not been fully implemented in event_weighter. Defaulting to 2023"<<endl;
     in_file_electron_         = "data/zgamma/2023/hzg_elid_2023_scalefactors.json";
     in_file_electron_reco_    = "data/zgamma/2023/electron_recoSF2023.json";
-    in_file_photon_           = "data/zgamma/2023/photon.json";
+    in_file_photon_           = "data/zgamma/2024/photon.json";
     in_file_photon_low_       = "data/zgamma/2022EE/hzg_phidvalidate_2022EE_scalefactors.json";
     in_file_photon_mceff_     = "data/zgamma/2023/photon_wp80mceff_2023.json";
     in_file_muon_             = "data/zgamma/2023/hzg_muid_2023_scalefactors.json";
