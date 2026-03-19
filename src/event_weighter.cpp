@@ -184,7 +184,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     in_file_muon_iso0p10_     = "data/zgamma/2023BPix/hzg_muiso0p1_2023BPix_efficiencies.json";
     in_file_muon_iso0p15_     = "data/zgamma/2023BPix/hzg_muiso0p15_2023BPix_efficiencies.json";
     in_file_ggf_nnlo_         = "data/zgamma/GluGluHToZG_NNLO_reweight_run3.json";
-    key_                      = "2024Prompt";
+    key_                      = "2023PromptD";
     puName_                   = "Collisions2023_369803_370790_eraD_GoldenJson";
     btag_lightname            = "deepJet_light";
     cs_electron_bpixhole_     = correction::CorrectionSet::from_file(
@@ -211,7 +211,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     in_file_muon_iso0p10_     = "data/zgamma/2023/hzg_muiso0p1_2023_efficiencies.json";
     in_file_muon_iso0p15_     = "data/zgamma/2023/hzg_muiso0p15_2023_efficiencies.json";
     in_file_ggf_nnlo_         = "data/zgamma/GluGluHToZG_NNLO_reweight_run3.json";
-    key_                      = "2023PromptC";
+    key_                      = "2024Prompt";
     puName_                   = "Collisions24_BCDEFGHI_goldenJSON";
     btag_lightname            = "deepJet_light";
     ph_shape_weighter_        = make_unique<rw_mmp_r3>();
