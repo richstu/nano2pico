@@ -531,6 +531,9 @@ float RawPuppiMET_pt
 float TkMET_phi
 float TkMET_pt
 float TkMET_sumEt
+float TrkMET_phi
+float TrkMET_pt
+float TrkMET_sumEt
 
 float MET_T1Smear_pt_jerUp
 float MET_T1Smear_pt_jerDown
@@ -671,9 +674,9 @@ float PV_z
 float PV_chi2
 float PV_score
 int PV_npvs
-char PV_npvs 12
+u_char PV_npvs 12
 int PV_npvsGood
-char PV_npvsGood 12
+u_char PV_npvsGood 12
 
 ################ Secondary vertices ################
 int nSV
@@ -729,7 +732,7 @@ int Pileup_nPU
 int Pileup_sumEOOT
 int Pileup_sumLOOT
 
-float fixedGridRhoAll
+float Rho_fixedGridRhoAll
 float fixedGridRhoFastjetAll
 float fixedGridRhoFastjetCentral
 float fixedGridRhoFastjetCentralCalo

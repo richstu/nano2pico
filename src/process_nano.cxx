@@ -377,8 +377,11 @@ int main(int argc, char *argv[]){
     pico.out_type()      = event_type;
 
     // number of reconstructed primary vertices
-    pico.out_npv() = nano.PV_npvs();
-    pico.out_npv_good() = nano.PV_npvsGood();
+    int PV_npvs, PV_npvsGood;
+    getPV_npvs(nano, nanoaod_version, PV_npvs);
+    getPV_npvsGood(nano, nanoaod_version, PV_npvsGood);
+    pico.out_npv() = PV_npvs;
+    pico.out_npv_good() = PV_npvsGood;
     // number of pileup in mc
     if (!isData) {
       pico.out_npu_tru() = nano.Pileup_nPU();
@@ -387,7 +390,7 @@ int main(int argc, char *argv[]){
 
     //pileup energy density
     if (nanoaod_version >= 11 || nanoaod_version == 9.5)
-      pico.out_rho() = nano.fixedGridRhoAll();
+      pico.out_rho() = nano.Rho_fixedGridRhoAll();
     // ----------------------------------------------------------------------------------------------
     //            *** Writing physics objects ***
     // N.B. Order in which producers are called matters! E.g. jets are not counted if overlapping 
