@@ -220,7 +220,7 @@ int main(int argc, char *argv[]){
   // Find nanoAOD version
   float nanoaod_version = -1;
   std::smatch nanoad_version_matches;
-  bool version_found = std::regex_search(in_file, nanoad_version_matches, std::regex("NanoAOD(?:APVv|v)(\\d+p\\d+|\\d+)"));
+  bool version_found = std::regex_search(in_file, nanoad_version_matches, std::regex("NanoAOD(?:APVv|v)(\\d+p\\d+|\\d+)"));  
   if (version_found) nanoaod_version = std::stof(std::regex_replace(nanoad_version_matches[1].str(), std::regex("p"), "."));
   else {
     bool is_nanoAODv7_found = std::regex_search(in_file, nanoad_version_matches, std::regex("02Apr2020"));
@@ -228,6 +228,8 @@ int main(int argc, char *argv[]){
   }
   if (Contains(in_dir, "NanoAODv9UCSB")) nanoaod_version = 9.5;
   if (Contains(in_dir, "NanoAODv12")) nanoaod_version = 12;
+  if (Contains(in_dir, "NanoAODv15")) nanoaod_version = 15;
+ 
   cout<<"Using NanoAOD version: "<<nanoaod_version<<endl;
 
   time_t begtime, endtime;
@@ -331,7 +333,6 @@ int main(int argc, char *argv[]){
   EventTools event_tools(in_path, year, isData, nanoaod_version);
   int event_type = event_tools.GetEventType();
   bool isDY = ((event_type / 100 == 62) || (event_type / 100 == 63)) && isZgamma;
-
   ISRTools isr_tools(in_path, year, nanoaod_version, isData);
 
   // Initialize trees
