@@ -43,7 +43,9 @@ MuonProducer::MuonProducer(string year_, bool isData_, float nanoaod_version_, s
         "data/zgamma/2024/muon_scalesmearing.json");
     run3 = true;
   }
-  else {
+  else if(year=="2016" || year=="2016APV" || year=="2017" || year=="2018"){
+    std::cout << "Run 2 sample, ScaRe file is not used nor set. " << std::endl;
+  } else {
     cs_scare_ = correction::CorrectionSet::from_file(
         "data/zgamma/2023BPix/muon_scalesmearing.json");
     run3 = true;
