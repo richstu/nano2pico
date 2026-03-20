@@ -150,18 +150,7 @@ double KinZfitter::gaussian(double x, double mu, double sigma){
   return exp(-0.5*pow(x - mu,2)/pow(sigma,2))/(sigma*sqrt(2*PI));
 }
 
-void KinZfitter::evaluateShape(double pT1, double pT2, unsigned int nfsrph, double pT3, double pT4){
-  if(nfsrph == 0){
-    setEs(pT1, pT2, 0);
-    setmZ(pT1, pT2, 0);
-  } else if (nfsrph == 1){
-    setEs(pT1, pT2, 1, pT3);
-    setmZ(pT1, pT2, 1, pT3);
-  } else if (nfsrph == 2){
-    setEs(pT1, pT2, 2, pT3, pT4);
-    setmZ(pT1, pT2, 2, pT3, pT4);
-  }
-  double mll = mll_;
+void KinZfitter::evaluateShape(double mll){
   double gausst1, gausst2, gausst3;
   gausst1 = gaussian(mll, meanGauss1_, sigmaGauss1_);
   gausst2 = gaussian(mll, meanGauss2_, sigmaGauss2_);
@@ -187,13 +176,14 @@ double KinZfitter::NLL_0(const double *pTs){
   double gauss1, gauss2, full, NLL;
   setEs(pTl1r, pTl2r, 0);
   setmZ(pTl1r, pTl2r, 0);
+  double mll = mll_;
 
   gauss1 = gaussian(pTl1r, pTl1_, sigmal1_);
   gauss2 = gaussian(pTl2r, pTl2_, sigmal2_);
   
-  evaluateShape(pTl1r, pTl2r, 0); 
+  evaluateShape(mll); 
 
-  full = gauss1*gauss2*shapeEval_;//Normalized
+  full = gauss1*gauss2*shapeEval_;
   NLL = -log(full);
   return NLL;
 }
@@ -206,14 +196,15 @@ double KinZfitter::NLL_1(const double *pTs){
   double gauss1, gauss2, gauss3, full, NLL;
   setEs(pTl1r, pTl2r, 1, pTg3r);
   setmZ(pTl1r, pTl2r, 1, pTg3r);
+  double mll = mll_;
 
   gauss1 = gaussian(pTl1r, pTl1_, sigmal1_);
   gauss2 = gaussian(pTl2r, pTl2_, sigmal2_);
   gauss3 = gaussian(pTg3r, pTg3_, sigmag3_);
 
-  evaluateShape(pTl1r, pTl2r, 1, pTg3r);
+  evaluateShape(mll);
 
-  full = gauss1*gauss2*gauss3*shapeEval_;//Normalized
+  full = gauss1*gauss2*gauss3*shapeEval_;
   NLL = -log(full);
   return NLL;
 }
@@ -227,15 +218,16 @@ double KinZfitter::NLL_2(const double *pTs){
   double gauss1, gauss2, gauss3, gauss4, full, NLL;
   setEs(pTl1r, pTl2r, 2, pTg3r, pTg4r);
   setmZ(pTl1r, pTl2r, 2, pTg3r, pTg4r);
+  double mll = mll_;
 
   gauss1 = gaussian(pTl1r, pTl1_, sigmal1_);
   gauss2 = gaussian(pTl2r, pTl2_, sigmal2_);
   gauss3 = gaussian(pTg3r, pTg3_, sigmag3_);
   gauss4 = gaussian(pTg4r, pTg4_, sigmag4_);
 
-  evaluateShape(pTl1r, pTl2r, 2, pTg3r, pTg4r);
+  evaluateShape(mll);
   
-  full = gauss1*gauss2*gauss3*gauss4*shapeEval_;//Normalized
+  full = gauss1*gauss2*gauss3*gauss4*shapeEval_;
   NLL = -log(full);
   return NLL;
 }
@@ -435,7 +427,6 @@ double KinZfitter::GetRefitMZ1()
 
 double KinZfitter::GetMZ1Err()
 {
-
   vector<TLorentzVector> p4s;
   vector<double> pTErrs;
 
@@ -444,7 +435,6 @@ double KinZfitter::GetMZ1Err()
 
   pTErrs.push_back(pTerrsZ1_[0]);
   pTErrs.push_back(pTerrsZ1_[1]);
-
     for(unsigned int ifsr1 = 0; ifsr1<p4sZ1ph_.size(); ifsr1++) {
       p4s.push_back(p4sZ1ph_[ifsr1]);
       pTErrs.push_back(pTerrsZ1ph_[ifsr1]);
@@ -526,7 +516,7 @@ float KinZfitter::GetMinNll()
 
 int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double & lph2)
 {
-  RooHelpers::LocalChangeMsgLevel changeMsgLvl(RooFit::ERROR);
+  //RooHelpers::LocalChangeMsgLevel changeMsgLvl(RooFit::ERROR);
   //Temporarily suppressing warnings to test n2p overall
   //KinZFitter needs some reworking to avoid sigma going negative
   l1= 1.0; l2 = 1.0;
@@ -580,8 +570,9 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
   double RECOpTph2max = RECOpTph2 < 2 ? RECOpTph2min : RECOpTph2+3*pTerrZ1_ph2;
   double RECOpT1min = max(5.0, RECOpT1-3*pTerrZ1_1);
   double RECOpT2min = max(5.0, RECOpT2-3*pTerrZ1_2);
-  double RECOpT1max = RECOpT1+3*pTerrZ1_1;//why??
+  double RECOpT1max = RECOpT1+3*pTerrZ1_1;
   double RECOpT2max = RECOpT2+3*pTerrZ1_2;
+
 
   //auto startTime = std::chrono::steady_clock::now();
   //Set global fit constants
@@ -608,6 +599,7 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
     setmZ(Z1_1.Pt(), Z1_2.Pt(), 1, Z1_ph1.Pt(), Z1_ph2.Pt());
   }
 
+
   //If mll is outside the bounds of the fit return mll without a fit
   if(mll_ < 60 || mll_ > 120) return mll_;
 
@@ -626,9 +618,8 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
     minimum->SetMaxFunctionCalls(1000); // for Minuit/Minuit2
     minimum->SetTolerance(1);
     minimum->SetPrintLevel(-1);
+    minimum->SetErrorDef(0.5); //0.5 for NLL, 1 for Chi2
  
-    // create gradfunctor
-    //ROOT::Math::GradFunctor f(this,&KinZfitter::NLL_0,&KinZfitter::gradNLL_0,2);
     ROOT::Math::Functor f(this, &KinZfitter::NLL_0,2);
     double step[2] = {0.5,0.5};
     double variable[2] = {Z1_1.Pt(),Z1_2.Pt()};
@@ -646,11 +637,11 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
     covstatus_my = minimum->CovMatrixStatus();
     minnll_my = minimum->MinValue();
   } else if(p4sZ1ph_.size()==1){
-    minimum->SetMaxFunctionCalls(1000); // for Minuit/Minuit2
+    minimum->SetMaxFunctionCalls(1000); 
     minimum->SetTolerance(1);
     minimum->SetPrintLevel(-1);
-    // create gradfunctor
-    //ROOT::Math::GradFunctor f(this,&KinZfitter::NLL_1,&KinZfitter::gradNLL_1,3);
+    minimum->SetErrorDef(0.5);
+
     ROOT::Math::Functor f(this, &KinZfitter::NLL_1,3);
     double step[3] = {0.5,0.5,0.5};
     double variable[3] = {Z1_1.Pt(),Z1_2.Pt(),Z1_ph1.Pt()};
@@ -671,12 +662,11 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
     covstatus_my = minimum->CovMatrixStatus();
     minnll_my = minimum->MinValue();
   } else if(p4sZ1ph_.size()==2){
-    minimum->SetMaxFunctionCalls(1000); // for Minuit/Minuit2
+    minimum->SetMaxFunctionCalls(1000);
     minimum->SetTolerance(1);
     minimum->SetPrintLevel(-1);
+    minimum->SetErrorDef(0.5);
   
-    // create gradfunctor
-    //ROOT::Math::GradFunctor f(this,&KinZfitter::NLL_2,&KinZfitter::gradNLL_2,4);
     ROOT::Math::Functor f(this, &KinZfitter::NLL_2,4);
     double step[4] = {0.5,0.5,0.5,0.5};
     double variable[4] = {Z1_1.Pt(),Z1_2.Pt(),Z1_ph1.Pt(),Z1_ph2.Pt()};
@@ -710,10 +700,10 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
   l2 = xs[1]/RECOpT2;
   pTerrZ1REFIT1 = errs[0];
   pTerrZ1REFIT2 = errs[1];
-
   //cout<<"l1,l2: "<<xs[0]<<", "<<xs[1]<<endl;
   pTerrsZ1REFIT_.push_back(pTerrZ1REFIT1);
   pTerrsZ1REFIT_.push_back(pTerrZ1REFIT2);
+  
 
   double pTerrZ1phREFIT1;
   double pTerrZ1phREFIT2;

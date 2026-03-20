@@ -73,7 +73,7 @@ class KinZfitter {
   void setEs(double pT1, double pT2, unsigned int nfsrph, double pT3 = 0, double pT4 = 0);
   void setmZ(double pT1, double pT2, unsigned int nfsrph, double pT3 = 0, double pT4 = 0);
   double gaussian(double x, double mu, double sigma);
-  void evaluateShape(double pT1, double pT2, unsigned int nfsrph, double pT3 = 0, double pT4 = 0);
+  void evaluateShape(double mll);
 
   double NLL_0(const double *pTs);
   double NLL_1(const double *pTs);

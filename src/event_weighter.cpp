@@ -537,10 +537,15 @@ void EventWeighter::PhotonSF(pico_tree &pico){
       id_sfup = id_sf+id_unc;
       id_sfdn = id_sf-id_unc;
     }
-    else if (year_=="2023"||year_=="2023BPix" || year_ == "2024" || year_ == "2025" || year_ == "2026") {
+    else if (year_=="2023"||year_=="2023BPix") {
       id_sf = map_photon_id_->evaluate({key_, "sf", wpstring, eta, pt, phi});
       id_sfup = map_photon_id_->evaluate({key_, "sfup", wpstring, eta, pt, phi});
       id_sfdn = map_photon_id_->evaluate({key_, "sfdown", wpstring, eta, pt, phi});
+    }
+    else if(year_ == "2024" || year_ == "2025" || year_ == "2026"){
+      id_sf = map_photon_id_->evaluate({key_, "sf", wpstring, eta, pt});
+      id_sfup = map_photon_id_->evaluate({key_, "sfup", wpstring, eta, pt});
+      id_sfdn = map_photon_id_->evaluate({key_, "sfdown", wpstring, eta, pt});
     }
     else {
       id_sf = map_photon_id_->evaluate({key_, "sf", wpstring, eta, pt});
