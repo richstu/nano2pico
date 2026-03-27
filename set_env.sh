@@ -5,13 +5,17 @@
 . /cvmfs/cms.cern.ch/cmsset_default.sh
 RUN_KERNEL=$(uname -r | cut -d '-' -f1)
 if [ "$RUN_KERNEL" == "3.10.0" ]; then
-  export SCRAM_ARCH=slc7_amd64_gcc700
-  cd /net/cms11/data/pico/cc7/CMSSW_10_2_13/src
+  export SCRAM_ARCH=slc7_amd64_gcc12
+  cd /net/cms11/data/pico/cc7/CMSSW_14_2_2/src
 elif [ "$RUN_KERNEL" == "2.6.32" ]; then
   cd /net/cms29/cms29r0/pico/CMSSW_10_2_11_patch1/src
 fi
 eval `scramv1 runtime -sh`
 cd -
+
+# path to scons for python 3.9
+export PATH=./lib/python3.9/site-packages/bin:$PATH
+export PYTHON3PATH=./lib/python3.9/site-packages/:$PYTHON3PATH
 
 # Do multi-core scons
 export SCONSFLAGS="-j $(nproc --all)"

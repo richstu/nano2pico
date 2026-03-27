@@ -36,8 +36,10 @@ array<float> Electron_eCorr
 array<float> Electron_eInvMinusPInv
 array<float> Electron_energyErr
 array<float> Electron_eta
+array<float> Electron_superclusterEta
 array<float> Electron_hoe
 array<float> Electron_ip3d
+array<float> Electron_ipLengthSig
 array<float> Electron_jetPtRelv2
 array<float> Electron_jetRelIso
 array<float> Electron_mass
@@ -313,6 +315,8 @@ array<float> Jet_btagDeepFlavB
 array<float> Jet_btagDeepFlavC
 array<float> Jet_chEmEF
 array<float> Jet_chHEF
+array<UChar_t> Jet_chMultiplicity
+array<UChar_t> Jet_neMultiplicity
 array<float> Jet_eta
 array<float> Jet_jercCHF
 array<float> Jet_jercCHPUF
@@ -374,6 +378,20 @@ array<float> Jet_btagRobustParTAK4B
 array<float> Jet_btagRobustParTAK4CvB
 array<float> Jet_btagRobustParTAK4CvL
 array<float> Jet_btagRobustParTAK4QG
+#NanoAODv15
+array<float> Jet_btagUParTAK4B
+array<float> Jet_btagUParTAK4CvB
+array<float> Jet_btagUParTAK4CvL
+array<float> Jet_btagUParTAK4CvNotB
+array<float> Jet_btagUParTAK4Ele
+array<float> Jet_btagUParTAK4Mu
+array<float> Jet_btagUParTAK4QvG
+array<float> Jet_btagUParTAK4SvCB
+array<float> Jet_btagUParTAK4SvUDG
+array<float> Jet_btagUParTAK4TauVJet
+array<float> Jet_btagUParTAK4UDG
+array<float> Jet_btagUParTAK4probb
+array<float> Jet_btagUParTAK4probbb
 
 ################ Very soft Jets ################
 

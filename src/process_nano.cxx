@@ -58,7 +58,6 @@ void GetOptions(int argc, char *argv[]);
 
 int main(int argc, char *argv[]){
   GetOptions(argc, argv);
-
   if(in_file=="" || in_dir=="" || out_dir == "") {
     cout<<"ERROR: Input file, sum-of-weights and/or output directory not specified. Exit."<<endl;
     exit(1);
@@ -72,6 +71,10 @@ int main(int argc, char *argv[]){
   if (Contains(in_file, "FSUL")) isFastsim = true;    
   bool isSignal = Contains(in_file, "TChiHH") || Contains(in_file, "T5qqqqZH") ? true : false;
   bool isZgamma = Contains(out_dir, "zgamma");
+  if (isZgamma)
+    isSignal = (Contains(in_file, "HtoZG") || Contains(in_file, "HToZG") || 
+                Contains(in_file, "HToMuMu") || Contains(in_file, "Hto2Mu") ? 
+                true : false);
   bool isHiggsino = Contains(out_dir, "higgsino");
   int year = -1;
   int isAPV = false;
@@ -93,6 +96,7 @@ int main(int argc, char *argv[]){
       else if (regex_search(in_file, std::regex("RunIIAutumn18"))) year = 2018;
       else if (regex_search(in_file, std::regex("Run3Summer22"))) year = 2022;
       else if (regex_search(in_file, std::regex("Run3Summer23"))) year = 2023;
+      else if (regex_search(in_file, std::regex("RunIII2024Summer24"))) year = 2024;
     }
   } else { // Data
     if (Contains(in_file, "HIPM")) isAPV = true;
@@ -101,6 +105,8 @@ int main(int argc, char *argv[]){
     else if (Contains(in_file, "Run2018")) year = 2018;
     else if (Contains(in_file, "Run2022")) year = 2022;
     else if (Contains(in_file, "Run2023")) year = 2023;
+    else if (Contains(in_file, "Run2024")) year = 2024;
+    else if (Contains(in_file, "Run2025")) year = 2025;
   }
   if (year < 0) {
     cout<<"ERROR: Add code for new year!"<<endl;
@@ -142,6 +148,9 @@ int main(int argc, char *argv[]){
   else if (year == 2022 && !is2022preEE)   year_string = "2022EE";
   else if (year == 2023 && is2023preBPix)  year_string = "2023";
   else if (year == 2023 && !is2023preBPix) year_string = "2023BPix";
+  else if (year == 2024)                   year_string = "2024";
+  else if (year == 2025)                   year_string = "2025";
+  else if (year == 2026)                   year_string = "2026";
   else {
     cout << "ERROR: unknown year";
     exit(1);
@@ -195,6 +204,12 @@ int main(int argc, char *argv[]){
       case 2023:
         if (Contains(in_file, "2023")) VVRunLumi = MakeVRunLumi("golden2023");
         break;
+      case 2024:
+        if (Contains(in_file, "2024")) VVRunLumi = MakeVRunLumi("golden2024");
+        break;
+      case 2025:
+        if (Contains(in_file, "2025")) VVRunLumi = MakeVRunLumi("golden2025");
+        break;
       default:
         cout << "ERROR: no golden cert for given year" << endl;
         exit(1);
@@ -227,7 +242,9 @@ int main(int argc, char *argv[]){
 
   // B-tag working points
   // Updated Values May-28-2024 from https://btv-wiki.docs.cern.ch/ScaleFactors/
+  // 2024 values from https://indico.cern.ch/event/1556659/contributions/6559758/attachments/3083466/5458488/BTag_250610_Summer24WPs.pdf
   // btag_df: WPs for deepJet (DeepFlavourB)
+  cout<<"B tag weighting using temporary values for 2024, 2025, 2026"<<endl;
   map<string, vector<float>> btag_df_wpts{
     {"2016APV", vector<float>({0.0508, 0.2598, 0.6502})},
     {"2016", vector<float>({0.0480, 0.2489, 0.6377})},
@@ -236,7 +253,10 @@ int main(int argc, char *argv[]){
     {"2022", vector<float>({0.0583, 0.3086, 0.7183})},
     {"2022EE", vector<float>({0.0614, 0.3196, 0.73})},
     {"2023", vector<float>({0.0479, 0.2431, 0.6553})},
-    {"2023BPix", vector<float>({0.048, 0.2435, 0.6563})}
+    {"2023BPix", vector<float>({0.048, 0.2435, 0.6563})},
+    {"2024", vector<float>({0.0485, 0.2480, 0.6708})},
+    {"2025", vector<float>({0.048, 0.2435, 0.6563})},
+    {"2026", vector<float>({0.048, 0.2435, 0.6563})}
   };
   // WPs for Run 3 values are for PNet, Run 2 values are for deepCSV (DeepB)
   map<string, vector<float>> btag_wpts{
@@ -247,7 +267,14 @@ int main(int argc, char *argv[]){
     {"2022", vector<float>({0.047,  0.245,  0.6734})},
     {"2022EE", vector<float>({0.0499, 0.2605, 0.6915})},  
     {"2023", vector<float>({0.0358, 0.1917, 0.6172})},
-    {"2023BPix", vector<float>({0.0359, 0.1919, 0.6133})}
+    {"2023BPix", vector<float>({0.0359, 0.1919, 0.6133})},
+    {"2024", vector<float>({0.0365, 0.1990, 0.6373})},
+    {"2025", vector<float>({0.0359, 0.1919, 0.6133})},
+    {"2026", vector<float>({0.0359, 0.1919, 0.6133})}
+  };
+  // WPs for Particle Transformer (UParT) in NanoAODv15
+  map<string, vector<float>> btag_upt_wpts{
+    {"2024", vector<float>({0.0246, 0.1272, 0.4648})}
   };
 
   // Double b-tagger working points
@@ -312,7 +339,6 @@ int main(int argc, char *argv[]){
   GammaGammaVarProducer gammagamma_producer(year);
   BBVarProducer bb_producer(year);
   BBGammaGammaVarProducer bbgammagamma_producer(year);
-
   //Initialize scale factor tools
   const string ctr = "central";
   const vector<string> updn = {"up","down"};
@@ -328,7 +354,6 @@ int main(int argc, char *argv[]){
   EventWeighter event_weighter(year_string, btag_df_wpts[year_string]);
   TriggerWeighter trigger_weighter(year_string);
   //cout<<"Is APV: "<<isAPV<<endl;
-
   // Other tools
   EventTools event_tools(in_path, year, isData, nanoaod_version);
   int event_type = event_tools.GetEventType();
@@ -358,7 +383,6 @@ int main(int argc, char *argv[]){
   cout << "Writing sum-of-weights to: " << wgt_sums_path << endl;
   Initialize(wgt_sums);
   wgt_sums.out_nent() = nentries;
-
   for(size_t entry(0); entry<nentries; ++entry){
     if (debug) cout << "GetEntry: " << entry <<" event = "<<pico.out_event()<< endl;
     nano.GetEntry(entry);
@@ -366,7 +390,6 @@ int main(int argc, char *argv[]){
       cout<<"Processing event: "<<entry<<endl;
     }
     //skip events that are data but not in the golden json
-
     if (isData) {
       if(!inJSON(VVRunLumi, nano.run(), nano.luminosityBlock())) 
 	{//cout<<"not in golden json"<<endl;
@@ -396,7 +419,6 @@ int main(int argc, char *argv[]){
     //pileup energy density
     if (nanoaod_version >= 11 || nanoaod_version == 9.5)
       pico.out_rho() = nano.fixedGridRhoAll();
-
     // ----------------------------------------------------------------------------------------------
     //            *** Writing physics objects ***
     // N.B. Order in which producers are called matters! E.g. jets are not counted if overlapping 
@@ -409,8 +431,9 @@ int main(int argc, char *argv[]){
     vector<int> sig_el_pico_idx = vector<int>();
     vector<int> sig_mu_pico_idx = vector<int>();
     vector<int> photon_el_pico_idx = vector<int>();
-    vector<int> sig_el_nano_idx = el_producer.WriteElectrons(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, sig_el_pico_idx, photon_el_pico_idx, isZgamma, isFastsim);
-    vector<int> sig_mu_nano_idx = mu_producer.WriteMuons(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, sig_mu_pico_idx, isZgamma, isFastsim);
+    
+    vector<int> sig_el_nano_idx = el_producer.WriteElectrons(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, sig_el_pico_idx, photon_el_pico_idx, isZgamma, isSignal, isFastsim);
+    vector<int> sig_mu_nano_idx = mu_producer.WriteMuons(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, sig_mu_pico_idx, isZgamma, isSignal, isFastsim);
     // save a separate vector with just signal leptons ordered by pt
     struct SignalLepton{ float pt; float eta; float phi; int pdgid;};
     vector<SignalLepton> sig_leps;
@@ -432,13 +455,12 @@ int main(int argc, char *argv[]){
     }
     vector<int> jet_isphoton_nano_idx = vector<int>();
     if(isZgamma || isHiggsino) 
-      vector<int> sig_ph_nano_idx = photon_producer.WritePhotons(nano, pico, jet_isphoton_nano_idx,
-                                                                 sig_el_nano_idx, sig_mu_nano_idx,
-                                                                 photon_el_pico_idx);
-
-    event_tools.WriteStitch(nano, pico);    
+      vector<int> sig_ph_nano_idx = photon_producer.WritePhotons(nano, pico, 
+          jet_isphoton_nano_idx, sig_el_nano_idx, sig_mu_nano_idx,
+          photon_el_pico_idx, isSignal);
+    event_tools.WriteStitch(nano, pico);
     tk_producer.WriteIsoTracks(nano, pico, sig_el_nano_idx, sig_mu_nano_idx, isFastsim, is_preUL);
-    dilep_producer.WriteDileptons(pico, sig_el_pico_idx, sig_mu_pico_idx);
+    dilep_producer.WriteDileptons(pico, isSignal);
 
     if (debug) cout<<"INFO:: Writing gen particles"<<endl;
 
@@ -450,7 +472,8 @@ int main(int argc, char *argv[]){
     vector<HiggsConstructionVariables> sys_higvars;
     vector<int> sig_jet_nano_idx = jetmet_producer.WriteJetMet(nano, pico, 
         jet_islep_nano_idx, jet_isvlep_nano_idx, jet_isphoton_nano_idx,
-        btag_wpts[year_string], btag_df_wpts[year_string], isFastsim, isSignal, sys_higvars);
+        btag_wpts[year_string], btag_df_wpts[year_string], btag_upt_wpts[year_string],
+        isFastsim, isSignal, sys_higvars);
     jetmet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year_string][1], isFastsim); // usually w.r.t. medium WP
     jetmet_producer.WriteFatJets(nano, pico, ddb_wpts[year_string], mdak8_wpts[year_string], pnetmd_wpts[year_string]); // jetmet_producer.SetVerbose(nano.nSubJet()>0);
     jetmet_producer.WriteSubJets(nano, pico);
@@ -491,7 +514,7 @@ int main(int argc, char *argv[]){
     if (debug) cout<<"INFO:: Writing analysis specific variables"<<endl;
     // might need as input sig_el_nano_idx, sig_mu_nano_idx, sig_ph_nano_idx
     if(isZgamma)
-      zgamma_producer.WriteZGammaVars(nano, pico, sig_jet_nano_idx);
+      zgamma_producer.WriteZGammaVars(pico, isSignal);
   
     if (isHiggsino) gammagamma_producer.WriteGammaGammaVars(pico);
     if (isHiggsino) bb_producer.WriteBBVars(pico, /*doDeepFlav*/false);
@@ -499,8 +522,12 @@ int main(int argc, char *argv[]){
     if (isHiggsino) bbgammagamma_producer.WriteBBGammaGammaVars(pico);
     
     //save higgs variables using DeepCSV and DeepFlavor
-    hig_producer.WriteHigVars(pico, false, isSignal, sys_higvars, nanoaod_version);
-    hig_producer.WriteHigVars(pico, true, isSignal, sys_higvars, nanoaod_version);
+    if (!isZgamma) {
+      hig_producer.WriteHigVars(pico, false, isSignal, sys_higvars, 
+                                nanoaod_version);
+      hig_producer.WriteHigVars(pico, true, isSignal, sys_higvars, 
+                                nanoaod_version);
+    }
 
     if (debug) cout<<"INFO:: Writing triggers"<<endl;
 
@@ -551,6 +578,7 @@ int main(int argc, char *argv[]){
         event_weighter.MuonMinisoSF(pico);
         event_weighter.PileupSF(pico);
         event_weighter.bTaggingSF(pico);
+        event_weighter.jetpuIdSF(pico);
         event_weighter.PhotonSF(pico);
         event_weighter.PhotonShapeSF(pico);
         event_weighter.FakePhotonSF(pico);
@@ -654,7 +682,8 @@ int main(int argc, char *argv[]){
     // note: will be set again in Step 3
     if (isZgamma) {
       pico.out_weight() = pico.out_w_lumi() * pico.out_w_lep() * 
-                          pico.out_w_btag_df() * pico.out_w_photon()  *
+                          pico.out_w_btag_df() * pico.out_w_jetpuid() *
+                          pico.out_w_photon()  *
                           pico.out_w_isr() * pico.out_w_pu() * 
                           pico.out_w_trig() * pico.out_w_phshape() * 
                           pico.out_w_prefire() * pico.out_w_fakephoton() *
@@ -760,9 +789,8 @@ int main(int argc, char *argv[]){
   wgt_sums.Write();
   pico.Write();
   time(&endtime); 
-  cout<<"Time passed: "<<hoursMinSec(difftime(endtime, begtime))<<endl<<endl;  
+  cout<<"Time passed: "<<hoursMinSec(difftime(endtime, begtime))<<endl<<endl; 
 }
-
 void Initialize(corrections_tree &wgt_sums){
   wgt_sums.out_neff()              = 0;
   wgt_sums.out_nent_zlep()         = 0;
@@ -813,7 +841,6 @@ void Initialize(corrections_tree &wgt_sums){
   wgt_sums.out_sys_ps().resize(4,0);
   //wgt_sums.out_sys_pdf().resize(102,0);
 }
-
 void GetOptions(int argc, char *argv[]){
   while(true){
     static struct option long_options[] = {

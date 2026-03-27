@@ -31,6 +31,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     in_file_pu_               = "data/zgamma/2016preVFP_UL/puWeights.json";
     in_file_btag_             = "data/zgamma/2016preVFP_UL/btagging.json";
     in_file_btag_mceff_       = "data/zgamma/2016preVFP_UL/btag_mceff.json";
+    in_file_jetpuid_          = "data/zgamma/2016preVFP_UL/UL16preVFP_jmar.json";
     in_file_electron_iso0p10_ = "data/zgamma/2016preVFP_UL/hzg_eliso0p1_2016APV_efficiencies.json";
     in_file_electron_iso0p15_ = "data/zgamma/2016preVFP_UL/hzg_eliso0p15_2016APV_efficiencies.json";
     in_file_muon_iso0p10_     = "data/zgamma/2016preVFP_UL/hzg_muiso0p1_2016APV_efficiencies.json";
@@ -52,6 +53,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     in_file_pu_               = "data/zgamma/2016postVFP_UL/puWeights.json";
     in_file_btag_             = "data/zgamma/2016postVFP_UL/btagging.json";
     in_file_btag_mceff_       = "data/zgamma/2016postVFP_UL/btag_mceff.json";
+    in_file_jetpuid_          = "data/zgamma/2016postVFP_UL/UL16postVFP_jmar.json";
     in_file_electron_iso0p10_ = "data/zgamma/2016postVFP_UL/hzg_eliso0p1_2016_efficiencies.json";
     in_file_electron_iso0p15_ = "data/zgamma/2016postVFP_UL/hzg_eliso0p15_2016_efficiencies.json";
     in_file_muon_iso0p10_     = "data/zgamma/2016postVFP_UL/hzg_muiso0p1_2016_efficiencies.json";
@@ -73,6 +75,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     in_file_pu_               = "data/zgamma/2017_UL/puWeights.json";
     in_file_btag_             = "data/zgamma/2017_UL/btagging.json";
     in_file_btag_mceff_       = "data/zgamma/2017_UL/btag_mceff.json";
+    in_file_jetpuid_          = "data/zgamma/2017_UL/UL17_jmar.json";
     in_file_electron_iso0p10_ = "data/zgamma/2017_UL/hzg_eliso0p1_2017_efficiencies.json";
     in_file_electron_iso0p15_ = "data/zgamma/2017_UL/hzg_eliso0p15_2017_efficiencies.json";
     in_file_muon_iso0p10_     = "data/zgamma/2017_UL/hzg_muiso0p1_2017_efficiencies.json";
@@ -94,6 +97,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     in_file_pu_               = "data/zgamma/2018_UL/puWeights.json";
     in_file_btag_             = "data/zgamma/2018_UL/btagging.json";
     in_file_btag_mceff_       = "data/zgamma/2018_UL/btag_mceff.json";
+    in_file_jetpuid_          = "data/zgamma/2018_UL/UL18_jmar.json";
     in_file_electron_iso0p10_ = "data/zgamma/2018_UL/hzg_eliso0p1_2018_efficiencies.json";
     in_file_electron_iso0p15_ = "data/zgamma/2018_UL/hzg_eliso0p15_2018_efficiencies.json";
     in_file_muon_iso0p10_     = "data/zgamma/2018_UL/hzg_muiso0p1_2018_efficiencies.json";
@@ -191,8 +195,48 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
         "data/zgamma/2023BPix/hzg_eliso0p15_2023BPixHole_efficiencies.json");
     ph_shape_weighter_        = make_unique<rw_mmp_r3>();
     zgbkg_isr_weighter_       = make_unique<kinr3_weighter>();
+  } else if (year=="2024"){
+    cout<<"2024 has not been fully implemented in event_weighter. Defaulting to 2023"<<endl;
+    in_file_electron_         = "data/zgamma/2023/hzg_elid_2023_scalefactors.json";
+    in_file_electron_reco_    = "data/zgamma/2023/electron_recoSF2023.json";
+    in_file_photon_           = "data/zgamma/2023/photon.json";
+    in_file_photon_low_       = "data/zgamma/2022EE/hzg_phidvalidate_2022EE_scalefactors.json";
+    in_file_photon_mceff_     = "data/zgamma/2023/photon_wp80mceff_2023.json";
+    in_file_muon_             = "data/zgamma/2023/hzg_muid_2023_scalefactors.json";
+    in_file_pu_               = "data/zgamma/2024/puweights_BCDEFGHI.json";
+    in_file_btag_             = "data/zgamma/2023/btagging.json";
+    in_file_btag_mceff_       = "data/zgamma/2023/btag_mceff.json";
+    in_file_electron_iso0p10_ = "data/zgamma/2023/hzg_eliso0p1_2023_efficiencies.json";
+    in_file_electron_iso0p15_ = "data/zgamma/2023/hzg_eliso0p15_2023_efficiencies.json";
+    in_file_muon_iso0p10_     = "data/zgamma/2023/hzg_muiso0p1_2023_efficiencies.json";
+    in_file_muon_iso0p15_     = "data/zgamma/2023/hzg_muiso0p15_2023_efficiencies.json";
+    in_file_ggf_nnlo_         = "data/zgamma/GluGluHToZG_NNLO_reweight_run3.json";
+    key_                      = "2023PromptC";
+    puName_                   = "Collisions24_BCDEFGHI_goldenJSON";
+    btag_lightname            = "deepJet_light";
+    ph_shape_weighter_        = make_unique<rw_mmp_r3>();
+    zgbkg_isr_weighter_       = make_unique<kinr3_weighter>();
   } else {
-    cout<<"Year has not been implemented in event_weighter"<<endl;
+    cout<<"Year has not been implemented in event_weighter. Defaulting to 2023"<<endl;
+    in_file_electron_         = "data/zgamma/2023/hzg_elid_2023_scalefactors.json";
+    in_file_electron_reco_    = "data/zgamma/2023/electron_recoSF2023.json";
+    in_file_photon_           = "data/zgamma/2023/photon.json";
+    in_file_photon_low_       = "data/zgamma/2022EE/hzg_phidvalidate_2022EE_scalefactors.json";
+    in_file_photon_mceff_     = "data/zgamma/2023/photon_wp80mceff_2023.json";
+    in_file_muon_             = "data/zgamma/2023/hzg_muid_2023_scalefactors.json";
+    in_file_pu_               = "data/zgamma/2023/puWeights.json";
+    in_file_btag_             = "data/zgamma/2023/btagging.json";
+    in_file_btag_mceff_       = "data/zgamma/2023/btag_mceff.json";
+    in_file_electron_iso0p10_ = "data/zgamma/2023/hzg_eliso0p1_2023_efficiencies.json";
+    in_file_electron_iso0p15_ = "data/zgamma/2023/hzg_eliso0p15_2023_efficiencies.json";
+    in_file_muon_iso0p10_     = "data/zgamma/2023/hzg_muiso0p1_2023_efficiencies.json";
+    in_file_muon_iso0p15_     = "data/zgamma/2023/hzg_muiso0p15_2023_efficiencies.json";
+    in_file_ggf_nnlo_         = "data/zgamma/GluGluHToZG_NNLO_reweight_run3.json";
+    key_                      = "2023PromptC";
+    puName_                   = "Collisions2023_366403_369802_eraBC_GoldenJson";
+    btag_lightname            = "deepJet_light";
+    ph_shape_weighter_        = make_unique<rw_mmp_r3>();
+    zgbkg_isr_weighter_       = make_unique<kinr3_weighter>();
   }
   cs_electron_              = correction::CorrectionSet::from_file(in_file_electron_);
   cs_electron_reco_         = correction::CorrectionSet::from_file(in_file_electron_reco_);
@@ -203,6 +247,9 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
   cs_pileup_                = correction::CorrectionSet::from_file(in_file_pu_);
   cs_btag_                  = correction::CorrectionSet::from_file(in_file_btag_);
   cs_btag_mceff_            = correction::CorrectionSet::from_file(in_file_btag_mceff_);
+  if(year == "2016APV" || year == "2016" || year == "2017" || year == "2018"){
+    cs_jetpuid_               = correction::CorrectionSet::from_file(in_file_jetpuid_);
+  }
   cs_el_iso0p10_            = correction::CorrectionSet::from_file(in_file_electron_iso0p10_);
   cs_el_iso0p15_            = correction::CorrectionSet::from_file(in_file_electron_iso0p15_);
   cs_mu_iso0p10_            = correction::CorrectionSet::from_file(in_file_muon_iso0p10_);
@@ -244,6 +291,9 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
   btag_wp_loose_            = btag_wpts[0];
   btag_wp_medium_           = btag_wpts[1];
   btag_wp_tight_            = btag_wpts[2];
+  if(year == "2016APV" || year == "2016" || year == "2017" || year == "2018"){
+    map_jetpuid_              = cs_jetpuid_->at("PUJetID_eff");
+  }
 }
 
 // Electron Reco+MVA ID Scale Factors
@@ -322,6 +372,10 @@ void EventWeighter::ElectronSF(pico_tree &pico){
       }
       sf_up = (sf+unc)*(sf_reco+unc_reco);
       sf_dn = (sf-unc)*(sf_reco-unc_reco);
+      if (isinf(sf) || isnan(sf)) sf = 1.0;
+      if (isinf(sf_reco) || isnan(sf_reco)) sf_reco = 1.0;
+      if (isinf(sf_up) || isnan(sf_up)) sf_up = 1.0;
+      if (isinf(sf_dn) || isnan(sf_dn)) sf_dn = 1.0;
       sf_tot *= sf*sf_reco;
       sf_tot_up *= sf_up;
       sf_tot_dn *= fmax(sf_dn,0.0);
@@ -420,6 +474,9 @@ void EventWeighter::ElectronMinisoSF(pico_tree &pico){
     sf = data_eff/simu_eff;
     sf_up = data_eff_up/simu_eff_dn;
     sf_dn = data_eff_dn/simu_eff_up;
+    if (isinf(sf) || isnan(sf)) sf = 1.0;
+    if (isinf(sf_up) || isnan(sf_up)) sf_up = 1.0;
+    if (isinf(sf_dn) || isnan(sf_dn)) sf_dn = 1.0;
     sf_tot *= sf;
     sf_tot_up *= sf_up;
     sf_tot_dn *= sf_dn;
@@ -456,14 +513,14 @@ void EventWeighter::PhotonSF(pico_tree &pico){
     else
       category += "LowR9";
     float ev_sf(1.0), ev_sfup(1.0), ev_sfdn(1.0);
-    if (year_=="2016APV" || year_=="2016" 
+    if (year_=="2016APV" || year_=="2016"
         || year_=="2017" || year_=="2018") {
       ev_sf = map_photon_csev_->evaluate({key_, "sf", "MVA", category});
       ev_sfup = map_photon_csev_->evaluate({key_, "sfup", "MVA", category});
       ev_sfdn = map_photon_csev_->evaluate({key_, "sfdown", "MVA", category});
     }
     else if (year_=="2022" || year_=="2022EE" 
-             || year_=="2023" || year_=="2023BPix") {
+             || year_=="2023" || year_=="2023BPix" || year_ == "2024" || year_ == "2025" || year_ == "2026") {
       ev_sf = map_photon_csev_->evaluate({key_, "sf", "MVA80", eta, r9});
       ev_sfup = map_photon_csev_->evaluate({key_, "sfup", "MVA80", eta, r9});
       ev_sfdn = map_photon_csev_->evaluate({key_, "sfdown", "MVA80", eta, r9});
@@ -474,13 +531,13 @@ void EventWeighter::PhotonSF(pico_tree &pico){
     float id_sf = 1.0;
     float id_sfup = 1.0;
     float id_sfdn = 1.0;
-    if (!(year_ == "2023" || year_ == "2023BPix") && pt < 20.0f) {
+    if (!(year_ == "2023" || year_ == "2023BPix" || year_ == "2024" || year_ == "2025" || year_ == "2026") && pt < 20.0f) {
       id_sf = (map_photon_id_low_pass_->evaluate({pt, eta}));
       float id_unc = map_photon_id_low_pass_unc_->evaluate({pt, eta});
       id_sfup = id_sf+id_unc;
       id_sfdn = id_sf-id_unc;
     }
-    else if (year_=="2023"||year_=="2023BPix") {
+    else if (year_=="2023"||year_=="2023BPix" || year_ == "2024" || year_ == "2025" || year_ == "2026") {
       id_sf = map_photon_id_->evaluate({key_, "sf", wpstring, eta, pt, phi});
       id_sfup = map_photon_id_->evaluate({key_, "sfup", wpstring, eta, pt, phi});
       id_sfdn = map_photon_id_->evaluate({key_, "sfdown", wpstring, eta, pt, phi});
@@ -669,12 +726,12 @@ void EventWeighter::MuonMinisoSF(pico_tree &pico){
 
 // Pileup Scale Factors
 void EventWeighter::PileupSF(pico_tree &pico){
-  pico.out_w_pu() = min(map_pileup_->evaluate({float(pico.out_npu_tru()), 
+  pico.out_w_pu() = min(map_pileup_->evaluate({float(pico.out_npu_tru_mean()), 
       "nominal"}),10.0);
   pico.out_sys_pu().resize(2, 1.);
-  pico.out_sys_pu()[0] = min(map_pileup_->evaluate({float(pico.out_npu_tru()), 
+  pico.out_sys_pu()[0] = min(map_pileup_->evaluate({float(pico.out_npu_tru_mean()), 
       "up"}),10.0);
-  pico.out_sys_pu()[1] = min(map_pileup_->evaluate({float(pico.out_npu_tru()), 
+  pico.out_sys_pu()[1] = min(map_pileup_->evaluate({float(pico.out_npu_tru_mean()), 
       "down"}),10.0);
 }
 
@@ -693,8 +750,8 @@ void EventWeighter::bTaggingSF(pico_tree &pico){
   for (unsigned ijet = 0; ijet < pico.out_jet_pt().size(); ijet++) {
 
     if(pico.out_jet_isgood().at(ijet) 
-       && abs(pico.out_jet_eta().at(ijet)) < 2.4f){
-
+       && abs(pico.out_jet_eta().at(ijet)) < 2.5f){
+      if((year_=="2016APV" || year_=="2016") && abs(pico.out_jet_eta().at(ijet)) > 2.4f) continue;
       //get true flavor
       int jet_flavor = abs(pico.out_jet_hflavor().at(ijet));
       if (jet_flavor != 5 && jet_flavor != 4) jet_flavor = 0;
@@ -975,6 +1032,64 @@ void EventWeighter::bTaggingSF(pico_tree &pico){
 //  pico.out_sys_udsghig()[1] = sf_tot_dn_udsg;
 //}
 
+void EventWeighter::jetpuIdSF(pico_tree &pico){
+  float sf_tot_nm = 1.0;
+  float sf_tot_up = 1.0;
+  float sf_tot_dn = 1.0;
+  correction::Correction::Ref *jetpuid_map = &map_jetpuid_;
+  string wp_string = "L";
+  if(year_ == "2016APV" || year_ == "2016" || year_ == "2017" || year_ == "2018"){
+    for (unsigned ijet = 0; ijet < pico.out_jet_pt().size(); ijet++) {
+      if(pico.out_jet_isgood_min().at(ijet)){
+        float pt = pico.out_jet_nanopt().at(ijet);
+        float eta = pico.out_jet_eta().at(ijet);
+        float phi = pico.out_jet_phi().at(ijet);
+        if(pt > 50.f) continue;
+        bool genMatched = false;
+        for(unsigned genidx(0); genidx < pico.out_genjet_pt().size(); genidx++){
+          if (dR(eta, pico.out_genjet_eta().at(genidx), 
+                 phi, pico.out_genjet_phi().at(genidx)) < 0.4f){
+            genMatched = true;
+            break;
+          }
+        }
+        if (genMatched == false) continue;
+
+        //calculate probability to be in loose WP in data and MC.
+        //This is done by combining SFs (data/MC) with MC efficiencies
+        //Then use prob(data)/prob(MC) to get final SFs
+        float sf_nm = (*jetpuid_map)->evaluate({eta, pt, "nom", wp_string});
+        float sf_up = (*jetpuid_map)->evaluate({eta, pt, "up", wp_string});
+        float sf_dn = (*jetpuid_map)->evaluate({eta, pt, "down", wp_string});
+        float mc_eff = (*jetpuid_map)->evaluate({eta, pt, "MCEff", wp_string});
+        //total SF is product of per-jet SFs
+ 
+        if (isinf(sf_nm)||isnan(sf_nm)) sf_nm = 1.0;
+        if (isinf(sf_up)||isnan(sf_up)) sf_up = 1.0;
+        if (isinf(sf_dn)||isnan(sf_dn)) sf_dn = 1.0;
+        if (pico.out_jet_puid_pass().at(ijet)==true){
+          sf_tot_nm *= sf_nm;
+          sf_tot_up *= sf_up;
+          sf_tot_dn *= sf_dn;
+        }else{
+          if(mc_eff!=1.0f){
+            sf_tot_nm *= (1.0f-sf_nm*mc_eff)/(1.0f-mc_eff);
+            sf_tot_up *= (1.0f-sf_up*mc_eff)/(1.0f-mc_eff);
+            sf_tot_dn *= (1.0f-sf_dn*mc_eff)/(1.0f-mc_eff);
+          }else{//No physically justified default value here. Skipping.
+            continue;
+          }
+        }
+        
+      } //jet is good
+    } //loop over jets
+  }//conditional year
+  pico.out_w_jetpuid() = sf_tot_nm;
+  pico.out_sys_jetpuid().resize(2,1.); 
+  pico.out_sys_jetpuid()[0] = sf_tot_up;
+  pico.out_sys_jetpuid()[1] = sf_tot_dn;
+}
+
 // Photon shape SFs, call after photons have been produced
 void EventWeighter::PhotonShapeSF(pico_tree &pico){
   //only apply to lead photon, and only if true photon
@@ -1057,7 +1172,6 @@ void EventWeighter::NNLOCorrection(pico_tree &pico){
     for (unsigned int i(0); i<pico.out_mc_pt().size(); i++){
       if (pico.out_mc_id().at(i)==25){
         hidx = i;
-        break;
       }
     }
     if (hidx>=0){

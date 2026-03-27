@@ -8,7 +8,7 @@
 
 #include "TLorentzVector.h"
 
-#include "correction.hpp"
+#include "correction.h"
 #include "hig_producer.hpp"
 #include "met_producer.hpp"
 #include "utilities.hpp"
@@ -76,7 +76,7 @@ JetMetProducer::JetMetProducer(int year_, string year_string_,
       map_jec_l1_.push_back(cs_jerc_->at("Summer22_22Sep2023_V2_MC_L1FastJet_AK4PFPuppi"));
     }
 
-    in_file_jetveto_ = "data/zgamma/2022/jetvetomaps_2022.json";
+    in_file_jetveto_ = "data/zgamma/2022/jetvetomaps.json";
     cs_jetveto_ = correction::CorrectionSet::from_file(in_file_jetveto_);
     map_jetveto_ = cs_jetveto_->at("Summer22_23Sep2023_RunCD_V1");
   }
@@ -104,7 +104,7 @@ JetMetProducer::JetMetProducer(int year_, string year_string_,
       map_jec_l1_.push_back(cs_jerc_->at("Summer22EE_22Sep2023_V2_MC_L1FastJet_AK4PFPuppi"));
     }
 
-    in_file_jetveto_ = "data/zgamma/2022EE/jetvetomaps_2022EE.json";
+    in_file_jetveto_ = "data/zgamma/2022EE/jetvetomaps.json";
     cs_jetveto_ = correction::CorrectionSet::from_file(in_file_jetveto_);
     map_jetveto_ = cs_jetveto_->at("Summer22EE_23Sep2023_RunEFG_V1");
   }
@@ -122,7 +122,7 @@ JetMetProducer::JetMetProducer(int year_, string year_string_,
       map_jec_l1_.push_back(cs_jerc_->at("Summer23Prompt23_V2_MC_L1FastJet_AK4PFPuppi"));
     }
 
-    in_file_jetveto_ = "data/zgamma/2023/jetvetomaps_2023.json";
+    in_file_jetveto_ = "data/zgamma/2023/jetvetomaps.json";
     cs_jetveto_ = correction::CorrectionSet::from_file(in_file_jetveto_);
     map_jetveto_ = cs_jetveto_->at("Summer23Prompt23_RunC_V1");
   }
@@ -140,12 +140,36 @@ JetMetProducer::JetMetProducer(int year_, string year_string_,
       map_jec_l1_.push_back(cs_jerc_->at("Summer23BPixPrompt23_V3_MC_L1FastJet_AK4PFPuppi"));
     }
 
-    in_file_jetveto_ = "data/zgamma/2023BPix/jetvetomaps_2023BPix.json";
+    in_file_jetveto_ = "data/zgamma/2023BPix/jetvetomaps.json";
     cs_jetveto_ = correction::CorrectionSet::from_file(in_file_jetveto_);
     map_jetveto_ = cs_jetveto_->at("Summer23BPixPrompt23_RunD_V1");
   }
+  else if (year_string=="2024") {
+    cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2024/jet_jerc.json");
+    if (isData) {
+      map_jec_.push_back(cs_jerc_->compound().at("Summer24Prompt24_V2_DATA_L1L2L3Res_AK4PFPuppi"));
+      map_jec_l1_.push_back(cs_jerc_->at("Summer24Prompt24_V2_DATA_L1FastJet_AK4PFPuppi"));
+    }
+    else {
+      map_jes_ = cs_jerc_->at("Summer24Prompt24_V2_MC_Total_AK4PFPuppi");
+      //jet_jerc json has these two branches from 2023BPix. . .
+      map_jersf_ = cs_jerc_->at("Summer23BPixPrompt23_RunD_JRV1_MC_ScaleFactor_AK4PFPuppi");
+      map_jermc_ = cs_jerc_->at("Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi");
+      map_jec_.push_back(cs_jerc_->compound().at("Summer24Prompt24_V2_MC_L1L2L3Res_AK4PFPuppi"));
+      map_jec_l1_.push_back(cs_jerc_->at("Summer24Prompt24_V2_MC_L1FastJet_AK4PFPuppi"));
+    }
+
+    in_file_jetveto_ = "data/zgamma/2024/jetvetomaps.json";
+    cs_jetveto_ = correction::CorrectionSet::from_file(in_file_jetveto_);
+    map_jetveto_ = cs_jetveto_->at("Summer24Prompt24_RunBCDEFGHI_V1");
+
+    in_file_jetid_ = "data/zgamma/2024/JetID_Run3_Rereco2022CDE_v2.json";
+    cs_jetid_ = correction::CorrectionSet::from_file(in_file_jetid_);
+    map_jetid_tight_ = cs_jetid_->at("AK4PUPPI_Tight");
+    map_jetid_tightlepveto_ = cs_jetid_->at("AK4PUPPI_TightLeptonVeto");
+  }
   else {
-    cout << "WARNING: No dedicated JEC/JER, defaulting to 2023BPix" << endl;
+    cout << "WARNING: No dedicated JEC/JER, defaulting to 2023BPix NanoAODv12(!) treatment." << endl;
 
     cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2023BPix/jet_jerc.json");
     if (isData) {
@@ -159,6 +183,11 @@ JetMetProducer::JetMetProducer(int year_, string year_string_,
       map_jec_.push_back(cs_jerc_->compound().at("Summer23BPixPrompt23_V3_MC_L1L2L3Res_AK4PFPuppi"));
       map_jec_l1_.push_back(cs_jerc_->at("Summer23BPixPrompt23_V3_MC_L1FastJet_AK4PFPuppi"));
     }
+
+    in_file_jetveto_ = "data/zgamma/2023BPix/jetvetomaps.json";
+    cs_jetveto_ = correction::CorrectionSet::from_file(in_file_jetveto_);
+    map_jetveto_ = cs_jetveto_->at("Summer23BPixPrompt23_RunD_V1");
+
   }
 }
 
@@ -205,6 +234,17 @@ float JetMetProducer::GetJEC(float jet_area, float jet_eta, float jet_phi,
      }
      else {
        return map_jec_l1_[era_idx]->evaluate({jet_area, jet_eta, jet_pt, rho});
+     }
+   }
+   else if (year_string == "2024" || year_string == "2025" || year_string == "2026"){
+     if (jec_type == JECType::L1L2L3) {
+       if (isData)
+         return map_jec_[0]->evaluate({jet_area, jet_eta, jet_pt, rho,
+                                       jet_phi, static_cast<float>(run)});
+       return map_jec_[0]->evaluate({jet_area, jet_eta, jet_pt, rho, jet_phi});
+     }
+     else {
+       return map_jec_l1_[0]->evaluate({jet_area, jet_eta, jet_pt, rho});
      }
    }
    else {
@@ -317,7 +357,7 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
       if (!isData) {
 
         float sigmajer = map_jermc_->evaluate({jet_type_eta[ijet],
-                                               jet_type_pt[ijet],rho});
+                                               jet_l1l2l3_pt,rho});
         float sjer_nom = 1.0f;
         float sjer_up = 1.0f;
         float sjer_dn = 1.0f;
@@ -327,11 +367,11 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
           sjer_dn = map_jersf_->evaluate({jet_type_eta[ijet],"down"});
         }
         else {
-          sjer_nom = map_jersf_->evaluate({jet_type_eta[ijet],jet_type_pt[ijet],
+          sjer_nom = map_jersf_->evaluate({jet_type_eta[ijet],jet_l1l2l3_pt,
                                            "nom"});
-          sjer_up = map_jersf_->evaluate({jet_type_eta[ijet],jet_type_pt[ijet],
+          sjer_up = map_jersf_->evaluate({jet_type_eta[ijet],jet_l1l2l3_pt,
                                           "up"});
-          sjer_dn = map_jersf_->evaluate({jet_type_eta[ijet],jet_type_pt[ijet],
+          sjer_dn = map_jersf_->evaluate({jet_type_eta[ijet],jet_l1l2l3_pt,
                                           "down"});
         }
 
@@ -340,14 +380,14 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
         for (int igen(0); igen<nano.nGenJet(); ++igen) {
           float dr = dR(jet_type_eta[ijet], nano.GenJet_eta()[igen], 
                         jet_type_phi[ijet], nano.GenJet_phi()[igen]);
-          float dpt = jet_type_pt[ijet]-nano.GenJet_pt()[igen];
-          if (dr < 0.2f && fabs(dpt) < 3.0f*sigmajer*jet_type_pt[ijet]) {
+          float dpt = jet_l1l2l3_pt-nano.GenJet_pt()[igen];
+          if (dr < 0.2f && fabs(dpt) < 3.0f*sigmajer*jet_l1l2l3_pt) {
             if (dr > mindr) continue;
             mindr = dr;
             found_genjet = true;
-            indiv_jer_nm = (1.0+(sjer_nom-1.0)*dpt/jet_type_pt[ijet]);
-            indiv_jer_up = (1.0+(sjer_up-1.0)*dpt/jet_type_pt[ijet]);
-            indiv_jer_dn = (1.0+(sjer_dn-1.0)*dpt/jet_type_pt[ijet]);
+            indiv_jer_nm = (1.0+(sjer_nom-1.0)*dpt/jet_l1l2l3_pt);
+            indiv_jer_up = (1.0+(sjer_up-1.0)*dpt/jet_l1l2l3_pt);
+            indiv_jer_dn = (1.0+(sjer_dn-1.0)*dpt/jet_l1l2l3_pt);
           }
         }
 
@@ -368,7 +408,7 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
             indiv_jer_up = 1.0;
             indiv_jer_dn = 1.0;
           }
-        }
+        } 
       }
 
       float jet_factor = jet_l1l2l3_pt*indiv_jer_nm/jet_type_pt[ijet];
@@ -387,7 +427,6 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
           jes_dn_factor.push_back(1.0-jes_unc);
         }
       }
-
       //propagate corrections to MET
       //propagate corrections for jets with pt>15 GeV after subtracting muons
       //(below this threshold, propagate from unclustered energy), and skip
@@ -400,7 +439,7 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
       float jet_sinphi = sin(jet_type_phi[ijet]);
       // Run 2: starting from T1 corrected MET  (i.e. L2L3-L1 applied)
       // Run 3: Apply L2L3-L1 corrections
-      if (jet_l1l2l3_pt_nomu > 15.0f && fabs(jet_type_eta[ijet])<5.2f 
+      if (jet_l1l2l3_pt_nomu*indiv_jer_nm > 15.0f && fabs(jet_type_eta[ijet])<5.2f 
           && emef < 0.9f) {
         float jet_nom_pt = jet_type_pt[ijet]*jet_factor;
         if (year <= 2018) {
@@ -558,17 +597,20 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
     vector<int> jet_isvlep_nano_idx,  
     vector<int> jet_isphoton_nano_idx,
     const vector<float> &btag_wpts, 
-    const vector<float> &btag_df_wpts, 
+    const vector<float> &btag_df_wpts,
+    const vector<float> &btag_upt_wpts, 
     bool isFastsim, 
     bool isSignal,
     vector<HiggsConstructionVariables> &sys_higvars){
   vector<int> sig_jet_nano_idx;
   pico.out_njet() = 0; pico.out_ht() = 0; pico.out_ht5() = 0; 
   pico.out_nbl() = 0; pico.out_nbm() = 0; pico.out_nbt() = 0; 
-  pico.out_nbdfl() = 0; pico.out_nbdfm() = 0; pico.out_nbdft() = 0; 
+  pico.out_nbdfl() = 0; pico.out_nbdfm() = 0; pico.out_nbdft() = 0;
+  pico.out_nbuptl() = 0; pico.out_nbuptm() = 0; pico.out_nbuptt() = 0; 
   pico.out_ngenjet() = 0;
   pico.out_ismapvetoevt() = false;
   pico.out_ishemvetoevt() = false;
+  pico.out_isetavetoevt() = false;
   //add smearing to jets and calculate uncertainties
   vector<float> Jet_pt, Jet_mass;
   vector<float> jet_nm_factor;
@@ -590,13 +632,16 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
     MET_pt = pico.out_met();
     MET_phi = pico.out_met_phi();
     for(int ijet(0); ijet<nano.nJet(); ++ijet) {
-      Jet_pt.push_back(nano.Jet_pt()[ijet]*jet_nm_factor[ijet]);
-      Jet_mass.push_back(nano.Jet_mass()[ijet]*jet_nm_factor[ijet]);
+      float jet_pt = nano.Jet_pt()[ijet];
+      float jet_mass = nano.Jet_mass()[ijet];
+      Jet_pt.push_back(jet_pt*jet_nm_factor[ijet]);
+      Jet_mass.push_back(jet_mass*jet_nm_factor[ijet]);
     }
   }
 
   vector<int> Jet_jetId;
-  getJetId(nano, nanoaod_version, Jet_jetId);
+  if ((nanoaod_version+0.01) < 13) getJetId(nano, nanoaod_version, Jet_jetId);
+  // Jet_jetId is left uninitialized for v15, filled later
   vector<int> Jet_hadronFlavour;
   if (!isData) getJet_hadronFlavour(nano, nanoaod_version, Jet_hadronFlavour);
   vector<int> Jet_partonFlavour;
@@ -637,7 +682,8 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
   }
 
   //calculate jet quality variables first to order pico list
-  vector<bool> jet_pass_jetidFix;
+  vector<bool> jet_pass_jetidFix;//jet ID tight
+  vector<bool> jet_pass_PUjetid;
   vector<bool> jet_islep; 
   vector<bool> jet_isvlep; 
   vector<bool> jet_isphoton; 
@@ -650,15 +696,40 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
   for(int ijet(0); ijet<nano.nJet(); ++ijet){
     float jet_abseta = fabs(nano.Jet_eta()[ijet]);
     // jetid applied to only fullsim and data
+    // Unclear if this is the case for PU jet ID, treating it this way for now
     //Check if this is correct for R2
     if (isFastsim) {
       jet_pass_jetidFix.push_back(true);
+      jet_pass_PUjetid.push_back(true);
     }
     else {
-      if (year < 2022) {
+      if (year >=2022 && (nanoaod_version+0.01) > 13){//Run3 NanoAODv15
+         bool tightId = map_jetid_tight_->evaluate({
+                        nano.Jet_eta()[ijet], nano.Jet_chHEF()[ijet], 
+                        nano.Jet_neHEF()[ijet], nano.Jet_chEmEF()[ijet], 
+                        nano.Jet_neEmEF()[ijet], nano.Jet_muEF()[ijet], 
+                        static_cast<int>(nano.Jet_chMultiplicity()[ijet]),
+                        static_cast<int>(nano.Jet_neMultiplicity()[ijet]), 
+                        static_cast<int>(nano.Jet_chMultiplicity()[ijet]) + 
+                        static_cast<int>(nano.Jet_neMultiplicity()[ijet])
+                        });
+         bool tightIdLepVeto = map_jetid_tightlepveto_->evaluate({
+                        nano.Jet_eta()[ijet], nano.Jet_chHEF()[ijet], 
+                        nano.Jet_neHEF()[ijet], nano.Jet_chEmEF()[ijet], 
+                        nano.Jet_neEmEF()[ijet], nano.Jet_muEF()[ijet], 
+                        static_cast<int>(nano.Jet_chMultiplicity()[ijet]),
+                        static_cast<int>(nano.Jet_neMultiplicity()[ijet]),
+                        static_cast<int>(nano.Jet_chMultiplicity()[ijet]) +
+                        static_cast<int>(nano.Jet_neMultiplicity()[ijet])
+                        });
+         int jetIdBits = 0;
+         if (tightId == 1) jetIdBits+=2;
+         if (tightIdLepVeto) jetIdBits+=4;
+         Jet_jetId.push_back(jetIdBits);
+         jet_pass_jetidFix.push_back((Jet_jetId[ijet] >= 1));//Check this one again. . . 
+      } else if (year < 2022) {//Run2 NanoAODv9
         jet_pass_jetidFix.push_back((Jet_jetId[ijet] >= 1));
-      }
-      else {
+      }  else {//Run 3 NanoAODv12
         if(jet_abseta<=2.7f){
           jet_pass_jetidFix.push_back(Jet_jetId[ijet] & (0b010));
         } else if (jet_abseta>2.7f && jet_abseta<=3.0f){
@@ -668,6 +739,14 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
           jet_pass_jetidFix.push_back((Jet_jetId[ijet] & (0b010)) 
               && (nano.Jet_neEmEF()[ijet] < 0.4f));
         }
+      }
+      if(year == 2016){//PU jet id is applied using JEC corrected jets, but not JES/JER
+                       //https://twiki.cern.ch/twiki/bin/view/CMS/PileupJetIDUL
+        jet_pass_PUjetid.push_back( (nano.Jet_puId()[ijet] & (1 << 0)) || nano.Jet_pt()[ijet] > 50.f);
+      } else if (year <= 2018){
+        jet_pass_PUjetid.push_back( (nano.Jet_puId()[ijet] & (1 << 2)) || nano.Jet_pt()[ijet] > 50.f);
+      } else {
+        jet_pass_PUjetid.push_back(true);
       }
     }
     // check overlap with signal leptons (or photons)
@@ -681,7 +760,8 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
         jet_isphoton_nano_idx.end(), ijet) != jet_isphoton_nano_idx.end()); 
     // eta horn veto
     jet_inetahornveto.push_back(year >=2017 && Jet_pt[ijet] < 50.0f 
-        && jet_abseta > 2.5f && jet_abseta < 3.0f); 
+        && jet_abseta > 2.5f && jet_abseta < 3.0f);
+    if(jet_inetahornveto.back()) pico.out_isetavetoevt() = true;
     // For studying jetmaps and HEM vetos. Don't include eta veto yet in order 
     // to remove anomalous met events.
     bool isgood_min = !jet_islep.back() && !jet_isphoton.back() 
@@ -689,7 +769,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
     // 2018 HEM veto. JetMET POG gives tighter selection than ours except 
     // 15 GeV cut. Apply our selection, with lower pT cut for veto events.
     bool isvetohem  = false;
-    if (year==2018 && isgood_min && nano.Jet_pt()[ijet]>15.0f 
+    if (year==2018 && isgood_min && jet_pass_PUjetid.back() && nano.Jet_pt()[ijet]>15.0f 
         && nano.Jet_eta()[ijet]>-3.2f && nano.Jet_eta()[ijet]<-1.3f 
         && nano.Jet_phi()[ijet]>-1.57f && nano.Jet_phi()[ijet]<-0.87f){
       if(isData && nano.run()>=319077) isvetohem = true;
@@ -720,9 +800,8 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
     jet_isgood_min.push_back(isgood_min && !jet_inetahornveto.back());
     jet_isgood.push_back(jet_isgood_min.back() && !jet_invetomap.back() 
                          && !jet_inhemveto.back() 
-                         && (Jet_pt[ijet] > min_jet_pt));
+                         && (Jet_pt[ijet] > min_jet_pt) && jet_pass_PUjetid.back());
   }
-
   //determine ordering based on isgood and pt
   vector<NanoOrderEntry> nano_entries;
   vector<int> ordered_nano_indices;
@@ -741,7 +820,6 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
       });
   for (NanoOrderEntry nano_entry : nano_entries)
     ordered_nano_indices.push_back(nano_entry.nano_idx);
-
   // saving jet info on all jets passing pt cut with any variation
   for(int ijet : ordered_nano_indices) {
     if (verbose) cout<<"Jet "<<ijet<<": pt = "<<setw(10)<<Jet_pt[ijet]
@@ -821,7 +899,6 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
           sys_jet_met_dphi.at(3).push_back(DeltaPhi(nano.Jet_phi()[ijet], pico.out_sys_met_phi()[3]));
       }
     }
-
     if (isData) {
       if (Jet_pt[ijet] <= min_jet_pt) continue;
     }
@@ -879,12 +956,12 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
           pico.out_sys_nbt()[3]++; 
       }
     }
-
     switch(year) {
       case 2016:
       case 2017:
       case 2018:
         pico.out_jet_pt().push_back(Jet_pt[ijet]);
+        pico.out_jet_nanopt().push_back(nano.Jet_pt()[ijet]);
         pico.out_jet_eta().push_back(nano.Jet_eta()[ijet]);
         pico.out_jet_phi().push_back(nano.Jet_phi()[ijet]);
         pico.out_jet_m().push_back(Jet_mass[ijet]);
@@ -901,12 +978,14 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
         pico.out_jet_isgood_min().push_back(jet_isgood_min[ijet]);
         pico.out_jet_isvetomap().push_back(jet_invetomap[ijet]);
         pico.out_jet_isvetohem().push_back(jet_inhemveto[ijet]);
+        pico.out_jet_isvetoeta().push_back(jet_inetahornveto[ijet]);
         pico.out_jet_id().push_back(Jet_jetId[ijet]);
         pico.out_jet_mht_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], mht_vec.Phi()));
         pico.out_jet_met_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], MET_phi));
         pico.out_jet_puid().push_back(nano.Jet_puId()[ijet]);
         pico.out_jet_puid_disc().push_back(nano.Jet_puIdDisc()[ijet]);
-        if (!isData) {
+        pico.out_jet_puid_pass().push_back(jet_pass_PUjetid[ijet]);
+        if (!isData && isSignal) {
           pico.out_sys_jet_pt_jesup().push_back(
               Jet_pt[ijet]*jes_up_factor[ijet]);
           pico.out_sys_jet_pt_jesdn().push_back(
@@ -923,11 +1002,23 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
               Jet_mass[ijet]*jer_up_factor[ijet]);
           pico.out_sys_jet_m_jerdn().push_back(
               Jet_mass[ijet]*jer_dn_factor[ijet]);
+          pico.out_sys_jet_isgood_jesup().push_back(isgood_nopt
+              && (Jet_pt[ijet]*jes_up_factor[ijet] > min_jet_pt));
+          pico.out_sys_jet_isgood_jesdn().push_back(isgood_nopt
+              && (Jet_pt[ijet]*jes_dn_factor[ijet] > min_jet_pt));
+          pico.out_sys_jet_isgood_jerup().push_back(isgood_nopt
+              && (Jet_pt[ijet]*jer_up_factor[ijet] > min_jet_pt));
+          pico.out_sys_jet_isgood_jerdn().push_back(isgood_nopt
+              && (Jet_pt[ijet]*jer_dn_factor[ijet] > min_jet_pt));
         }
         break;
       case 2022:
       case 2023:
+      case 2024:
+      case 2025:
+      case 2026:
         pico.out_jet_pt().push_back(Jet_pt[ijet]);
+        pico.out_jet_nanopt().push_back(nano.Jet_pt()[ijet]);
         pico.out_jet_eta().push_back(nano.Jet_eta()[ijet]);
         pico.out_jet_phi().push_back(nano.Jet_phi()[ijet]);
         pico.out_jet_m().push_back(Jet_mass[ijet]);
@@ -935,7 +1026,10 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
         //pico.out_jet_breg_res().push_back(nano.Jet_bRegRes()[ijet]);
         if (nanoaod_version < 11.89) pico.out_jet_deepcsv().push_back(nano.Jet_btagDeepB()[ijet]);
         if (nanoaod_version > 11.5) pico.out_jet_btagpnetb().push_back(nano.Jet_btagPNetB()[ijet]);
-        if (nanoaod_version > 11.95) pico.out_jet_btagak4b().push_back(nano.Jet_btagRobustParTAK4B()[ijet]);
+        if (nanoaod_version > 11.95 && nanoaod_version < 14.9) 
+           pico.out_jet_btagak4b().push_back(nano.Jet_btagRobustParTAK4B()[ijet]);
+        if(nanoaod_version+0.01 > 15)
+           pico.out_jet_btaguptb().push_back(nano.Jet_btagUParTAK4B()[ijet]);
         pico.out_jet_deepflav().push_back(nano.Jet_btagDeepFlavB()[ijet]);
         pico.out_jet_ne_emef().push_back(nano.Jet_neEmEF()[ijet]);
         //pico.out_jet_qgl().push_back(nano.Jet_qgl()[ijet]);
@@ -946,9 +1040,13 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
         pico.out_jet_isgood_min().push_back(jet_isgood_min[ijet]);
         pico.out_jet_isvetomap().push_back(jet_invetomap[ijet]);
         pico.out_jet_isvetohem().push_back(jet_inhemveto[ijet]);
+        pico.out_jet_isvetoeta().push_back(jet_inetahornveto[ijet]);
         pico.out_jet_id().push_back(Jet_jetId[ijet]);
+        if (nanoaod_version + 0.01 > 15) 
+           pico.out_jet_puid_disc().push_back(nano.Jet_puIdDisc()[ijet]);
         pico.out_jet_mht_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], mht_vec.Phi()));
         pico.out_jet_met_dphi().push_back(DeltaPhi(nano.Jet_phi()[ijet], MET_phi));
+        pico.out_jet_puid_pass().push_back(true);
         //pico.out_jet_puid().push_back(nano.Jet_puId()[ijet]);
         //pico.out_jet_puid_disc().push_back(nano.Jet_puIdDisc()[ijet]);
         if (!isData) {
@@ -968,6 +1066,14 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
               Jet_mass[ijet]*jer_up_factor[ijet]);
           pico.out_sys_jet_m_jerdn().push_back(
               Jet_mass[ijet]*jer_dn_factor[ijet]);
+          pico.out_sys_jet_isgood_jesup().push_back(isgood_nopt
+              && (Jet_pt[ijet]*jes_up_factor[ijet] > min_jet_pt));
+          pico.out_sys_jet_isgood_jesdn().push_back(isgood_nopt
+              && (Jet_pt[ijet]*jes_dn_factor[ijet] > min_jet_pt));
+          pico.out_sys_jet_isgood_jerup().push_back(isgood_nopt
+              && (Jet_pt[ijet]*jer_up_factor[ijet] > min_jet_pt));
+          pico.out_sys_jet_isgood_jerdn().push_back(isgood_nopt
+              && (Jet_pt[ijet]*jer_dn_factor[ijet] > min_jet_pt));
         }
         break;
       default:
@@ -976,7 +1082,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
     }
     if (!isData && Jet_hadronFlavour.size() > 0) {
       pico.out_jet_hflavor().push_back(Jet_hadronFlavour[ijet]);
-      pico.out_jet_pflavor().push_back(Jet_partonFlavour[ijet]);
+    pico.out_jet_pflavor().push_back(Jet_partonFlavour[ijet]);
       pico.out_jet_genjet_idx().push_back(Jet_genJetIdx[ijet]);
     }
     // will be overwritten with the overlapping fat jet index, if such exists, in WriteFatJets
@@ -987,7 +1093,6 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
 
     if (!jet_islep[ijet] && !jet_isphoton[ijet]) 
       pico.out_ht5() += Jet_pt[ijet];
-
     if (jet_isgood[ijet]) {
       sig_jet_nano_idx.push_back(ijet);
       pico.out_njet()++;
@@ -1003,7 +1108,12 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
       }
       if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[0]) pico.out_nbdfl()++; 
       if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[1]) pico.out_nbdfm()++; 
-      if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[2]) pico.out_nbdft()++; 
+      if (nano.Jet_btagDeepFlavB()[ijet] > btag_df_wpts[2]) pico.out_nbdft()++;
+      if ((nanoaod_version+0.01)>15){
+        if (nano.Jet_btagUParTAK4B()[ijet] > btag_upt_wpts[0]) pico.out_nbuptl()++;
+        if (nano.Jet_btagUParTAK4B()[ijet] > btag_upt_wpts[1]) pico.out_nbuptm()++;
+        if (nano.Jet_btagUParTAK4B()[ijet] > btag_upt_wpts[2]) pico.out_nbuptt()++;
+      } 
     }
   } // end jet loop
   
@@ -1026,7 +1136,8 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
     if (ijet_e24==3) break;
     ijet_e24++;
   }
-  if (isSignal && !sys_jet_met_dphi.empty()) {
+
+  if (isSignal && (nanoaod_version+0.01)<9) {
     for (unsigned ijec(0); ijec < 4; ijec++) {
       for (unsigned ijet(0); ijet < sys_jet_met_dphi[ijec].size(); ijet++) {
         float cut_ = ijet<=1 ? 0.5 : 0.3;
@@ -1067,7 +1178,7 @@ void JetMetProducer::WriteFatJets(nano_tree &nano, pico_tree &pico,
   vector<float> FatJet_particleNetMD_Xbb;
   vector<int> FatJet_subJetIdx1;
   vector<int> FatJet_subJetIdx2;
-  getFatJet_btagDDBvL(nano, nanoaod_version, FatJet_btagDDBvL);
+  if(nanoaod_version < 13.1) getFatJet_btagDDBvL(nano, nanoaod_version, FatJet_btagDDBvL);
   getFatJet_subJetIdx1(nano, nanoaod_version, FatJet_subJetIdx1);
   getFatJet_subJetIdx2(nano, nanoaod_version, FatJet_subJetIdx2);
 
@@ -1094,8 +1205,8 @@ void JetMetProducer::WriteFatJets(nano_tree &nano, pico_tree &pico,
     pico.out_fjet_m().push_back(nano.FatJet_mass()[ifjet]);
     pico.out_fjet_msoftdrop().push_back(nano.FatJet_msoftdrop()[ifjet]);
     // Mass-decorrelated Deep Double B, H->bb vs QCD discriminator, endorsed by BTV
-    pico.out_fjet_deep_md_hbb_btv().push_back(FatJet_btagDDBvL[ifjet]); // FatJet_btagDDBvL is a function in utilities.cpp
-    pico.out_fjet_mva_hbb_btv().push_back(nano.FatJet_btagHbb()[ifjet]);
+    if(nanoaod_version < 13.1) pico.out_fjet_deep_md_hbb_btv().push_back(FatJet_btagDDBvL[ifjet]);
+    if(nanoaod_version < 13.1) pico.out_fjet_mva_hbb_btv().push_back(nano.FatJet_btagHbb()[ifjet]);
     if (nanoaod_version+0.01 < 11.9) {
       // Mass-decorrelated DeepAK8, H->bb vs QCD discriminator, endorsed by JME
       pico.out_fjet_deep_md_hbb_jme().push_back(nano.FatJet_deepTagMD_HbbvsQCD()[ifjet]); //Mass-decorrelated DeepBoostedJet tagger H->bb vs QCD
@@ -1118,12 +1229,10 @@ void JetMetProducer::WriteFatJets(nano_tree &nano, pico_tree &pico,
     }
     pico.out_fjet_subjet_idx1().push_back(FatJet_subJetIdx1[ifjet]);
     pico.out_fjet_subjet_idx2().push_back(FatJet_subJetIdx2[ifjet]);
-
     for(unsigned ijet(0); ijet<pico.out_jet_pt().size(); ++ijet){
       if (dR(pico.out_jet_eta()[ijet], nano.FatJet_eta()[ifjet], pico.out_jet_phi()[ijet], nano.FatJet_phi()[ifjet])<0.8f)
         pico.out_jet_fjet_idx()[ijet] = ifjet;
     }
-
     pico.out_nfjet()++;
     
     //Changes for boosted 4b, commenting them out and voiding the unused variables since it had errors and we are no longer doing boosted 4b
@@ -1159,14 +1268,12 @@ void JetMetProducer::WriteSubJets(nano_tree &nano, pico_tree &pico){
     pico.out_subfjet_eta().push_back(nano.SubJet_eta()[isubj]);
     pico.out_subfjet_phi().push_back(nano.SubJet_phi()[isubj]);
     pico.out_subfjet_m().push_back(nano.SubJet_mass()[isubj]);
-
-    pico.out_subfjet_deepcsv().push_back(nano.SubJet_btagDeepB()[isubj]);
+    if (nanoaod_version < 13.1) pico.out_subfjet_deepcsv().push_back(nano.SubJet_btagDeepB()[isubj]);
     pico.out_subfjet_raw_factor().push_back(nano.SubJet_rawFactor()[isubj]);
     pico.out_subfjet_tau1().push_back(nano.SubJet_tau1()[isubj]);
     pico.out_subfjet_tau2().push_back(nano.SubJet_tau2()[isubj]);
     pico.out_subfjet_tau3().push_back(nano.SubJet_tau3()[isubj]);
     pico.out_subfjet_tau4().push_back(nano.SubJet_tau4()[isubj]);
-
     //match to highest pT ak4 jet that has not already been matched to a previous subjet
     float mindr(999.); int closest_jet(-1);
     for(unsigned ijet(0); ijet<pico.out_jet_pt().size(); ++ijet){

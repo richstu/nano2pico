@@ -7,7 +7,7 @@
 
 #include "TRandom3.h"
 
-#include "correction.hpp"
+#include "correction.h"
 #include "utilities.hpp"
 
 using namespace std;
@@ -45,41 +45,57 @@ PhotonProducer::PhotonProducer(string year_, bool isData_,
     cs_scale_syst_ = correction::CorrectionSet::from_file(
         "data/zgamma/2022/photonSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
-        "EGMScale_Compound_Pho_2022preEE");
+        "Scale");
     map_smearing_ = cs_scale_syst_->at(
-        "EGMSmearAndSyst_PhoPTsplit_2022preEE");
+        "SmearAndSyst");
   }
   else if (year=="2022EE") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
         "data/zgamma/2022EE/photonSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
-        "EGMScale_Compound_Pho_2022postEE");
+        "Scale");
     map_smearing_ = cs_scale_syst_->at(
-        "EGMSmearAndSyst_PhoPTsplit_2022postEE");
+        "SmearAndSyst");
   }
   else if (year=="2023") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
         "data/zgamma/2023/photonSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
-        "EGMScale_Compound_Pho_2023preBPIX");
+        "Scale");
     map_smearing_ = cs_scale_syst_->at(
-        "EGMSmearAndSyst_PhoPTsplit_2023preBPIX");
+        "SmearAndSyst");
   }
   else if (year=="2023BPix") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
         "data/zgamma/2023BPix/photonSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
-        "EGMScale_Compound_Pho_2023postBPIX");
+        "Scale");
     map_smearing_ = cs_scale_syst_->at(
-        "EGMSmearAndSyst_PhoPTsplit_2023postBPIX");
+        "SmearAndSyst");
+  }
+  else if (year=="2024") {
+    cs_scale_syst_ = correction::CorrectionSet::from_file(
+        "data/zgamma/2024/photonSS_EtDependent.json");
+    map_scale_ = cs_scale_syst_->compound().at(
+        "Scale");
+    map_smearing_ = cs_scale_syst_->at(
+        "SmearAndSyst");
+  }
+  else if (year=="2025") {
+    cs_scale_syst_ = correction::CorrectionSet::from_file(
+        "data/zgamma/2025/EGMScalesSmearing_Pho_2025_forEGM.v1.json");
+    map_scale_ = cs_scale_syst_->compound().at(
+        "Scale");
+    map_smearing_ = cs_scale_syst_->at(
+        "SmearAndSyst");
   }
   else {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
         "data/zgamma/2023BPix/photonSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
-        "EGMScale_Compound_Pho_2023postBPIX");
+        "Scale");
     map_smearing_ = cs_scale_syst_->at(
-        "EGMSmearAndSyst_PhoPTsplit_2023postBPIX");
+        "SmearAndSyst");
     std::cout << "WARNING: No dedicated EGM scale/smearing JSONs, defaulting to 2023BPix" << std::endl;
   }
 }
@@ -89,11 +105,9 @@ PhotonProducer::~PhotonProducer(){
 
 bool PhotonProducer::IsSignal(nano_tree &nano, pico_tree &pico, int nano_idx, 
                               float scaleres_corr, float minLepDR, 
-                              vector<int> &photon_el_pico_idx) {
+                              vector<int> &photon_el_pico_idx, bool skip_pt) {
   float pt = nano.Photon_pt()[nano_idx]*scaleres_corr;
-  //float eta = nano.Photon_eta()[nano_idx];
-  //float mva = nano.Photon_mvaID()[nano_idx];
-  if (pt < SignalPhotonPtCut) return false;
+  if (pt < SignalPhotonPtCut && !skip_pt) return false;
   if (!(nano.Photon_isScEtaEB()[nano_idx] 
         || nano.Photon_isScEtaEE()[nano_idx])) return false;
   if (!nano.Photon_mvaID_WP80()[nano_idx]) return false;
@@ -102,12 +116,45 @@ bool PhotonProducer::IsSignal(nano_tree &nano, pico_tree &pico, int nano_idx,
   if (!nano.Photon_electronVeto()[nano_idx]) return false;
   if (!(minLepDR > 0.3f)) return false;
   //(void)minLepDR;
-  if (!(photon_el_pico_idx[nano_idx]==-1 || !(pico.out_el_sig()[photon_el_pico_idx[nano_idx]]))) {};//return false;
+  if (!(photon_el_pico_idx[nano_idx]==-1 || !(pico.out_el_sig()[photon_el_pico_idx[nano_idx]]))) return false;
   return true;
 }
 
-vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vector<int> &jet_isphoton_nano_idx, vector<int> &sig_el_nano_idx, vector<int> &sig_mu_nano_idx, vector<int> &photon_el_pico_idx){
 
+float PhotonProducer::SCeta(bool isScEtaEB, float eta, float phi, 
+                            float pvx, float pvy, float pvz){
+    //calculate eta w.r.t. origin (SCeta)
+    float origin_eta = 0.0;
+    if (isScEtaEB) {
+      float pv_tan_theta_over_2 = exp(-1.0*eta);
+      float pv_tan_theta = 2.0*pv_tan_theta_over_2/(1.0-pv_tan_theta_over_2*pv_tan_theta_over_2);
+      float photon_unit_x = cos(phi);
+      float photon_unit_y = sin(phi);
+      float pv_ecal_dr = 130.0 - (pvx*photon_unit_x+pvy*photon_unit_y);
+      float pv_ecal_dz = pv_ecal_dr/pv_tan_theta;
+      float origin_theta = atan(130.0/(pvz+pv_ecal_dz));
+      if (origin_theta < 0) origin_theta += M_PI;
+      origin_eta = -1.0*log(tan(origin_theta/2.0));
+    }
+    else { //if (nano.Photon_isScEtaEE()[iph])
+      float pv_tan_theta_over_2 = exp(-1.0*eta);
+      float pv_tan_theta = 2.0*pv_tan_theta_over_2/(1.0-pv_tan_theta_over_2*pv_tan_theta_over_2);
+      float photon_unit_x = cos(phi);
+      float photon_unit_y = sin(phi);
+      float pv_ecal_dz = 310.0-pvz; //+ endcap
+      if (eta < 0) pv_ecal_dz = 310.0+pvz; //- endcap
+      float pv_ecal_dr = pv_ecal_dz*pv_tan_theta;
+      float origin_theta = atan(((photon_unit_x*pvx+photon_unit_y*pvy)+pv_ecal_dr)/310.0);
+      if (origin_theta < 0) origin_theta += M_PI;
+      origin_eta = -1.0*log(tan(origin_theta/2.0));
+    }
+  return origin_eta;
+}
+
+vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, 
+    vector<int> &jet_isphoton_nano_idx, vector<int> &sig_el_nano_idx, 
+    vector<int> &sig_mu_nano_idx, vector<int> &photon_el_pico_idx, 
+    bool is_signal_sample) {
   pico.out_nphoton() = 0;
   // pico.out_nfsrphoton() = 0;
   vector<int> sig_photon_nano_idx;
@@ -136,45 +183,81 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
   vector<float> smear_syst_dn;
   vector<float> photon_drmin;
   vector<float> photon_drmax;
+  vector<float> energy_err_corr;
+  vector<float> energy_err_scale_up;
+  vector<float> energy_err_scale_dn;
+  vector<float> energy_err_smear_up;
+  vector<float> energy_err_smear_dn;
   for(int iph(0); iph<nano.nPhoton(); ++iph){
     //deal with scale/smearing (systematics only for NanoAODv9 [run 2], full
     //correction for NanoAODv10+ [run3])
     float pt = nano.Photon_pt()[iph];
     float eta = nano.Photon_eta()[iph];
     float phi = nano.Photon_phi()[iph];
-
+    float origin_eta = SCeta(nano.Photon_isScEtaEB()[iph], eta, phi, nano.PV_x(), nano.PV_y(), nano.PV_z());
     if (year=="2016APV"||year=="2016"||year=="2017"||year=="2018") {
       scaleres_corr.push_back(1.0f);
+      energy_err_corr.push_back(nano.Photon_energyErr()[iph]);
       if (!isData) {
         scale_syst_up.push_back(map_scale_syst_->evaluate({str_scale_syst_,
             "scaleup",eta,nano.Photon_seedGain()[iph]}));
         scale_syst_dn.push_back(map_scale_syst_->evaluate({str_scale_syst_,
             "scaledown",eta,nano.Photon_seedGain()[iph]}));
-        smear_syst_up.push_back(1.0f+nano.Photon_dEsigmaUp()[iph]);
-        smear_syst_dn.push_back(1.0f+nano.Photon_dEsigmaDown()[iph]);
+        smear_syst_up.push_back(1.0f
+                                -nano.Photon_dEsigmaUp()[iph]/cosh(eta)/pt);
+        smear_syst_dn.push_back(1.0f
+                                -nano.Photon_dEsigmaDown()[iph]/cosh(eta)/pt);
+        energy_err_scale_up.push_back(nano.Photon_energyErr()[iph]
+                                      *scale_syst_up[iph]);
+        energy_err_scale_dn.push_back(nano.Photon_energyErr()[iph]
+                                      *scale_syst_dn[iph]);
+        energy_err_smear_up.push_back(nano.Photon_energyErr()[iph]);
+        energy_err_smear_dn.push_back(nano.Photon_energyErr()[iph]);
+
       }
     }
-    else if ((year=="2022"||year=="2022EE"||year=="2023"||year=="2023BPix") 
-             && pt>20) {
+    else if ((year=="2022"||year=="2022EE"||year=="2023"||year=="2023BPix"||year=="2024"||year=="2025"||year=="2026") 
+             && pt>15.f) {
       float run = static_cast<float>(nano.run());
       float r9 = fmin(fmax(nano.Photon_r9()[iph],0.0),1.0);
+      float energy = pt*cosh(eta);
       float seedGain = static_cast<float>(nano.Photon_seedGain()[iph]);
       if (isData) {
         //scale corrections applied to data
-        scaleres_corr.push_back(map_scale_->evaluate({"scale",run,eta,r9,
-            fabs(eta),pt,seedGain}));
+        float scale = map_scale_->evaluate({"scale",run,origin_eta,r9,
+            pt,seedGain});
+        float smear = map_smearing_->evaluate({"smear",pt*scale,r9,origin_eta});
+        scaleres_corr.push_back(scale);
+        energy_err_corr.push_back(sqrt(pow(nano.Photon_energyErr()[iph],2) 
+                                         + pow((energy * smear),2))*scale);
       }
       else {
         //smearing corrections applied to MC, syst.s also calculated
-        float rho = map_smearing_->evaluate({"smear",pt,r9,fabs(eta)});
-        float err_rho = map_smearing_->evaluate({"esmear",pt,r9,fabs(eta)});
-        float scale_unc = map_smearing_->evaluate({"escale",pt,r9,fabs(eta)});
+        float smear = map_smearing_->evaluate({"smear",pt,r9,origin_eta});
+        float scale_up = map_scale_->evaluate({"scale_up",run,origin_eta,r9,
+            pt,seedGain});
+        float scale_dn = map_scale_->evaluate({"scale_down",run,origin_eta,r9,
+            pt,seedGain});
+        float smear_up = map_smearing_->evaluate({"smear_up",pt,r9,origin_eta});
+        float smear_dn = map_smearing_->evaluate({"smear_down",pt,r9,origin_eta});
         float rand = rng_.Gaus();
-        scaleres_corr.push_back(1.0f+rand*rho);
-        smear_syst_up.push_back(1.0f+rand*(rho+err_rho));
-        smear_syst_dn.push_back(1.0f+rand*(rho-err_rho));
-        scale_syst_up.push_back(1.0f+scale_unc);
-        scale_syst_dn.push_back(1.0f-scale_unc);
+        float smearing = 1.0f+rand*smear;
+        float smearing_up = 1.0f+rand*smear_up;
+        float smearing_dn = 1.0f+rand*smear_dn;
+        scaleres_corr.push_back(smearing);
+        smear_syst_up.push_back(smearing_up);
+        smear_syst_dn.push_back(smearing_dn);
+        scale_syst_up.push_back(scale_up);
+        scale_syst_dn.push_back(scale_dn);
+
+        float new_energy_err = sqrt(pow(nano.Photon_energyErr()[iph],2) + pow((energy * smear),2)) * smearing;
+        energy_err_corr.push_back(new_energy_err);
+        energy_err_scale_up.push_back(new_energy_err*scale_up);
+        energy_err_scale_dn.push_back(new_energy_err*scale_dn);
+        energy_err_smear_up.push_back(sqrt(pow(nano.Photon_energyErr()[iph],2) 
+                                      + pow((energy * smear_up),2)) * smearing_up);
+        energy_err_smear_dn.push_back(sqrt(pow(nano.Photon_energyErr()[iph],2) 
+                                      + pow((energy * smear_dn),2)) * smearing_dn);
       }
     }
     else {
@@ -183,6 +266,11 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
       smear_syst_dn.push_back(1.0f);
       scale_syst_up.push_back(1.0f);
       scale_syst_dn.push_back(1.0f);
+      energy_err_corr.push_back(nano.Photon_energyErr()[iph]);
+      energy_err_scale_up.push_back(nano.Photon_energyErr()[iph]);
+      energy_err_scale_dn.push_back(nano.Photon_energyErr()[iph]);
+      energy_err_smear_up.push_back(nano.Photon_energyErr()[iph]);
+      energy_err_smear_dn.push_back(nano.Photon_energyErr()[iph]);
     }
 
     // Find min(dR) between photon and signal lepton
@@ -224,7 +312,6 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
   std::vector<int> ordered_nano_indices;
   for (NanoOrderEntry nano_entry : nano_entries)
     ordered_nano_indices.push_back(nano_entry.nano_idx);
-
   //then, add branches to pico
   int pico_idx = 0;
   for(int iph : ordered_nano_indices) {
@@ -232,6 +319,8 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
     float pt = raw_pt*scaleres_corr[iph];
     float eta = nano.Photon_eta()[iph];
     float phi = nano.Photon_phi()[iph];
+    float origin_eta = SCeta(nano.Photon_isScEtaEB()[iph], eta, phi, nano.PV_x(), nano.PV_y(), nano.PV_z());
+    float energy_err = energy_err_corr[iph];
     float mva = nano.Photon_mvaID()[iph];
     bool eVeto = nano.Photon_electronVeto()[iph];
 
@@ -241,6 +330,8 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
 
     bool isSignal = IsSignal(nano, pico, iph, scaleres_corr[iph], 
                              photon_drmin[iph], photon_el_pico_idx);
+    bool isSignal_nopt = IsSignal(nano, pico, iph, scaleres_corr[iph], 
+                                  photon_drmin[iph], photon_el_pico_idx, true);
 
     //some logic to save highest pt photon passing HIG-19-014 selection
     bool isSignalhig019014 = (((nano.Photon_isScEtaEB()[iph] && mva > -0.4f) 
@@ -252,32 +343,6 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
         pico.out_photon_idx_hig019014() = pico_idx;
         hig019014_photon_idx = pico_idx;
       }
-    }
-
-    //calculate eta w.r.t. origin (SCeta)
-    float origin_eta = 0.0;
-    if (nano.Photon_isScEtaEB()[iph]) {
-      float pv_tan_theta_over_2 = exp(-1.0*eta);
-      float pv_tan_theta = 2.0*pv_tan_theta_over_2/(1.0-pv_tan_theta_over_2*pv_tan_theta_over_2);
-      float photon_unit_x = cos(nano.Photon_phi()[iph]);
-      float photon_unit_y = sin(nano.Photon_phi()[iph]);
-      float pv_ecal_dr = 130.0 - (nano.PV_x()*photon_unit_x+nano.PV_y()*photon_unit_y);
-      float pv_ecal_dz = pv_ecal_dr/pv_tan_theta;
-      float origin_theta = atan(130.0/(nano.PV_z()+pv_ecal_dz));
-      if (origin_theta < 0) origin_theta += M_PI;
-      origin_eta = -1.0*log(tan(origin_theta/2.0));
-    }
-    else { //if (nano.Photon_isScEtaEE()[iph])
-      float pv_tan_theta_over_2 = exp(-1.0*eta);
-      float pv_tan_theta = 2.0*pv_tan_theta_over_2/(1.0-pv_tan_theta_over_2*pv_tan_theta_over_2);
-      float photon_unit_x = cos(nano.Photon_phi()[iph]);
-      float photon_unit_y = sin(nano.Photon_phi()[iph]);
-      float pv_ecal_dz = 310.0-nano.PV_z(); //+ endcap
-      if (eta < 0) pv_ecal_dz = 310.0+nano.PV_z(); //- endcap
-      float pv_ecal_dr = pv_ecal_dz*pv_tan_theta;
-      float origin_theta = atan(((photon_unit_x*nano.PV_x()+photon_unit_y*nano.PV_y())+pv_ecal_dr)/310.0);
-      if (origin_theta < 0) origin_theta += M_PI;
-      origin_eta = -1.0*log(tan(origin_theta/2.0));
     }
 
     //find nearest jet and get PUID
@@ -294,7 +359,6 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
         }
       }
     }
-
     //check for nearby gen particles with pT>15 GeV and fromHardprocess
     bool hardprocess = false;
     if (!isData) {
@@ -320,8 +384,8 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
     pico.out_photon_r9().push_back(nano.Photon_r9()[iph]);
     pico.out_photon_sieie().push_back(nano.Photon_sieie()[iph]);
     pico.out_photon_hoe().push_back(nano.Photon_hoe()[iph]);
-    pico.out_photon_energyErr().push_back(nano.Photon_energyErr()[iph]);
-    pico.out_photon_relpterr().push_back(nano.Photon_energyErr()[iph]
+    pico.out_photon_energyErr().push_back(energy_err);
+    pico.out_photon_relpterr().push_back(energy_err
                                          /(pt*TMath::CosH(eta)));
     pico.out_photon_elveto().push_back(eVeto);
     pico.out_photon_isScEtaEB().push_back(nano.Photon_isScEtaEB()[iph]);
@@ -337,20 +401,34 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
     pico.out_photon_idCutBased().push_back(Photon_cutBased[iph]);
     pico.out_photon_id().push_back(nano.Photon_mvaID_WP90()[iph]);
     pico.out_photon_id80().push_back(nano.Photon_mvaID_WP80()[iph]);
-    if (!isData) {
+   if (!isData) {
       pico.out_photon_pflavor().push_back(nano.Photon_genPartFlav()[iph]);
       pico.out_photon_hardprocess().push_back(hardprocess);
-      pico.out_sys_photon_pt_resup().push_back(raw_pt*smear_syst_up[iph]);
-      pico.out_sys_photon_pt_resdn().push_back(raw_pt*smear_syst_dn[iph]);
-      pico.out_sys_photon_pt_scaleup().push_back(pt*scale_syst_up[iph]);
-      pico.out_sys_photon_pt_scaledn().push_back(pt*scale_syst_dn[iph]);
+      if (is_signal_sample) {
+        pico.out_sys_photon_pt_resup().push_back(raw_pt*smear_syst_up[iph]);
+        pico.out_sys_photon_pt_resdn().push_back(raw_pt*smear_syst_dn[iph]);
+        pico.out_sys_photon_pt_scaleup().push_back(pt*scale_syst_up[iph]);
+        pico.out_sys_photon_pt_scaledn().push_back(pt*scale_syst_dn[iph]);
+        pico.out_sys_photon_enerr_resup().push_back(energy_err_smear_up[iph]);
+        pico.out_sys_photon_enerr_resdn().push_back(energy_err_smear_dn[iph]);
+        pico.out_sys_photon_enerr_scaleup().push_back(energy_err_scale_up[iph]);
+        pico.out_sys_photon_enerr_scaledn().push_back(energy_err_scale_dn[iph]);
+        pico.out_sys_photon_sig_resup().push_back(isSignal_nopt 
+            && (raw_pt*smear_syst_up[iph] > SignalPhotonPtCut));
+        pico.out_sys_photon_sig_resdn().push_back(isSignal_nopt 
+            && (raw_pt*smear_syst_dn[iph] > SignalPhotonPtCut));
+        pico.out_sys_photon_sig_scaleup().push_back(isSignal_nopt 
+            && (pt*scale_syst_up[iph] > SignalPhotonPtCut));
+        pico.out_sys_photon_sig_scaledn().push_back(isSignal_nopt 
+            && (pt*scale_syst_dn[iph] > SignalPhotonPtCut));
+      }
     }
     if (year=="2016APV"||year=="2016"||year=="2017"||year=="2018") {
       pico.out_photon_ecorr().push_back(nano.Photon_eCorr()[iph]);
       pico.out_photon_reliso().push_back(nano.Photon_pfRelIso03_all()[iph]);
       pico.out_photon_pudisc().push_back(photon_puid_disc);
     }
-    else if (year=="2022"||year=="2022EE"||year=="2023"||year=="2023BPix") {
+    else if (year=="2022"||year=="2022EE"||year=="2023"||year=="2023BPix"||year=="2024"||year=="2025"||year=="2026") {
       pico.out_photon_reliso().push_back(nano.Photon_pfRelIso03_all_quadratic()[iph]);
       pico.out_photon_phiso().push_back(nano.Photon_pfPhoIso03()[iph]);
       pico.out_photon_chiso().push_back(nano.Photon_pfChargedIsoPFPV()[iph]);
