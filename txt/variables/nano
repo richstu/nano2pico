@@ -733,6 +733,7 @@ int Pileup_sumEOOT
 int Pileup_sumLOOT
 
 float Rho_fixedGridRhoAll
+float fixedGridRhoAll
 float fixedGridRhoFastjetAll
 float fixedGridRhoFastjetCentral
 float fixedGridRhoFastjetCentralCalo

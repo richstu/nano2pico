@@ -96,7 +96,7 @@ EventTools::EventTools(const string &name_, int year_, bool isData_, float nanoa
   if((Contains(name,"DYJetsToLL_M-50") || Contains(name,"DYJetsToLL_M-50")) && year<2022){ has_photon_in_sample = false; overlap_removal_key = "DYlowpt";}
   if((Contains(name,"DYJetsToLL_M-50") || Contains(name,"DYJetsToLL_M-50")) && year>=2022){ has_photon_in_sample = false; overlap_removal_key = "DY";}
   if(Contains(name,"DYto2L-2Jets_MLL-50_TuneCP5")){ has_photon_in_sample = false; overlap_removal_key = "DY";}
-  if(Contains(name, "DYto2E-2Jets_Bin-MLL-50_TuneCP5") || Contains(name, "DYto2Mu-2Jets_Bin-MLL-50_TuneCP5")){ has_photon_in_sample = false; overlap_removal_key = "DY";}
+  if(Contains(name, "DYto2E-2Jets_Bin-MLL-50_TuneCP5") || Contains(name, "DYto2Mu-2Jets_Bin-MLL-50_TuneCP5") || Contains(name, "DYto2Tau-2Jets_Bin-MLL-50_TuneCP5")){ has_photon_in_sample = false; overlap_removal_key = "DY";}
   if(Contains(name,"ZGToLLG_01J_5f_lowMLL_lowGPt")){ has_photon_in_sample = true;  overlap_removal_key = "DYlowpt";}
   if(Contains(name,"ZGToLLG_01J_5f_TuneCP5") || Contains(name,"DYGto2LG-1Jets_MLL-50")){ has_photon_in_sample = true;  overlap_removal_key = "DY";} 
   if(Contains(name,"DYGto2LG-1Jets_Bin-MLL-50")){ has_photon_in_sample = true;  overlap_removal_key = "DY";}
