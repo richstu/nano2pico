@@ -455,6 +455,16 @@ void getGenJet_partonFlavour(nano_tree & nano, float nanoaod_version, vector<int
   }
 }
 
+void getPV_npvs(nano_tree & nano, float nanoaod_version, int & PV_npvs){
+  if(nanoaod_version+0.01 > 12) PV_npvs = nano.PV_npvs_12p0();
+  else PV_npvs = nano.PV_npvs();
+}
+
+void getPV_npvsGood(nano_tree & nano, float nanoaod_version, int & PV_npvsGood){
+  if(nanoaod_version+0.01 > 12) PV_npvsGood = nano.PV_npvsGood_12p0();
+  else PV_npvsGood = nano.PV_npvsGood();
+}
+
 
 bool check_miniso(pico_tree & pico, float miniso_comp) {
   for(int iel(0); iel<pico.out_nel(); ++iel){
