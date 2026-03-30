@@ -891,7 +891,7 @@ int EventTools::GetEventType(){
     }else if(Contains(name, "TTZToQQ")){ category = 1; bin = 0;
     }else if(Contains(name, "ttZJets_Tune")){ category = 2; bin = 0;
     }
-  }else if(Contains(name, "DYJetsToLL") || Contains(name,"DYto2L")){ sample = 6;
+  }else if(Contains(name, "DYJetsToLL") ||  Contains(name,"DYto2")){ sample = 6;
     if(Contains(name, "DYJetsToLL_M-50_Tune") && Contains(name, "madgraphMLM")){ category = 0; bin = 0;
     }else if(Contains(name, "DYJetsToLL_M-50_HT")){ category = 1;
       if(Contains(name, "HT-70to100")){ bin = 0;
@@ -905,7 +905,7 @@ int EventTools::GetEventType(){
       }else if(Contains(name, "HT-600toInf")){ bin = 10;
       }
     } else if(Contains(name, "DYJetsToLL") && Contains(name, "amcatnloFXFX")){ category = 2; 
-      if(Contains(name, "M-50_Tune")){ bin = 0;
+     if(Contains(name, "M-50_Tune")){ bin = 0;
       }else if(Contains(name, "Pt-50To100")){ bin = 1;
       }else if(Contains(name, "Pt-100To250")){ bin = 2;
       }else if(Contains(name, "Pt-250To400")){ bin = 3;
@@ -913,6 +913,7 @@ int EventTools::GetEventType(){
       }else if(Contains(name, "Pt-650ToInf")){ bin = 5;
       }
     } else if(Contains(name, "DYto2L-2Jets_MLL-50")){ category = 3; bin = 0;
+    } else if(Contains(name, "DYto2") && Contains(name, "amcatnloFXFX")){ category = 4; bin = 0; 
     }
   }else if(Contains(name, "QCD")){ sample = 7;
     if(Contains(name, "QCD_HT")){ category = 0;
