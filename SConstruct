@@ -3,7 +3,7 @@ import os
 import subprocess
 import sys
 
-DEBUG = False
+DEBUG = True
 
 # envDict: { key: value }
 def findEnviornment(scriptname, envDict):

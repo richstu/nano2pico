@@ -17,7 +17,7 @@
 
 using namespace std;
 
-EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
+EventWeighter::EventWeighter(string year, bool isSignal, const vector<float> &btag_wpts){
   string photon_idmapname = "Photon-ID-SF";
   string photon_csevmapname = "Photon-CSEV-SF";
   string btag_lightname = "deepJet_incl";
@@ -294,6 +294,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
   if(year == "2016APV" || year == "2016" || year == "2017" || year == "2018"){
     map_jetpuid_              = cs_jetpuid_->at("PUJetID_eff");
   }
+  is_signal_                = isSignal;
 }
 
 // Electron Reco+MVA ID Scale Factors
@@ -382,9 +383,11 @@ void EventWeighter::ElectronSF(pico_tree &pico){
     }
   }
   pico.out_w_el() = sf_tot;
-  pico.out_sys_el().resize(2,1.); 
-  pico.out_sys_el()[0] = sf_tot_up;
-  pico.out_sys_el()[1] = sf_tot_dn;
+  if (is_signal_) {
+    pico.out_sys_el().resize(2,1.); 
+    pico.out_sys_el()[0] = sf_tot_up;
+    pico.out_sys_el()[1] = sf_tot_dn;
+  }
 }
 
 // note: call after ElectronSF
@@ -482,8 +485,10 @@ void EventWeighter::ElectronMinisoSF(pico_tree &pico){
     sf_tot_dn *= sf_dn;
   }
   pico.out_w_el() *= sf_tot;
-  pico.out_sys_el()[0] *= sf_tot_up;
-  pico.out_sys_el()[1] *= sf_tot_dn;
+  if (is_signal_) {
+    pico.out_sys_el()[0] *= sf_tot_up;
+    pico.out_sys_el()[1] *= sf_tot_dn;
+  }
 }
 
 // Photon Total Scale Factors
@@ -586,12 +591,14 @@ void EventWeighter::PhotonSF(pico_tree &pico){
     }
   }
   pico.out_w_photon() = sf_tot;
-  pico.out_sys_photon().resize(2,1.); 
-  pico.out_sys_photon()[0] = sf_tot_idup;
-  pico.out_sys_photon()[1] = sf_tot_iddn;
-  pico.out_sys_photon_csev().resize(2,1.); 
-  pico.out_sys_photon_csev()[0] = sf_tot_evup;
-  pico.out_sys_photon_csev()[1] = sf_tot_evdn;
+  if (is_signal_) {
+    pico.out_sys_photon().resize(2,1.); 
+    pico.out_sys_photon()[0] = sf_tot_idup;
+    pico.out_sys_photon()[1] = sf_tot_iddn;
+    pico.out_sys_photon_csev().resize(2,1.); 
+    pico.out_sys_photon_csev()[0] = sf_tot_evup;
+    pico.out_sys_photon_csev()[1] = sf_tot_evdn;
+  }
 }
 
 // Muon Scale Factors
@@ -651,9 +658,11 @@ void EventWeighter::MuonSF(pico_tree &pico){
     }
   }
   pico.out_w_mu() = sf_tot;
-  pico.out_sys_mu().resize(2,1.); 
-  pico.out_sys_mu()[0] = sf_tot_up;
-  pico.out_sys_mu()[1] = sf_tot_dn;
+  if (is_signal_) {
+    pico.out_sys_mu().resize(2,1.); 
+    pico.out_sys_mu()[0] = sf_tot_up;
+    pico.out_sys_mu()[1] = sf_tot_dn;
+  }
 }
 
 // note: call after MuonSF
@@ -725,19 +734,23 @@ void EventWeighter::MuonMinisoSF(pico_tree &pico){
     sf_tot_dn *= sf_dn;
   }
   pico.out_w_mu() *= sf_tot;
-  pico.out_sys_mu()[0] *= sf_tot_up;
-  pico.out_sys_mu()[1] *= sf_tot_dn;
+  if (is_signal_) {
+    pico.out_sys_mu()[0] *= sf_tot_up;
+    pico.out_sys_mu()[1] *= sf_tot_dn;
+  }
 }
 
 // Pileup Scale Factors
 void EventWeighter::PileupSF(pico_tree &pico){
   pico.out_w_pu() = min(map_pileup_->evaluate({float(pico.out_npu_tru_mean()), 
       "nominal"}),10.0);
-  pico.out_sys_pu().resize(2, 1.);
-  pico.out_sys_pu()[0] = min(map_pileup_->evaluate({float(pico.out_npu_tru_mean()), 
-      "up"}),10.0);
-  pico.out_sys_pu()[1] = min(map_pileup_->evaluate({float(pico.out_npu_tru_mean()), 
-      "down"}),10.0);
+  if (is_signal_) {
+    pico.out_sys_pu().resize(2, 1.);
+    pico.out_sys_pu()[0] = min(map_pileup_->evaluate({
+        float(pico.out_npu_tru_mean()), "up"}),10.0);
+    pico.out_sys_pu()[1] = min(map_pileup_->evaluate({
+        float(pico.out_npu_tru_mean()), "down"}),10.0);
+  }
 }
 
 // b-tagging Scale Factors
@@ -939,18 +952,20 @@ void EventWeighter::bTaggingSF(pico_tree &pico){
 
   pico.out_w_bhig_df() = sf_tot_nm;
   pico.out_w_btag_df() = sf_tot_wpm;
-  pico.out_sys_bchig().resize(2,1.); 
-  pico.out_sys_udsghig().resize(2,1.); 
-  pico.out_sys_bchig_uncorr().resize(2,1.); 
-  pico.out_sys_udsghig_uncorr().resize(2,1.); 
-  pico.out_sys_bchig()[0] = sf_tot_up_bc;
-  pico.out_sys_bchig()[1] = sf_tot_dn_bc;
-  pico.out_sys_udsghig()[0] = sf_tot_up_udsg;
-  pico.out_sys_udsghig()[1] = sf_tot_dn_udsg;
-  pico.out_sys_bchig_uncorr()[0] = sf_tot_up_uncorr_bc;
-  pico.out_sys_bchig_uncorr()[1] = sf_tot_dn_uncorr_bc;
-  pico.out_sys_udsghig_uncorr()[0] = sf_tot_up_uncorr_udsg;
-  pico.out_sys_udsghig_uncorr()[1] = sf_tot_dn_uncorr_udsg;
+  if (is_signal_) {
+    pico.out_sys_bchig().resize(2,1.); 
+    pico.out_sys_udsghig().resize(2,1.); 
+    pico.out_sys_bchig_uncorr().resize(2,1.); 
+    pico.out_sys_udsghig_uncorr().resize(2,1.); 
+    pico.out_sys_bchig()[0] = sf_tot_up_bc;
+    pico.out_sys_bchig()[1] = sf_tot_dn_bc;
+    pico.out_sys_udsghig()[0] = sf_tot_up_udsg;
+    pico.out_sys_udsghig()[1] = sf_tot_dn_udsg;
+    pico.out_sys_bchig_uncorr()[0] = sf_tot_up_uncorr_bc;
+    pico.out_sys_bchig_uncorr()[1] = sf_tot_dn_uncorr_bc;
+    pico.out_sys_udsghig_uncorr()[0] = sf_tot_up_uncorr_udsg;
+    pico.out_sys_udsghig_uncorr()[1] = sf_tot_dn_uncorr_udsg;
+  }
 }
 
 //If we use mutiple WPs, this method is probably easiest to synchronize across
@@ -1090,9 +1105,11 @@ void EventWeighter::jetpuIdSF(pico_tree &pico){
     } //loop over jets
   }//conditional year
   pico.out_w_jetpuid() = sf_tot_nm;
-  pico.out_sys_jetpuid().resize(2,1.); 
-  pico.out_sys_jetpuid()[0] = sf_tot_up;
-  pico.out_sys_jetpuid()[1] = sf_tot_dn;
+  if (is_signal_) {
+    pico.out_sys_jetpuid().resize(2,1.); 
+    pico.out_sys_jetpuid()[0] = sf_tot_up;
+    pico.out_sys_jetpuid()[1] = sf_tot_dn;
+  }
 }
 
 // Photon shape SFs, call after photons have been produced

@@ -80,24 +80,24 @@ void validate_weights() {
   };
 
   vector<EventWeighter> weighters;
-  weighters.push_back(EventWeighter("2016APV", btag_wps[2016]));
-  weighters.push_back(EventWeighter("2016", btag_wps[2016]));
-  weighters.push_back(EventWeighter("2017", btag_wps[2017]));
-  weighters.push_back(EventWeighter("2018", btag_wps[2018]));
-  weighters.push_back(EventWeighter("2022", btag_wps[2022]));
-  weighters.push_back(EventWeighter("2022EE", btag_wps[2022]));
-  weighters.push_back(EventWeighter("2023", btag_wps[2023]));
-  weighters.push_back(EventWeighter("2023BPix", btag_wps[2023]));
+  weighters.push_back(EventWeighter("2016APV", true, btag_wps[2016]));
+  weighters.push_back(EventWeighter("2016", true, btag_wps[2016]));
+  weighters.push_back(EventWeighter("2017", true, btag_wps[2017]));
+  weighters.push_back(EventWeighter("2018", true, btag_wps[2018]));
+  weighters.push_back(EventWeighter("2022", true, btag_wps[2022]));
+  weighters.push_back(EventWeighter("2022EE", true, btag_wps[2022]));
+  weighters.push_back(EventWeighter("2023", true, btag_wps[2023]));
+  weighters.push_back(EventWeighter("2023BPix", true, btag_wps[2023]));
 
   vector<TriggerWeighter> trigger_weighters;
-  trigger_weighters.push_back(TriggerWeighter("2016APV"));
-  trigger_weighters.push_back(TriggerWeighter("2016"));
-  trigger_weighters.push_back(TriggerWeighter("2017"));
-  trigger_weighters.push_back(TriggerWeighter("2018"));
-  trigger_weighters.push_back(TriggerWeighter("2022"));
-  trigger_weighters.push_back(TriggerWeighter("2022EE"));
-  trigger_weighters.push_back(TriggerWeighter("2023"));
-  trigger_weighters.push_back(TriggerWeighter("2023BPix"));
+  trigger_weighters.push_back(TriggerWeighter("2016APV", true));
+  trigger_weighters.push_back(TriggerWeighter("2016", true));
+  trigger_weighters.push_back(TriggerWeighter("2017", true));
+  trigger_weighters.push_back(TriggerWeighter("2018", true));
+  trigger_weighters.push_back(TriggerWeighter("2022", true));
+  trigger_weighters.push_back(TriggerWeighter("2022EE", true));
+  trigger_weighters.push_back(TriggerWeighter("2023", true));
+  trigger_weighters.push_back(TriggerWeighter("2023BPix", true));
 
   vector<int> years = {2016,2016,2017,2018,2022,2022,2023,2023};
   vector<string> years_string = {"2016APV","2016","2017","2018","2022","2022EE","2023","2023BPix"};
@@ -143,6 +143,8 @@ void validate_weights() {
                                    500.0};
   vector<float> trig_mu_eta_bins = {0.0,0.9,1.2,2.1,2.4};
 
+  nano_tree nano("/net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc/TTJets_SingleLeptFromT_TuneCP5_13TeV-madgraphMLM-pythia8__RunIISummer20UL18NanoAODv9__106X_upgrade2018_realistic_v16_L1v1-v1__2520000__5968E5C2-2F17-3F4E-995C-72FBA03317D7.root",9);
+  nano.GetEntry(0);
   pico_tree pico("","temp.root");
 
   bool check_electron_weights = true;
@@ -391,7 +393,7 @@ void validate_weights() {
                       }
                     }
                     //get trigger weight and check sanity
-                    trigger_weighters[iyear].GetSF(pico);
+                    trigger_weighters[iyear].GetSF(pico, nano);
                     vector<float> sfs = {pico.out_w_trig(), 
                         pico.out_sys_trig_el()[0], pico.out_sys_trig_el()[1], 
                         pico.out_sys_trig_mu()[0], pico.out_sys_trig_mu()[1]};
@@ -505,24 +507,24 @@ void make_sf_plots(const char* filename, int year_idx, string output_prefix) {
   };
 
   vector<EventWeighter> weighters;
-  weighters.push_back(EventWeighter("2016APV", btag_wps[2016]));
-  weighters.push_back(EventWeighter("2016", btag_wps[2016]));
-  weighters.push_back(EventWeighter("2017", btag_wps[2017]));
-  weighters.push_back(EventWeighter("2018", btag_wps[2018]));
-  weighters.push_back(EventWeighter("2022", btag_wps[2022]));
-  weighters.push_back(EventWeighter("2022EE", btag_wps[2022]));
-  weighters.push_back(EventWeighter("2023", btag_wps[2023]));
-  weighters.push_back(EventWeighter("2023BPix", btag_wps[2023]));
+  weighters.push_back(EventWeighter("2016APV", true, btag_wps[2016]));
+  weighters.push_back(EventWeighter("2016", true, btag_wps[2016]));
+  weighters.push_back(EventWeighter("2017", true, btag_wps[2017]));
+  weighters.push_back(EventWeighter("2018", true, btag_wps[2018]));
+  weighters.push_back(EventWeighter("2022", true, btag_wps[2022]));
+  weighters.push_back(EventWeighter("2022EE", true, btag_wps[2022]));
+  weighters.push_back(EventWeighter("2023", true, btag_wps[2023]));
+  weighters.push_back(EventWeighter("2023BPix", true, btag_wps[2023]));
 
   vector<TriggerWeighter> trigger_weighters;
-  trigger_weighters.push_back(TriggerWeighter("2016APV"));
-  trigger_weighters.push_back(TriggerWeighter("2016"));
-  trigger_weighters.push_back(TriggerWeighter("2017"));
-  trigger_weighters.push_back(TriggerWeighter("2018"));
-  trigger_weighters.push_back(TriggerWeighter("2022"));
-  trigger_weighters.push_back(TriggerWeighter("2022EE"));
-  trigger_weighters.push_back(TriggerWeighter("2023"));
-  trigger_weighters.push_back(TriggerWeighter("2023BPix"));
+  trigger_weighters.push_back(TriggerWeighter("2016APV", true));
+  trigger_weighters.push_back(TriggerWeighter("2016", true));
+  trigger_weighters.push_back(TriggerWeighter("2017", true));
+  trigger_weighters.push_back(TriggerWeighter("2018", true));
+  trigger_weighters.push_back(TriggerWeighter("2022", true));
+  trigger_weighters.push_back(TriggerWeighter("2022EE", true));
+  trigger_weighters.push_back(TriggerWeighter("2023", true));
+  trigger_weighters.push_back(TriggerWeighter("2023BPix", true));
 
   vector<int> years = {2016,2016,2017,2018,2022,2022,2023,2023};
   vector<string> years_string = {"2016APV","2016","2017","2018","2022","2022EE","2023","2023BPix"};
@@ -601,6 +603,9 @@ void make_sf_plots(const char* filename, int year_idx, string output_prefix) {
   int nel;
   int nmu;
   int nphoton;
+
+  nano_tree nano("/net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc/TTJets_SingleLeptFromT_TuneCP5_13TeV-madgraphMLM-pythia8__RunIISummer20UL18NanoAODv9__106X_upgrade2018_realistic_v16_L1v1-v1__2520000__5968E5C2-2F17-3F4E-995C-72FBA03317D7.root",9);
+  nano.GetEntry(0);
 
   pico_tree pico("","temp.root");
 
@@ -683,7 +688,7 @@ void make_sf_plots(const char* filename, int year_idx, string output_prefix) {
     weighters[year_idx].ElectronSF(pico);
     weighters[year_idx].MuonSF(pico);
     weighters[year_idx].PhotonSF(pico);
-    trigger_weighters[year_idx].GetSF(pico);
+    trigger_weighters[year_idx].GetSF(pico, nano);
 
     if (nel == 2 && nmu == 0) {
       for (unsigned iel = 0; iel < el_sig->size(); iel++) {

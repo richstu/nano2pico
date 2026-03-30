@@ -40,6 +40,8 @@ input_files = [
 
 #input_files = ['/net/cms11/cms11r0/pico/NanoAODv12/nano/2022EE/mc/DYGto2LG-1Jets_MLL-50_PTG-200_TuneCP5_13p6TeV_amcatnloFXFX-pythia8__Run3Summer22EENanoAODv12__130X_mcRun3_2022_realistic_postEE_v6-v4__30000__f5929cb0-6abf-4d15-a539-82dd8a25e07e.root']
 
+input_files = ['/net/cms11/cms11r0/pico/NanoAODv9/nano/2016APV/mc/ZGToLLG_01J_5f_lowMLL_lowGPt_TuneCP5_13TeV-amcatnloFXFX-pythia8__RunIISummer20UL16NanoAODAPVv9__106X_mcRun2_asymptotic_preVFP_v11-v1__30000__F995D7AB-9F03-D246-AE5C-3B084629CEE8.root']
+
 for input_file in input_files:
   path_pos = input_file.rfind('/')
   indir = input_file[:path_pos]
@@ -50,16 +52,16 @@ for input_file in input_files:
     #cmd = './run/process_nano.exe --in_file '+infile+' --in_dir '+indir+' --out_dir out/zgamma/'
     cmd = './run/process_nano.exe --in_file '+infile+' --in_dir '+indir+' --out_dir out/zgamma/ --nent 1000'
     print_and_run(cmd)
-  if not 'data' in input_file:
-    #merge corrections
-    for infile in infiles:
-      cmd = './run/merge_corrections.exe out/zgamma/corrections/corr_'+infile
-      cmd += ' out/zgamma/wgt_sums/wgt_sums_'+infile
-      print_and_run(cmd)
-    #apply corrections
-    for infile in infiles:
-      cmd = './run/apply_corrections.exe --in_file raw_pico_'+infile+' --in_dir out/zgamma/raw_pico/ --corr_file corr_'+infile
-      print_and_run(cmd)
+  #if not 'data' in input_file:
+  #  #merge corrections
+  #  for infile in infiles:
+  #    cmd = './run/merge_corrections.exe out/zgamma/corrections/corr_'+infile
+  #    cmd += ' out/zgamma/wgt_sums/wgt_sums_'+infile
+  #    print_and_run(cmd)
+  #  #apply corrections
+  #  for infile in infiles:
+  #    cmd = './run/apply_corrections.exe --in_file raw_pico_'+infile+' --in_dir out/zgamma/raw_pico/ --corr_file corr_'+infile
+  #    print_and_run(cmd)
 
 ##clean output
 #for dirname in ['raw_pico','unskimmed','corrections','wgt_sums']:
