@@ -167,10 +167,9 @@ EventTools::EventTools(const string &name_, int year_, bool isData_, float nanoa
     overlap_pt = overlap_removal_map[overlap_removal_key][0]; overlap_isocone = overlap_removal_map[overlap_removal_key][1];
     std::cout << "Using the following key for overlap removal: " << overlap_removal_key << std::endl;
   }
-
-
+  
   if(Contains(name, "EGamma")) // replaced SingleElectron and DoubleEG starting in 2018
-    dataset = Dataset::EGamma;
+   dataset = Dataset::EGamma;
   else if(Contains(name, "SingleElectron")) 
     dataset = Dataset::SingleElectron;
   else if(Contains(name, "SingleMuon")) 
@@ -804,14 +803,12 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
       nano.HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId_Mass55() ||
       nano.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90() ||
       nano.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95();
-
   bool doublemuon_trigs = nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL() ||
       nano.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL() || nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ() ||
       nano.HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ() || nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8() || 
       nano.HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8() || nano.HLT_Mu37_TkMu27();
 
   bool muoneg_trigs = nano.HLT_Mu17_Photon30_IsoCaloId();
-
   //Multilepton triggers
   pico.out_HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL() = nano.HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL();
   pico.out_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ() = nano.HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ();
@@ -897,9 +894,9 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
     else return false;
   }
   else if (isHiggsino) { // bbgg and 4b triggers
-    // this assumes that we process either all the datasets or at least an ordered subset starting with the DoubleEG 
+    // this assumes that we process either all the datasets or at least an ordered subset starting with the DoubleEG
     if (dataset==Dataset::DoubleEG                              					  	         && doubleeg_trigs) return true;
-    else if (dataset==Dataset::EGamma                      	     					                 && doubleeg_trigs) return true;
+    else if (dataset==Dataset::EGamma                      	     					                 && doubleeg_trigs) return true; 
     //else if ((year>=2018) && dataset==Dataset::EGamma               		  			   		   && egamma_trigs) return true;
     else if ((year==2016||year==2017) && dataset==Dataset::SingleElectron 				    		   && egamma_trigs) return true;
     else if ((year<=2018) && dataset==Dataset::MET 			 	          && met_trigs && !doubleeg_trigs && !egamma_trigs) return true;

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # The ./jobscript_check.py should return 'success' or 'fail' or 'to_submit' or 'submitted' for a job_log_string
 # The input is given as sys.argv[1] = queue_system.compress_string(job_log_string) sys.argv[2] = queue_system.compress_string(job_argument_string)
 import sys
@@ -10,7 +10,7 @@ from ROOT import TChain
 job_log_string = queue_system.decompress_string(sys.argv[1])
 job_argument_string = queue_system.decompress_string(sys.argv[2])
 #job_argument_string = "--command=\"/net/cms37/data1/jbkim/analysis/nano2pico.inyo/run/process_nano.exe -f JetHT__Run2016H__02Apr2020-v1__40000__E316083A-DB8C-484C-8013-C9C3A301ED61.root -i /net/cms25/cms25r5/pico/NanoAODv7/nano/2016/data/ -o /net/cms25/cms25r5/pico/NanoAODv7/higgsino_inyo/2016/data/\""
-
+#job_argument_string = "--command=\"/net/cms37/data1/mhussain/HH-MET/nano2pico_apr2025/nano2pico/run/process_nano.exe -f GG-Box-3Jets_Bin-MGG-80_TuneSherpaDef_13p6TeV_sherpaMEPS__RunIII2024Summer24NanoAODv15__150X_mcRun3_2024_realistic_v2-v2__2810000__e87878a4-001b-4581-9af8-158e2a5681f0.root -i /net/cms11/cms11r0/pico/NanoAODv15/nano/2024/mc -o /net/cms11/cms11r0/pico/NanoAODv15/higgsino_run3_blanc_v1/2024/mc/\""
 print(job_argument_string)
 
 class GoldenJson:
@@ -31,7 +31,8 @@ class GoldenJson:
         lumi_blocks_string = run_line[run_line.find('['):run_line.rfind(']')]
         lumi_blocks_list = lumi_blocks_string.replace('[','').replace(']','').replace(' ','').split(',')
         int_lumi_blocks_list = []
-        for index in range(len(lumi_blocks_list)/2):
+        print(lumi_blocks_list)
+        for index in range(int(len(lumi_blocks_list)/2)):
           int_lumi_blocks_list.append((int(lumi_blocks_list[2*index]),int(lumi_blocks_list[2*index+1])))
         self.good_lumi_blocks[run_number] = int_lumi_blocks_list
 
@@ -55,7 +56,7 @@ egamma_triggers = ['HLT_Ele25_WPTight_Gsf','HLT_Ele27_WPTight_Gsf','HLT_Ele28_WP
 muon_triggers = ['HLT_IsoMu20','HLT_IsoMu22','HLT_IsoMu24','HLT_IsoMu27','HLT_IsoTkMu20','HLT_IsoTkMu22','HLT_IsoTkMu24','HLT_Mu50','HLT_Mu55','HLT_TkMu50','HLT_IsoMu22_eta2p1','HLT_IsoMu24_eta2p1','HLT_Mu45_eta2p1','HLT_Mu15_IsoVVVL_PFHT350','HLT_Mu15_IsoVVVL_PFHT400','HLT_Mu15_IsoVVVL_PFHT450','HLT_Mu15_IsoVVVL_PFHT600','HLT_Mu50_IsoVVVL_PFHT400','HLT_Mu50_IsoVVVL_PFHT450']
 jetht_triggers = ['HLT_PFJet500','HLT_PFHT125','HLT_PFHT200','HLT_PFHT300','HLT_PFHT400','HLT_PFHT475','HLT_PFHT600','HLT_PFHT650','HLT_PFHT800','HLT_PFHT900','HLT_PFHT180','HLT_PFHT370','HLT_PFHT430','HLT_PFHT510','HLT_PFHT590','HLT_PFHT680','HLT_PFHT780','HLT_PFHT890','HLT_PFHT1050','HLT_PFHT250','HLT_PFHT350']
 
-args = job_argument_string.split('--command="')[1].split('"')[0]
+args = job_argument_string.decode('utf-8').split('--command="')[1].split('"')[0]
 tmp = args.split(' ')
 infile_path = tmp[4]+'/'+tmp[2]
 outfile_path = tmp[6]+'/raw_pico/raw_pico_'+tmp[2]
@@ -63,7 +64,7 @@ outfile_path = tmp[6]+'/raw_pico/raw_pico_'+tmp[2]
 infile = TChain("Events");
 infile.Add(infile_path);
 in_nent = 0
-if 'data/' in infile_path: # changed 'data' to 'data/' so that nano2pico can be run locally without errors 
+if 'data' in infile_path:
   for i in range(0, infile.GetEntries()):
     infile.GetEntry(i)
     #check triggers, matching overlap removal scheme in event_tools.cpp

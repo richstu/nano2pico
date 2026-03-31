@@ -232,6 +232,7 @@ int main(int argc, char *argv[]){
   }
   if (Contains(in_dir, "NanoAODv9UCSB")) nanoaod_version = 9.5;
   if (Contains(in_dir, "NanoAODv12") || Contains(in_dir, "NanoAODv13")) nanoaod_version = 12;
+  if (Contains(in_dir, "NanoAODv15")) nanoaod_version = 15;
   cout<<"Using NanoAOD version: "<<nanoaod_version<<endl;
 
   time_t begtime, endtime;
@@ -395,10 +396,8 @@ int main(int argc, char *argv[]){
 	{//cout<<"not in golden json"<<endl;
 	continue; }
     }
-
     bool passed_trig = event_tools.SaveTriggerDecisions(nano, pico, isZgamma, isHiggsino);
     if (isData && !passed_trig) {
-      	//cout<<"trigger not pass"<<endl;
 	continue;
     }
     // event info

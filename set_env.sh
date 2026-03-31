@@ -1,6 +1,6 @@
 #!/bin/bash
 # Sets root, python, scons, ssh, and batch enviornment for ucsb servers
-
+export PATH=/cvmfs/cms.cern.ch/slc7_amd64_gcc700/cms/cmssw/CMSSW_10_2_13/external/slc7_amd64_gcc700/bin:$PATH
 # Setup root environment according to kernel of ucsb server
 . /cvmfs/cms.cern.ch/cmsset_default.sh
 RUN_KERNEL=$(uname -r | cut -d '-' -f1)
