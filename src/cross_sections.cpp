@@ -640,11 +640,18 @@ namespace xsec{
     //Background samples
     if(file.Contains("GG-Box-3Jets_MGG-80_13p6TeV")) xsec = 88.75; // from XSDB
     if(file.Contains("GG-Box-3Jets_Bin-MGG-80_TuneSherpaDef_13p6TeV_sherpaMEPS")) xsec = 88.75; // from XSDB
+    if(file.Contains("GG-Box-2B-2Jets_Bin-MGG-80_TuneSherpaDef_13p6TeV_sherpaMEPS")) xsec = 11.67; // not on XSDB
+    if(file.Contains("GG-Box-1B-2Jets_Bin-MGG-80_TuneSherpaDef_13p6TeV_sherpaMEPS")) xsec = 11.98; // not on XSDB
     if(file.Contains("GG-Box-1B-2Jets_MGG-80_13p6TeV_sherpa")) xsec = 11.98; //using run2 xsec, change this to (11.98) 
     if(file.Contains("GG-Box-2B-2Jets_MGG-80_13p6TeV_sherpa")) xsec = 11.67; //using run2 xsec, change this to (11.67)
     if(file.Contains("GJet_PT-20to40_DoubleEMEnriched_MGG-80_TuneCP5_13p6TeV_pythia8")) xsec = 242.5; // from XSDB
+    if(file.Contains("GJet_Bin-MGG-80-PT-20to40_TuneCP5_13p6TeV_pythia8")) xsec = 248.1; // from XSDB
+    if(file.Contains("GJet_Bin-MGG-80-PT40_TuneCP5_13p6TeV_pythia8")) xsec = 923.4; // from XSDB
     if(file.Contains("GJet_PT-40_DoubleEMEnriched_MGG-80_TuneCP5_13p6TeV_pythia8")) xsec = 919.1; // from XSDB
     if(file.Contains("TTto2L2Nu-3Jets_TuneCP5_13p6TeV_madgraphMLM-pythia8")) xsec = 58.3; // from XSDB
+    if(file.Contains("TTG-1Jets_TuneCP5_13p6TeV_amcatnloFXFXold-pythia8"))  xsec = 4.5; // cant find on XSDB, so making up the number for now
+    if(file.Contains("TTto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8")) xsec = 762.1*0.105; // from xsdb
+    if(file.Contains("TTtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8")) xsec = 762.1*0.5; // from xsdb
     if(file.Contains("TTG-1Jets_PTG-10to100_TuneCP5_13p6TeV_amcatnloFXFXold-pythia8"))  xsec = 4.216; // from XSDB
     if(file.Contains("TTG-1Jets_PTG-100to200_TuneCP5_13p6TeV_amcatnloFXFXold-pythia8"))  xsec = 0.4114; // from XSDB
     if(file.Contains("TTG-1Jets_PTG-200_TuneCP5_13p6TeV_amcatnloFXFXold-pythia8"))  xsec = 0.1284; // from XSDB
