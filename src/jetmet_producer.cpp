@@ -501,8 +501,13 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
 //writes other MET variables and non-jet MET uncertainties
 void JetMetProducer::WriteMetVariations(nano_tree &nano, pico_tree &pico) {
   pico.out_met_calo()    = nano.CaloMET_pt();
-  pico.out_met_tk()      = nano.TkMET_pt();
-  pico.out_met_tk_phi()  = nano.TkMET_phi();
+  if(nanoaod_version+0.01<12){
+    pico.out_met_tk()    = nano.TkMET_pt();
+    pico.out_met_tk_phi()= nano.TkMET_phi();
+  }else if(nanoaod_version+0.01 > 12){
+    pico.out_met_tk()    = nano.TrkMET_pt();
+    pico.out_met_tk_phi()= nano.TrkMET_phi();
+  }
   pico.out_met_tru()     = nano.GenMET_pt();
   pico.out_met_tru_phi() = nano.GenMET_phi();
   pico.out_ht_isr_me()   = nano.LHE_HTIncoming();

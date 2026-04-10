@@ -130,5 +130,7 @@ void getJet_partonFlavour(nano_tree & nano, float nanoaod_version, std::vector<i
 void getGenPart_genPartIdxMother(nano_tree & nano, float nanoaod_version, std::vector<int> & GenPart_genPartIdxMother);
 void getGenPart_statusFlags(nano_tree & nano, float nanoaod_version, std::vector<int> & GenPart_statusFlags);
 void getGenJet_partonFlavour(nano_tree & nano, float nanoaod_version, std::vector<int> & GenJet_partonFlavour);
+void getPV_npvs(nano_tree & nano, float nanoaod_version, int & PV_npvs);
+void getPV_npvsGood(nano_tree & nano, float nanoaod_version, int & PV_npvsGood);
 bool check_miniso(pico_tree & pico, float miniso_comp);
 #endif
