@@ -223,12 +223,14 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
   //For the working overlap removal the information has been moved to the constructor
   float ptmin = overlap_pt;
   float isocone = overlap_isocone;
+  /*
   float ptmin_old = 15.0;
   float etamax_old = 2.6;
   float isocone_old = 0.05;
-
+  */
   float ph_pt = 0;//avoiding floating point errors
   float comp_pt = 0;//avoiding floating point errors
+  /*
   if(isWW || isZZ || isTTJets_LO_Incl || Contains(name,"TTGJets")){
     ptmin_old = 10.0;
     etamax_old= 99.0;
@@ -237,7 +239,7 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
   if(isWW || isWZ){
     ptmin_old = 20;
   }
-
+  */
   bool found_hadronic_w = false;
   bool found_higgs = false;
   int ntrulep = 0; //includes taus, unlike pico branch
@@ -293,7 +295,7 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
         }
       }
 
-
+      /*
       if( (mc_statusFlags[0] || mc_statusFlags[8]) ){  // Which are isPrompt or fromHardProcess
         genPhoton.SetPtEtaPhi(nano.GenPart_pt().at(mc_idx), 
                             nano.GenPart_eta().at(mc_idx), 
@@ -335,7 +337,7 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
           }
         }
       }
-
+    */
     } //GenPart_pdgId==22
   } //loop over GenParts
 

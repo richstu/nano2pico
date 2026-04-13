@@ -124,7 +124,7 @@ ZGammaVarProducer::RefitResults ZGammaVarProducer::PerformKinematicRefit(
   int idx_l2 = pico.out_ll_i2()[ll_variation];
   float l1_pt = pico.out_ll_l1_pt()[ll_variation];
   float l2_pt = pico.out_ll_l2_pt()[ll_variation];
-
+  int flavor = pico.out_ll_lepid()[0];
   if(pico.out_ll_lepid()[0] == 13){
     int idx_fsr1, idx_fsr2;
 
@@ -174,8 +174,7 @@ ZGammaVarProducer::RefitResults ZGammaVarProducer::PerformKinematicRefit(
     leptons_pterr_map[0] = pico.out_el_energyErr()[idx_l1]*l1.Pt()/l1.P();
     leptons_pterr_map[1] = pico.out_el_energyErr()[idx_l2]*l2.Pt()/l2.P();
   }
-
-  kinZfitter->Setup(leptons_map, fsrphotons_map, leptons_pterr_map);
+  kinZfitter->Setup(leptons_map, fsrphotons_map, leptons_pterr_map, flavor);
   kinZfitter->KinRefitZ1();
   refit_leptons = kinZfitter->GetRefitP4s();
   RefitResults result = {refit_leptons[0], refit_leptons[1], status, 
