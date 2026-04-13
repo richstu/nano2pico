@@ -1,6 +1,6 @@
 #include <array>
 #include <ctime>
-
+#include <fstream>
 #include <iostream>
 #include <iomanip>
 #include <bitset>
@@ -9,6 +9,8 @@
 #include <getopt.h>
 
 #include "TError.h"
+
+#include "json.hpp"
 
 #include "nano_tree.hpp"
 #include "pico_tree.hpp"
@@ -45,21 +47,28 @@ namespace {
   string in_file = "";
   string in_dir = "";
   string out_dir = "";
+  string skim_rule = "";
   int nent_test = -1;
+  string norm_file = "";
   bool debug = false;
   // requirements for jets to be counted in njet, mofified for Zgamma below
   float min_jet_pt = 30.0;
   float max_jet_eta =  2.4;
 }
+
+const int MURF_VARIATIONS = 9;
+
 struct MCMetadata {
   double gen_event_sumw;
-  array<double, 9> lhe_scale_sumw;
+  array<double, MURF_VARIATIONS> lhe_scale_sumw;
 };
 
 void WriteDataQualityFilters(nano_tree& nano, pico_tree& pico);
 void CopyTriggerDecisions(nano_tree& nano, pico_tree& pico);
 void GetOptions(int argc, char *argv[]);
 MCMetadata GetMCMetadata(string filename);
+MCMetadata GetMCMetadataFromJson(string in_dir, string in_file, 
+                                 string norm_fname);
 
 int main(int argc, char *argv[]){
   GetOptions(argc, argv);
@@ -319,10 +328,13 @@ int main(int argc, char *argv[]){
   BBVarProducer bb_producer(year);
   BBGammaGammaVarProducer bbgammagamma_producer(year);
   //Initialize scale factor tools
-  //TODO add argument to take summed mcmetadata
   MCMetadata mc_metadata = MCMetadata();
-  if (!isData)
-    mc_metadata = GetMCMetadata(in_path);
+  if (!isData) {
+    if (norm_file=="") 
+      mc_metadata = GetMCMetadata(in_path);
+    else
+      mc_metadata = GetMCMetadataFromJson(in_dir, in_file, norm_file);
+  }
   const string ctr = "central";
   const vector<string> updn = {"up","down"};
   PrefireWeighter prefire_weighter(year, true);
@@ -367,7 +379,7 @@ int main(int argc, char *argv[]){
     double event_fraction = (static_cast<double>(nent_test)
                              /static_cast<double>(nano.GetEntries()));
     mc_metadata.gen_event_sumw *= event_fraction;
-    for (int imurf = 0; imurf < 9; imurf++) {
+    for (int imurf = 0; imurf < MURF_VARIATIONS; imurf++) {
       mc_metadata.lhe_scale_sumw[imurf] *= event_fraction;
     }
   }
@@ -644,8 +656,8 @@ int main(int argc, char *argv[]){
     if (!isData) {
       pico.out_w_lumi() = cross_section*nano.genWeight()
                           /mc_metadata.gen_event_sumw;
-      pico.out_sys_murf().resize(9,1.); 
-      for (int imurf = 0; imurf < 9; imurf++) {
+      pico.out_sys_murf().resize(MURF_VARIATIONS,1.); 
+      for (int imurf = 0; imurf < MURF_VARIATIONS; imurf++) {
         pico.out_sys_murf()[imurf] = nano.LHEScaleWeight()[imurf]
             /(mc_metadata.lhe_scale_sumw[imurf]*mc_metadata.gen_event_sumw);
       }
@@ -676,7 +688,17 @@ int main(int argc, char *argv[]){
     }
 
     if (debug) cout<<"INFO:: Filling tree"<<endl;
-    pico.Fill();
+
+    if (skim_rule=="ll" && pico.out_nll()<1) {
+      pico.Clear();
+    }
+    if (skim_rule=="llg" && (pico.out_nll()<1 || pico.out_nphoton()<1)) {
+      pico.Clear();
+    }
+    else {
+      pico.Fill();
+    }
+
   } // loop over events
 
   pico.Write();
@@ -692,6 +714,8 @@ void GetOptions(int argc, char *argv[]){
       {"in_dir",  required_argument, 0,'i'},
       {"out_dir", required_argument, 0,'o'},
       {"nent",    required_argument, 0, 0},
+      {"norm",    required_argument, 0, 0},
+      {"skim",    required_argument, 0, 0},
       {"debug",    no_argument, 0, 'd'},
       {0, 0, 0, 0}
     };
@@ -719,6 +743,10 @@ void GetOptions(int argc, char *argv[]){
       optname = long_options[option_index].name;
       if(optname == "nent"){
         nent_test = atoi(optarg);
+      }else if(optname == "norm"){
+        norm_file = optarg;
+      }else if(optname == "skim"){
+        skim_rule = optarg;
       }else{
         printf("Bad option! Found option name %s\n", optname.c_str());
         exit(1);
@@ -749,5 +777,46 @@ MCMetadata GetMCMetadata(string filename) {
   metadata->SetBranchAddress("LHEScaleSumw",&mc_metadata.lhe_scale_sumw[0]);
   metadata->GetEntry(0);
   nanoaod_file.Close();
+  return mc_metadata;
+}
+/**
+ * @brief Gets sums of generator weights from sums generated with 
+ * find_normalization.py
+ *
+ * @param in_dir directory in which NanoAOD file is stored
+ * @param in_file input NanoAOD filename
+ * @param norm_fname json with normalization info
+ *
+ * @return MC Metadata consisting of genEventSumw and LHEScaleSumw
+ */
+MCMetadata GetMCMetadataFromJson(string in_dir, string in_file, 
+                                 string norm_fname) {
+  string tag;
+  string::size_type pos = in_file.find("__");
+  if (pos != string::npos) {
+    tag = in_file.substr(0,pos);
+  }
+  pos = tag.find("_ext");
+  if (pos != string::npos) {
+    tag = in_file.substr(0,pos);
+  }
+  ifstream norm_file(norm_fname);
+  nlohmann::json norm_json = nlohmann::json::parse(norm_file);
+  if (!norm_json.contains(in_dir)) {
+    cout << "ERROR: No entry for nano directory in normalization json." 
+         << endl;
+    exit(1);
+  }
+  if (!norm_json[in_dir].contains(tag)) {
+    cout << "ERROR: No entry for sample tag in normalization json." 
+         << endl;
+    exit(1);
+  }
+  MCMetadata mc_metadata;
+  mc_metadata.gen_event_sumw = norm_json[in_dir][tag]["genEventSumw"];
+  for (unsigned imurf = 0; imurf < MURF_VARIATIONS; imurf++) {
+    mc_metadata.lhe_scale_sumw[imurf] = norm_json[in_dir][tag][
+        ("LHEScaleSumw"+to_string(imurf)).c_str()];
+  }
   return mc_metadata;
 }

@@ -447,6 +447,7 @@ void WriteHeader(const vector<Variable> &vars, const string name){
   file << "  void GetEntry(const long entry);\n";
 
   file << "  void Fill();\n";
+  file << "  void Clear();\n";
   file << "  void Write();\n\n";
 
   file << "  bool readOnly_;\n\n";
@@ -639,7 +640,10 @@ void WriteSource(const vector<Variable> &vars, const string name){
   }
   file << "  }\n\n";
   file << "  outtree_->Fill();\n";
+  file << "  Clear();\n";
+  file << "}\n\n"; //close Fill method bracket
 
+  file << "void "<< name <<"_tree::Clear(){\n";
   file << "  //Resetting input tree variables\n";
   file << "  if (!writeOnly_) {\n";
   for(vector<Variable>::const_iterator var = vars.begin(); var != vars.end(); ++var){
@@ -674,7 +678,7 @@ void WriteSource(const vector<Variable> &vars, const string name){
     file << "    c_out_" << var->name_ << "_ = false;\n";
   }
   file << "  }\n";
-  file << "}\n\n"; // close Fill method bracket
+  file << "}\n\n"; // close Clear method bracket
 
   file << "void "<< name <<"_tree::Write(){\n";
   file << "  outfile_->cd();\n";
