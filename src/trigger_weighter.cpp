@@ -310,15 +310,21 @@ vector<float> TriggerWeighter::GetSF(
     prefire_sf_dn = prefire_weights[2];
   }
   else {
-    float adj_prob_data = el_prob_data[0]*mu_prob_data[0];
-    adj_prob_data = 1.0 - prefire_weights[0]*(1.0 - adj_prob_data);
-    float adj_prob_data_up = el_prob_data[0]*mu_prob_data[0];
-    adj_prob_data_up = 1.0 - prefire_weights[1]*(1.0 - adj_prob_data_up);
-    float adj_prob_data_dn = el_prob_data[0]*mu_prob_data[0];
-    adj_prob_data_dn = 1.0 - prefire_weights[2]*(1.0 - adj_prob_data_dn);
-    prefire_sf = safe_div(adj_prob_data, el_prob_mc[0]*mu_prob_mc[0]);
-    prefire_sf_up = safe_div(adj_prob_data_up, el_prob_mc[0]*mu_prob_mc[0]);
-    prefire_sf_dn = safe_div(adj_prob_data_dn, el_prob_mc[0]*mu_prob_mc[0]);
+    //float adj_prob_data = el_prob_data[0]*mu_prob_data[0];
+    //adj_prob_data = 1.0 - prefire_weights[0]*(1.0 - adj_prob_data);
+    //float adj_prob_data_up = el_prob_data[0]*mu_prob_data[0];
+    //adj_prob_data_up = 1.0 - prefire_weights[1]*(1.0 - adj_prob_data_up);
+    //float adj_prob_data_dn = el_prob_data[0]*mu_prob_data[0];
+    //adj_prob_data_dn = 1.0 - prefire_weights[2]*(1.0 - adj_prob_data_dn);
+    float prob_data = el_prob_data[0]*mu_prob_data[0];
+    if (prob_data > 0.0) {
+      prefire_sf = 1.0 + ((1.0 - prefire_weights[0])*(1.0 - prob_data)
+                          /prob_data);
+      prefire_sf_up = 1.0 + ((1.0 - prefire_weights[1])*(1.0 - prob_data)
+                             /prob_data);
+      prefire_sf_dn = 1.0 + ((1.0 - prefire_weights[2])*(1.0 - prob_data)
+                             /prob_data);
+    }
     prefire_sf = bound(prefire_sf, 10.0f, 0.0f);
     prefire_sf_up = bound(prefire_sf_up, 10.0f, 0.0f);
     prefire_sf_dn = bound(prefire_sf_dn, 10.0f, 0.0f);

@@ -320,7 +320,7 @@ int main(int argc, char *argv[]){
   BBGammaGammaVarProducer bbgammagamma_producer(year);
   //Initialize scale factor tools
   //TODO add argument to take summed mcmetadata
-  MCMetadata mc_metadata;
+  MCMetadata mc_metadata = MCMetadata();
   if (!isData)
     mc_metadata = GetMCMetadata(in_path);
   const string ctr = "central";
@@ -344,6 +344,10 @@ int main(int argc, char *argv[]){
   bool isDY = ((event_type / 100 == 62) || (event_type / 100 == 63)) && isZgamma;
   ISRTools isr_tools(in_path, year, nanoaod_version, isData);
 
+  double cross_section(1.0); // fb
+  if (!isData)
+    cross_section = xsec::crossSection(in_file, year)*1000.0;
+
   // Initialize trees
   gErrorIgnoreLevel=6000; // Turns off ROOT errors due to missing branches
   nano_tree nano(in_path, nanoaod_version);
@@ -357,6 +361,16 @@ int main(int argc, char *argv[]){
   }
   // cout << "Running on "<< (isFastsim ? "FastSim" : "FullSim") << endl;
   // cout << "Calculating weights based on " << year << " scale factors." << endl;
+  // If running on a subset of events, scale assuming negative weights evenly 
+  // distributed throughout data set
+  if (!isData && nent_test>0) {
+    double event_fraction = (static_cast<double>(nent_test)
+                             /static_cast<double>(nano.GetEntries()));
+    mc_metadata.gen_event_sumw *= event_fraction;
+    for (int imurf = 0; imurf < 9; imurf++) {
+      mc_metadata.lhe_scale_sumw[imurf] *= event_fraction;
+    }
+  }
 
   pico_tree pico("", out_path);
   gErrorIgnoreLevel=-1;
@@ -628,7 +642,8 @@ int main(int argc, char *argv[]){
     // Deal with overall weights (nominal, scale/PDF/PS variations)
     // Note: genEventSumw is calculated from genWeight not Generator_weight
     if (!isData) {
-      pico.out_w_lumi() = nano.genWeight()/mc_metadata.gen_event_sumw;
+      pico.out_w_lumi() = cross_section*nano.genWeight()
+                          /mc_metadata.gen_event_sumw;
       pico.out_sys_murf().resize(9,1.); 
       for (int imurf = 0; imurf < 9; imurf++) {
         pico.out_sys_murf()[imurf] = nano.LHEScaleWeight()[imurf]
@@ -659,7 +674,10 @@ int main(int argc, char *argv[]){
                           pico.out_w_bhig() *
                           pico.out_w_isr() * pico.out_w_pu();
     }
-  }
+
+    if (debug) cout<<"INFO:: Filling tree"<<endl;
+    pico.Fill();
+  } // loop over events
 
   pico.Write();
 
