@@ -172,7 +172,7 @@ def processMc(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, 
   process_commands = [
     #0
     [notify_script+' "Start process nano '+mc_tag+'"',
-    './scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/mc --production '+PRODUCTION_NAME+' --dataset_list '+dataset_list+' --tag '+mc_tag+' --skim llg',
+    './scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/mc --production '+PRODUCTION_NAME+' --dataset_list '+dataset_list+' --tag '+mc_tag,
     'auto_submit_jobs.py process_nano_cmds_'+mc_tag+'.json -c scripts/check_process_nano_job.py -f',
     notify_script+' "Finished process nano '+mc_tag+'"'], 
     
