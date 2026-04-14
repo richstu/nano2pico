@@ -81,6 +81,8 @@ python3 scripts/find_normalization.py -n /net/cms11/cms11r0/pico/NanoAODv12/nano
 
 This will write the output to `txt/wgt_sums/wgt_sums.json`, which can then be used by the pico processing step to calculate event weights.
 
+Finally, productions are generally performed with a tagged version of nano2pico. See the appendix below on how to create a git tag.
+
 ### Step 1-3. All-in-one script
 
 For existing analyses, there exist scripts that will run the nano2pico conversion together with the standard skim and slim steps for that analysis. For the Higgs to Z gamma analysis, this sripts is [produce_htozgamma_picos.py](scripts/produce_htozgamma_picos.py). Required arguments include the production name/git tag, the year, the NanoAOD version, the input directory, whether the samples are data or MC, and the data set list. An example of its usage is given below.
