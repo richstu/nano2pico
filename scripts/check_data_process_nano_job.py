@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # The ./jobscript_check.py should return 'success' or 'fail' or 'to_submit' or 'submitted' for a job_log_string
 # The input is given as sys.argv[1] = queue_system.compress_string(job_log_string) sys.argv[2] = queue_system.compress_string(job_argument_string)
 import sys
@@ -12,7 +12,7 @@ job_argument_string = queue_system.decompress_string(sys.argv[2])
 
 print(job_argument_string)
 
-args = job_argument_string.split('--command="')[1].split('"')[0]
+args = job_argument_string.decode('utf-8').split('--command="')[1].split('"')[0]
 tmp = args.split(' ')
 infile_path = tmp[4]+'/'+tmp[2]
 outfile_path = tmp[6]+'/raw_pico/raw_pico_'+tmp[2]
@@ -35,20 +35,20 @@ for iTrial in range(5):
     isFail = True
     break
   
-  for line in job_log_string.split('\n'):
-    if 'Error in <TTree::SetBranchStatus>: unknown branch' in line:
+  for line in job_log_string.decode('utf-8').split('\n'):
+    if 'Error in <TTree::SetBranchStatus>: unknown branch' or 'Error in <TChain::SetBranchAddress>: The pointer type' in line:
       continue
     if 'error' in line.lower():
       print('[For queue_system] fail: Error in job_log')
       isFail = True
       break
   
-  if 'segmentation fault' in job_log_string.lower():
+  if 'segmentation fault' in job_log_string.decode('utf-8').lower():
     print('[For queue_system] fail: Segmentation fault in job_log')
     isFail = True
     break
   
-  if 'segmentation violation' in job_log_string.lower():
+  if 'segmentation violation' in job_log_string.decode('utf-8').lower():
     print('[For queue_system] fail: Segmentation violation in job_log')
     isFail = True
     break

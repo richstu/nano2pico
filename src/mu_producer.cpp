@@ -43,12 +43,6 @@ MuonProducer::MuonProducer(string year_, bool isData_, float nanoaod_version_, s
         "data/zgamma/2024/muon_scalesmearing.json");
     run3 = true;
   }
-  else {
-    cs_scare_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2023BPix/muon_scalesmearing.json");
-    run3 = true;
-    std::cout << "WARNING: No dedicated ScaRe correction jsons for chosen year, defaulting to 2023BPix" << std::endl;
-  }
 }
 
 MuonProducer::~MuonProducer(){
@@ -100,7 +94,6 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
   vector<float> muon_pt_resdn;
 
   float pt_thresh = 26.f;
-
   for(int imu(0); imu<nano.nMuon(); ++imu){
     float eta = nano.Muon_eta()[imu];
     float phi = nano.Muon_phi()[imu];
@@ -183,7 +176,6 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
   std::vector<int> ordered_nano_indices;
   for (NanoOrderEntry nano_entry : nano_entries)
     ordered_nano_indices.push_back(nano_entry.nano_idx);
-
   vector<int> sig_mu_nano_idx;
   pico.out_nmu() = 0; pico.out_nvmu() = 0;
   int pico_idx = 0;

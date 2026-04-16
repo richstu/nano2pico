@@ -95,7 +95,7 @@ if __name__ == '__main__':
     # Output: SMS-TChiHH_mChi-1000_mLSP-1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISummer16NanoAODv5__PUSummer16v3Fast_94X_mcRun2_asymptotic_v3-v1.root
     out_filename = convert_name(file_paths_string, ['RunII','PUSummer'])
     #out_filename = out_filename.replace('SMS-TChiHH_HToBB_HToBB', 'SMS-TChiHH_mChi-'+str(mass)+'_mLSP-1')
-    out_filename = out_filename.replace('SMS-TChiHH', 'SMS-TChiHH_mChi-'+str(mass)+'_mLSP-'+str(mass_lsp))
+    out_filename = out_filename.replace('SMS-TChiZH-Hto2G', 'SMS-TChiZH-Hto2G_mChi-'+str(mass)+'_mLSP-'+str(mass_lsp))
     out_file_path = os.path.join(args['output_dir'], out_filename)
     treename = "Events"
   elif args['skim_name'] !="":

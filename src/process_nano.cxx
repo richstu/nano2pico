@@ -69,13 +69,14 @@ int main(int argc, char *argv[]){
   bool isFastsim = false;
   if (Contains(in_file, "Fast")) isFastsim = true;
   if (Contains(in_file, "FSUL")) isFastsim = true;    
-  bool isSignal = Contains(in_file, "TChiHH") || Contains(in_file, "T5qqqqZH") ? true : false;
+  bool isSignal = Contains(in_file, "TChiHH") || Contains(in_file, "TChiZH") ||Contains(in_file, "T5qqqqZH") ? true : false; 
   bool isZgamma = Contains(out_dir, "zgamma");
   if (isZgamma)
     isSignal = (Contains(in_file, "HtoZG") || Contains(in_file, "HToZG") || 
                 Contains(in_file, "HToMuMu") || Contains(in_file, "Hto2Mu") ? 
                 true : false);
   bool isHiggsino = Contains(out_dir, "higgsino");
+
   int year = -1;
   int isAPV = false;
   int is_preUL = true;
@@ -459,7 +460,7 @@ int main(int argc, char *argv[]){
           photon_el_pico_idx, isSignal);
     event_tools.WriteStitch(nano, pico);
     tk_producer.WriteIsoTracks(nano, pico, sig_el_nano_idx, sig_mu_nano_idx, isFastsim, is_preUL);
-    dilep_producer.WriteDileptons(pico, isSignal);
+    if(isZgamma) dilep_producer.WriteDileptons(pico, isSignal);
 
     if (debug) cout<<"INFO:: Writing gen particles"<<endl;
 

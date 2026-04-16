@@ -222,6 +222,72 @@ def processMc(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, 
   ]
   return processSteps(process_commands, YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, NANOAOD_VERSION, FIRST_COMMAND, NO_RUN, mc_tag)
 
+
+
+def processSig(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, NANOAOD_VERSION, FIRST_COMMAND, notify_script, SigFolder):
+  print("[Info] pico dir: "+PICO_DIR)
+  print("[Info] step file: "+STEP_FILEBASENAME)
+  print("[Info] log file: "+LOG_FILENAME)
+  YEAR = str(YEAR)
+  mc_tag=PRODUCTION_NAME+'_'+YEAR+'_mc'
+  # Add mc commands
+  process_commands = [
+    #0 STEP 0 FOR SPECIFIC DATASETS ##########################
+    #[notify_script+' "Start process nano '+mc_tag+'"',
+    #'./scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/mc --production '+PRODUCTION_NAME+' --dataset_list txt/datasets/'+NANOAOD_VERSION+'_bbgg_higgsino_'+YEAR+'_mc_dataset_paths --tag '+mc_tag,
+    #'auto_submit_jobs.py process_nano_cmds_'+mc_tag+'.json -c scripts/check_process_nano_job.py -f',
+    #notify_script+' "Finished process nano '+mc_tag+'"'], 
+    
+    
+    #0 for all datasets inside mc folder
+    [notify_script+' "Start process nano '+mc_tag+'"',
+    './scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/'+SigFolder+'/ --production '+PRODUCTION_NAME+' --tag '+mc_tag,
+    'auto_submit_jobs.py process_nano_cmds_'+mc_tag+'.json -c scripts/check_process_nano_job.py -f',
+    notify_script+' "Finished process nano '+mc_tag+'"'], 
+
+    #1
+    [notify_script+' "Start merge corrections '+mc_tag+'"',
+    './scripts/merge_corrections.py --wgt_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/wgt_sums/ --corr_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/corrections/',
+    notify_script+' "Finished merge corrections '+mc_tag+'"'],
+    
+    #2
+    [notify_script+' "Start applied corrections '+mc_tag+'"',
+    './scripts/write_apply_corrections_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/raw_pico/ --tag '+mc_tag,
+    'auto_submit_jobs.py '+mc_tag+'_apply_corr_cmds.json -c scripts/check_apply_corrections_job.py -f',
+    notify_script+' "Finished applied corrections '+mc_tag+'"'],
+    
+    """
+    #3
+    [notify_script+' "Start skim llg '+mc_tag+'"',
+    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/unskimmed/ --skim_name llg --tag '+mc_tag,
+    'auto_submit_jobs.py skim_llg_cmds_'+mc_tag+'.json -c scripts/check_skim.py -f',
+    notify_script+' "Finished skim llg '+mc_tag+'"'],
+    
+    #4
+    [notify_script+' "Start merge llg '+mc_tag+'"',
+    './scripts/write_slim_and_merge_cmds.py -f --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/skim_llg/ --slim_name zgmc --tag '+mc_tag,
+    'auto_submit_jobs.py '+mc_tag+'_slim_zgmc_llg_cmds.json -f',
+    './scripts/confirm_slim.py '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/skim_llg '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/merged_zgmc_llg',
+    notify_script+' "Finished merge llg '+mc_tag+'"'],
+
+    #5
+    [notify_script+' "Start skim ll '+mc_tag+'"',
+    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/unskimmed/ --skim_name ll --tag '+mc_tag,
+    'auto_submit_jobs.py skim_ll_cmds_'+mc_tag+'.json -c scripts/check_skim.py -f',
+    notify_script+' "Finished skim ll '+mc_tag+'"'],
+    
+    #6
+    [notify_script+' "Start merge ll '+mc_tag+'"',
+    './scripts/write_slim_and_merge_cmds.py -f --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/skim_ll/ --slim_name zgmc --tag '+mc_tag,
+    'auto_submit_jobs.py '+mc_tag+'_slim_zgmc_ll_cmds.json -f',
+    './scripts/confirm_slim.py '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/skim_ll '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/merged_zgmc_ll',
+    notify_script+' "Finished merge ll '+mc_tag+'"'],
+    """
+  ]
+  return processSteps(process_commands, YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, NANOAOD_VERSION, FIRST_COMMAND, NO_RUN, mc_tag)
+
+
+
 def processData(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, NANOAOD_VERSION, FIRST_COMMAND, notify_script):
   YEAR = str(YEAR)
   # Add signal commands
@@ -322,6 +388,7 @@ Pico files: BASE_FOLDERNAME/NANOAOD_VERSION/TAG_NAME/(2016,2017,2018)/(data,mc,s
   dataset_list_files = []
   for year in years:
     dataset_list_files.append(f'txt/datasets/{args.nanoaod_version}_bbgg_higgsino_{year}_mc_dataset_paths')
+    #dataset_list_files.append(f'txt/datasets/{args.nanoaod_version}_bbgg_higgsino_{year}_sig_dataset_paths')
     #dataset_list_files.append(f'txt/datasets/{args.nanoaod_version}_bbgg_higgsino_{year}_data_dataset_paths')
   for dataset_list_file in dataset_list_files:
     if not os.path.exists(dataset_list_file): 
@@ -413,8 +480,9 @@ Pico files: BASE_FOLDERNAME/NANOAOD_VERSION/TAG_NAME/(2016,2017,2018)/(data,mc,s
   # They are compared and missing steps are ran.
   # Step is the step that is running. Will run the next step.
   for year in years:
-    #FIRST_COMMAND = processMc(YEAR=year, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_bbgg_higgsino_picos.py.'+PRODUCTION_NAME+ '.' + str(year) + '.mc.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_bbgg_higgsino_picos.py.'+PRODUCTION_NAME+ '.' + str(year) + '.mc.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
-    FIRST_COMMAND = processData(YEAR=year, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_bbgg_higgsino_picos.py.'+PRODUCTION_NAME+'.' + str(year) + '.mc.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_bbgg_higgsino_picos.py.'+PRODUCTION_NAME+'.' + str(year) + '.mc.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
+    FIRST_COMMAND = processMc(YEAR=year, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_bbgg_higgsino_picos.py.'+PRODUCTION_NAME+ '.' + str(year) + '.mc.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_bbgg_higgsino_picos.py.'+PRODUCTION_NAME+ '.' + str(year) + '.mc.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
+    FIRST_COMMAND = processSig(YEAR=year, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_bbgg_higgsino_picos.py.'+PRODUCTION_NAME+ '.' + str(year) + '.mc.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_bbgg_higgsino_picos.py.'+PRODUCTION_NAME+ '.' + str(year) + '.mc.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
+    #FIRST_COMMAND = processData(YEAR=year, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_bbgg_higgsino_picos.py.'+PRODUCTION_NAME+'.' + str(year) + '.mc.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_bbgg_higgsino_picos.py.'+PRODUCTION_NAME+'.' + str(year) + '.mc.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
   #for year in years:
   #  FIRST_COMMAND = processData(YEAR=year, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2016.data.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2016.data.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
 

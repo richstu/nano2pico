@@ -1,4 +1,4 @@
-#!/bin/env python
+#!/bin/env python3
 import os, argparse
 import ROOT
 
@@ -9,17 +9,17 @@ def get_2d_mass_points(signal_chain, pdgId_1, pdgId_2):
   mass_array_1 = signal_chain.GetV1()
   mass_array_2 = signal_chain.GetV2()
   mass_points = set()
-  '''
+  
   #print(number_variables, signal_chain.GetEntries())
   for iVar in range(number_variables):
     #print (mass_array_1[iVar], mass_array_2[iVar])
-    if (mass_array_1[iVar] == 127):
-      mass_points.add((mass_array_1[iVar], int(round(mass_array_2[iVar]/25)*25)))
+    if (mass_array_1[iVar] == 150):
+      mass_points.add((int(round(mass_array_1[iVar])), int(round(mass_array_2[iVar]/50)*50)))
     else:
-      mass_points.add((int(round(mass_array_1[iVar]/25)*25), int(round(mass_array_2[iVar]/25)*25)))
-  print(mass_points)'''
+      mass_points.add((int(round(mass_array_1[iVar]/50)*50), int(round(mass_array_2[iVar]/50)*50)))
+  print(mass_points)
 
-  
+  '''
   # for 4b samples:
   nlsp_min, nlsp_max, nlsp_step = 200, 1300, 100
   lsp_min, lsp_max, lsp_step = 100, 1100, 100
@@ -41,7 +41,7 @@ def get_2d_mass_points(signal_chain, pdgId_1, pdgId_2):
   for point in mpoints:
     mchi, mlsp = point[0], point[1]
     mass_points.add((mchi, mlsp))
-
+ '''
 
   return sorted(mass_points)
 
