@@ -5,9 +5,15 @@ import sys
 import os
 import argparse
 import shlex
-import queue_system
+import zlib
 from ROOT import TChain
 from skim_file import get_cuts
+
+# Decompress string for passed things through posix
+# this is normally in queue system, but it breaks with python3 so here is a 
+# reimplementation for now MO
+def decompress_string(compressed_string):
+  return zlib.decompress(bytes.fromhex(compressed_string)).decode('utf-8')
 
 #def get_args(keys, job_argument_string):
 #  parser = argparse.ArgumentParser()
@@ -32,8 +38,8 @@ from skim_file import get_cuts
 
 # job_argument_string = "/net/top/homes/oshiro/code/nano2pico/scripts/skim_file.py -k 2l -i /net/cms29/cms29r0/pico/NanoAODv5/ttz_cordellbankv2/2016/data/unskimmed/pico_Run2016B_0_SingleElectron_SingleMuon_Nano1June2019-v1_runs275290.root -o /net/cms29/cms29r0/pico/NanoAODv5/ttz_cordellbankv2/2016/data/skim_2l/"
 #job_argument_string = '--command="/net/top/homes/oshiro/code/nano2pico/scripts/skim_file.py -m 127 -i "/net/cms29/cms29r0/pico/NanoAODv5/nano/2018/SMS-TChiHH_unsplit/SMS-TChiHH_*_TuneCP2_13TeV-madgraphMLM-pythia8__RunIIAutumn18NanoAODv5__PUFall18Fast_Nano1June2019_102X_upgrade2018_realistic_v19-v1_*.root" -o /net/cms29/cms29r0/pico/NanoAODv5/nano/2018/SMS-TChiHH_2D/"'
-job_log_string = queue_system.decompress_string(sys.argv[1])
-job_argument_string = queue_system.decompress_string(sys.argv[2])
+job_log_string = decompress_string(sys.argv[1])
+job_argument_string = decompress_string(sys.argv[2])
 
 print(job_argument_string)
 

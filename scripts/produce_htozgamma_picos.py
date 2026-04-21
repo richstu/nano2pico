@@ -178,7 +178,7 @@ def processMc(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, 
     
     #1
     [notify_script+' "Start skim llg '+mc_tag+'"',
-    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/unskimmed/ --skim_name llg --tag '+mc_tag,
+    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/raw_pico/ --skim_name llg --tag '+mc_tag,
     'auto_submit_jobs.py skim_llg_cmds_'+mc_tag+'.json -c scripts/check_skim.py -f',
     notify_script+' "Finished skim llg '+mc_tag+'"'],
     
@@ -191,7 +191,7 @@ def processMc(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, 
 
     #3
     [notify_script+' "Start skim ll '+mc_tag+'"',
-    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/unskimmed/ --skim_name ll --tag '+mc_tag,
+    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/raw_pico/ --skim_name ll --tag '+mc_tag,
     'auto_submit_jobs.py skim_ll_cmds_'+mc_tag+'.json -c scripts/check_skim.py -f',
     notify_script+' "Finished skim ll '+mc_tag+'"'],
     
@@ -364,6 +364,8 @@ Pico files: BASE_FOLDERNAME/NANOAOD_VERSION/TAG_NAME/(2016,2017,2018)/(data,mc,s
   # Set variables
   PRODUCTION_NAME = args.tag_name #Ex) 'htozgamma_klamath'
   PICO_DIR = args.base_foldername #Ex) '/net/cms17/cms17r0/pico'
+  if PICO_DIR[-1] == '/':
+    PICO_DIR = PICO_DIR[:-1]
   NANOAOD_VERSION = args.nanoaod_version # Ex) 'NanoAODv9'
   NO_RUN = args.fake_run
   # To prompt for first command

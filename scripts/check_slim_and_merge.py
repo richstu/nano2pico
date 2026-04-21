@@ -2,10 +2,16 @@
 # The ./jobscript_check.py should return 'success' or 'fail' or 'to_submit' or 'submitted' for a job_log_string
 # The input is given as sys.argv[1] = queue_system.compress_string(job_log_string) sys.argv[2] = queue_system.compress_string(job_argument_string)
 import sys
-import queue_system
 import ROOT
 import argparse
 import shlex
+import zlib
+
+# Decompress string for passed things through posix
+# this is normally in queue system, but it breaks with python3 so here is a 
+# reimplementation for now MO
+def decompress_string(compressed_string):
+  return zlib.decompress(bytes.fromhex(compressed_string)).decode('utf-8')
 
 # Note that hyphens get removed for output.
 def get_args(keys, job_argument_string):
@@ -16,8 +22,8 @@ def get_args(keys, job_argument_string):
   return vars(args)
 
 if __name__ == "__main__":
-  job_log_string = queue_system.decompress_string(sys.argv[1])
-  job_argument_string = queue_system.decompress_string(sys.argv[2])
+  job_log_string = decompress_string(sys.argv[1])
+  job_argument_string = decompress_string(sys.argv[2])
   
   print(job_argument_string)
 

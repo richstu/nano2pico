@@ -781,16 +781,16 @@
       "LHEScaleSumw8": 0.0
     },
     "ZGToLLG_01J_5f_lowMLL_lowGPt_TuneCP5_13TeV-amcatnloFXFX-pythia8": {
-      "genEventSumw": 13107255164.340525,
-      "LHEScaleSumw0": 26.691010635314058,
-      "LHEScaleSumw1": 27.779716259783015,
-      "LHEScaleSumw2": 28.37743248201721,
-      "LHEScaleSumw3": 25.696384525668925,
-      "LHEScaleSumw4": 27.000000027567726,
-      "LHEScaleSumw5": 27.838070005320414,
-      "LHEScaleSumw6": 24.895532547090642,
-      "LHEScaleSumw7": 26.361771817949297,
-      "LHEScaleSumw8": 27.384251002270776
+      "genEventSumw": 26525996243.718525,
+      "LHEScaleSumw0": 195.762903393579,
+      "LHEScaleSumw1": 203.757798428776,
+      "LHEScaleSumw2": 208.1545361530419,
+      "LHEScaleSumw3": 188.43709073382163,
+      "LHEScaleSumw4": 198.00000002756772,
+      "LHEScaleSumw5": 204.1512283518967,
+      "LHEScaleSumw6": 182.54160382638665,
+      "LHEScaleSumw7": 193.2916708451092,
+      "LHEScaleSumw8": 200.78969887108994
     },
     "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8": {
       "genEventSumw": 1220934627963.0718,
@@ -1575,16 +1575,16 @@
       "LHEScaleSumw8": 9.012484854337032
     },
     "ZGToLLG_01J_5f_lowMLL_lowGPt_TuneCP5_13TeV-amcatnloFXFX-pythia8": {
-      "genEventSumw": 13003821894.68158,
-      "LHEScaleSumw0": 27.669094092953248,
-      "LHEScaleSumw1": 28.80322162603664,
-      "LHEScaleSumw2": 29.431910412480804,
-      "LHEScaleSumw3": 26.64280351133886,
-      "LHEScaleSumw4": 28.000000027465518,
-      "LHEScaleSumw5": 28.877405869211007,
-      "LHEScaleSumw6": 25.814945359418388,
-      "LHEScaleSumw7": 27.340705202169946,
-      "LHEScaleSumw8": 28.40875369640705
+      "genEventSumw": 26436873975.844982,
+      "LHEScaleSumw0": 206.65978504106684,
+      "LHEScaleSumw1": 215.02567594250155,
+      "LHEScaleSumw2": 219.59063887926058,
+      "LHEScaleSumw3": 198.95924096765273,
+      "LHEScaleSumw4": 209.00000002746552,
+      "LHEScaleSumw5": 215.4362694483225,
+      "LHEScaleSumw6": 192.75608176093283,
+      "LHEScaleSumw7": 204.06334393539854,
+      "LHEScaleSumw8": 211.93446479817766
     },
     "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8": {
       "genEventSumw": 1545707981555.5618,
@@ -2345,16 +2345,16 @@
       "LHEScaleSumw8": 0.0
     },
     "ZGToLLG_01J_5f_lowMLL_lowGPt_TuneCP5_13TeV-amcatnloFXFX-pythia8": {
-      "genEventSumw": 25897367902.86569,
-      "LHEScaleSumw0": 50.416719335282345,
-      "LHEScaleSumw1": 52.47418002448824,
-      "LHEScaleSumw2": 53.60544029413094,
-      "LHEScaleSumw3": 48.536821227406165,
-      "LHEScaleSumw4": 51.0,
-      "LHEScaleSumw5": 52.5848222684795,
-      "LHEScaleSumw6": 47.023201410159416,
-      "LHEScaleSumw7": 49.79334979510136,
-      "LHEScaleSumw8": 51.726136602912185
+      "genEventSumw": 52882971143.902885,
+      "LHEScaleSumw0": 399.3987621325646,
+      "LHEScaleSumw1": 415.70647963177913,
+      "LHEScaleSumw2": 424.67696305785694,
+      "LHEScaleSumw3": 384.48606401936627,
+      "LHEScaleSumw4": 404.0,
+      "LHEScaleSumw5": 416.5556137723914,
+      "LHEScaleSumw6": 372.48308001008246,
+      "LHEScaleSumw7": 394.4239996422692,
+      "LHEScaleSumw8": 409.73125492162467
     }
   },
   "/net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc": {
@@ -3067,16 +3067,16 @@
       "LHEScaleSumw8": 11.26205663911608
     },
     "ZGToLLG_01J_5f_lowMLL_lowGPt_TuneCP5_13TeV-amcatnloFXFX-pythia8": {
-      "genEventSumw": 26433592628.924793,
-      "LHEScaleSumw0": 47.455663925026485,
-      "LHEScaleSumw1": 49.385162319454146,
-      "LHEScaleSumw2": 50.44224319812657,
-      "LHEScaleSumw3": 45.68751687050383,
-      "LHEScaleSumw4": 48.0,
-      "LHEScaleSumw5": 49.4851196176673,
-      "LHEScaleSumw6": 44.263638326102054,
-      "LHEScaleSumw7": 46.865896350864055,
-      "LHEScaleSumw8": 48.67940244841848
+      "genEventSumw": 53545878491.06043,
+      "LHEScaleSumw0": 417.1824594554437,
+      "LHEScaleSumw1": 434.2707317028463,
+      "LHEScaleSumw2": 443.7114860263304,
+      "LHEScaleSumw3": 401.571812684688,
+      "LHEScaleSumw4": 422.0,
+      "LHEScaleSumw5": 435.1744327267168,
+      "LHEScaleSumw6": 389.00643210487357,
+      "LHEScaleSumw7": 411.9619064760771,
+      "LHEScaleSumw8": 428.00128784053743
     },
     "DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8": {
       "genEventSumw": 3323477295419.9946,
@@ -6169,6 +6169,20 @@
       "LHEScaleSumw6": 111.14153442450461,
       "LHEScaleSumw7": 116.5929654091013,
       "LHEScaleSumw8": 120.3345669789505
+    }
+  },
+  "/net/cms11/cms11r0/pico/NanoAODv15/nano/2024/mc": {
+    "DYGto2LG-1Jets_Bin-MLL-50_TuneCP5_13p6TeV_amcatnloFXFX-pythia8": {
+      "genEventSumw": 64119124041.99761,
+      "LHEScaleSumw0": 1516.7919182672351,
+      "LHEScaleSumw1": 1564.448158847048,
+      "LHEScaleSumw2": 1589.0774574475272,
+      "LHEScaleSumw3": 1466.5936457268965,
+      "LHEScaleSumw4": 1527.0,
+      "LHEScaleSumw5": 1564.947678198679,
+      "LHEScaleSumw6": 1426.0445971354152,
+      "LHEScaleSumw7": 1496.0972564213114,
+      "LHEScaleSumw8": 1544.2647320594926
     }
   }
 }

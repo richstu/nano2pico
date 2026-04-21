@@ -1,14 +1,21 @@
 #!/usr/bin/env python3
 # The ./jobscript_check.py should return 'success' or 'fail' or 'to_submit' or 'submitted' for a job_log_string
 # The input is given as sys.argv[1] = queue_system.compress_string(job_log_string) sys.argv[2] = queue_system.compress_string(job_argument_string)
+import json
 import sys
 import os
-import queue_system
+import zlib
 from ROOT import TChain
 
+# Decompress string for passed things through posix
+# this is normally in queue system, but it breaks with python3 so here is a 
+# reimplementation for now MO
+def decompress_string(compressed_string):
+  return zlib.decompress(bytes.fromhex(compressed_string)).decode('utf-8')
+
 # job_argument_string = "/net/top/homes/aovcharova/code/nano2pico/run/process_nano.exe -f DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISummer16NanoAODv5__PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1__250000__233E4358-D599-FE4A-B585-A6B18F4DDEF1.root -i /mnt/hadoop/pico/NanoAODv5/nano/2016/mc/ -o /net/cms29/cms29r0/pico/NanoAODv5/higgsino_angeles/2016/mc/"
-job_log_string = queue_system.decompress_string(sys.argv[1])
-job_argument_string = queue_system.decompress_string(sys.argv[2])
+job_log_string = decompress_string(sys.argv[1])
+job_argument_string = decompress_string(sys.argv[2])
 #job_argument_string = "--command=\"/net/cms37/data1/jbkim/analysis/nano2pico.inyo/run/process_nano.exe -f JetHT__Run2016H__02Apr2020-v1__40000__E316083A-DB8C-484C-8013-C9C3A301ED61.root -i /net/cms25/cms25r5/pico/NanoAODv7/nano/2016/data/ -o /net/cms25/cms25r5/pico/NanoAODv7/higgsino_inyo/2016/data/\""
 
 print(job_argument_string)
@@ -21,19 +28,10 @@ class GoldenJson:
   def __init__(self):
     #load golden jsons
     for json_filename in os.listdir('txt/json/'):
-      json_file = open('txt/json/'+json_filename,'r')
-      json_file_text = json_file.read().split('\n')
-      json_file.close()
-      for run_line in json_file_text:
-        if (len(run_line.split('"')) < 2):
-          continue
-        run_number = int(run_line.split('"')[1])
-        lumi_blocks_string = run_line[run_line.find('['):run_line.rfind(']')]
-        lumi_blocks_list = lumi_blocks_string.replace('[','').replace(']','').replace(' ','').split(',')
-        int_lumi_blocks_list = []
-        for index in range(len(lumi_blocks_list)/2):
-          int_lumi_blocks_list.append((int(lumi_blocks_list[2*index]),int(lumi_blocks_list[2*index+1])))
-        self.good_lumi_blocks[run_number] = int_lumi_blocks_list
+      with open('txt/json/'+json_filename,'r') as json_file:
+        json_content = json.loads(json_file.read())
+      for run in json_content:
+        self.good_lumi_blocks[int(run)] = json_content[run]
 
   def check(self, run, lumi_block):
     if run in self.good_lumi_blocks:
@@ -64,6 +62,7 @@ infile = TChain("Events");
 infile.Add(infile_path);
 in_nent = 0
 if 'data' in infile_path:
+  # I can't believe we are doing a python event loop, no wonder this is slow MO
   for i in range(0, infile.GetEntries()):
     infile.GetEntry(i)
     #check triggers, matching overlap removal scheme in event_tools.cpp
