@@ -33,7 +33,6 @@ def get_tag(path: str) -> str:
   """
   tag = path.split("/")[-1]
   tag = re.findall('(.*?)__',tag)[0]
-  tag = tag.split("_ext")[0]
   return tag
 
 def find_normalization(nano_dir: str, output_name: str, overwrite: bool, 

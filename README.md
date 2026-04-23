@@ -33,7 +33,7 @@ After compilation, one can convert NanoAOD root files to pico files using 'run/p
 Example usage of the `process_nano` program is shown below.
 
 ~~~~bash
-./compile.sh && ./run/process_nano.exe --in_file SMS-TChiHH_mChi-1000_mLSP-1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISummer16NanoAODv5__PUSummer16v3Fast_94X_mcRun2_asymptotic_v3-v1.root --in_dir /net/cms29/cms29r0/pico/NanoAODv5/nano/2016/TChiHH/ --out_dir out/ --nent 10000
+./compile.sh && ./run/process_nano.exe --in_dir /net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc --in_file DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8__RunIISummer20UL18NanoAODv9__106X_upgrade2018_realistic_v16_L1v1-v2__230000__133DEE73-5874-BF43-8B04-8816BE82DF6A.root --out_dir out/zgamma/ --nent 10000
 ~~~~
 
 :bangbang: Code functionality also relies on the input NanoAOD filename! Specifically, `INFILE` is parsed for:
@@ -85,7 +85,7 @@ Finally, productions are generally performed with a tagged version of nano2pico.
 
 ### Step 1-3. All-in-one script
 
-For existing analyses, there exist scripts that will run the nano2pico conversion together with the standard skim and slim steps for that analysis. For the Higgs to Z gamma analysis, this sripts is [produce_htozgamma_picos.py](scripts/produce_htozgamma_picos.py). Required arguments include the production name/git tag, the year, the NanoAOD version, the input directory, whether the samples are data or MC, and the data set list. An example of its usage is given below.
+For existing analyses, there exist scripts that will run the nano2pico conversion together with the standard skim and slim steps for that analysis. For the Higgs to Z gamma analysis, this script is [produce_htozgamma_picos.py](scripts/produce_htozgamma_picos.py). Required arguments include the production name/git tag, the year, the NanoAOD version, the input directory, whether the samples are data or MC, and the data set list. An example of its usage is given below.
 
 ```sh
 python3 scripts/produce_htozgamma_picos.py -t htozgamma_redwood_v0 -y 2018 -n NanoAODv9 -b /net/cms11/cms11r0/pico/ -d mc -l txt/datasets/mc18_temp
