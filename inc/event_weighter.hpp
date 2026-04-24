@@ -16,7 +16,8 @@
 
 class EventWeighter{
 public:
-  EventWeighter(std::string year, const std::vector<float> &btag_wpts);
+  EventWeighter(std::string year, bool isSignal, 
+                const std::vector<float> &btag_wpts);
 
   void ElectronSF(pico_tree &pico);
 
@@ -114,6 +115,7 @@ private:
   float btag_wp_medium_;
   float btag_wp_tight_;
   bool post_bpix_;
+  bool is_signal_;
 };
 
 #endif

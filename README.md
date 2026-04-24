@@ -24,32 +24,19 @@ You can then compile via `scons`. `compile.sh` is outdated, but may work.
 
 ## How does nano2pico work?
 
-This package is used to do the Nano -> pico conversion in three steps in order to allow parallelizing the production at the sub-dataset level:
+For typical production usage with the condor batch system, see the next section. This section details lower level nano2pico usage, which is most useful for small scale testing.
 
-  1. All variables and event weights (except normalization) are calculated using [src/process_nano.cxx](src/process_nano.cxx). For Monte Carlo events, this step also keeps a tally of the weights for all events in the file being run over as input to the next step. For data events, only this step is needed.
-  2. The sums of weights from step 1 are further aggregate to get the total per dataset. A correction is then calculated to ensure that the weights do not change the total expected number of events for the dataset. This is done in [src/merge_corrections.cxx](src/merge_corrections.cxx). The luminosity normalization weight `w_lumi` to be applied to get the yield in 1fb-1 is also calculated for each dataset in this step.
-  3. The `raw_pico` files from step 1 are corrected by the per-dataset correction factors derived in step 2 and written to the `unskimmed` folder.
+After compilation, one can convert NanoAOD root files to pico files using 'run/process_nano.exe' ([source](src/process_nano.cxx)). This program takes as arguments the directory containing the input file, the input filename, and the output directory. There are also optional arguments: `nent` to specify the maximum number of events to process, `norm` to specify an external normalization json, and `skim` to save only events passing certain criteria.
 
-At this point, various skims can be made as defined in [scripts/skim_file.py](scripts/skim_file.py).
+*Note:* The input path in which the input NanoAOD files are stored as well as the output path are analyzed to determine the behavior of nano2pico. In particular, the input path must contain the string `NanoAODvX` (or `NanoAODv9UCSB`) to specify the NanoAOD version for processing. The output directory must contain a folder `raw_pico`. The analysis settings are currently also based on the output path, and as such, the string `zgamma` or `higgsino` should appear in the output path to specify the analysis configuration.
 
-*Note:* The input path in which the input NanoAOD files are stored as well as the output path are analyzed to determine the behavior of nano2pico. To run with settings for the Higgs to Z gamma analysis, the 'out_dir' should contain "zgamma" in its name. To run on custom NanoAODv9 files, the input directory must contain "NanoAODv9UCSB" in its name.
-
-## Interactive test usage
-
-Define some paths, e.g.:
+Example usage of the `process_nano` program is shown below.
 
 ~~~~bash
-export INDIR=/net/cms29/cms29r0/pico/NanoAODv5/nano/2016/TChiHH/
-export INFILE=SMS-TChiHH_mChi-1000_mLSP-1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISummer16NanoAODv5__PUSummer16v3Fast_94X_mcRun2_asymptotic_v3-v1.root
+./compile.sh && ./run/process_nano.exe --in_dir /net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc --in_file DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8__RunIISummer20UL18NanoAODv9__106X_upgrade2018_realistic_v16_L1v1-v2__230000__133DEE73-5874-BF43-8B04-8816BE82DF6A.root --out_dir out/zgamma/ --nent 10000
 ~~~~
 
-Step 1. Make an output directory `out/` (or another name containing `zgamma` if processing for Higgs to Z gamma) with subdirectories `wgt_sums` and `raw_pico`. Produce raw pico ntuple from a nano input file:
-
-~~~~bash
-./compile.sh && ./run/process_nano.exe --in_file $INFILE --in_dir $INDIR --out_dir out/ --nent 10000
-~~~~
-`nent` can be set to `-1` to process all events in a file.
-:bangbang: Code functionality relies on the input NanoAOD filename! Specifically, `INFILE` is parsed for:
+:bangbang: Code functionality also relies on the input NanoAOD filename! Specifically, `INFILE` is parsed for:
 
 * flag `isData = infile.Contains("Run201") ? true : false;`
 * flag `isFastsim = infile.Contains("Fast") ? true : false;`
@@ -58,17 +45,19 @@ Step 1. Make an output directory `out/` (or another name containing `zgamma` if 
 * output branch `type` is set based on the presence of dataset name substrings (see event_tools.cpp)
 * branches related on ISR also depend on the presence of dataset name substrings
 
-Step 2. If you are using data, you are done! If you are using MC, for each dataset, it is necessary to add up the sums of weights obtained for each file in step 1 and calculate the corrections needed to normalize each individual weight as well as the total weight. Note that the order of options is fixed with the arguments after the first being the input files. This is to allow arbitrary number of input files. Note that again functionality depends on the naming, e.g. correction file name is used to decide what cross-section to use. To perform this process, make subdirectory `corrections` in `out`. Then:
+By default, simulation weights are normalized just within a single NanoAOD file. To process multiple NanoAOD files and use a common normalization across files, use the `norm` argument together with a weight sums json file generated by `find_normalization.py` as discussed in the next section.
 
-~~~~bash
-./compile.sh && ./run/merge_corrections.exe out/corrections/corr_$INFILE out/wgt_sums/wgt_sums_$INFILE
-~~~~
+If the data sets were not skimmed (events/rows removed) in the intial processing, one can create skims using the script [scripts/skim_file.py](scripts/skim_file.py), which takes as arguments the skim name, the input path for the file to skim, and the output directory. Example usage is shown below.
 
-Step 3. Make subdirectory `unskimmed` in `out`. Using the pico file from step 1 and the corrections file from step 2 as input, we can renormalize the weight branches using the following command:
+```sh
+scripts/skim_file.py -k ll -i out/zgamma/raw_pico/raw_pico_DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8__RunIISummer20UL18NanoAODv9__106X_upgrade2018_realistic_v16_L1v1-v2__230000__133DEE73-5874-BF43-8B04-8816BE82DF6A.root -o out/zgamma/skim_ll
+```
 
-~~~~bash
-./compile.sh && ./run/apply_corrections.exe --in_file raw_pico_$INFILE --in_dir out/raw_pico/ --corr_file corr_$INFILE
-~~~~
+Finally, one can merge data sets and remove columns to create slims using the script [scripts/slim_and_merge.py](scripts/slim_and_merge.py), which takes a slim rules file, the input files to merge with wildcards, and the the output file. Example usage is shown below.
+
+```sh
+scripts/slim_and_merge.py -s txt/slim_rules/zgmc.txt -i out/zgamma/skim_ll/raw_pico_ll_DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8*.root -o out/zgamma/merged_zgll
+```
 
 ## Batch system usage
 
@@ -76,15 +65,35 @@ nano2pico supports batch system usage to process many datasets in parallel. Curr
 
 While previous versions of nano2pico used the custom UCSB batch system, the current version now uses HTCondor. For this reason, jobs must be run on the cms11 server. To get permission to run jobs on HTCondor, please contact Jaebak.
 
-### Step 0. Setup environment
+### Step0. Setup
 
-  source set_env.sh
+To set up the environment, use
+
+```sh
+source set_env.sh
+```
+
+You will need to find or create a list of data sets to process. You can find many existing lists in the `txt/datasets` folder. A list simply consists of the NanoAOD data set names as they appear on DAS. If you are processing a new MC dataset list, you must calculate the overall luminosity/generator weight normalization. You can use the [find_normalization.py script](script/find_normalization.py) to do this, as demonstrated in the example below.
+
+```sh
+python3 scripts/find_normalization.py -n /net/cms11/cms11r0/pico/NanoAODv12/nano/2023BPix/mc/ -d txt/datasets/NanoAODv12_htozgamma_2023BPix_sig_dataset_paths -o wgt_sums.json -w -v
+```
+
+This will write the output to `txt/wgt_sums/wgt_sums.json`, which can then be used by the pico processing step to calculate event weights.
+
+Finally, productions are generally performed with a tagged version of nano2pico. See the appendix below on how to create a git tag.
+
+### Step 1-3. All-in-one script
+
+For existing analyses, there exist scripts that will run the nano2pico conversion together with the standard skim and slim steps for that analysis. For the Higgs to Z gamma analysis, this script is [produce_htozgamma_picos.py](scripts/produce_htozgamma_picos.py). Required arguments include the production name/git tag, the year, the NanoAOD version, the input directory, whether the samples are data or MC, and the data set list. An example of its usage is given below.
+
+```sh
+python3 scripts/produce_htozgamma_picos.py -t htozgamma_redwood_v0 -y 2018 -n NanoAODv9 -b /net/cms11/cms11r0/pico/ -d mc -l txt/datasets/mc18_temp
+```
 
 ### Step 1. Converting Nano to Pico:
 
-First, generate a text file containing the datasets in DAS format (this is produced by copy\_dataset) or the filenames to be processed, one per line. If you use filenames, you must add the argument `--list_format filename` when invoking `scripts/write_process_nano_cmds.py`.
-
-Next, generate a python file that prints the commands to be run in the batch (input for the queue system):
+Generate a python file that prints the commands to be run in the batch (input for the queue system):
 
 ~~~~bash 
 ./scripts/write_process_nano_cmds.py --in_dir /mnt/hadoop/pico/NanoAODv5/nano/2016/mc/ \
@@ -134,28 +143,7 @@ One can also resume the auto_submit_job.py like below
 auto_submit_jobs.py auto_higgsino_angeles.json -c scripts/check_process_nano_job.py -o auto_higgsino_angeles.json
 ~~~~
 
-If processing Monte Carlo, then proceed to steps 2 and 3 (MC). If processing data, proceed directly to step 4.
-
-### Step 2 (MC). Merge sums of weights
-
-For example:
-
-~~~~bash 
-./scripts/merge_corrections.py --wgt_dir /net/cms29/cms29r0/pico/NanoAODv5/higgsino_angeles/2016/mc/wgt_sums/ \
-                               --corr_dir /net/cms29/cms29r0/pico/NanoAODv5/higgsino_angeles/2016/mc/corrections/ 
-~~~~
-
-### Step 3 (MC). Submit the weight correction jobs
-
-To generate the commands use:
-
-~~~~bash 
-./scripts/write_apply_corrections_cmds.py --in_dir /net/cms29/cms29r0/pico/NanoAODv5/higgsino_angeles/2016/mc/raw_pico/
-~~~~
-
-Follow similar process as in Step 1 to submit the commands as batch jobs. 
-
-### Step 4. Making skims
+### Step 2. Making skims
 
 It's recommended to start with a relatively inclusive skim which would then serve as the starting point for tighter skims to minimize total time spent on skimming. For example:
 
@@ -174,7 +162,7 @@ Use `--overwrite` to run over all files even if output already exists. Otherwise
 
 Note that this step works also on slims produced by Step 5.
 
-### Step 5. Making slims
+### Step 3. Making slims
 
 Finally, one can remove branches that are not commonly used and merge all files pertaining to one dataset into a single file to further reduce size and speed up making plots. For example:
 
@@ -186,41 +174,6 @@ Finally, one can remove branches that are not commonly used and merge all files 
 Here the slim name must correspond to a txt file in the slim_rules folder, so in this example `txt/slim_rules/higmc.txt`. The file contains the list of branches to be dropped/kept.
 
 Similarly to above, one can optionally use `--overwrite` or `--tag`.
-
-### Step 6. Prior to DNN training: Prepare tree with DNN inputs (deprecated)
-
-For the higgsino analysis, one can prepare a tree with all the necessary DNN inputs for either training or inference using the executable `make_higfeats.exe`, and in the batch system, e.g.:
-
-~~~~bash 
-./scripts/write_generic_cmds.py ./scripts/write_generic_cmds.py \
-           -i /net/cms29/cms29r0/pico/NanoAODv5/higgsino_eldorado/2017/mc/merged_higmc_higloose/ \
-           -o /net/cms29/cms29r0/pico/NanoAODv5/higgsino_eldorado/2017/mc/higfeats_higloose/ \
-           -e ./run/make_higfeats.exe -t mc2017
-~~~~
-
-As usual, the tag is optional and only relevant for the filename of the resulting cmd file.
-
-### Step 7. After DNN evaluation: Merge pico with DNN output (deprecated)
-
-After training the DNN and evaluating its output for all samples of interest using the `diboson_ml` package, one can update the corresponding pico trees to add a new branch containing the DNN output. This relies on having the events in the same order, so one has to update the pico ntuples used as input to higfeats! Given it is rather quick, it's done interactively.
-
-For now, copy the input folder just in case...
-
-~~~~bash 
-cp -r /net/cms29/cms29r0/pico/NanoAODv5/higgsino_eldorado/2016/mc/merged_higmc_higloose/ \
-      /net/cms29/cms29r0/pico/NanoAODv5/higgsino_eldorado/2016/mc/mergednn_higmc_higloose/ 
-./scripts/run_update_pico.py \
-     --pico_dir /net/cms29/cms29r0/pico/NanoAODv5/higgsino_eldorado/2016/mc/mergednn_higmc_higloose/ \
-     --dnnout_dir /net/cms29/cms29r0/pico/NanoAODv5/higgsino_eldorado/2016/mc/dnnout_higloose/
-~~~~
-
-## Calculating b-tagging efficiencies (deprecated)
-
-Use `parameterize_efficiency.cxx`, giving the directory with all the MC files and the year as arguments. Below is an example run for 2016 MC.
-
-~~~~bash
-./compile.sh && ./run/parameterize_efficiency.exe -i /mnt/hadoop/jbkim/2019_09_30/2016/mc/ -y 2016
-~~~~
 
 ## Description of pico branches
 

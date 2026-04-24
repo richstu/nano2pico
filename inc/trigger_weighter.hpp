@@ -7,6 +7,7 @@
 
 #include "correction.h"
 #include "pico_tree.hpp"
+#include "nano_tree.hpp"
 
 enum class LeptonHLTStatus {fail_all=0, pass_lowerdilep=1, pass_upperdilep=2, pass_singlelep=3};
 
@@ -21,15 +22,17 @@ public:
     for a particular year
   
     \param[in] year  year of data taking
+    \param[in] isSignal  flag to save systematics
    */
-  TriggerWeighter(std::string year);
+  TriggerWeighter(std::string year, bool isSignal);
 
   /*!\brief calculates MC-data scale factor for event in the format {value, systup, systdown}
      where the variations are obtained by taking value*syst(up|down)
  
   \param[in] pico pico n-tuple. Lepton and trigger branches must be filled
+  \param[in] nano NanoAOD n-tuple. 
  */
-  void GetSF(pico_tree &pico);
+  void GetSF(pico_tree &pico, nano_tree &nano);
 
 private:
   /*!\brief returns MC-data scale factor for event in the format {value, elsystup, elsystdown, musystup, musystdn}
@@ -44,11 +47,16 @@ private:
     \param[in] pass_singlemu if event passes single muon trigger(s)
     \param[in] pass_diel if event passes double electron trigger(s)
     \param[in] pass_dimu if event passes double muon trigger(s)
+    \param[in] prefire_weights (nominal, up, down) prefire weights
+
+    \return (nominal SF, el up, el down, mu up, mu down, prefire SF, 
+             prefire up, prefire down)
    */
   std::vector<float> GetSF(std::vector<float> electron_pt, 
       std::vector<float> muon_pt, std::vector<float> electron_eta, 
       std::vector<float> muon_eta, std::vector<float> electron_phi,
-      bool pass_singleel, bool pass_singlemu, bool pass_diel, bool pass_dimu);
+      bool pass_singleel, bool pass_singlemu, bool pass_diel, bool pass_dimu,
+      std::vector<float> prefire_weights);
 
   /*!\brief returns probability (efficiency) for event to pass single or dilepton
     triggers for a particular lepton flavor in the format 
@@ -61,6 +69,8 @@ private:
     \param[in] pass_dilep if event passes single lepton trigger(s)
     \param[in] is_data sets whether data or MC probability is calculated
     \param[in] is_electron sets whether e or mu probability is calculated
+
+    \return (nominal SF, up variation, down variation)
    */
   std::vector<float> GetFlavorProbability(
       std::vector<float> lepton_pt, std::vector<float> lepton_eta, 
@@ -127,6 +137,9 @@ private:
   correction::Correction::Ref map_singlemu_mceff_; 
   correction::Correction::Ref map_singlemu_mcunc_; 
   bool post_bpix_;
+  bool is_run2_;
+  bool is_2017_;
+  bool is_signal_;
 };
 
 #endif

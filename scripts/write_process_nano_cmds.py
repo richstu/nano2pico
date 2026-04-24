@@ -16,6 +16,9 @@ parser.add_argument('-t', '--tag', default='',
 parser.add_argument("-l","--list_format", default="DAS", choices=["DAS","filename"],
                     help="Sets whether the dataset list is in DAS format or filename format.")
 parser.add_argument("--data", action="store_true", help='For DAS data datasets')
+parser.add_argument('-n', '--norm', default='txt/wgt_sums/wgt_sums.json',
+                    help='Normalization json file.')
+parser.add_argument('-s', '--skim', default='', help='Skim rule.')
 args = vars(parser.parse_args())
 
 in_dir = args['in_dir']
@@ -78,7 +81,9 @@ cmdfile = open(cmdfile_name,'w')
 cmdfile.write('#!/bin/env python\n')
 for ifile_path in in_file_paths:
   ifile = os.path.basename(os.path.realpath(ifile_path))
-  cmd = '{}/run/process_nano.exe -f {} -i {} -o {}'.format(os.getcwd(), ifile, in_dir, out_base_dir)
+  cmd = '{}/run/process_nano.exe -f {} -i {} -o {} --norm {}'.format(os.getcwd(), ifile, in_dir, out_base_dir, args['norm'])
+  if args['skim'] != '':
+    cmd += (' --skim '+args['skim'])
   cmdfile.write('print(\"'+cmd+'\")\n')
 
 cmdfile.close()

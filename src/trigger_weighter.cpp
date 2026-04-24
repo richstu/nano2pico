@@ -35,7 +35,7 @@ float safe_div(float num, float den) {
   return 1.0f;
 }
 
-TriggerWeighter::TriggerWeighter(string year) {
+TriggerWeighter::TriggerWeighter(string year, bool isSignal) {
   string in_file_path;
   string in_file_ello;
   string in_file_elup;
@@ -43,6 +43,8 @@ TriggerWeighter::TriggerWeighter(string year) {
   string in_file_mulo;
   string in_file_muup;
   string in_file_musi;
+  is_2017_ = false;
+  is_run2_ = false;
   if (year=="2016APV") {
     in_file_path = "data/zgamma/2016preVFP_UL/";
     in_file_ello = "hzg_eltrig12_2016APV_efficiencies";
@@ -51,6 +53,7 @@ TriggerWeighter::TriggerWeighter(string year) {
     in_file_mulo = "hzg_mutrig8_2016APV_efficiencies";
     in_file_muup = "hzg_mutrig17_2016APV_efficiencies";
     in_file_musi = "hzg_mutrig24_2016APV_efficiencies";
+    is_run2_ = true;
   } 
   else if (year=="2016") {
     in_file_path = "data/zgamma/2016postVFP_UL/";
@@ -60,6 +63,7 @@ TriggerWeighter::TriggerWeighter(string year) {
     in_file_mulo = "hzg_mutrig8_2016_efficiencies";
     in_file_muup = "hzg_mutrig17_2016_efficiencies";
     in_file_musi = "hzg_mutrig24_2016_efficiencies";
+    is_run2_ = true;
   } 
   else if (year=="2017") {
     in_file_path = "data/zgamma/2017_UL/";
@@ -69,6 +73,8 @@ TriggerWeighter::TriggerWeighter(string year) {
     in_file_mulo = "hzg_mutrig8_2017_efficiencies";
     in_file_muup = "hzg_mutrig17_2017_efficiencies";
     in_file_musi = "hzg_mutrig27_2017_efficiencies";
+    is_run2_ = true;
+    is_2017_ = true;
   } 
   else if (year=="2018") {
     in_file_path = "data/zgamma/2018_UL/";
@@ -78,6 +84,7 @@ TriggerWeighter::TriggerWeighter(string year) {
     in_file_mulo = "hzg_mutrig8_2018_efficiencies";
     in_file_muup = "hzg_mutrig17_2018_efficiencies";
     in_file_musi = "hzg_mutrig24_2018_efficiencies";
+    is_run2_ = true;
   }
   else if (year=="2022") {
     in_file_path = "data/zgamma/2022/";
@@ -183,10 +190,10 @@ TriggerWeighter::TriggerWeighter(string year) {
     map_hole_singleel_mcunc_     = cs_elsi_hole_->at("systmc");
     post_bpix_ = true;
   }
+  is_signal_ = isSignal;
 }
 
-
-void TriggerWeighter::GetSF(pico_tree &pico) {
+void TriggerWeighter::GetSF(pico_tree &pico, nano_tree &nano) {
   //this is just a wrapper around the other GetSF that extracts relevant info
   //from pico tree
 
@@ -209,24 +216,38 @@ void TriggerWeighter::GetSF(pico_tree &pico) {
     }
   }
 
+  vector<float> prefire_weights;
+  prefire_weights.resize(3,1.0f);
+  if (is_run2_) {
+    prefire_weights[0] = nano.L1PreFiringWeight_Nom();
+    prefire_weights[1] = nano.L1PreFiringWeight_Up();
+    prefire_weights[2] = nano.L1PreFiringWeight_Dn();
+  }
+
   vector<float> sfs =  GetSF(electron_pt, muon_pt, electron_eta, muon_eta, 
       electron_phi, pico.out_trig_single_el(), pico.out_trig_single_mu(), 
-      pico.out_trig_double_el(), pico.out_trig_double_mu());
+      pico.out_trig_double_el(), pico.out_trig_double_mu(), prefire_weights);
   pico.out_w_trig() = sfs[0];
-  pico.out_sys_trig().resize(2,1.0f); //unused in ZGamma
-  pico.out_sys_trig_el().resize(2,1.0f);
-  pico.out_sys_trig_mu().resize(2,1.0f);
-  pico.out_sys_trig_el()[0] = sfs[1];
-  pico.out_sys_trig_el()[1] = sfs[2];
-  pico.out_sys_trig_mu()[0] = sfs[3];
-  pico.out_sys_trig_mu()[1] = sfs[4];
+  pico.out_w_prefire() = sfs[5];
+  if (is_signal_) {
+    pico.out_sys_trig().resize(2,1.0f); //unused in ZGamma
+    pico.out_sys_trig_el().resize(2,1.0f);
+    pico.out_sys_trig_mu().resize(2,1.0f);
+    pico.out_sys_prefire().resize(2,1.0f); 
+    pico.out_sys_trig_el()[0] = sfs[1];
+    pico.out_sys_trig_el()[1] = sfs[2];
+    pico.out_sys_trig_mu()[0] = sfs[3];
+    pico.out_sys_trig_mu()[1] = sfs[4];
+    pico.out_sys_prefire()[0] = sfs[6];
+    pico.out_sys_prefire()[1] = sfs[7];
+  }
 }
 
 vector<float> TriggerWeighter::GetSF(
     vector<float> electron_pt, vector<float> muon_pt, 
     vector<float> electron_eta, vector<float> muon_eta, 
     vector<float> electron_phi, bool pass_singleel, bool pass_singlemu, 
-    bool pass_diel, bool pass_dimu) {
+    bool pass_diel, bool pass_dimu, vector<float> prefire_weights) {
 
   //note that this only weights leptons that pass the signal criteria
   //i.e. trigger efficiencies will remain uncorrected for leptons failing
@@ -279,7 +300,38 @@ vector<float> TriggerWeighter::GetSF(
   sf_muup = bound(sf_muup, 10.0f, 0.0f);
   sf_mudn = bound(sf_mudn, 10.0f, 0.0f);
 
-  return {sf, sf_elup, sf_eldn, sf_muup, sf_mudn};
+  //prefiring SFs
+  float prefire_sf = 1.0f;
+  float prefire_sf_up = 1.0f;
+  float prefire_sf_dn = 1.0f;
+  if (pass_singlemu || pass_dimu || pass_singleel || pass_diel) {
+    prefire_sf = prefire_weights[0];
+    prefire_sf_up = prefire_weights[1];
+    prefire_sf_dn = prefire_weights[2];
+  }
+  else {
+    //float adj_prob_data = el_prob_data[0]*mu_prob_data[0];
+    //adj_prob_data = 1.0 - prefire_weights[0]*(1.0 - adj_prob_data);
+    //float adj_prob_data_up = el_prob_data[0]*mu_prob_data[0];
+    //adj_prob_data_up = 1.0 - prefire_weights[1]*(1.0 - adj_prob_data_up);
+    //float adj_prob_data_dn = el_prob_data[0]*mu_prob_data[0];
+    //adj_prob_data_dn = 1.0 - prefire_weights[2]*(1.0 - adj_prob_data_dn);
+    float prob_data = el_prob_data[0]*mu_prob_data[0];
+    if (prob_data > 0.0) {
+      prefire_sf = 1.0 + ((1.0 - prefire_weights[0])*(1.0 - prob_data)
+                          /prob_data);
+      prefire_sf_up = 1.0 + ((1.0 - prefire_weights[1])*(1.0 - prob_data)
+                             /prob_data);
+      prefire_sf_dn = 1.0 + ((1.0 - prefire_weights[2])*(1.0 - prob_data)
+                             /prob_data);
+    }
+    prefire_sf = bound(prefire_sf, 10.0f, 0.0f);
+    prefire_sf_up = bound(prefire_sf_up, 10.0f, 0.0f);
+    prefire_sf_dn = bound(prefire_sf_dn, 10.0f, 0.0f);
+  }
+
+  return {sf, sf_elup, sf_eldn, sf_muup, sf_mudn, prefire_sf, prefire_sf_up, 
+          prefire_sf_dn};
 }
 
 
@@ -421,6 +473,24 @@ vector<float> TriggerWeighter::GetFlavorProbability(
         if (ilep == lepton_status.size()-1)
           finished = true;
       }
+    }
+  }
+
+  // Extra Zvtx correction, see 
+  // https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaUL2016To2018
+  if (is_2017_ && is_electron && is_data) {
+    if (pass_singlelep || pass_dilep) {
+      tot_prob *= 0.991;
+      tot_prob_up *= 0.991;
+      tot_prob_dn *= 0.991;
+    }
+    else { //fail triggers
+      float pass_prob = 1.0-tot_prob;
+      float pass_prob_up = 1.0-tot_prob_up;
+      float pass_prob_dn = 1.0-tot_prob_dn;
+      tot_prob = 1.0-pass_prob*0.991;
+      tot_prob_up = 1.0-pass_prob_up*0.991;
+      tot_prob_dn = 1.0-pass_prob_dn*0.991;
     }
   }
 

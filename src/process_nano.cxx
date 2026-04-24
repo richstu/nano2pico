@@ -1,5 +1,6 @@
+#include <array>
 #include <ctime>
-
+#include <fstream>
 #include <iostream>
 #include <iomanip>
 #include <bitset>
@@ -8,6 +9,8 @@
 #include <getopt.h>
 
 #include "TError.h"
+
+#include "json.hpp"
 
 #include "nano_tree.hpp"
 #include "pico_tree.hpp"
@@ -44,17 +47,28 @@ namespace {
   string in_file = "";
   string in_dir = "";
   string out_dir = "";
+  string skim_rule = "";
   int nent_test = -1;
+  string norm_file = "";
   bool debug = false;
   // requirements for jets to be counted in njet, mofified for Zgamma below
   float min_jet_pt = 30.0;
   float max_jet_eta =  2.4;
 }
 
+const int MURF_VARIATIONS = 9;
+
+struct MCMetadata {
+  double gen_event_sumw;
+  array<double, MURF_VARIATIONS> lhe_scale_sumw;
+};
+
 void WriteDataQualityFilters(nano_tree& nano, pico_tree& pico);
 void CopyTriggerDecisions(nano_tree& nano, pico_tree& pico);
-void Initialize(corrections_tree& wgt_sums);
 void GetOptions(int argc, char *argv[]);
+MCMetadata GetMCMetadata(string filename);
+MCMetadata GetMCMetadataFromJson(string in_dir, string in_file, 
+                                 string norm_fname);
 
 int main(int argc, char *argv[]){
   GetOptions(argc, argv);
@@ -213,7 +227,6 @@ int main(int argc, char *argv[]){
   }
 
   string in_path = in_dir+"/"+in_file;
-  string wgt_sums_path = out_dir+"/wgt_sums/wgt_sums_"+in_file;
   string out_path;
   out_path = out_dir+"/raw_pico/raw_pico_"+in_file;
 
@@ -315,6 +328,13 @@ int main(int argc, char *argv[]){
   BBVarProducer bb_producer(year);
   BBGammaGammaVarProducer bbgammagamma_producer(year);
   //Initialize scale factor tools
+  MCMetadata mc_metadata = MCMetadata();
+  if (!isData) {
+    if (norm_file=="") 
+      mc_metadata = GetMCMetadata(in_path);
+    else
+      mc_metadata = GetMCMetadataFromJson(in_dir, in_file, norm_file);
+  }
   const string ctr = "central";
   const vector<string> updn = {"up","down"};
   PrefireWeighter prefire_weighter(year, true);
@@ -326,14 +346,19 @@ int main(int argc, char *argv[]){
   LeptonWeighter lep_weighter16gh(year, isZgamma, true);
   PhotonWeighter photon_weighter(year, isZgamma || isHiggsino);
   // UL scale factors
-  EventWeighter event_weighter(year_string, btag_df_wpts[year_string]);
-  TriggerWeighter trigger_weighter(year_string);
+  EventWeighter event_weighter(year_string, isSignal, 
+                               btag_df_wpts[year_string]);
+  TriggerWeighter trigger_weighter(year_string, isSignal);
   //cout<<"Is APV: "<<isAPV<<endl;
   // Other tools
   EventTools event_tools(in_path, year, isData, nanoaod_version);
   int event_type = event_tools.GetEventType();
   bool isDY = ((event_type / 100 == 62) || (event_type / 100 == 63)) && isZgamma;
   ISRTools isr_tools(in_path, year, nanoaod_version, isData);
+
+  double cross_section(1.0); // fb
+  if (!isData)
+    cross_section = xsec::crossSection(in_file, year)*1000.0;
 
   // Initialize trees
   gErrorIgnoreLevel=6000; // Turns off ROOT errors due to missing branches
@@ -348,15 +373,21 @@ int main(int argc, char *argv[]){
   }
   // cout << "Running on "<< (isFastsim ? "FastSim" : "FullSim") << endl;
   // cout << "Calculating weights based on " << year << " scale factors." << endl;
+  // If running on a subset of events, scale assuming negative weights evenly 
+  // distributed throughout data set
+  if (!isData && nent_test>0) {
+    double event_fraction = (static_cast<double>(nent_test)
+                             /static_cast<double>(nano.GetEntries()));
+    mc_metadata.gen_event_sumw *= event_fraction;
+    for (int imurf = 0; imurf < MURF_VARIATIONS; imurf++) {
+      mc_metadata.lhe_scale_sumw[imurf] *= event_fraction;
+    }
+  }
 
   pico_tree pico("", out_path);
   gErrorIgnoreLevel=-1;
   cout << "Writing output to: " << out_path << endl;
 
-  corrections_tree wgt_sums("", wgt_sums_path);
-  cout << "Writing sum-of-weights to: " << wgt_sums_path << endl;
-  Initialize(wgt_sums);
-  wgt_sums.out_nent() = nentries;
   for(size_t entry(0); entry<nentries; ++entry){
     if (debug) cout << "GetEntry: " << entry <<" event = "<<pico.out_event()<< endl;
     nano.GetEntry(entry);
@@ -501,17 +532,16 @@ int main(int argc, char *argv[]){
                                 nanoaod_version);
     }
 
-    if (debug) cout<<"INFO:: Writing triggers"<<endl;
-
-    if (isHiggsino) event_tools.WriteTriggerEfficiency(pico);
-    if (isZgamma && !isData) {
-      trigger_weighter.GetSF(pico);
-    }
-
     // ----------------------------------------------------------------------------------------------
     //              *** Calculating weight branches ***
     // ----------------------------------------------------------------------------------------------
     if (debug) cout<<"INFO:: Calculating weights"<<endl;
+
+    if (isHiggsino) event_tools.WriteTriggerEfficiency(pico);
+    if (isZgamma && !isData) {
+      trigger_weighter.GetSF(pico, nano);
+    }
+
     float w_lep(1.), w_fs_lep(1.);
     float w_photon(1.);
     vector<float> sys_lep(2,1.), sys_fs_lep(2,1.);
@@ -522,19 +552,12 @@ int main(int argc, char *argv[]){
       pico.out_w_btag_df() = 1.; 
       pico.out_w_bhig()    = 1.; 
       pico.out_w_bhig_df() = 1.; 
-      pico.out_sys_bchig().resize(2,0); pico.out_sys_udsghig().resize(2,0);
-      pico.out_sys_fs_bchig().resize(2,0); pico.out_sys_fs_udsghig().resize(2,0);
       pico.out_w_lep() = 1.;
       pico.out_w_fs_lep() = 1.;
-      pico.out_sys_lep().resize(2,0); pico.out_sys_fs_lep().resize(2,0);
       pico.out_w_pu() = 1.;
-      pico.out_sys_pu().resize(2, 0);
       pico.out_w_photon() = 1.;
       pico.out_w_trig() = 1.;
       pico.out_w_isr() = 1.;
-      pico.out_sys_photon().resize(2,0);
-      pico.out_sys_photon_csev().resize(2,0);
-      pico.out_sys_isr().resize(2,0);
       pico.out_w_nnlo()   = 1.;
     } else { // MC
       if ((!is_preUL) || year>=2022) { //UL or run 3
@@ -543,35 +566,31 @@ int main(int argc, char *argv[]){
         event_weighter.ElectronMinisoSF(pico);
         event_weighter.MuonSF(pico);
         event_weighter.MuonMinisoSF(pico);
+        // TODO check if PU weights are okay without normalization
         event_weighter.PileupSF(pico);
         event_weighter.bTaggingSF(pico);
         event_weighter.jetpuIdSF(pico);
         event_weighter.PhotonSF(pico);
+        // TODO check if photon shape weights are okay without normalization
         event_weighter.PhotonShapeSF(pico);
         event_weighter.FakePhotonSF(pico);
+        // TODO check if ISR weights are okay without normalization
         event_weighter.ZISRSF(pico);
+        // TODO check if NNLO weights are okay without normalization
         event_weighter.NNLOCorrection(pico);
-        pico.out_sys_isr().resize(2,1.);
-        pico.out_sys_lep().resize(2,1.); 
-        pico.out_sys_prefire().resize(2, 1.); 
-        pico.out_w_lep()          = pico.out_w_el() * pico.out_w_mu();
-        pico.out_sys_lep()[0]     = pico.out_sys_el()[0]*pico.out_sys_mu()[0]; 
-        pico.out_sys_lep()[1]     = pico.out_sys_el()[1]*pico.out_sys_mu()[1]; 
-        pico.out_sys_fs_bchig().resize(2,1.); 
-        pico.out_sys_fs_udsghig().resize(2,1.); 
-        pico.out_sys_fs_lep().resize(2,1.);
+        pico.out_w_lep()     = pico.out_w_el() * pico.out_w_mu();
         pico.out_w_btag()    = 1.; 
         pico.out_w_bhig()    = 1.; 
         pico.out_w_fs_lep()  = 1.;
-        if (year >= 2022) {
-          pico.out_w_prefire()      = 1.0;
-          pico.out_sys_prefire()[0] = 1.0;
-          pico.out_sys_prefire()[1] = 1.0;
-        }
-        else {
-          pico.out_w_prefire()      = nano.L1PreFiringWeight_Nom();
-          pico.out_sys_prefire()[0] = nano.L1PreFiringWeight_Up();
-          pico.out_sys_prefire()[1] = nano.L1PreFiringWeight_Dn();
+        if (isSignal) {
+          pico.out_sys_isr().resize(2,1.);
+          pico.out_sys_lep().resize(2,1.); 
+          pico.out_sys_prefire().resize(2, 1.); 
+          pico.out_sys_fs_bchig().resize(2,1.); 
+          pico.out_sys_fs_udsghig().resize(2,1.); 
+          pico.out_sys_fs_lep().resize(2,1.);
+          pico.out_sys_lep()[0] = pico.out_sys_el()[0]*pico.out_sys_mu()[0]; 
+          pico.out_sys_lep()[1] = pico.out_sys_el()[1]*pico.out_sys_mu()[1]; 
         }
       } else { // Pre-UL run 2
         pico.out_w_btag()    = btag_weighter.EventWeight(pico, BTagEntry::OP_MEDIUM, ctr, ctr);; 
@@ -632,177 +651,63 @@ int main(int argc, char *argv[]){
       isr_tools.WriteISRWeights(pico);
     }
 
-    // to be calculated in Step 2: merge_corrections
-    if (!isData)
-      pico.out_w_lumi() = nano.Generator_weight()>0 ? 1:-1;
-    else
-      pico.out_w_lumi() = 1.;
-
-    //copy LHE scale variation, PDF, and PS weights
+    // Deal with overall weights (nominal, scale/PDF/PS variations)
+    // Note: genEventSumw is calculated from genWeight not Generator_weight
     if (!isData) {
-      pico.out_sys_murf() = nano.LHEScaleWeight();
+      pico.out_w_lumi() = cross_section*nano.genWeight()
+                          /mc_metadata.gen_event_sumw;
+      if (isSignal) {
+        pico.out_sys_murf().resize(MURF_VARIATIONS,1.); 
+        for (int imurf = 0; imurf < MURF_VARIATIONS; imurf++) {
+          pico.out_sys_murf()[imurf] = nano.LHEScaleWeight()[imurf]
+              /(mc_metadata.lhe_scale_sumw[imurf]*mc_metadata.gen_event_sumw);
+        }
+      }
+      // PDF weights negligible in HtoZgamma and large disk usage
+      // if used, one should normalize by LHEPdfSumw analogously to murf
       //pico.out_sys_pdf() = nano.LHEPdfWeight();
+      // TODO check if PS weights are okay without normalization
       pico.out_sys_ps() = nano.PSWeight();
     }
+    else {
+      pico.out_w_lumi() = 1.;
+    }
 
-    // note: will be set again in Step 3
     if (isZgamma) {
       pico.out_weight() = pico.out_w_lumi() * pico.out_w_lep() * 
                           pico.out_w_btag_df() * pico.out_w_jetpuid() *
-                          pico.out_w_photon()  *
-                          pico.out_w_isr() * pico.out_w_pu() * 
-                          pico.out_w_trig() * pico.out_w_phshape() * 
-                          pico.out_w_prefire() * pico.out_w_fakephoton() *
-                          pico.out_w_nnlo();
+                          pico.out_w_photon()  * pico.out_w_isr() * 
+                          pico.out_w_pu() * pico.out_w_trig() * 
+                          pico.out_w_phshape() * pico.out_w_prefire() * 
+                          pico.out_w_fakephoton() * pico.out_w_nnlo();
     } else {
       // for non Z-gamma: do not put anything that will not be renormalized
       // in weight
       pico.out_weight() = pico.out_w_lumi() *
-                          pico.out_w_lep() * pico.out_w_fs_lep() * pico.out_w_bhig() *
+                          pico.out_w_lep() * pico.out_w_fs_lep() * 
+                          pico.out_w_bhig() *
                           pico.out_w_isr() * pico.out_w_pu();
     }
 
-    // ----------------------------------------------------------------------------------------------
-    //              *** Add up weights to save for renormalization step ***
-    // ----------------------------------------------------------------------------------------------
-    if (debug) cout<<"INFO:: Writing sum of weights"<<endl;
-    if (!isData) {
-      wgt_sums.out_weight() += pico.out_weight();
-      // taking care of samples with negative weights
-      wgt_sums.out_neff() += nano.Generator_weight()>0 ? 1:-1;
-
-      // leptons, keeping track of 0l and 1l totals separately to determine the SF for 0l events
-      if(pico.out_nlep()==0){
-        wgt_sums.out_nent_zlep() += 1.;
-        wgt_sums.out_tot_weight_l0() += pico.out_weight()*(nano.Generator_weight()>0 ? 1:-1); // multiplying by GenWeight to remove the sign...
-      }else{
-        wgt_sums.out_tot_weight_l1() += pico.out_weight()*(nano.Generator_weight()>0 ? 1:-1);
-        wgt_sums.out_w_lep() += w_lep;
-        if(isFastsim) wgt_sums.out_w_fs_lep() += w_fs_lep;
-        for(size_t i = 0; i<pico.out_sys_lep().size(); ++i){
-          wgt_sums.out_sys_lep()[i] += sys_lep[i];
-          wgt_sums.out_sys_fs_lep()[i] += sys_fs_lep[i];
-        }
-      }
-      if (pico.out_nel()>0) {
-        wgt_sums.out_neff_el() += nano.Generator_weight()>0 ? 1:-1;
-        if (pico.out_trig_single_el() || pico.out_trig_double_el()) {
-          wgt_sums.out_neff_pass_eltrigs() += nano.Generator_weight()>0 ? 1:-1;
-        }
-      }
-      wgt_sums.out_w_el()      += pico.out_w_el();
-      wgt_sums.out_w_mu()      += pico.out_w_mu();
-      wgt_sums.out_w_photon()  += pico.out_w_photon();
-      wgt_sums.out_w_phshape() += pico.out_w_phshape();
-      wgt_sums.out_w_btag()    += pico.out_w_btag();
-      wgt_sums.out_w_btag_df() += pico.out_w_btag_df();
-      wgt_sums.out_w_bhig()    += pico.out_w_bhig();
-      wgt_sums.out_w_bhig_df() += pico.out_w_bhig_df();
-      wgt_sums.out_w_pu()      += pico.out_w_pu();
-      wgt_sums.out_w_trig()    += pico.out_w_trig();
-      if (isZgamma) {
-        //only sum w_ISR for events to which it applies (DY/DYG nllphoton>=1)
-        if (((pico.out_type() >= 6000 && pico.out_type() < 7000) ||
-              (pico.out_type() >= 17000 && pico.out_type() < 18000))
-              && pico.out_nllphoton() >= 1) {
-          wgt_sums.out_w_isr() += pico.out_w_isr();
-          wgt_sums.out_nent_isr() += 1.;
-        }
-      }
-      else {
-        wgt_sums.out_w_isr()     += pico.out_w_isr();
-      }
-      wgt_sums.out_w_nnlo()    += pico.out_w_nnlo();
-
-      for(size_t i = 0; i<2; ++i){ 
-        wgt_sums.out_sys_el()[i]           += pico.out_sys_el()[i];
-        wgt_sums.out_sys_mu()[i]           += pico.out_sys_mu()[i];
-        wgt_sums.out_sys_photon()[i]       += pico.out_sys_photon()[i];
-        wgt_sums.out_sys_photon_csev()[i]  += pico.out_sys_photon_csev()[i];
-        wgt_sums.out_sys_trig()[i]         += pico.out_sys_trig()[i];
-        wgt_sums.out_sys_trig_el()[i]      += pico.out_sys_trig_el()[i];
-        wgt_sums.out_sys_trig_mu()[i]      += pico.out_sys_trig_mu()[i];
-        wgt_sums.out_sys_bchig()[i]        += pico.out_sys_bchig()[i];
-        wgt_sums.out_sys_udsghig()[i]      += pico.out_sys_udsghig()[i];
-        wgt_sums.out_sys_fs_bchig()[i]     += pico.out_sys_fs_bchig()[i];
-        wgt_sums.out_sys_fs_udsghig()[i]   += pico.out_sys_fs_udsghig()[i];
-        wgt_sums.out_sys_isr()[i]          += pico.out_sys_isr()[i];
-        wgt_sums.out_sys_pu()[i]           += pico.out_sys_pu()[i];
-        wgt_sums.out_sys_bchig_uncorr()[i] += pico.out_sys_bchig_uncorr()[i];
-        wgt_sums.out_sys_udsghig_uncorr()[i] += pico.out_sys_udsghig_uncorr()[i];
-      }
-      for(size_t i = 0; i<pico.out_sys_murf().size(); ++i){ 
-        wgt_sums.out_sys_murf()[i] += pico.out_sys_murf()[i];
-      }
-      for(size_t i = 0; i<pico.out_sys_ps().size(); ++i){ 
-        wgt_sums.out_sys_ps()[i] += pico.out_sys_ps()[i];
-      }
-      //for(size_t i = 0; i<pico.out_sys_pdf().size(); ++i){ 
-      //  wgt_sums.out_sys_pdf()[i] += pico.out_sys_pdf()[i];
-      //}
-    }
-    
     if (debug) cout<<"INFO:: Filling tree"<<endl;
-    pico.Fill();
+
+    if (skim_rule=="ll" && pico.out_nll()<1) {
+      pico.Clear();
+    }
+    if (skim_rule=="llg" && (pico.out_nll()<1 || pico.out_nphoton()<1)) {
+      pico.Clear();
+    }
+    else {
+      pico.Fill();
+    }
+
   } // loop over events
 
-  wgt_sums.Fill();
-  wgt_sums.Write();
   pico.Write();
 
   cout<<endl;
   time(&endtime); 
   cout<<"Time passed: "<<hoursMinSec(difftime(endtime, begtime))<<endl<<endl; 
-}
-void Initialize(corrections_tree &wgt_sums){
-  wgt_sums.out_neff()              = 0;
-  wgt_sums.out_nent_zlep()         = 0;
-  wgt_sums.out_nent_isr()          = 0;
-  wgt_sums.out_neff_el()           = 0;
-  wgt_sums.out_neff_pass_eltrigs() = 0;
-  wgt_sums.out_tot_weight_l0()     = 0.;
-  wgt_sums.out_tot_weight_l1()     = 0.;
-
-  wgt_sums.out_weight()      = 0.;
-  wgt_sums.out_w_lumi()      = 0.;
-  wgt_sums.out_w_el()        = 0.;
-  wgt_sums.out_w_mu()        = 0.;
-  wgt_sums.out_w_lep()       = 0.;
-  wgt_sums.out_w_fs_lep()    = 0.;
-  wgt_sums.out_w_photon()    = 0.;
-  wgt_sums.out_w_phshape()   = 0.;
-  wgt_sums.out_w_btag()      = 0.;
-  wgt_sums.out_w_btag_df()   = 0.;
-  wgt_sums.out_w_bhig()      = 0.;
-  wgt_sums.out_w_bhig_df()   = 0.;
-  wgt_sums.out_w_isr()       = 0.;
-  wgt_sums.out_w_pu()        = 0.;
-  wgt_sums.out_w_trig()      = 0.;
-  wgt_sums.out_w_zvtx_pass() = 0.;
-  wgt_sums.out_w_zvtx_fail() = 0.;
-  wgt_sums.out_w_nnlo()      = 0.;
-  // w_prefire should not be normalized
-
-  wgt_sums.out_sys_el().resize(2,0);
-  wgt_sums.out_sys_mu().resize(2,0);
-  wgt_sums.out_sys_lep().resize(2,0);
-  wgt_sums.out_sys_fs_lep().resize(2,0);
-  wgt_sums.out_sys_photon().resize(2,0);
-  wgt_sums.out_sys_photon_csev().resize(2,0);
-  wgt_sums.out_sys_bchig().resize(2,0);
-  wgt_sums.out_sys_udsghig().resize(2,0);
-  wgt_sums.out_sys_bchig_uncorr().resize(2,0);
-  wgt_sums.out_sys_udsghig_uncorr().resize(2,0);
-  wgt_sums.out_sys_fs_bchig().resize(2,0);
-  wgt_sums.out_sys_fs_udsghig().resize(2,0);
-  wgt_sums.out_sys_isr().resize(2,0);
-  wgt_sums.out_sys_pu().resize(2,0);
-  wgt_sums.out_sys_trig().resize(2,0);
-  wgt_sums.out_sys_trig_el().resize(2,0);
-  wgt_sums.out_sys_trig_mu().resize(2,0);
-  wgt_sums.out_sys_murf().resize(9,0);
-  wgt_sums.out_sys_ps().resize(4,0);
-  //wgt_sums.out_sys_pdf().resize(102,0);
 }
 void GetOptions(int argc, char *argv[]){
   while(true){
@@ -811,6 +716,8 @@ void GetOptions(int argc, char *argv[]){
       {"in_dir",  required_argument, 0,'i'},
       {"out_dir", required_argument, 0,'o'},
       {"nent",    required_argument, 0, 0},
+      {"norm",    required_argument, 0, 0},
+      {"skim",    required_argument, 0, 0},
       {"debug",    no_argument, 0, 'd'},
       {0, 0, 0, 0}
     };
@@ -838,6 +745,10 @@ void GetOptions(int argc, char *argv[]){
       optname = long_options[option_index].name;
       if(optname == "nent"){
         nent_test = atoi(optarg);
+      }else if(optname == "norm"){
+        norm_file = optarg;
+      }else if(optname == "skim"){
+        skim_rule = optarg;
       }else{
         printf("Bad option! Found option name %s\n", optname.c_str());
         exit(1);
@@ -848,4 +759,66 @@ void GetOptions(int argc, char *argv[]){
       break;
     }
   }
+}
+/**
+ * @brief Gets sums of generator weights for given NanoAOD file
+ *
+ * @param filename NanoAOD filename including path
+ *
+ * @return MC Metadata consisting of genEventSumw and LHEScaleSumw
+ */
+MCMetadata GetMCMetadata(string filename) {
+  TFile nanoaod_file(filename.c_str(),"READ");
+  if (nanoaod_file.IsZombie()) {
+    cout << "ERROR (get_gen_event_sumw): invalid file." << endl;
+    exit(1);
+  }
+  TTree* metadata = static_cast<TTree*>(nanoaod_file.Get("Runs"));
+  MCMetadata mc_metadata;
+  metadata->SetBranchAddress("genEventSumw",&mc_metadata.gen_event_sumw);
+  metadata->SetBranchAddress("LHEScaleSumw",&mc_metadata.lhe_scale_sumw[0]);
+  metadata->GetEntry(0);
+  nanoaod_file.Close();
+  return mc_metadata;
+}
+/**
+ * @brief Gets sums of generator weights from sums generated with 
+ * find_normalization.py
+ *
+ * @param in_dir directory in which NanoAOD file is stored
+ * @param in_file input NanoAOD filename
+ * @param norm_fname json with normalization info
+ *
+ * @return MC Metadata consisting of genEventSumw and LHEScaleSumw
+ */
+MCMetadata GetMCMetadataFromJson(string in_dir, string in_file, 
+                                 string norm_fname) {
+  string tag;
+  string::size_type pos = in_file.find("__");
+  if (pos != string::npos) {
+    tag = in_file.substr(0,pos);
+  }
+  pos = tag.find("_ext");
+  if (pos != string::npos) {
+    tag = in_file.substr(0,pos);
+  }
+  ifstream norm_file(norm_fname);
+  nlohmann::json norm_json = nlohmann::json::parse(norm_file);
+  if (!norm_json.contains(in_dir)) {
+    cout << "ERROR: No entry for nano directory in normalization json." 
+         << endl;
+    exit(1);
+  }
+  if (!norm_json[in_dir].contains(tag)) {
+    cout << "ERROR: No entry for sample tag in normalization json." 
+         << endl;
+    exit(1);
+  }
+  MCMetadata mc_metadata;
+  mc_metadata.gen_event_sumw = norm_json[in_dir][tag]["genEventSumw"];
+  for (unsigned imurf = 0; imurf < MURF_VARIATIONS; imurf++) {
+    mc_metadata.lhe_scale_sumw[imurf] = norm_json[in_dir][tag][
+        ("LHEScaleSumw"+to_string(imurf)).c_str()];
+  }
+  return mc_metadata;
 }
