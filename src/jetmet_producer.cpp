@@ -168,6 +168,30 @@ JetMetProducer::JetMetProducer(int year_, string year_string_,
     map_jetid_tight_ = cs_jetid_->at("AK4PUPPI_Tight");
     map_jetid_tightlepveto_ = cs_jetid_->at("AK4PUPPI_TightLeptonVeto");
   }
+  else if (year_string=="2025") {
+    if(isData) {
+      cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2025/jet_jerc.json");
+      map_jec_.push_back(cs_jerc_->compound().at("Winter25Prompt25_V3_DATA_L1L2L3Res_AK4PFPuppi"));
+      map_jec_l1_.push_back(cs_jerc_->at("Winter25Prompt25_V3_DATA_L1FastJet_AK4PFPuppi"));
+    }
+    else {
+      cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2024/jet_jerc.json");//2024 MC being used for both 2024 and 2025
+      map_jes_ = cs_jerc_->at("Summer24Prompt24_V2_MC_Total_AK4PFPuppi");
+      //jet_jerc json has these two branches from 2023BPix. . .
+      map_jersf_ = cs_jerc_->at("Summer23BPixPrompt23_RunD_JRV1_MC_ScaleFactor_AK4PFPuppi");
+      map_jermc_ = cs_jerc_->at("Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi");
+      map_jec_.push_back(cs_jerc_->compound().at("Summer24Prompt24_V2_MC_L1L2L3Res_AK4PFPuppi"));
+      map_jec_l1_.push_back(cs_jerc_->at("Summer24Prompt24_V2_MC_L1FastJet_AK4PFPuppi"));
+    }
+    in_file_jetveto_ = "data/zgamma/2025/jetvetomaps.json";
+    cs_jetveto_ = correction::CorrectionSet::from_file(in_file_jetveto_);
+    map_jetveto_ = cs_jetveto_->at("Winter25Prompt25_RunCDEFG_V1");
+
+    in_file_jetid_ = "data/zgamma/2024/JetID_Run3_Rereco2022CDE_v2.json";//No jetID jsons for 2025 yet.
+    cs_jetid_ = correction::CorrectionSet::from_file(in_file_jetid_);
+    map_jetid_tight_ = cs_jetid_->at("AK4PUPPI_Tight");
+    map_jetid_tightlepveto_ = cs_jetid_->at("AK4PUPPI_TightLeptonVeto");
+  }
   else {
     cout << "WARNING: No dedicated JEC/JER, defaulting to 2023BPix NanoAODv12(!) treatment." << endl;
 
@@ -832,7 +856,6 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
                                     <<endl;
     bool isgood_nopt = jet_isgood_min[ijet] && !jet_invetomap[ijet] 
                        && !jet_inhemveto[ijet];
-
     //sys_jetvar convention: [0] JER up, [1] JER down, [2] JEC up, [3] JEC down
     //for now, only save sys_ variables
     //old code for preUL Nanos; see GetJetUncertainties for newer Nano versions
@@ -1093,7 +1116,6 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
     //the jets for the higgs pair with smallest dm will be set to true in hig_producer
     pico.out_jet_h1d().push_back(false);
     pico.out_jet_h2d().push_back(false);
-
     if (!jet_islep[ijet] && !jet_isphoton[ijet]) 
       pico.out_ht5() += Jet_pt[ijet];
     if (jet_isgood[ijet]) {

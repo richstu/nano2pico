@@ -83,7 +83,7 @@ PhotonProducer::PhotonProducer(string year_, bool isData_,
   }
   else if (year=="2025") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2025/EGMScalesSmearing_Pho_2025_forEGM.v1.json");
+        "data/zgamma/2025/photonSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
         "Scale");
     map_smearing_ = cs_scale_syst_->at(
