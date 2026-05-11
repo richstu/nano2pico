@@ -232,7 +232,7 @@ EventWeighter::EventWeighter(string year, bool isSignal, const vector<float> &bt
     in_file_muon_iso0p10_     = "data/zgamma/2023/hzg_muiso0p1_2023_efficiencies.json";
     in_file_muon_iso0p15_     = "data/zgamma/2023/hzg_muiso0p15_2023_efficiencies.json";
     in_file_ggf_nnlo_         = "data/zgamma/GluGluHToZG_NNLO_reweight_run3.json";
-    key_                      = "2024Prompt";
+    key_                      = "2025Prompt";
     puName_                   = "Collisions24_BCDEFGHI_goldenJSON";
     btag_lightname            = "deepJet_light";
     ph_shape_weighter_        = make_unique<rw_mmp_r3>();
