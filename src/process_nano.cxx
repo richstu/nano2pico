@@ -285,7 +285,8 @@ int main(int argc, char *argv[]){
   };
   // WPs for Particle Transformer (UParT) in NanoAODv15
   map<string, vector<float>> btag_upt_wpts{
-    {"2024", vector<float>({0.0246, 0.1272, 0.4648})}
+    {"2024", vector<float>({0.0246, 0.1272, 0.4648})},
+    {"2025", vector<float>({0.0246, 0.1272, 0.4648})}
   };
 
   // Rochester corrections
