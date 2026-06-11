@@ -695,7 +695,7 @@ int main(int argc, char *argv[]){
     if (skim_rule=="ll" && pico.out_nll()<1) {
       pico.Clear();
     }
-    if (skim_rule=="llg" && (pico.out_nll()<1 || pico.out_nphoton()<1)) {
+    else if (skim_rule=="llg" && (pico.out_nll()<1 || pico.out_nphoton()<1)) {
       pico.Clear();
     }
     else {
