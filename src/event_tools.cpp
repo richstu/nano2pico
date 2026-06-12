@@ -183,7 +183,7 @@ EventTools::EventTools(const string &name_, int year_, bool isData_, float nanoa
     dataset = Dataset::MuonEG;
   else if(Contains(name, "Muon") && !Contains(name,"DoubleMuon") && !Contains(name,"SingleMuon") && !Contains(name,"MuonEG"))  //replaced SingleMuon and DoubleMuon starting in 2022
     dataset = Dataset::Muon;
-  else if(Contains(name, "MET")) 
+  else if(Contains(name, "MET") && !Contains(name, "JetMET")) // JetMET also contains "MET", fix wrong assignment for Run 3 JetMET samples 
     dataset = Dataset::MET;
   else if(Contains(name, "JetHT")) 
     dataset = Dataset::JetHT;
