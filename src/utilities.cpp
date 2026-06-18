@@ -242,7 +242,7 @@ void getMETWithJEC(nano_tree & nano, int year, bool isFastsim, float & MET_pt, f
 void getJetWithJEC(nano_tree & nano, bool isFastsim, vector<float> & Jet_pt, vector<float> & Jet_mass) {
   Jet_pt.resize(nano.nJet());
   Jet_mass.resize(nano.nJet());
-  for(int ijet(0); ijet<nano.nJet(); ++ijet){
+  for(unsigned int ijet(0); ijet<nano.nJet(); ++ijet){
     if (isFastsim) {
       Jet_pt[ijet] = nano.Jet_pt_nom()[ijet];
       Jet_mass[ijet] = nano.Jet_mass_nom()[ijet];
@@ -255,7 +255,7 @@ void getJetWithJEC(nano_tree & nano, bool isFastsim, vector<float> & Jet_pt, vec
 
 void getJetId(nano_tree & nano, float nanoaod_version, vector<int> & Jet_jetId) {
   Jet_jetId.resize(nano.nJet());
-  for(int ijet(0); ijet<nano.nJet(); ++ijet){
+  for(unsigned int ijet(0); ijet<nano.nJet(); ++ijet){
     if (nanoaod_version+0.01 > 11.9 && nanoaod_version+0.01 < 13) Jet_jetId[ijet] = nano.Jet_jetId_11p9()[ijet];
     else if (nanoaod_version+0.01 < 11.9) Jet_jetId[ijet] = nano.Jet_jetId()[ijet];
     else{
@@ -267,7 +267,7 @@ void getJetId(nano_tree & nano, float nanoaod_version, vector<int> & Jet_jetId) 
 
 void getFatJet_btagDDBvL(nano_tree & nano, float nanoaod_version, vector<float> & FatJet_btagDDBvL) {
   FatJet_btagDDBvL.resize(nano.nFatJet());
-  for(int ijet(0); ijet<nano.nFatJet(); ++ijet){
+  for(unsigned int ijet(0); ijet<nano.nFatJet(); ++ijet){
     if (nanoaod_version+0.01 < 9) FatJet_btagDDBvL[ijet] = nano.FatJet_btagDDBvL()[ijet];
     else if(nanoaod_version < 13.1) FatJet_btagDDBvL[ijet] = nano.FatJet_btagDDBvLV2()[ijet];
     else{
@@ -280,7 +280,7 @@ void getFatJet_btagDDBvL(nano_tree & nano, float nanoaod_version, vector<float> 
 void getFatJet_particleNetWithMass_WvsQCD(nano_tree & nano, float nanoaod_version, 
                                           vector<float> & FatJet_particleNetWithMass_WvsQCD) {
   FatJet_particleNetWithMass_WvsQCD.resize(nano.nFatJet());
-  for(int ijet(0); ijet<nano.nFatJet(); ++ijet){
+  for(unsigned int ijet(0); ijet<nano.nFatJet(); ++ijet){
     if (nanoaod_version+0.01 < 11.9) 
       FatJet_particleNetWithMass_WvsQCD[ijet] = nano.FatJet_particleNet_WvsQCD()[ijet];
     else
@@ -291,7 +291,7 @@ void getFatJet_particleNetWithMass_WvsQCD(nano_tree & nano, float nanoaod_versio
 void getFatJet_particleNetWithMass_ZvsQCD(nano_tree & nano, float nanoaod_version, 
                                           vector<float> & FatJet_particleNetWithMass_ZvsQCD) {
   FatJet_particleNetWithMass_ZvsQCD.resize(nano.nFatJet());
-  for(int ijet(0); ijet<nano.nFatJet(); ++ijet){
+  for(unsigned int ijet(0); ijet<nano.nFatJet(); ++ijet){
     if (nanoaod_version+0.01 < 11.9) 
       FatJet_particleNetWithMass_ZvsQCD[ijet] = nano.FatJet_particleNet_ZvsQCD()[ijet];
     else 
@@ -302,7 +302,7 @@ void getFatJet_particleNetWithMass_ZvsQCD(nano_tree & nano, float nanoaod_versio
 void getFatJet_particleNetWithMass_TvsQCD(nano_tree & nano, float nanoaod_version, 
                                           vector<float> & FatJet_particleNetWithMass_TvsQCD) {
   FatJet_particleNetWithMass_TvsQCD.resize(nano.nFatJet());
-  for(int ijet(0); ijet<nano.nFatJet(); ++ijet){
+  for(unsigned int ijet(0); ijet<nano.nFatJet(); ++ijet){
     if (nanoaod_version+0.01 < 11.9) 
       FatJet_particleNetWithMass_TvsQCD[ijet] = nano.FatJet_particleNet_TvsQCD()[ijet];
     else 
@@ -313,7 +313,7 @@ void getFatJet_particleNetWithMass_TvsQCD(nano_tree & nano, float nanoaod_versio
 void getFatJet_particleNet_mass(nano_tree & nano, float nanoaod_version, 
                                           vector<float> & FatJet_particleNet_mass) {
   FatJet_particleNet_mass.resize(nano.nFatJet());
-  for(int ijet(0); ijet<nano.nFatJet(); ++ijet){
+  for(unsigned int ijet(0); ijet<nano.nFatJet(); ++ijet){
     if (nanoaod_version+0.01 < 11.9) 
       FatJet_particleNet_mass[ijet] = nano.FatJet_particleNet_mass()[ijet];
     else 
@@ -323,15 +323,16 @@ void getFatJet_particleNet_mass(nano_tree & nano, float nanoaod_version,
 
 void getPhoton_electronIdx(nano_tree & nano, float nanoaod_version, vector<int> & Photon_electronIdx) {
   Photon_electronIdx.resize(nano.nPhoton());
-  for(int iphoton(0); iphoton<nano.nPhoton(); ++iphoton){
-    if (nanoaod_version+0.01 > 11.9) Photon_electronIdx[iphoton] = nano.Photon_electronIdx_11p9()[iphoton];
+  for(unsigned int iphoton(0); iphoton<nano.nPhoton(); ++iphoton){
+    if (nanoaod_version+0.01 > 11.9) Photon_electronIdx[iphoton] = -1;
+    //if (nanoaod_version+0.01 > 11.9) Photon_electronIdx[iphoton] = nano.Photon_electronIdx_11p9()[iphoton];
     else Photon_electronIdx[iphoton] = nano.Photon_electronIdx()[iphoton];
   }
 }
 
 void getMuon_fsrPhotonIdx(nano_tree & nano, float nanoaod_version, vector<int> & Muon_fsrPhotonIdx) {
   Muon_fsrPhotonIdx.resize(nano.nMuon());
-  for(int imuon(0); imuon<nano.nMuon(); ++imuon){
+  for(unsigned int imuon(0); imuon<nano.nMuon(); ++imuon){
     if (nanoaod_version+0.01 > 11.9) Muon_fsrPhotonIdx[imuon] = nano.Muon_fsrPhotonIdx_11p9()[imuon];
     else Muon_fsrPhotonIdx[imuon] = nano.Muon_fsrPhotonIdx()[imuon];
   }
@@ -339,37 +340,45 @@ void getMuon_fsrPhotonIdx(nano_tree & nano, float nanoaod_version, vector<int> &
 
 void getElectron_photonIdx(nano_tree & nano, float nanoaod_version, vector<int> & Electron_photonIdx) {
   Electron_photonIdx.resize(nano.nElectron());
-  //cout<<"nElectron: "<<nano.nElectron()<<endl;
-  //cout<<"  "<<nano.Electron_photonIdx()[0]<<endl;
-  ////cout<<"  "<<nano.Electron_photonIdx_short()[0]<<endl;
-  //cout<<"nPhoton: "<<nano.nPhoton()<<endl;
-  //cout<<"  "<<nano.Photon_cutBased()[0]<<endl;
-  //cout<<"  "<<nano.Photon_cutBased_char()[0]<<endl;
-  for(int iel(0); iel<nano.nElectron(); ++iel){
-    if (nanoaod_version+0.01 > 11.9) Electron_photonIdx[iel] = nano.Electron_photonIdx_11p9()[iel];
+  for(unsigned int iel(0); iel<nano.nElectron(); ++iel){
+    //if (nanoaod_version+0.01 > 11.9) Electron_photonIdx[iel] = nano.Electron_photonIdx_11p9()[iel];
+    if (nanoaod_version+0.01 > 11.9) Electron_photonIdx[iel] = -1;
     else Electron_photonIdx[iel] = nano.Electron_photonIdx()[iel];
   }
 }
 
+void getPhoton_genPartFlav(nano_tree & nano, vector<int> & Photon_pflav) {
+  Photon_pflav.resize(nano.Photon_pt().size());
+  for(unsigned int iph(0); iph<nano.nPhoton(); ++iph){
+    int genidx = nano.Photon_genPartIdx_12p0()[iph];
+    if(abs(nano.GenPart_pdgId()[genidx]) == 11) Photon_pflav[iph] = 11;
+    else if(nano.GenPart_pdgId()[genidx] == 22 && (nano.GenPart_statusFlags_12p0()[genidx] & 0x1) == 1) Photon_pflav[iph] = 1;
+    else Photon_pflav[iph] = 0;
+  }
+}
+
 void getFsrPhoton_muonIdx(nano_tree & nano, float nanoaod_version, vector<int> & FsrPhoton_muonIdx) {
-  FsrPhoton_muonIdx.resize(nano.nFsrPhoton());
+  //FsrPhoton_muonIdx.resize(nano.nFsrPhoton());
+  FsrPhoton_muonIdx.resize(nano.FsrPhoton_pt().size());
   for(int ipart(0); ipart<nano.nFsrPhoton(); ++ipart){
     if (nanoaod_version+0.01 > 11.9) FsrPhoton_muonIdx[ipart] = nano.FsrPhoton_muonIdx_11p9()[ipart];
+    //if (nanoaod_version+0.01 > 11.9) FsrPhoton_muonIdx[ipart]= nano.FsrPhoton_muonIdx()[ipart];
     else FsrPhoton_muonIdx[ipart] = nano.FsrPhoton_muonIdx()[ipart];
   }
 }
 
 void getPhoton_jetIdx(nano_tree & nano, float nanoaod_version, vector<int> & Photon_jetIdx) {
   Photon_jetIdx.resize(nano.nPhoton());
-  for(int ipart(0); ipart<nano.nPhoton(); ++ipart){
-    if (nanoaod_version+0.01 > 11.9) Photon_jetIdx[ipart] = nano.Photon_jetIdx_11p9()[ipart];
+  for(unsigned int ipart(0); ipart<nano.nPhoton(); ++ipart){
+    //if (nanoaod_version+0.01 > 11.9) Photon_jetIdx[ipart] = nano.Photon_jetIdx_11p9()[ipart];
+    if (nanoaod_version+0.01 > 11.9) Photon_jetIdx[ipart] = -1;
     else Photon_jetIdx[ipart] = nano.Photon_jetIdx()[ipart];
   }
 }
 
 void getPhoton_cutBased(nano_tree & nano, float nanoaod_version, vector<int> & Photon_cutBased) {
   Photon_cutBased.resize(nano.nPhoton());
-  for(int ipart(0); ipart<nano.nPhoton(); ++ipart){
+  for(unsigned int ipart(0); ipart<nano.nPhoton(); ++ipart){
     if (nanoaod_version+0.01 > 11.9) Photon_cutBased[ipart] = nano.Photon_cutBased_11p9()[ipart];
     else Photon_cutBased[ipart] = nano.Photon_cutBased()[ipart];
   }
@@ -377,31 +386,33 @@ void getPhoton_cutBased(nano_tree & nano, float nanoaod_version, vector<int> & P
 
 void getFatJet_subJetIdx1(nano_tree & nano, float nanoaod_version, vector<int> & FatJet_subJetIdx1) {
   FatJet_subJetIdx1.resize(nano.nFatJet());
-  for(int ipart(0); ipart<nano.nFatJet(); ++ipart){
-    if (nanoaod_version+0.01 > 11.9) FatJet_subJetIdx1[ipart] = nano.FatJet_subJetIdx1_11p9()[ipart];
+  for(unsigned int ipart(0); ipart<nano.nFatJet(); ++ipart){
+    //if (nanoaod_version+0.01 > 11.9) FatJet_subJetIdx1[ipart] = nano.FatJet_subJetIdx1_11p9()[ipart];
+    if (nanoaod_version+0.01 > 11.9) FatJet_subJetIdx1[ipart] = 0;
     else FatJet_subJetIdx1[ipart] = nano.FatJet_subJetIdx1()[ipart];
   }
 }
 
 void getFatJet_subJetIdx2(nano_tree & nano, float nanoaod_version, vector<int> & FatJet_subJetIdx2) {
   FatJet_subJetIdx2.resize(nano.nFatJet());
-  for(int ipart(0); ipart<nano.nFatJet(); ++ipart){
-    if (nanoaod_version+0.01 > 11.9) FatJet_subJetIdx2[ipart] = nano.FatJet_subJetIdx2_11p9()[ipart];
+  for(unsigned int ipart(0); ipart<nano.nFatJet(); ++ipart){
+    //if (nanoaod_version+0.01 > 11.9) FatJet_subJetIdx2[ipart] = nano.FatJet_subJetIdx2_11p9()[ipart];
+    if (nanoaod_version+0.01 > 11.9) FatJet_subJetIdx2[ipart] = 0;
     else FatJet_subJetIdx2[ipart] = nano.FatJet_subJetIdx2()[ipart];
   }
 }
 
 void getMuon_nTrackerLayers(nano_tree & nano, float nanoaod_version, vector<int> & Muon_nTrackerLayers) {
   Muon_nTrackerLayers.resize(nano.nMuon());
-  for(int ipart(0); ipart<nano.nMuon(); ++ipart){
+  for(unsigned int ipart(0); ipart<nano.nMuon(); ++ipart){
     if (nanoaod_version+0.01 > 11.9) Muon_nTrackerLayers[ipart] = nano.Muon_nTrackerLayers_11p9()[ipart];
     else Muon_nTrackerLayers[ipart] = nano.Muon_nTrackerLayers()[ipart];
   }
 }
 
-void getMuon_genPartIdx(nano_tree & nano, float nanoaod_version, vector<int> & Muon_genPartIdx) {
+void getMuon_genPartIdx(nano_tree & nano, float nanoaod_version, vector<unsigned int> & Muon_genPartIdx) {
   Muon_genPartIdx.resize(nano.nMuon());
-  for(int ipart(0); ipart<nano.nMuon(); ++ipart){
+  for(unsigned int ipart(0); ipart<nano.nMuon(); ++ipart){
     if (nanoaod_version+0.01 > 12) Muon_genPartIdx[ipart] = nano.Muon_genPartIdx_12p0()[ipart];                                                                                                                                          
     else Muon_genPartIdx[ipart] = nano.Muon_genPartIdx()[ipart];                                                                                                                                                                         
   }
@@ -409,7 +420,7 @@ void getMuon_genPartIdx(nano_tree & nano, float nanoaod_version, vector<int> & M
 
 void getJet_genJetIdx(nano_tree & nano, float nanoaod_version, vector<int> & Jet_genJetIdx) {
   Jet_genJetIdx.resize(nano.nJet());
-  for(int ipart(0); ipart<nano.nJet(); ++ipart){
+  for(unsigned int ipart(0); ipart<nano.nJet(); ++ipart){
     if (nanoaod_version+0.01 > 12) Jet_genJetIdx[ipart] = nano.Jet_genJetIdx_12p0()[ipart];
     else Jet_genJetIdx[ipart] = nano.Jet_genJetIdx()[ipart];
   }
@@ -417,7 +428,7 @@ void getJet_genJetIdx(nano_tree & nano, float nanoaod_version, vector<int> & Jet
 
 void getJet_hadronFlavour(nano_tree & nano, float nanoaod_version, vector<int> & Jet_hadronFlavour) {
   Jet_hadronFlavour.resize(nano.nJet());
-  for(int ipart(0); ipart<nano.nJet(); ++ipart){
+  for(unsigned int ipart(0); ipart<nano.nJet(); ++ipart){
     if (nanoaod_version+0.01 > 12) Jet_hadronFlavour[ipart] = nano.Jet_hadronFlavour_12p0()[ipart];
     else Jet_hadronFlavour[ipart] = nano.Jet_hadronFlavour()[ipart];
   }
@@ -425,31 +436,34 @@ void getJet_hadronFlavour(nano_tree & nano, float nanoaod_version, vector<int> &
 
 void getJet_partonFlavour(nano_tree & nano, float nanoaod_version, vector<int> & Jet_partonFlavour) {
   Jet_partonFlavour.resize(nano.nJet());
-  for(int ipart(0); ipart<nano.nJet(); ++ipart){
+  for(unsigned int ipart(0); ipart<nano.nJet(); ++ipart){
     if (nanoaod_version+0.01 > 12) Jet_partonFlavour[ipart] = nano.Jet_partonFlavour_12p0()[ipart];
     else Jet_partonFlavour[ipart] = nano.Jet_partonFlavour()[ipart];
   }
 }
 
 void getGenPart_genPartIdxMother(nano_tree & nano, float nanoaod_version, vector<int> & GenPart_genPartIdxMother) {
-  GenPart_genPartIdxMother.resize(nano.nGenPart());
-  for(int ipart(0); ipart<nano.nGenPart(); ++ipart){
+  //GenPart_genPartIdxMother.resize(nano.nGenPart());
+  GenPart_genPartIdxMother.resize(nano.GenPart_pt().size());
+  for(unsigned int ipart(0); ipart<nano.GenPart_pt().size(); ++ipart){
     if (nanoaod_version+0.01 > 12) GenPart_genPartIdxMother[ipart] = nano.GenPart_genPartIdxMother_12p0()[ipart];
     else GenPart_genPartIdxMother[ipart] = nano.GenPart_genPartIdxMother()[ipart];
   }
 }
 
 void getGenPart_statusFlags(nano_tree & nano, float nanoaod_version, vector<int> & GenPart_statusFlags) {
-  GenPart_statusFlags.resize(nano.nGenPart());                                                                                                                                                                                                    
-  for(int ipart(0); ipart<nano.nGenPart(); ++ipart){
+  //GenPart_statusFlags.resize(nano.nGenPart());
+  GenPart_statusFlags.resize(nano.GenPart_pt().size());
+  for(unsigned int ipart(0); ipart<nano.GenPart_pt().size(); ++ipart){
     if (nanoaod_version+0.01 > 12) GenPart_statusFlags[ipart] = nano.GenPart_statusFlags_12p0()[ipart];                                                                                                                                  
     else GenPart_statusFlags[ipart] = nano.GenPart_statusFlags()[ipart];                                                                                                                                                                 
   }
 }
 
 void getGenJet_partonFlavour(nano_tree & nano, float nanoaod_version, vector<int> & GenJet_partonFlavour) {
-  GenJet_partonFlavour.resize(nano.nGenJet());
-  for(int ipart(0); ipart<nano.nGenJet(); ++ipart){
+  //GenJet_partonFlavour.resize(nano.nGenJet());
+  GenJet_partonFlavour.resize(nano.GenJet_pt().size());
+  for(unsigned int ipart(0); ipart<nano.GenJet_pt().size(); ++ipart){
     if (nanoaod_version+0.01 > 12) GenJet_partonFlavour[ipart] = nano.GenJet_partonFlavour_12p0()[ipart];
     else GenJet_partonFlavour[ipart] = nano.GenJet_partonFlavour()[ipart];
   }

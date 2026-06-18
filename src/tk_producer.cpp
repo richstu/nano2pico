@@ -12,15 +12,15 @@ IsoTrackProducer::IsoTrackProducer(int year_){
 IsoTrackProducer::~IsoTrackProducer(){
 }
 
-void IsoTrackProducer::WriteIsoTracks(nano_tree &nano, pico_tree &pico, 
-                                      vector<int> &sig_el_nano_idx, vector<int> &sig_mu_nano_idx, bool isFastsim, bool is_preUL){
+void IsoTrackProducer::WriteIsoTracks(nano_tree &nano, pico_tree &pico,
+                                      vector<int> &sig_el_nano_idx, vector<int> &sig_mu_nano_idx, 
+                                      bool isFastsim, bool isFlashsim, bool is_preUL){
   float MET_pt, MET_phi;
   getMETWithJEC(nano, year, isFastsim, MET_pt, MET_phi, is_preUL);
-
   pico.out_ntk() = 0;
   // N.B. Objects that end up in the slimmedElecrtons or slimmedMuons collections are not stored 
   // as IsoTrack in Nano so we have to loop over all three collections
-  for (int itk(0); itk < nano.nIsoTrack(); itk++) {
+  for (unsigned int itk(0); itk < nano.IsoTrack_pt().size(); itk++) {
     if (nano.IsoTrack_isPFcand()[itk]==0 || nano.IsoTrack_isFromLostTrack()[itk]==1) continue;
     IsGoodTk(pico, false /*isNanoElectron*/ , false /*isNanoMuon*/ , nano.IsoTrack_pdgId()[itk],
              nano.IsoTrack_pt()[itk], nano.IsoTrack_eta()[itk], nano.IsoTrack_phi()[itk], 
@@ -28,9 +28,8 @@ void IsoTrackProducer::WriteIsoTracks(nano_tree &nano, pico_tree &pico,
              nano.IsoTrack_dxy()[itk], nano.IsoTrack_dz()[itk],
              GetMT(MET_pt, MET_phi,  nano.IsoTrack_pt()[itk], nano.IsoTrack_phi()[itk]));
   }
-
   // collect relevant Electrons
-  for (int iel(0); iel < nano.nElectron(); iel++) {
+  for (unsigned int iel(0); iel < nano.nElectron(); iel++) {
     if (nano.Electron_isPFcand()[iel]==0) continue;
     if (find(sig_el_nano_idx.begin(), sig_el_nano_idx.end(), iel)!=sig_el_nano_idx.end()) continue;
     IsGoodTk(pico, true /*isNanoElectron*/ , false /*isNanoMuon*/ , nano.Electron_pdgId()[iel],
@@ -39,12 +38,13 @@ void IsoTrackProducer::WriteIsoTracks(nano_tree &nano, pico_tree &pico,
              nano.Electron_dxy()[iel], nano.Electron_dz()[iel],
              GetMT(MET_pt, MET_phi,  nano.Electron_pt()[iel], nano.Electron_phi()[iel]));
   }
-
   // collect relevant Muons
-  for (int imu(0); imu < nano.nMuon(); imu++) {
+  for (unsigned int imu(0); imu < nano.nMuon(); imu++) {
     if (nano.Muon_isPFcand()[imu]==0) continue;
     if (find(sig_mu_nano_idx.begin(), sig_mu_nano_idx.end(), imu)!=sig_mu_nano_idx.end()) continue;
-    IsGoodTk(pico, false /*isNanoElectron*/ , true /*isNanoMuon*/ , nano.Muon_pdgId()[imu],
+    int mu_pdgid = 13;
+    if(!isFlashsim) mu_pdgid = nano.Muon_pdgId()[imu];
+    IsGoodTk(pico, false /*isNanoElectron*/ , true /*isNanoMuon*/ , mu_pdgid,
              nano.Muon_pt()[imu], nano.Muon_eta()[imu], nano.Muon_phi()[imu], 
              nano.Muon_miniPFRelIso_chg()[imu], nano.Muon_pfRelIso03_chg()[imu],
              nano.Muon_dxy()[imu], nano.Muon_dz()[imu],
@@ -62,7 +62,6 @@ bool IsoTrackProducer::IsGoodTk(pico_tree &pico, bool isNanoElectron, bool isNan
   // abs(dxy) < 0.2 && 
   // abs(dz) < 0.1 && 
   // ((pfIsolationDR03().chargedHadronIso < 5 && pt < 25) || pfIsolationDR03().chargedHadronIso/pt < 0.2)
-
   pdgid = abs(pdgid);
 
   if (pdgid!=11 && pdgid!=13 && pdgid!=211) return false; 

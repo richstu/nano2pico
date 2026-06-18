@@ -90,7 +90,7 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
   getMuon_fsrPhotonIdx(nano, nanoaod_version, Muon_fsrPhotonIdx);
   vector<int> Muon_nTrackerLayers;
   getMuon_nTrackerLayers(nano, nanoaod_version, Muon_nTrackerLayers);
-  vector<int> Muon_genPartIdx;
+  vector<unsigned int> Muon_genPartIdx;
   if (!isData) getMuon_genPartIdx(nano, nanoaod_version, Muon_genPartIdx);
 
   //scale+resolution corrections
@@ -103,7 +103,7 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
 
   float pt_thresh = 26.f;
 
-  for(int imu(0); imu<nano.nMuon(); ++imu){
+  for(unsigned int imu(0); imu<nano.nMuon(); ++imu){
     float eta = nano.Muon_eta()[imu];
     float phi = nano.Muon_phi()[imu];
     int charge = nano.Muon_charge()[imu];
@@ -121,7 +121,7 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
         float scale_unc = rc.kScaleDTerror(charge,pt,eta,phi);
         float resolution_unc = 1.0;
         if (Muon_genPartIdx[imu] > 0 
-            && Muon_genPartIdx[imu] < nano.nGenPart()) {
+            && Muon_genPartIdx[imu] < nano.GenPart_pt().size()) {
           float gen_pt = nano.GenPart_pt()[Muon_genPartIdx[imu]];
           resolution_sf = rc.kSpreadMC(charge,pt,eta,phi,gen_pt);
           resolution_unc = rc.kSpreadMCerror(charge,pt,eta,phi,gen_pt)
@@ -169,7 +169,7 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
 
   //first, determine ordering based on signal and pt
   std::vector<NanoOrderEntry> nano_entries;
-  for(int imu(0); imu<nano.nMuon(); ++imu){
+  for(unsigned int imu(0); imu<nano.nMuon(); ++imu){
     NanoOrderEntry nano_entry;
     nano_entry.nano_idx = imu;
     nano_entry.pt = muon_pt_corr[imu];
@@ -250,7 +250,7 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
       pico.out_nvmu()++;
       pico.out_nvlep()++;
       // save indices of matching jets
-      for (int ijet(0); ijet<nano.nJet(); ijet++) {
+      for (unsigned int ijet(0); ijet<nano.nJet(); ijet++) {
         if (dR(nano.Muon_eta()[imu], nano.Jet_eta()[ijet], nano.Muon_phi()[imu], nano.Jet_phi()[ijet])<0.4f &&
           fabs(Jet_pt[ijet] - nano.Muon_pt()[imu])/nano.Muon_pt()[imu] < 1.0f)
           jet_isvlep_nano_idx.push_back(ijet);
@@ -263,7 +263,7 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
       sig_mu_pico_idx.push_back(pico_idx);
 
       // save indices of matching jets
-      for (int ijet(0); ijet<nano.nJet(); ijet++) {
+      for (unsigned int ijet(0); ijet<nano.nJet(); ijet++) {
         if (dR(nano.Muon_eta()[imu], nano.Jet_eta()[ijet], nano.Muon_phi()[imu], nano.Jet_phi()[ijet])<0.4f &&
           fabs(Jet_pt[ijet] - nano.Muon_pt()[imu])/nano.Muon_pt()[imu] < 1.0f)
           jet_islep_nano_idx.push_back(ijet);

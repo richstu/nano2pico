@@ -243,7 +243,7 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
   bool found_hadronic_w = false;
   bool found_higgs = false;
   int ntrulep = 0; //includes taus, unlike pico branch
-  for(int mc_idx(0); mc_idx<nano.nGenPart(); mc_idx++) {
+  for(unsigned int mc_idx(0); mc_idx<nano.GenPart_pt().size(); mc_idx++) {
 
     bitset<15> mc_statusFlags(GenPart_statusFlags.at(mc_idx));
 
@@ -273,7 +273,7 @@ void EventTools::WriteStitch(nano_tree &nano, pico_tree &pico){
         if(ph_pt > ptmin){
           //check if another generator particle nearby
           bool found_other_particles = false;
-          for (int mc_idx_2 = 0; mc_idx_2 < nano.nGenPart(); mc_idx_2++) {
+          for (unsigned int mc_idx_2 = 0; mc_idx_2 < nano.GenPart_pt().size(); mc_idx_2++) {
             bitset<15> mc_statusFlags2(GenPart_statusFlags.at(mc_idx_2));
             comp_pt = nano.GenPart_pt().at(mc_idx_2);
             compPart.SetPtEtaPhi(comp_pt, 
@@ -383,10 +383,10 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
   if (isFastsim) {
     // Fastsim: veto if certain central jets have no matching GenJet as per SUSY recommendation:
     // https://twiki.cern.ch/twiki/bin/view/CMS/SUSRecommendations18#Cleaning_up_of_fastsim_jets_from
-    for(int ijet(0); ijet<nano.nJet(); ++ijet){
+    for(unsigned int ijet(0); ijet<nano.nJet(); ++ijet){
       if(Jet_pt[ijet] > 20.0f && fabs(nano.Jet_eta()[ijet])<=2.5f && nano.Jet_chHEF()[ijet] < 0.1f) {
         bool found_match = false;
-        for(int igenjet(0); igenjet<nano.nGenJet(); ++igenjet){
+        for(unsigned int igenjet(0); igenjet<nano.GenJet_pt().size(); ++igenjet){
           if (dR(nano.Jet_eta()[ijet], nano.GenJet_eta()[igenjet], nano.Jet_phi()[ijet], nano.GenJet_phi()[igenjet])<=0.3f) {
             found_match = true;
             break;
@@ -400,7 +400,7 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
     }
   } else if ((nanoaod_version+0.01) < 13){ // Fullsim: require just loosest possible ID for now (for all jets, not just central!)
                                            // Jet Id doesn't exist for NanoAODv15
-    for(int ijet(0); ijet<nano.nJet(); ++ijet){
+    for(unsigned int ijet(0); ijet<nano.nJet(); ++ijet){
       if (Jet_pt[ijet] > min_jet_pt && Jet_jetId[ijet] < 1) 
         pico.out_pass_jets() = false;
     } 
@@ -418,7 +418,7 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
   }
 
   pico.out_pass_low_neutral_jet() = true;
-  for(int ijet(0); ijet<nano.nJet();){  
+  for(unsigned int ijet(0); ijet<nano.nJet();){  
     if (nano.Jet_neEmEF()[ijet] <0.03f && DeltaPhi(nano.Jet_phi()[ijet], pico.out_met_phi())>(TMath::Pi()-0.4f))
       pico.out_pass_low_neutral_jet() = false;
     break; //only apply to leading jet
@@ -426,7 +426,7 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
 
   pico.out_pass_htratio_dphi_tight() = true;
   float htratio = pico.out_ht5()/pico.out_ht();
-  for(int ijet(0); ijet<nano.nJet();){  
+  for(unsigned int ijet(0); ijet<nano.nJet();){  
     if (htratio >= 1.2f && DeltaPhi(nano.Jet_phi()[ijet], pico.out_met_phi()) < (5.3f*htratio - 4.78f)) 
       pico.out_pass_htratio_dphi_tight() = false;
     break; //only apply to leading jet
@@ -437,7 +437,7 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
     int counter = 0;
     bool goodjet[2] = {true, true};
     double dphi = 0.;
-    for (int ijet(0); ijet < nano.nJet(); ijet++) {
+    for (unsigned int ijet(0); ijet < nano.nJet(); ijet++) {
       if (counter >= 2) break;
       float jet_pt = nano.Jet_pt()[ijet];
       if (isFastsim) jet_pt = nano.Jet_pt_nom()[ijet];
@@ -470,7 +470,7 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
     } else if(year>=2022){
       bool ecal_pass = true;
       if(isData && nano.PuppiMET_pt()>100.f && (nano.run()>=362433 && nano.run()<=367144)){
-        for(int ijet(0); ijet < nano.nJet(); ijet++) {
+        for(unsigned int ijet(0); ijet < nano.nJet(); ijet++) {
           if(nano.Jet_pt()[ijet]>50.f && nano.Jet_eta()[ijet]>-0.5f && nano.Jet_eta()[ijet]<-0.1f
                      && nano.Jet_phi()[ijet]>-2.1f && nano.Jet_phi()[ijet]<-1.8f
                      && (nano.Jet_neEmEF()[ijet]>0.9f || nano.Jet_chEmEF()[ijet]>0.9f)

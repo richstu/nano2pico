@@ -1,9 +1,9 @@
 # See the docs for definitions:
 # https://cms-nanoaod-integration.web.cern.ch/integration/master-102X/mc102X_doc.html
 
-int run
-int luminosityBlock
-Long64_t event
+UInt_t run
+UInt_t luminosityBlock
+ULong64_t event
 
 
 ################ Weights ################
@@ -19,387 +19,387 @@ float L1PreFiringWeight_Dn
 
 ################ Electrons ################
 
-int nElectron
+ULong_t nElectron
 # delta eta (SC,ele) with sign
-array<float> Electron_deltaEtaSC
-array<float> Electron_dEsigmaUp
-array<float> Electron_dEsigmaDown
-array<float> Electron_dr03EcalRecHitSumEt
-array<float> Electron_dr03HcalDepth1TowerSumEt
-array<float> Electron_dr03TkSumPt
-array<float> Electron_dr03TkSumPtHEEP
-array<float> Electron_dxy
-array<float> Electron_dxyErr
-array<float> Electron_dz
-array<float> Electron_dzErr
-array<float> Electron_eCorr
-array<float> Electron_eInvMinusPInv
-array<float> Electron_energyErr
-array<float> Electron_eta
-array<float> Electron_superclusterEta
-array<float> Electron_hoe
-array<float> Electron_ip3d
-array<float> Electron_ipLengthSig
-array<float> Electron_jetPtRelv2
-array<float> Electron_jetRelIso
-array<float> Electron_mass
-array<float> Electron_miniPFRelIso_all
-array<float> Electron_miniPFRelIso_chg
-array<float> Electron_mvaFall17V1Iso
-array<float> Electron_mvaFall17V1noIso
-array<float> Electron_mvaFall17V2Iso
-array<float> Electron_mvaFall17V2noIso
-array<float> Electron_mvaIso
-array<float> Electron_pfRelIso03_all
-array<float> Electron_pfRelIso03_chg
-array<float> Electron_phi
-array<float> Electron_pt
-array<float> Electron_r9
-array<float> Electron_sieie
-array<float> Electron_sip3d
-array<float> Electron_mvaTTH
-array<int> Electron_charge
-array<float> Electron_scEtOverPt
+vector<float> Electron_deltaEtaSC
+vector<float> Electron_dEsigmaUp
+vector<float> Electron_dEsigmaDown
+vector<float> Electron_dr03EcalRecHitSumEt
+vector<float> Electron_dr03HcalDepth1TowerSumEt
+vector<float> Electron_dr03TkSumPt
+vector<float> Electron_dr03TkSumPtHEEP
+vector<float> Electron_dxy
+vector<float> Electron_dxyErr
+vector<float> Electron_dz
+vector<float> Electron_dzErr
+vector<float> Electron_eCorr
+vector<float> Electron_eInvMinusPInv
+vector<float> Electron_energyErr
+vector<float> Electron_eta
+vector<float> Electron_superclusterEta
+vector<float> Electron_hoe
+vector<float> Electron_ip3d
+vector<float> Electron_ipLengthSig
+vector<float> Electron_jetPtRelv2
+vector<float> Electron_jetRelIso
+vector<float> Electron_mass
+vector<float> Electron_miniPFRelIso_all
+vector<float> Electron_miniPFRelIso_chg
+vector<float> Electron_mvaFall17V1Iso
+vector<float> Electron_mvaFall17V1noIso
+vector<float> Electron_mvaFall17V2Iso
+vector<float> Electron_mvaFall17V2noIso
+vector<float> Electron_mvaIso
+vector<float> Electron_pfRelIso03_all
+vector<float> Electron_pfRelIso03_chg
+vector<float> Electron_phi
+vector<float> Electron_pt
+vector<float> Electron_r9
+vector<float> Electron_sieie
+vector<float> Electron_sip3d
+vector<float> Electron_mvaTTH
+vector<int> Electron_charge
+vector<float> Electron_scEtOverPt
 # cut-based ID Fall17 V2 (0:fail, 1:veto, 2:loose, 3:medium, 4:tight)
-array<int> Electron_cutBased
-array<int> Electron_cutBased_Fall17_V1
-array<int> Electron_jetIdx
-array<short> Electron_jetIdx 12
-array<int> Electron_pdgId
-array<int> Electron_photonIdx
-array<short> Electron_photonIdx 11.9
-array<int> Electron_tightCharge
-array<UChar_t> Electron_tightCharge 12
-array<int> Electron_vidNestedWPBitmap
-array<int> Electron_vidNestedWPBitmapHEEP
-array<bool> Electron_convVeto
-array<bool> Electron_cutBased_HEEP
-array<bool> Electron_isPFcand
-array<char> Electron_lostHits
-array<bool> Electron_mvaFall17V1Iso_WP80
-array<bool> Electron_mvaFall17V1Iso_WP90
-array<bool> Electron_mvaFall17V1Iso_WPL
-array<bool> Electron_mvaFall17V1noIso_WP80
-array<bool> Electron_mvaFall17V1noIso_WP90
-array<bool> Electron_mvaFall17V1noIso_WPL
-array<bool> Electron_mvaFall17V2Iso_WP80
-array<bool> Electron_mvaFall17V2Iso_WP90
-array<bool> Electron_mvaFall17V2Iso_WPL
-array<bool> Electron_mvaFall17V2noIso_WP80
-array<bool> Electron_mvaFall17V2noIso_WP90
-array<bool> Electron_mvaFall17V2noIso_WPL
-array<bool> Electron_mvaIso_WP80
-array<bool> Electron_mvaIso_WP90
-array<char> Electron_seedGain
-array<int> Electron_genPartIdx
-array<short> Electron_genPartIdx 12
-array<char> Electron_genPartFlav
-array<char> Electron_cleanmask
+vector<int> Electron_cutBased
+vector<int> Electron_cutBased_Fall17_V1
+vector<int> Electron_jetIdx
+vector<short> Electron_jetIdx 12
+vector<int> Electron_pdgId
+vector<int> Electron_photonIdx
+vector<short> Electron_photonIdx 11.9
+vector<int> Electron_tightCharge
+vector<UChar_t> Electron_tightCharge 12
+vector<int> Electron_vidNestedWPBitmap
+vector<int> Electron_vidNestedWPBitmapHEEP
+vector<bool> Electron_convVeto
+vector<bool> Electron_cutBased_HEEP
+vector<bool> Electron_isPFcand
+vector<char> Electron_lostHits
+vector<bool> Electron_mvaFall17V1Iso_WP80
+vector<bool> Electron_mvaFall17V1Iso_WP90
+vector<bool> Electron_mvaFall17V1Iso_WPL
+vector<bool> Electron_mvaFall17V1noIso_WP80
+vector<bool> Electron_mvaFall17V1noIso_WP90
+vector<bool> Electron_mvaFall17V1noIso_WPL
+vector<bool> Electron_mvaFall17V2Iso_WP80
+vector<bool> Electron_mvaFall17V2Iso_WP90
+vector<bool> Electron_mvaFall17V2Iso_WPL
+vector<bool> Electron_mvaFall17V2noIso_WP80
+vector<bool> Electron_mvaFall17V2noIso_WP90
+vector<bool> Electron_mvaFall17V2noIso_WPL
+vector<bool> Electron_mvaIso_WP80
+vector<bool> Electron_mvaIso_WP90
+vector<char> Electron_seedGain
+vector<int> Electron_genPartIdx
+vector<short> Electron_genPartIdx 12
+vector<char> Electron_genPartFlav
+vector<char> Electron_cleanmask
 # NanoAODv12
-array<float> Electron_mvaHZZIso
-array<float> Electron_mvaNoIso
-array<bool> Electron_mvaNoIso_WP80
-array<bool> Electron_mvaNoIso_WP90
-array<short> Electron_fsrPhotonIdx
-array<char> Electron_seediEtaOriX
-array<int> Electron_seediPhiOriY
-array<short> Electron_svIdx
+vector<float> Electron_mvaHZZIso
+vector<float> Electron_mvaNoIso
+vector<bool> Electron_mvaNoIso_WP80
+vector<bool> Electron_mvaNoIso_WP90
+vector<short> Electron_fsrPhotonIdx
+vector<char> Electron_seediEtaOriX
+vector<int> Electron_seediPhiOriY
+vector<short> Electron_svIdx
 
 ################ Muons ################
 
-int nMuon
-array<float> Muon_dxy
-array<float> Muon_dxyErr
-array<float> Muon_dz
-array<float> Muon_dzErr
-array<float> Muon_eta
-array<float> Muon_ip3d
-array<float> Muon_jetPtRelv2
-array<float> Muon_jetRelIso
-array<float> Muon_mass
-array<float> Muon_miniPFRelIso_all
-array<float> Muon_miniPFRelIso_chg
-array<float> Muon_pfRelIso03_all
-array<float> Muon_pfRelIso03_chg
-array<float> Muon_pfRelIso04_all
-array<float> Muon_phi
-array<float> Muon_pt
-array<float> Muon_ptErr
-array<float> Muon_segmentComp
-array<float> Muon_sip3d
-array<float> Muon_softMva
-array<float> Muon_tkRelIso
-array<float> Muon_tunepRelPt
-array<float> Muon_mvaLowPt
-array<float> Muon_mvaTTH
-array<int> Muon_fsrPhotonIdx
-array<short> Muon_fsrPhotonIdx 11.9
-array<int> Muon_charge
-array<int> Muon_jetIdx
-array<short> Muon_jetIdx 12
-array<int> Muon_nStations
-array<char> Muon_nStations 12
-array<int> Muon_nTrackerLayers
-array<char> Muon_nTrackerLayers 11.9
-array<int> Muon_pdgId
-array<int> Muon_tightCharge
-array<char> Muon_tightCharge 12
-array<char> Muon_highPtId
-array<bool> Muon_inTimeMuon
-array<bool> Muon_isGlobal
-array<bool> Muon_isPFcand
-array<bool> Muon_isTracker
-array<bool> Muon_looseId
-array<bool> Muon_mediumId
-array<bool> Muon_mediumPromptId
-array<char> Muon_miniIsoId
-array<char> Muon_multiIsoId
-array<char> Muon_mvaId
-array<char> Muon_pfIsoId
-array<bool> Muon_softId
-array<bool> Muon_softMvaId
-array<bool> Muon_tightId
-array<char> Muon_tkIsoId
-array<bool> Muon_triggerIdLoose
-array<int> Muon_genPartIdx
-array<short> Muon_genPartIdx 12
-array<char> Muon_genPartFlav
-array<char> Muon_cleanmask
+ULong_t nMuon
+vector<float> Muon_dxy
+vector<float> Muon_dxyErr
+vector<float> Muon_dz
+vector<float> Muon_dzErr
+vector<float> Muon_eta
+vector<float> Muon_ip3d
+vector<float> Muon_jetPtRelv2
+vector<float> Muon_jetRelIso
+vector<float> Muon_mass
+vector<float> Muon_miniPFRelIso_all
+vector<float> Muon_miniPFRelIso_chg
+vector<float> Muon_pfRelIso03_all
+vector<float> Muon_pfRelIso03_chg
+vector<float> Muon_pfRelIso04_all
+vector<float> Muon_phi
+vector<float> Muon_pt
+vector<float> Muon_ptErr
+vector<float> Muon_segmentComp
+vector<float> Muon_sip3d
+vector<float> Muon_softMva
+vector<float> Muon_tkRelIso
+vector<float> Muon_tunepRelPt
+vector<float> Muon_mvaLowPt
+vector<float> Muon_mvaTTH
+vector<int> Muon_fsrPhotonIdx
+vector<short> Muon_fsrPhotonIdx 11.9
+vector<int> Muon_charge
+vector<int> Muon_jetIdx
+vector<short> Muon_jetIdx 12
+vector<int> Muon_nStations
+vector<char> Muon_nStations 12
+vector<int> Muon_nTrackerLayers
+vector<char> Muon_nTrackerLayers 11.9
+vector<int> Muon_pdgId
+vector<int> Muon_tightCharge
+vector<char> Muon_tightCharge 12
+vector<char> Muon_highPtId
+vector<bool> Muon_inTimeMuon
+vector<bool> Muon_isGlobal
+vector<bool> Muon_isPFcand
+vector<bool> Muon_isTracker
+vector<bool> Muon_looseId
+vector<bool> Muon_mediumId
+vector<bool> Muon_mediumPromptId
+vector<char> Muon_miniIsoId
+vector<char> Muon_multiIsoId
+vector<char> Muon_mvaId
+vector<char> Muon_pfIsoId
+vector<bool> Muon_softId
+vector<bool> Muon_softMvaId
+vector<bool> Muon_tightId
+vector<char> Muon_tkIsoId
+vector<bool> Muon_triggerIdLoose
+vector<int> Muon_genPartIdx
+vector<short> Muon_genPartIdx 12
+vector<char> Muon_genPartFlav
+vector<char> Muon_cleanmask
 #NanoAODv12
-array<float> Muon_mvaMuID
-array<char> Muon_mvaMuID_WP
-array<float> Muon_bsConstrainedChi2
-array<float> Muon_bsConstrainedPt
-array<float> Muon_bsConstrainedPtErr
-array<short> Muon_svIdx
+vector<float> Muon_mvaMuID
+vector<char> Muon_mvaMuID_WP
+vector<float> Muon_bsConstrainedChi2
+vector<float> Muon_bsConstrainedPt
+vector<float> Muon_bsConstrainedPtErr
+vector<short> Muon_svIdx
 
 ################ Taus ################
 
-int nTau
-array<float> Tau_chargedIso
-array<float> Tau_dxy
-array<float> Tau_dz
-array<float> Tau_eta
-array<float> Tau_leadTkDeltaEta
-array<float> Tau_leadTkDeltaPhi
-array<float> Tau_leadTkPtOverTauPt
-array<float> Tau_mass
-array<float> Tau_neutralIso
-array<float> Tau_phi
-array<float> Tau_photonsOutsideSignalCone
-array<float> Tau_pt
-array<float> Tau_puCorr
-array<float> Tau_rawAntiEle
-array<float> Tau_rawAntiEle2018
-array<float> Tau_rawIso
-array<float> Tau_rawIsodR03
-array<float> Tau_rawMVAnewDM2017v2
-array<float> Tau_rawMVAoldDM
-array<float> Tau_rawMVAoldDM2017v1
-array<float> Tau_rawMVAoldDM2017v2
-array<float> Tau_rawMVAoldDMdR032017v2
-array<int> Tau_charge
-array<int> Tau_decayMode
-array<int> Tau_jetIdx
-array<int> Tau_rawAntiEleCat
-array<int> Tau_rawAntiEleCat2018
-array<char> Tau_idAntiEle
-array<char> Tau_idAntiEle2018
-array<char> Tau_idAntiMu
-array<bool> Tau_idDecayMode
-array<bool> Tau_idDecayModeNewDMs
-array<char> Tau_idMVAnewDM2017v2
-array<char> Tau_idMVAoldDM
-array<char> Tau_idMVAoldDM2017v1
-array<char> Tau_idMVAoldDM2017v2
-array<char> Tau_idMVAoldDMdR032017v2
-array<char> Tau_cleanmask
-array<int> Tau_genPartIdx
-array<char> Tau_genPartFlav
+ULong_t nTau
+vector<float> Tau_chargedIso
+vector<float> Tau_dxy
+vector<float> Tau_dz
+vector<float> Tau_eta
+vector<float> Tau_leadTkDeltaEta
+vector<float> Tau_leadTkDeltaPhi
+vector<float> Tau_leadTkPtOverTauPt
+vector<float> Tau_mass
+vector<float> Tau_neutralIso
+vector<float> Tau_phi
+vector<float> Tau_photonsOutsideSignalCone
+vector<float> Tau_pt
+vector<float> Tau_puCorr
+vector<float> Tau_rawAntiEle
+vector<float> Tau_rawAntiEle2018
+vector<float> Tau_rawIso
+vector<float> Tau_rawIsodR03
+vector<float> Tau_rawMVAnewDM2017v2
+vector<float> Tau_rawMVAoldDM
+vector<float> Tau_rawMVAoldDM2017v1
+vector<float> Tau_rawMVAoldDM2017v2
+vector<float> Tau_rawMVAoldDMdR032017v2
+vector<int> Tau_charge
+vector<int> Tau_decayMode
+vector<int> Tau_jetIdx
+vector<int> Tau_rawAntiEleCat
+vector<int> Tau_rawAntiEleCat2018
+vector<char> Tau_idAntiEle
+vector<char> Tau_idAntiEle2018
+vector<char> Tau_idAntiMu
+vector<bool> Tau_idDecayMode
+vector<bool> Tau_idDecayModeNewDMs
+vector<char> Tau_idMVAnewDM2017v2
+vector<char> Tau_idMVAoldDM
+vector<char> Tau_idMVAoldDM2017v1
+vector<char> Tau_idMVAoldDM2017v2
+vector<char> Tau_idMVAoldDMdR032017v2
+vector<char> Tau_cleanmask
+vector<int> Tau_genPartIdx
+vector<char> Tau_genPartFlav
 
 
 ################ Isolated tracks ################
 
 # isolated tracks after basic selection (((pt>5 && (abs(pdgId) == 11 || abs(pdgId) == 13)) || pt > 10) && (abs(pdgId) < 15 || abs(eta) < 2.5) && abs(dxy) < 0.2 && abs(dz) < 0.1 && ((pfIsolationDR03().chargedHadronIso < 5 && pt < 25) || pfIsolationDR03().chargedHadronIso/pt < 0.2)) and lepton veto
 int nIsoTrack
-array<float> IsoTrack_dxy
-array<float> IsoTrack_dz
-array<float> IsoTrack_eta
-array<float> IsoTrack_pfRelIso03_all
-array<float> IsoTrack_pfRelIso03_chg
-array<float> IsoTrack_phi
-array<float> IsoTrack_pt
-array<float> IsoTrack_miniPFRelIso_all
-array<float> IsoTrack_miniPFRelIso_chg
-array<int> IsoTrack_fromPV
-array<int> IsoTrack_pdgId
-array<bool> IsoTrack_isHighPurityTrack
-array<bool> IsoTrack_isPFcand
-array<bool> IsoTrack_isFromLostTrack
+vector<float> IsoTrack_dxy
+vector<float> IsoTrack_dz
+vector<float> IsoTrack_eta
+vector<float> IsoTrack_pfRelIso03_all
+vector<float> IsoTrack_pfRelIso03_chg
+vector<float> IsoTrack_phi
+vector<float> IsoTrack_pt
+vector<float> IsoTrack_miniPFRelIso_all
+vector<float> IsoTrack_miniPFRelIso_chg
+vector<int> IsoTrack_fromPV
+vector<int> IsoTrack_pdgId
+vector<bool> IsoTrack_isHighPurityTrack
+vector<bool> IsoTrack_isPFcand
+vector<bool> IsoTrack_isFromLostTrack
 
 ################ Photons ################
 
-int nPhoton
-array<float> Photon_dEsigmaUp
-array<float> Photon_dEsigmaDown
-array<float> Photon_eCorr
-array<float> Photon_energyErr
-array<float> Photon_energyRaw
-array<float> Photon_eta
-array<float> Photon_hoe
-array<float> Photon_esEffSigmaRR
-array<float> Photon_esEnergyOverRawE
-array<float> Photon_mass
-array<float> Photon_mvaID
-array<float> Photon_mvaIDV1
-array<float> Photon_pfPhoIso03
-array<float> Photon_pfChargedIso
-array<float> Photon_pfChargedIsoPFPV
-array<float> Photon_pfChargedIsoWorstVtx
-array<float> Photon_pfRelIso03_all
-array<float> Photon_pfRelIso03_all_quadratic
-array<float> Photon_pfRelIso03_chg
-array<float> Photon_phi
-array<float> Photon_pt
-array<float> Photon_r9
-array<float> Photon_s4
-array<float> Photon_sieie
-array<float> Photon_sieip
-array<float> Photon_etaWidth
-array<float> Photon_phiWidth
-array<int> Photon_charge
-array<int> Photon_cutBased
-array<char> Photon_cutBased 11.9
-array<int> Photon_cutBasedBitmap
-array<int> Photon_cutBasedV1Bitmap
-array<int> Photon_electronIdx
-array<short> Photon_electronIdx 11.9
-array<int> Photon_jetIdx
-array<short> Photon_jetIdx 11.9
-array<int> Photon_pdgId
-array<int> Photon_vidNestedWPBitmap
-array<bool> Photon_electronVeto
-array<bool> Photon_isScEtaEB
-array<bool> Photon_isScEtaEE
-array<bool> Photon_mvaID_WP80
-array<bool> Photon_mvaID_WP90
-array<bool> Photon_pixelSeed
-array<char> Photon_seedGain
-array<int> Photon_genPartIdx
-array<short> Photon_genPartIdx 12
-array<char> Photon_genPartFlav
-array<char> Photon_cleanmask
+ULong_t nPhoton
+vector<float> Photon_dEsigmaUp
+vector<float> Photon_dEsigmaDown
+vector<float> Photon_eCorr
+vector<float> Photon_energyErr
+vector<float> Photon_energyRaw
+vector<float> Photon_eta
+vector<float> Photon_hoe
+vector<float> Photon_esEffSigmaRR
+vector<float> Photon_esEnergyOverRawE
+vector<float> Photon_mass
+vector<float> Photon_mvaID
+vector<float> Photon_mvaIDV1
+vector<float> Photon_pfPhoIso03
+vector<float> Photon_pfChargedIso
+vector<float> Photon_pfChargedIsoPFPV
+vector<float> Photon_pfChargedIsoWorstVtx
+vector<float> Photon_pfRelIso03_all
+vector<float> Photon_pfRelIso03_all_quadratic
+vector<float> Photon_pfRelIso03_chg
+vector<float> Photon_phi
+vector<float> Photon_pt
+vector<float> Photon_r9
+vector<float> Photon_s4
+vector<float> Photon_sieie
+vector<float> Photon_sieip
+vector<float> Photon_etaWidth
+vector<float> Photon_phiWidth
+vector<int> Photon_charge
+vector<int> Photon_cutBased
+vector<char> Photon_cutBased 11.9
+vector<int> Photon_cutBasedBitmap
+vector<int> Photon_cutBasedV1Bitmap
+vector<int> Photon_electronIdx
+vector<short> Photon_electronIdx 11.9
+vector<int> Photon_jetIdx
+vector<short> Photon_jetIdx 11.9
+vector<int> Photon_pdgId
+vector<int> Photon_vidNestedWPBitmap
+vector<bool> Photon_electronVeto
+vector<bool> Photon_isScEtaEB
+vector<bool> Photon_isScEtaEE
+vector<bool> Photon_mvaID_WP80
+vector<bool> Photon_mvaID_WP90
+vector<bool> Photon_pixelSeed
+vector<char> Photon_seedGain
+vector<int> Photon_genPartIdx
+vector<short> Photon_genPartIdx 12
+vector<char> Photon_genPartFlav
+vector<char> Photon_cleanmask
 
 ############### FsrPhotons ###############
 
 int nFsrPhoton
-array<float> FsrPhoton_dROverEt2
-array<float> FsrPhoton_eta
-array<int> FsrPhoton_muonIdx
-array<short> FsrPhoton_muonIdx 11.9
-array<float> FsrPhoton_phi
-array<float> FsrPhoton_pt
-array<float> FsrPhoton_relIso03
+vector<float> FsrPhoton_dROverEt2
+vector<float> FsrPhoton_eta
+vector<int> FsrPhoton_muonIdx
+vector<short> FsrPhoton_muonIdx 11.9
+vector<float> FsrPhoton_phi
+vector<float> FsrPhoton_pt
+vector<float> FsrPhoton_relIso03
 #nanoAODv12
-array<short> FsrPhoton_electronIdx
+vector<short> FsrPhoton_electronIdx
 
 ################ AK4 Jets ################
 
-int nJet
-array<float> Jet_area
-array<float> Jet_btagCMVA
-array<float> Jet_btagCSVV2
-array<float> Jet_btagDeepB
-array<float> Jet_btagDeepC
-array<float> Jet_btagDeepFlavB
-array<float> Jet_btagDeepFlavC
-array<float> Jet_chEmEF
-array<float> Jet_chHEF
-array<UChar_t> Jet_chMultiplicity
-array<UChar_t> Jet_neMultiplicity
-array<float> Jet_eta
-array<float> Jet_jercCHF
-array<float> Jet_jercCHPUF
-array<float> Jet_mass
-array<float> Jet_mass_nom
-array<float> Jet_muEF
-array<float> Jet_muonSubtrFactor
-array<float> Jet_neEmEF
-array<float> Jet_neHEF
-array<float> Jet_phi
-array<float> Jet_pt
-array<float> Jet_pt_nom
-array<float> Jet_qgl
-array<float> Jet_rawFactor
-array<float> Jet_bRegCorr
-array<float> Jet_bRegRes
-array<int> Jet_electronIdx1
-array<short> Jet_electronIdx1 12
-array<int> Jet_electronIdx2
-array<short> Jet_electronIdx2 12
-array<int> Jet_jetId
-array<char> Jet_jetId 11.9
-array<int> Jet_muonIdx1
-array<short> Jet_muonIdx1 12
-array<int> Jet_muonIdx2
-array<short> Jet_muonIdx2 12
-array<int> Jet_nConstituents
-array<int> Jet_nElectrons
-array<char> Jet_nElectrons 12
-array<int> Jet_nMuons
-array<char> Jet_nMuons 12
-array<int> Jet_puId
-array<float> Jet_puIdDisc
-array<int> Jet_genJetIdx
-array<short> Jet_genJetIdx 12
-array<int> Jet_hadronFlavour
-array<char> Jet_hadronFlavour 12
-array<int> Jet_partonFlavour
-array<short> Jet_partonFlavour 12
-array<char> Jet_cleanmask
-array<float> Jet_pt_jerUp
-array<float> Jet_pt_jerDown
-array<float> Jet_pt_jesTotalUp
-array<float> Jet_pt_jesTotalDown
-array<float> Jet_mass_jerUp
-array<float> Jet_mass_jerDown
-array<float> Jet_mass_jesTotalUp
-array<float> Jet_mass_jesTotalDown
+ULong_t nJet
+vector<float> Jet_area
+vector<float> Jet_btagCMVA
+vector<float> Jet_btagCSVV2
+vector<float> Jet_btagDeepB
+vector<float> Jet_btagDeepC
+vector<float> Jet_btagDeepFlavB
+vector<float> Jet_btagDeepFlavC
+vector<float> Jet_chEmEF
+vector<float> Jet_chHEF
+vector<UChar_t> Jet_chMultiplicity
+vector<UChar_t> Jet_neMultiplicity
+vector<float> Jet_eta
+vector<float> Jet_jercCHF
+vector<float> Jet_jercCHPUF
+vector<float> Jet_mass
+vector<float> Jet_mass_nom
+vector<float> Jet_muEF
+vector<float> Jet_muonSubtrFactor
+vector<float> Jet_neEmEF
+vector<float> Jet_neHEF
+vector<float> Jet_phi
+vector<float> Jet_pt
+vector<float> Jet_pt_nom
+vector<float> Jet_qgl
+vector<float> Jet_rawFactor
+vector<float> Jet_bRegCorr
+vector<float> Jet_bRegRes
+vector<int> Jet_electronIdx1
+vector<short> Jet_electronIdx1 12
+vector<int> Jet_electronIdx2
+vector<short> Jet_electronIdx2 12
+vector<int> Jet_jetId
+vector<char> Jet_jetId 11.9
+vector<int> Jet_muonIdx1
+vector<short> Jet_muonIdx1 12
+vector<int> Jet_muonIdx2
+vector<short> Jet_muonIdx2 12
+vector<int> Jet_nConstituents
+vector<int> Jet_nElectrons
+vector<char> Jet_nElectrons 12
+vector<int> Jet_nMuons
+vector<char> Jet_nMuons 12
+vector<int> Jet_puId
+vector<float> Jet_puIdDisc
+vector<int> Jet_genJetIdx
+vector<short> Jet_genJetIdx 12
+vector<int> Jet_hadronFlavour
+vector<char> Jet_hadronFlavour 12
+vector<int> Jet_partonFlavour
+vector<short> Jet_partonFlavour 12
+vector<char> Jet_cleanmask
+vector<float> Jet_pt_jerUp
+vector<float> Jet_pt_jerDown
+vector<float> Jet_pt_jesTotalUp
+vector<float> Jet_pt_jesTotalDown
+vector<float> Jet_mass_jerUp
+vector<float> Jet_mass_jerDown
+vector<float> Jet_mass_jesTotalUp
+vector<float> Jet_mass_jesTotalDown
 #NanoAODv12
-array<float> Jet_PNetRegPtRawCorr
-array<float> Jet_PNetRegPtRawCorrNeutrino
-array<float> Jet_PNetRegPtRawRes
-array<float> Jet_btagPNetB
-array<float> Jet_btagPNetCvB
-array<float> Jet_btagPNetCvL
-array<float> Jet_btagPNetQvG
-array<float> Jet_btagPNetTauVarrayJet
-array<float> Jet_btagRobustParTAK4B
-array<float> Jet_btagRobustParTAK4CvB
-array<float> Jet_btagRobustParTAK4CvL
-array<float> Jet_btagRobustParTAK4QG
+vector<float> Jet_PNetRegPtRawCorr
+vector<float> Jet_PNetRegPtRawCorrNeutrino
+vector<float> Jet_PNetRegPtRawRes
+vector<float> Jet_btagPNetB
+vector<float> Jet_btagPNetCvB
+vector<float> Jet_btagPNetCvL
+vector<float> Jet_btagPNetQvG
+vector<float> Jet_btagPNetTauVvectorJet
+vector<float> Jet_btagRobustParTAK4B
+vector<float> Jet_btagRobustParTAK4CvB
+vector<float> Jet_btagRobustParTAK4CvL
+vector<float> Jet_btagRobustParTAK4QG
 #NanoAODv15
-array<float> Jet_btagUParTAK4B
-array<float> Jet_btagUParTAK4CvB
-array<float> Jet_btagUParTAK4CvL
-array<float> Jet_btagUParTAK4CvNotB
-array<float> Jet_btagUParTAK4Ele
-array<float> Jet_btagUParTAK4Mu
-array<float> Jet_btagUParTAK4QvG
-array<float> Jet_btagUParTAK4SvCB
-array<float> Jet_btagUParTAK4SvUDG
-array<float> Jet_btagUParTAK4TauVJet
-array<float> Jet_btagUParTAK4UDG
-array<float> Jet_btagUParTAK4probb
-array<float> Jet_btagUParTAK4probbb
+vector<float> Jet_btagUParTAK4B
+vector<float> Jet_btagUParTAK4CvB
+vector<float> Jet_btagUParTAK4CvL
+vector<float> Jet_btagUParTAK4CvNotB
+vector<float> Jet_btagUParTAK4Ele
+vector<float> Jet_btagUParTAK4Mu
+vector<float> Jet_btagUParTAK4QvG
+vector<float> Jet_btagUParTAK4SvCB
+vector<float> Jet_btagUParTAK4SvUDG
+vector<float> Jet_btagUParTAK4TauVJet
+vector<float> Jet_btagUParTAK4UDG
+vector<float> Jet_btagUParTAK4probb
+vector<float> Jet_btagUParTAK4probbb
 
 ################ Very soft Jets ################
 
 # jets clustered from charged candidates compatible with primary vertex (charge()!=0 && pvAssociationQuality()>=5 && vertexRef().key()==0)
-int nSoftActivityJet
-array<float> SoftActivityJet_eta
-array<float> SoftActivityJet_phi
-array<float> SoftActivityJet_pt
+ULong_t nSoftActivityJet
+vector<float> SoftActivityJet_eta
+vector<float> SoftActivityJet_phi
+vector<float> SoftActivityJet_pt
 float SoftActivityJetHT
 float SoftActivityJetHT10
 float SoftActivityJetHT2
@@ -410,73 +410,73 @@ int SoftActivityJetNjets5
 
 ################ AK8 Jets ################
 
-int nFatJet
-array<float> FatJet_area
-array<float> FatJet_btagCMVA
-array<float> FatJet_btagCSVV2
-array<float> FatJet_btagDDBvL
-array<float> FatJet_btagDDBvLV2
-array<float> FatJet_btagDDCvB
-array<float> FatJet_btagDDCvL
-array<float> FatJet_btagDeepB
-array<float> FatJet_btagHbb
-array<float> FatJet_deepTagMD_H4qvsQCD
-array<float> FatJet_deepTagMD_HbbvsQCD
-array<float> FatJet_deepTagMD_TvsQCD
-array<float> FatJet_deepTagMD_WvsQCD
-array<float> FatJet_deepTagMD_ZHbbvsQCD
-array<float> FatJet_deepTagMD_ZHccvsQCD
-array<float> FatJet_deepTagMD_ZbbvsQCD
-array<float> FatJet_deepTagMD_ZvsQCD
-array<float> FatJet_deepTagMD_bbvsLight
-array<float> FatJet_deepTagMD_ccvsLight
-array<float> FatJet_deepTag_H
-array<float> FatJet_deepTag_QCD
-array<float> FatJet_deepTag_QCDothers
-array<float> FatJet_deepTag_TvsQCD
-array<float> FatJet_deepTag_WvsQCD
-array<float> FatJet_deepTag_ZvsQCD
-array<float> FatJet_eta
-array<float> FatJet_mass
-array<float> FatJet_msoftdrop
-array<float> FatJet_n2b1
-array<float> FatJet_n3b1
-array<float> FatJet_particleNetWithMass_TvsQCD
-array<float> FatJet_particleNetWithMass_WvsQCD
-array<float> FatJet_particleNetWithMass_ZvsQCD
-array<float> FatJet_particleNet_TvsQCD
-array<float> FatJet_particleNet_WvsQCD
-array<float> FatJet_particleNet_ZvsQCD
-array<float> FatJet_particleNet_mass
-array<float> FatJet_particleNet_massCorr
-array<float> FatJet_phi
-array<float> FatJet_pt
-array<float> FatJet_rawFactor
-array<float> FatJet_tau1
-array<float> FatJet_tau2
-array<float> FatJet_tau3
-array<float> FatJet_tau4
-array<int> FatJet_jetId
-array<int> FatJet_subJetIdx1
-array<short> FatJet_subJetIdx1 11.9
-array<int> FatJet_subJetIdx2
-array<short> FatJet_subJetIdx2 11.9
+ULong_t nFatJet
+vector<float> FatJet_area
+vector<float> FatJet_btagCMVA
+vector<float> FatJet_btagCSVV2
+vector<float> FatJet_btagDDBvL
+vector<float> FatJet_btagDDBvLV2
+vector<float> FatJet_btagDDCvB
+vector<float> FatJet_btagDDCvL
+vector<float> FatJet_btagDeepB
+vector<float> FatJet_btagHbb
+vector<float> FatJet_deepTagMD_H4qvsQCD
+vector<float> FatJet_deepTagMD_HbbvsQCD
+vector<float> FatJet_deepTagMD_TvsQCD
+vector<float> FatJet_deepTagMD_WvsQCD
+vector<float> FatJet_deepTagMD_ZHbbvsQCD
+vector<float> FatJet_deepTagMD_ZHccvsQCD
+vector<float> FatJet_deepTagMD_ZbbvsQCD
+vector<float> FatJet_deepTagMD_ZvsQCD
+vector<float> FatJet_deepTagMD_bbvsLight
+vector<float> FatJet_deepTagMD_ccvsLight
+vector<float> FatJet_deepTag_H
+vector<float> FatJet_deepTag_QCD
+vector<float> FatJet_deepTag_QCDothers
+vector<float> FatJet_deepTag_TvsQCD
+vector<float> FatJet_deepTag_WvsQCD
+vector<float> FatJet_deepTag_ZvsQCD
+vector<float> FatJet_eta
+vector<float> FatJet_mass
+vector<float> FatJet_msoftdrop
+vector<float> FatJet_n2b1
+vector<float> FatJet_n3b1
+vector<float> FatJet_particleNetWithMass_TvsQCD
+vector<float> FatJet_particleNetWithMass_WvsQCD
+vector<float> FatJet_particleNetWithMass_ZvsQCD
+vector<float> FatJet_particleNet_TvsQCD
+vector<float> FatJet_particleNet_WvsQCD
+vector<float> FatJet_particleNet_ZvsQCD
+vector<float> FatJet_particleNet_mass
+vector<float> FatJet_particleNet_massCorr
+vector<float> FatJet_phi
+vector<float> FatJet_pt
+vector<float> FatJet_rawFactor
+vector<float> FatJet_tau1
+vector<float> FatJet_tau2
+vector<float> FatJet_tau3
+vector<float> FatJet_tau4
+vector<int> FatJet_jetId
+vector<int> FatJet_subJetIdx1
+vector<short> FatJet_subJetIdx1 11.9
+vector<int> FatJet_subJetIdx2
+vector<short> FatJet_subJetIdx2 11.9
 
 int nSubJet
-array<float> SubJet_btagCMVA
-array<float> SubJet_btagCSVV2
-array<float> SubJet_btagDeepB
-array<float> SubJet_eta
-array<float> SubJet_mass
-array<float> SubJet_n2b1
-array<float> SubJet_n3b1
-array<float> SubJet_phi
-array<float> SubJet_pt
-array<float> SubJet_rawFactor
-array<float> SubJet_tau1
-array<float> SubJet_tau2
-array<float> SubJet_tau3
-array<float> SubJet_tau4
+vector<float> SubJet_btagCMVA
+vector<float> SubJet_btagCSVV2
+vector<float> SubJet_btagDeepB
+vector<float> SubJet_eta
+vector<float> SubJet_mass
+vector<float> SubJet_n2b1
+vector<float> SubJet_n3b1
+vector<float> SubJet_phi
+vector<float> SubJet_pt
+vector<float> SubJet_rawFactor
+vector<float> SubJet_tau1
+vector<float> SubJet_tau2
+vector<float> SubJet_tau3
+vector<float> SubJet_tau4
 
 ################ MET ################
 
@@ -553,65 +553,65 @@ float METFixEE2017_T1_phi_jesTotalUp
 float METFixEE2017_T1_phi_jesTotalDown
 
 int nCorrT1METJet
-array<float> CorrT1METJet_area
-array<float> CorrT1METJet_eta
-array<float> CorrT1METJet_muonSubtrFactor
-array<float> CorrT1METJet_phi
-array<float> CorrT1METJet_rawPt
+vector<float> CorrT1METJet_area
+vector<float> CorrT1METJet_eta
+vector<float> CorrT1METJet_muonSubtrFactor
+vector<float> CorrT1METJet_phi
+vector<float> CorrT1METJet_rawPt
 
 ################ Generator particle record ################
 
 int nGenPart
-array<float> GenPart_eta
-array<float> GenPart_mass
-array<float> GenPart_phi
-array<float> GenPart_pt
-array<int> GenPart_genPartIdxMother
-array<short> GenPart_genPartIdxMother 12
-array<int> GenPart_pdgId
-array<int> GenPart_status
-array<int> GenPart_statusFlags
-array<ushort> GenPart_statusFlags 12
+vector<float> GenPart_eta
+vector<float> GenPart_mass
+vector<float> GenPart_phi
+vector<float> GenPart_pt
+vector<int> GenPart_genPartIdxMother
+vector<short> GenPart_genPartIdxMother 12
+vector<int> GenPart_pdgId
+vector<int> GenPart_status
+vector<int> GenPart_statusFlags
+vector<ushort> GenPart_statusFlags 12
 
 int nGenDressedLepton
-array<float> GenDressedLepton_eta
-array<float> GenDressedLepton_mass
-array<float> GenDressedLepton_phi
-array<float> GenDressedLepton_pt
-array<int> GenDressedLepton_pdgId
-array<bool> GenDressedLepton_hasTauAnc
+vector<float> GenDressedLepton_eta
+vector<float> GenDressedLepton_mass
+vector<float> GenDressedLepton_phi
+vector<float> GenDressedLepton_pt
+vector<int> GenDressedLepton_pdgId
+vector<bool> GenDressedLepton_hasTauAnc
 
 int nGenVisTau
-array<float> GenVisTau_eta
-array<float> GenVisTau_mass
-array<float> GenVisTau_phi
-array<float> GenVisTau_pt
-array<int> GenVisTau_charge
-array<int> GenVisTau_genPartIdxMother
-array<int> GenVisTau_status
+vector<float> GenVisTau_eta
+vector<float> GenVisTau_mass
+vector<float> GenVisTau_phi
+vector<float> GenVisTau_pt
+vector<int> GenVisTau_charge
+vector<int> GenVisTau_genPartIdxMother
+vector<int> GenVisTau_status
 
 int nGenJet
-array<float> GenJet_eta
-array<float> GenJet_mass
-array<float> GenJet_phi
-array<float> GenJet_pt
-array<char> GenJet_hadronFlavour
-array<int> GenJet_partonFlavour
-array<short> GenJet_partonFlavour 12
+vector<float> GenJet_eta
+vector<float> GenJet_mass
+vector<float> GenJet_phi
+vector<float> GenJet_pt
+vector<char> GenJet_hadronFlavour
+vector<int> GenJet_partonFlavour
+vector<short> GenJet_partonFlavour 12
 
 int nGenJetAK8
-array<float> GenJetAK8_eta
-array<float> GenJetAK8_mass
-array<float> GenJetAK8_phi
-array<float> GenJetAK8_pt
-array<int> GenJetAK8_partonFlavour
-array<char> GenJetAK8_hadronFlavour
+vector<float> GenJetAK8_eta
+vector<float> GenJetAK8_mass
+vector<float> GenJetAK8_phi
+vector<float> GenJetAK8_pt
+vector<int> GenJetAK8_partonFlavour
+vector<char> GenJetAK8_hadronFlavour
 
 int nSubGenJetAK8
-array<float> SubGenJetAK8_eta
-array<float> SubGenJetAK8_mass
-array<float> SubGenJetAK8_phi
-array<float> SubGenJetAK8_pt
+vector<float> SubGenJetAK8_eta
+vector<float> SubGenJetAK8_mass
+vector<float> SubGenJetAK8_phi
+vector<float> SubGenJetAK8_pt
 
 float GenMET_phi
 float GenMET_pt
@@ -647,25 +647,25 @@ char LHE_NpNLO
 char LHE_NpLO
 
 int nLHEPart
-array<float> LHEPart_pt
-array<float> LHEPart_eta
-array<float> LHEPart_phi
-array<float> LHEPart_mass
-array<int> LHEPart_pdgId
+vector<float> LHEPart_pt
+vector<float> LHEPart_eta
+vector<float> LHEPart_phi
+vector<float> LHEPart_mass
+vector<int> LHEPart_pdgId
 
 float LHEWeight_originalXWGTUP
 int nLHEPdfWeight
-array<float> LHEPdfWeight
+vector<float> LHEPdfWeight
 int nLHEReweightingWeight
-array<float> LHEReweightingWeight
+vector<float> LHEReweightingWeight
 int nLHEScaleWeight
-array<float> LHEScaleWeight
+vector<float> LHEScaleWeight
 int nPSWeight
-array<float> PSWeight
+vector<float> PSWeight
 
 ################ Primary vertices ################
 int nOtherPV
-array<float> OtherPV_z
+vector<float> OtherPV_z
 
 float PV_ndof
 float PV_x
@@ -679,19 +679,19 @@ int PV_npvsGood
 u_char PV_npvsGood 12
 
 ################ Secondary vertices ################
-int nSV
-array<float> SV_dlen
-array<float> SV_dlenSig
-array<float> SV_pAngle
-array<float> SV_chi2
-array<float> SV_eta
-array<float> SV_mass
-array<float> SV_ndof
-array<float> SV_phi
-array<float> SV_pt
-array<float> SV_x
-array<float> SV_y
-array<float> SV_z
+ULong_t nSV
+vector<float> SV_dlen
+vector<float> SV_dlenSig
+vector<float> SV_pAngle
+vector<float> SV_chi2
+vector<float> SV_eta
+vector<float> SV_mass
+vector<float> SV_ndof
+vector<float> SV_phi
+vector<float> SV_pt
+vector<float> SV_x
+vector<float> SV_y
+vector<float> SV_z
 
 ################ Filters ################
 bool Flag_HBHENoiseFilter
@@ -743,16 +743,16 @@ float Rho_fixedGridRhoFastjetAll
 
 ################ Trigger related ################
 int nTrigObj
-array<float> TrigObj_pt
-array<float> TrigObj_eta
-array<float> TrigObj_phi
-array<float> TrigObj_l1pt
-array<float> TrigObj_l1pt_2
-array<float> TrigObj_l2pt
-array<int> TrigObj_id
-array<int> TrigObj_l1iso
-array<int> TrigObj_l1charge
-array<int> TrigObj_filterBits
+vector<float> TrigObj_pt
+vector<float> TrigObj_eta
+vector<float> TrigObj_phi
+vector<float> TrigObj_l1pt
+vector<float> TrigObj_l1pt_2
+vector<float> TrigObj_l2pt
+vector<int> TrigObj_id
+vector<int> TrigObj_l1iso
+vector<int> TrigObj_l1charge
+vector<int> TrigObj_filterBits
 
 bool L1Reco_step
 bool L1simulation_step

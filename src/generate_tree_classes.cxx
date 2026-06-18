@@ -248,6 +248,7 @@ void WriteNanoHeader(const vector<Variable> &vars){
   file << "#include <vector>\n";
   file << "#include <string>\n";
   file << "#include <cmath>\n\n";
+  file << "#include \"ROOT/RVec.hxx\"\n";
   file << "#include \"TTree.h\"\n";
   file << "#include \"TFile.h\"\n\n";
   file << "#include \"TChain.h\"\n\n";

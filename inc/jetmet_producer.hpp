@@ -35,6 +35,7 @@ public:
                                const std::vector<float> &btag_df_wpts,
                                const std::vector<float> &btag_upt_wpts, 
                                bool isFastsim, 
+                               bool isFlashsim,
                                bool isSignal,
                                std::vector<HiggsConstructionVariables> &sys_higvars);
   void WriteFatJets(nano_tree &nano, pico_tree &pico);
@@ -47,7 +48,7 @@ private:
   float GetJEC(float jet_area, float jet_eta, float jet_phi, float jet_pt, 
                float rho, unsigned int run, JECType jec_type);
 
-  void PropagateJERC(nano_tree &nano, pico_tree &pico, 
+  void PropagateJERC(nano_tree &nano, pico_tree &pico, bool isFlashsim, 
                      std::vector<float> &jer_nm_factor, 
                      std::vector<float> &jer_up_factor,
                      std::vector<float> &jer_dn_factor,

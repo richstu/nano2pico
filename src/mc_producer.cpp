@@ -101,7 +101,7 @@ void GenParticleProducer::WriteGenParticles(nano_tree &nano, pico_tree &pico, bo
 
   // Collect interesting particle indices
   vector<int> interested_mc_indices;
-  for(int imc(0); imc<nano.nGenPart(); ++imc) {
+  for(unsigned int imc(0); imc<nano.GenPart_pt().size(); ++imc) {
     int mc_id = nano.GenPart_pdgId().at(imc);
     bitset<15> mc_statusFlags(GenPart_statusFlags.at(imc));
     bool is_interesting = IsInteresting(interested_mc_ids, interested_mc_ids_range, mc_id);

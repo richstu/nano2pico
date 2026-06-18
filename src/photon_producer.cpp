@@ -156,13 +156,14 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico,
   vector<int> sig_photon_nano_idx;
   int nphotons(0);
 
+  vector<int> Photon_pflav;
+  getPhoton_genPartFlav(nano, Photon_pflav);
   vector<int> FsrPhoton_muonIdx;
   getFsrPhoton_muonIdx(nano, nanoaod_version, FsrPhoton_muonIdx);
   vector<int> Photon_jetIdx;
   getPhoton_jetIdx(nano, nanoaod_version, Photon_jetIdx);
   vector<int> Photon_cutBased;
   getPhoton_cutBased(nano, nanoaod_version, Photon_cutBased);
-
   int hig019014_photon_idx = -1;
   //Set a default value 
   pico.out_photon_idx_hig019014() = -1;
@@ -184,7 +185,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico,
   vector<float> energy_err_scale_dn;
   vector<float> energy_err_smear_up;
   vector<float> energy_err_smear_dn;
-  for(int iph(0); iph<nano.nPhoton(); ++iph){
+  for(unsigned int iph(0); iph<nano.nPhoton(); ++iph){
     //deal with scale/smearing (systematics only for NanoAODv9 [run 2], full
     //correction for NanoAODv10+ [run3])
     float pt = nano.Photon_pt()[iph];
@@ -268,7 +269,6 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico,
       energy_err_smear_up.push_back(nano.Photon_energyErr()[iph]);
       energy_err_smear_dn.push_back(nano.Photon_energyErr()[iph]);
     }
-
     // Find min(dR) between photon and signal lepton
     double minLepDR(999.);
     double maxLepDR(0.);
@@ -287,10 +287,9 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico,
     photon_drmin.push_back(minLepDR);
     photon_drmax.push_back(maxLepDR);
   }
-
   //first, determine ordering based on signal and pt
   std::vector<NanoOrderEntry> nano_entries;
-  for(int iph(0); iph<nano.nPhoton(); ++iph){
+  for(unsigned int iph(0); iph<nano.nPhoton(); ++iph){
     NanoOrderEntry nano_entry;
     nano_entry.nano_idx = iph;
     nano_entry.pt = nano.Photon_pt()[iph]*scaleres_corr[iph];
@@ -307,7 +306,6 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico,
   std::vector<int> ordered_nano_indices;
   for (NanoOrderEntry nano_entry : nano_entries)
     ordered_nano_indices.push_back(nano_entry.nano_idx);
-
   //then, add branches to pico
   int pico_idx = 0;
   for(int iph : ordered_nano_indices) {
@@ -340,12 +338,11 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico,
         hig019014_photon_idx = pico_idx;
       }
     }
-
     //find nearest jet and get PUID
     float photon_puid_disc = -1.0;
     float min_jet_dr = 999.0;
     if (nanoaod_version < 9.99) { //PUID not available for run 3
-      for (int ijet = 0; ijet < nano.nJet(); ijet++) {
+      for (unsigned int ijet = 0; ijet < nano.nJet(); ijet++) {
         float ph_jet_dr = dR(eta, nano.Jet_eta()[ijet], phi, nano.Jet_phi()[ijet]);
         if (ph_jet_dr < 0.4) {
           if (ph_jet_dr < min_jet_dr) {
@@ -355,11 +352,10 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico,
         }
       }
     }
-
     //check for nearby gen particles with pT>15 GeV and fromHardprocess
     bool hardprocess = false;
     if (!isData) {
-      for (int imc = 0; imc < nano.nGenPart(); imc++) {
+      for (unsigned int imc = 0; imc < nano.GenPart_pt().size(); imc++) {
         if (nano.GenPart_pt()[imc] > 15
             && ((GenPart_statusFlags[imc] & 0x100) != 0)) {
           //skip promptly decaying particles (W Z t H)
@@ -373,7 +369,6 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico,
         }
       }
     }
-    
     pico.out_photon_pt().push_back(pt);
     pico.out_photon_pt_raw().push_back(raw_pt);
     pico.out_photon_eta().push_back(eta);
@@ -394,12 +389,12 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico,
     pico.out_photon_origin_eta().push_back(origin_eta);
     pico.out_photon_pixelseed().push_back(nano.Photon_pixelSeed()[iph]);
     pico.out_photon_idmva().push_back(mva);
-    pico.out_photon_idCutBasedBitMap().push_back(nano.Photon_vidNestedWPBitmap()[iph]);
+    //pico.out_photon_idCutBasedBitMap().push_back(nano.Photon_vidNestedWPBitmap()[iph]);
     pico.out_photon_idCutBased().push_back(Photon_cutBased[iph]);
     pico.out_photon_id().push_back(nano.Photon_mvaID_WP90()[iph]);
     pico.out_photon_id80().push_back(nano.Photon_mvaID_WP80()[iph]);
     if (!isData) {
-      pico.out_photon_pflavor().push_back(nano.Photon_genPartFlav()[iph]);
+      pico.out_photon_pflavor().push_back(Photon_pflav[iph]);
       pico.out_photon_hardprocess().push_back(hardprocess);
       if (is_signal_sample) {
         pico.out_sys_photon_pt_resup().push_back(raw_pt*smear_syst_up[iph]);
@@ -464,16 +459,15 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico,
       // save indices of matching jets
       if (Photon_jetIdx[iph]>=0)
         jet_isphoton_nano_idx.push_back(Photon_jetIdx[iph]);
-      for (int ijet(0); ijet<nano.nJet(); ijet++)
+      for (unsigned int ijet(0); ijet<nano.nJet(); ijet++)
         if (dR(eta, nano.Jet_eta()[ijet], phi, nano.Jet_phi()[ijet])<0.4f)
           jet_isphoton_nano_idx.push_back(ijet);
     }
     pico_idx++;
   }
-
   //Saves indices for FSR photons
   pico.out_nfsrphoton() = 0;
-  for(int iph(0); iph < nano.nFsrPhoton(); ++iph){
+  for(unsigned int iph(0); iph < nano.FsrPhoton_pt().size(); ++iph){
     //These set of selections require the photon be close to the corresponding muon and relatively soft
     if (nano.FsrPhoton_pt()[iph] <= FsrPhotonPtCut) continue;
     if (fabs(nano.FsrPhoton_eta()[iph]) > FsrPhotonEtaCut) continue;
@@ -482,7 +476,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico,
 
     //Check for separation between fsrphoton and first photon candidate
     if ((pico.out_nphoton() > 0) && dR(pico.out_photon_eta()[0],nano.FsrPhoton_eta()[iph],pico.out_photon_phi()[0],nano.FsrPhoton_phi()[iph]) < FsrSeparationReq) continue;
-    
+   
     //Add the values to the pico trees
     pico.out_fsrphoton_pt().push_back(nano.FsrPhoton_pt()[iph]);
     pico.out_fsrphoton_eta().push_back(nano.FsrPhoton_eta()[iph]);
@@ -490,10 +484,9 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico,
     pico.out_fsrphoton_reliso().push_back(nano.FsrPhoton_relIso03()[iph]);
     pico.out_fsrphoton_muonidx().push_back(FsrPhoton_muonIdx[iph]);
     pico.out_fsrphoton_droveret2().push_back(nano.FsrPhoton_dROverEt2()[iph]);
-    if (nanoaod_version +0.01 > 12) pico.out_fsrphoton_electronidx().push_back(nano.FsrPhoton_electronIdx()[iph]);
+    //if (nanoaod_version +0.01 > 12) pico.out_fsrphoton_electronidx().push_back(nano.FsrPhoton_electronIdx()[iph]);
     pico.out_nfsrphoton()++;
   } 
-
   return sig_photon_nano_idx;
 }
 

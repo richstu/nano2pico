@@ -259,7 +259,7 @@ float JetMetProducer::GetJEC(float jet_area, float jet_eta, float jet_phi,
 
 // Note this function also writes out MET and its systematic uncertainties 
 // from propagating JES/JER uncertainties
-void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico, 
+void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico, bool isFlashsim,
                                    vector<float> &jet_nm_factor, 
                                    vector<float> &jer_up_factor,
                                    vector<float> &jer_dn_factor,
@@ -274,7 +274,6 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
     WriteMetVariations(nano, pico);
     return;
   }
-
   //implementation originally based on the following:
   //https://github.com/cms-nanoAOD/nanoAOD-tools/blob/master/python/postprocessing/modules/jme/jetmetUncertainties.py
   float met_x, met_y;
@@ -300,7 +299,6 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
   // loop over regular jets and jets that didn't make it into slimmedjets 
   // (CorrT1METJets)
   for (int jet_type(0); jet_type<2; jet_type++) {
-
     vector<float> jet_type_pt, jet_type_eta, jet_type_phi, jet_type_area;
     vector<float> jet_type_rawfactor, jet_type_muonfactor;
     int jet_type_size(0);
@@ -314,6 +312,7 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
       jet_type_size = nano.nJet();
     }
     else {
+      if(isFlashsim == true) continue;
       jet_type_area = nano.CorrT1METJet_area();
       jet_type_pt = nano.CorrT1METJet_rawPt();
       jet_type_eta = nano.CorrT1METJet_eta();
@@ -377,7 +376,7 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
 
         bool found_genjet = false;
         float mindr = 999.0f;
-        for (int igen(0); igen<nano.nGenJet(); ++igen) {
+        for (unsigned int igen(0); igen<nano.GenJet_pt().size(); ++igen) {
           float dr = dR(jet_type_eta[ijet], nano.GenJet_eta()[igen], 
                         jet_type_phi[ijet], nano.GenJet_phi()[igen]);
           float dpt = jet_l1l2l3_pt-nano.GenJet_pt()[igen];
@@ -605,6 +604,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
     const vector<float> &btag_df_wpts,
     const vector<float> &btag_upt_wpts, 
     bool isFastsim, 
+    bool isFlashsim,
     bool isSignal,
     vector<HiggsConstructionVariables> &sys_higvars){
   vector<int> sig_jet_nano_idx;
@@ -632,11 +632,11 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
     met_producer.WriteMet(nano, pico, isFastsim, isSignal, is_preUL);
   }
   else  {
-    PropagateJERC(nano, pico, jet_nm_factor, jer_up_factor, 
+    PropagateJERC(nano, pico, isFlashsim, jet_nm_factor, jer_up_factor, 
                   jer_dn_factor, jes_up_factor, jes_dn_factor);
     MET_pt = pico.out_met();
     MET_phi = pico.out_met_phi();
-    for(int ijet(0); ijet<nano.nJet(); ++ijet) {
+    for(unsigned int ijet(0); ijet<nano.nJet(); ++ijet) {
       float jet_pt = nano.Jet_pt()[ijet];
       float jet_mass = nano.Jet_mass()[ijet];
       Jet_pt.push_back(jet_pt*jet_nm_factor[ijet]);
@@ -656,7 +656,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
   if (!isData) getGenJet_partonFlavour(nano, nanoaod_version, GenJet_partonFlavour);
   // calculate MHT; needed when saving jet info
   TLorentzVector mht_vec;
-  for(int ijet(0); ijet<nano.nJet(); ++ijet){
+  for(unsigned int ijet(0); ijet<nano.nJet(); ++ijet){
     if (Jet_pt[ijet] > min_jet_pt) {
       TLorentzVector ijet_v4;
       ijet_v4.SetPtEtaPhiM(Jet_pt[ijet], nano.Jet_eta()[ijet], nano.Jet_phi()[ijet], Jet_mass[ijet]);
@@ -696,7 +696,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
   vector<bool> jet_invetomap;
   vector<bool> jet_isgood_min; //!lep, !pho, eta cut, ID(fix), eta horn
   vector<bool> jet_isgood; //same as isgood_min + HEM/Run3 veto + pT cut
-  for(int ijet(0); ijet<nano.nJet(); ++ijet){
+  for(unsigned int ijet(0); ijet<nano.nJet(); ++ijet){
     float jet_abseta = fabs(nano.Jet_eta()[ijet]);
     // jetid applied to only fullsim and data
     // Unclear if this is the case for PU jet ID, treating it this way for now
@@ -808,7 +808,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
   //determine ordering based on isgood and pt
   vector<NanoOrderEntry> nano_entries;
   vector<int> ordered_nano_indices;
-  for(int ijet(0); ijet<nano.nJet(); ++ijet){
+  for(unsigned int ijet(0); ijet<nano.nJet(); ++ijet){
     NanoOrderEntry nano_entry;
     nano_entry.nano_idx = ijet;
     nano_entry.pt = Jet_pt[ijet];
@@ -1150,8 +1150,8 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
   }
   // Saving GenJet information
   if (!isData) {
-    pico.out_ngenjet() = nano.nGenJet();
-    for(int ijet(0); ijet<nano.nGenJet(); ++ijet){
+    pico.out_ngenjet() = nano.GenJet_pt().size();
+    for(unsigned int ijet(0); ijet<nano.GenJet_pt().size(); ++ijet){
       pico.out_genjet_pt().push_back(nano.GenJet_pt()[ijet]);
       pico.out_genjet_eta().push_back(nano.GenJet_eta()[ijet]);
       pico.out_genjet_phi().push_back(nano.GenJet_phi()[ijet]);
@@ -1183,7 +1183,7 @@ void JetMetProducer::WriteFatJets(nano_tree &nano, pico_tree &pico){
     getFatJet_particleNet_mass(nano, nanoaod_version, FatJet_particleNet_mass);
   }
 
-  for(int ifjet(0); ifjet<nano.nFatJet(); ++ifjet){
+  for(unsigned int ifjet(0); ifjet<nano.nFatJet(); ++ifjet){
     if (verbose) cout<<"FatJet "<<ifjet<<": pt = "<<setw(10)<<nano.FatJet_pt()[ifjet]
                                        <<" eta = "<<setw(10)<<nano.FatJet_eta()[ifjet]
                                        <<" phi = "<<setw(10)<<nano.FatJet_phi()[ifjet]
@@ -1225,7 +1225,7 @@ void JetMetProducer::WriteFatJets(nano_tree &nano, pico_tree &pico){
 void JetMetProducer::WriteSubJets(nano_tree &nano, pico_tree &pico){
   pico.out_nsubfjet() = 0; 
   set<int> matched_ak4_jets;
-  for(int isubj(0); isubj<nano.nSubJet(); ++isubj){
+  for(unsigned int isubj(0); isubj<nano.SubJet_pt().size(); ++isubj){
     pico.out_subfjet_pt().push_back(nano.SubJet_pt()[isubj]);
     pico.out_subfjet_eta().push_back(nano.SubJet_eta()[isubj]);
     pico.out_subfjet_phi().push_back(nano.SubJet_phi()[isubj]);

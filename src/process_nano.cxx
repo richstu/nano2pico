@@ -51,6 +51,7 @@ namespace {
   int nent_test = -1;
   string norm_file = "";
   bool debug = false;
+  bool isFlashsim = false;
   // requirements for jets to be counted in njet, mofified for Zgamma below
   float min_jet_pt = 30.0;
   float max_jet_eta =  2.4;
@@ -77,7 +78,6 @@ int main(int argc, char *argv[]){
     exit(1);
   }
 
-  //bool isData = Contains(in_file, "Run201") ? true : false;
   bool isData = Contains(in_file, "Run20") ? true : false; //Changed to allow for Run 3 data
   bool isFastsim = Contains(in_file, "Fast") ? true : false;
   bool isSignal = Contains(in_file, "TChiHH") || Contains(in_file, "T5qqqqZH") ? true : false;
@@ -349,7 +349,6 @@ int main(int argc, char *argv[]){
   EventWeighter event_weighter(year_string, isSignal, 
                                btag_df_wpts[year_string]);
   TriggerWeighter trigger_weighter(year_string, isSignal);
-  //cout<<"Is APV: "<<isAPV<<endl;
   // Other tools
   EventTools event_tools(in_path, year, isData, nanoaod_version);
   int event_type = event_tools.GetEventType();
@@ -361,7 +360,7 @@ int main(int argc, char *argv[]){
     cross_section = xsec::crossSection(in_file, year)*1000.0;
 
   // Initialize trees
-  gErrorIgnoreLevel=6000; // Turns off ROOT errors due to missing branches
+  //gErrorIgnoreLevel=6000; // Turns off ROOT errors due to missing branches
   nano_tree nano(in_path, nanoaod_version);
   //nano_tree nano(in_path, 9);
   size_t nentries(nent_test>0 ? nent_test : nano.GetEntries());
@@ -385,7 +384,7 @@ int main(int argc, char *argv[]){
   }
 
   pico_tree pico("", out_path);
-  gErrorIgnoreLevel=-1;
+  //gErrorIgnoreLevel=-1;
   cout << "Writing output to: " << out_path << endl;
 
   for(size_t entry(0); entry<nentries; ++entry){
@@ -407,7 +406,6 @@ int main(int argc, char *argv[]){
     pico.out_lumiblock() = nano.luminosityBlock();
     pico.out_run()       = nano.run();
     pico.out_type()      = event_type;
-
     // number of reconstructed primary vertices
     int PV_npvs, PV_npvsGood;
     getPV_npvs(nano, nanoaod_version, PV_npvs);
@@ -435,7 +433,7 @@ int main(int argc, char *argv[]){
     vector<int> sig_el_pico_idx = vector<int>();
     vector<int> sig_mu_pico_idx = vector<int>();
     vector<int> photon_el_pico_idx = vector<int>();
-    
+
     vector<int> sig_el_nano_idx = el_producer.WriteElectrons(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, sig_el_pico_idx, photon_el_pico_idx, isZgamma, isSignal, isFastsim);
     vector<int> sig_mu_nano_idx = mu_producer.WriteMuons(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, sig_mu_pico_idx, isZgamma, isSignal, isFastsim);
     // save a separate vector with just signal leptons ordered by pt
@@ -446,8 +444,7 @@ int main(int argc, char *argv[]){
                           nano.Electron_phi()[iel], nano.Electron_pdgId()[iel]});
     for (auto &imu: sig_mu_nano_idx) 
       sig_leps.push_back({nano.Muon_pt()[imu], nano.Muon_eta()[imu], 
-                          nano.Muon_phi()[imu], nano.Muon_pdgId()[imu]});
-
+                          nano.Muon_phi()[imu], 13});
     auto greaterPt = [](SignalLepton lep1, SignalLepton lep2){ return lep1.pt > lep2.pt;};
     sort(sig_leps.begin(), sig_leps.end(), greaterPt);
     for(auto &ilep : sig_leps) {
@@ -462,21 +459,19 @@ int main(int argc, char *argv[]){
           jet_isphoton_nano_idx, sig_el_nano_idx, sig_mu_nano_idx,
           photon_el_pico_idx, isSignal);
     event_tools.WriteStitch(nano, pico);
-    tk_producer.WriteIsoTracks(nano, pico, sig_el_nano_idx, sig_mu_nano_idx, isFastsim, is_preUL);
+    tk_producer.WriteIsoTracks(nano, pico, sig_el_nano_idx, sig_mu_nano_idx, isFastsim, isFlashsim, is_preUL);
     dilep_producer.WriteDileptons(pico, isSignal);
-
     if (debug) cout<<"INFO:: Writing gen particles"<<endl;
 
     if (!isData) mc_producer.WriteGenParticles(nano, pico, isDY);
     isr_tools.WriteISRSystemPt(nano, pico);
-
     if (debug) cout<<"INFO:: Writing jets, MET and ISR vars"<<endl;
 
     vector<HiggsConstructionVariables> sys_higvars;
     vector<int> sig_jet_nano_idx = jetmet_producer.WriteJetMet(nano, pico, 
         jet_islep_nano_idx, jet_isvlep_nano_idx, jet_isphoton_nano_idx,
         btag_wpts[year_string], btag_df_wpts[year_string], btag_upt_wpts[year_string],
-        isFastsim, isSignal, sys_higvars);
+        isFastsim, isFlashsim, isSignal, sys_higvars);
     jetmet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year_string][1], isFastsim); // usually w.r.t. medium WP
     jetmet_producer.WriteFatJets(nano, pico); // jetmet_producer.SetVerbose(nano.nSubJet()>0);
     jetmet_producer.WriteSubJets(nano, pico);
@@ -650,7 +645,6 @@ int main(int argc, char *argv[]){
       //probably should be deprecated
       isr_tools.WriteISRWeights(pico);
     }
-
     // Deal with overall weights (nominal, scale/PDF/PS variations)
     // Note: genEventSumw is calculated from genWeight not Generator_weight
     if (!isData) {
@@ -719,12 +713,13 @@ void GetOptions(int argc, char *argv[]){
       {"norm",    required_argument, 0, 0},
       {"skim",    required_argument, 0, 0},
       {"debug",    no_argument, 0, 'd'},
+      {"flashsim", no_argument, 0, 's'},
       {0, 0, 0, 0}
     };
 
     char opt = -1;
     int option_index;
-    opt = getopt_long(argc, argv, "f:i:o:d", long_options, &option_index);
+    opt = getopt_long(argc, argv, "f:i:o:d:s", long_options, &option_index);
     if(opt == -1) break;
 
     string optname;
@@ -740,6 +735,9 @@ void GetOptions(int argc, char *argv[]){
       break;
     case 'o':
       out_dir = optarg;
+      break;
+    case 's':
+      isFlashsim = true;
       break;
     case 0:
       optname = long_options[option_index].name;

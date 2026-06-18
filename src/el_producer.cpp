@@ -148,10 +148,8 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
   getElectron_photonIdx(nano, nanoaod_version, Electron_photonIdx);
   vector<int> Photon_electronIdx;
   getPhoton_electronIdx(nano, nanoaod_version, Photon_electronIdx);
-
-  for (int iph(0); iph<nano.nPhoton(); ++iph)
+  for (unsigned int iph(0); iph<nano.nPhoton(); ++iph)
     photon_el_pico_idx.push_back(-1);
-
   //calculate scale/resolution corrections
   vector<float> scaleres_corr;
   vector<float> scale_syst_up;
@@ -163,7 +161,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
   vector<float> energy_err_scale_dn;
   vector<float> energy_err_smear_up;
   vector<float> energy_err_smear_dn;
-  for(int iel(0); iel<nano.nElectron(); ++iel){
+  for(unsigned int iel(0); iel<nano.nElectron(); ++iel){
     if (!isZgamma) {
       scaleres_corr.push_back(1.0f);
       scale_syst_up.push_back(1.0f);
@@ -260,7 +258,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
 
   //first, determine ordering based on signal and pt
   std::vector<NanoOrderEntry> nano_entries;
-  for(int iel(0); iel<nano.nElectron(); ++iel){
+  for(unsigned int iel(0); iel<nano.nElectron(); ++iel){
     NanoOrderEntry nano_entry;
     nano_entry.nano_idx = iel;
     nano_entry.pt = nano.Electron_pt()[iel]*scaleres_corr[iel];
@@ -276,7 +274,6 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
   std::vector<int> ordered_nano_indices;
   for (NanoOrderEntry nano_entry : nano_entries)
     ordered_nano_indices.push_back(nano_entry.nano_idx);
-
   //then, add branches to pico
   vector<int> sig_el_nano_idx;
   pico.out_nel() = 0; pico.out_nvel() = 0;
@@ -330,7 +327,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
     pico.out_el_ispf().push_back(nano.Electron_isPFcand()[iel]);
     pico.out_el_charge().push_back(nano.Electron_charge()[iel]);
     if (!isData) {
-      pico.out_el_pflavor().push_back(nano.Electron_genPartFlav()[iel]);
+      //pico.out_el_pflavor().push_back(nano.Electron_genPartFlav()[iel]);
     }
     if (isZgamma) {
       pico.out_el_sip3d().push_back(nano.Electron_sip3d()[iel]);
@@ -368,32 +365,31 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
                                        nano.Electron_mvaHZZIso()[iel]);
         pico.out_el_idmva().push_back(nano.Electron_mvaIso()[iel]);
         pico.out_el_idmvaHZZ().push_back(nano.Electron_mvaHZZIso()[iel]);
-        pico.out_el_id80().push_back(nano.Electron_mvaIso_WP80()[iel]);
-        pico.out_el_id90().push_back(nano.Electron_mvaIso_WP90()[iel]);
+        //pico.out_el_id80().push_back(nano.Electron_mvaIso_WP80()[iel]);
+        //pico.out_el_id90().push_back(nano.Electron_mvaIso_WP90()[iel]);
         pico.out_el_idLoose().push_back(hzz_wp2022);
-        pico.out_el_fsrphotonidx().push_back(nano.Electron_fsrPhotonIdx()[iel]);
+        //pico.out_el_fsrphotonidx().push_back(nano.Electron_fsrPhotonIdx()[iel]);
       }
       else {
         std::cout<<"Need code for new year in WriteElectrons (in el_producer.cpp)"<<endl;
         exit(1);
       }
-      int bitmap = nano.Electron_vidNestedWPBitmapHEEP()[iel];
-      pico.out_el_ecal().push_back(EcalDriven(bitmap));
+      //int bitmap = nano.Electron_vidNestedWPBitmapHEEP()[iel];
+      //pico.out_el_ecal().push_back(EcalDriven(bitmap));
     }
-    
     // veto electron selection
     if (miniiso < ElectronMiniIsoCut) {
       pico.out_nvel()++;
       pico.out_nvlep()++;
       // save indices of matching jets
-      for (int ijet(0); ijet<nano.nJet(); ijet++) {
+      for (unsigned int ijet(0); ijet<nano.nJet(); ijet++) {
         if (dR(eta, nano.Jet_eta()[ijet], phi, nano.Jet_phi()[ijet])<0.4f &&
             fabs(Jet_pt[ijet] - nano.Electron_pt()[iel])/nano.Electron_pt()[iel] < 1.0f)
           jet_isvlep_nano_idx.push_back(ijet);
       }
     }
 
-    for (int iph(0); iph<nano.nPhoton(); ++iph) {
+    for (unsigned int iph(0); iph<nano.nPhoton(); ++iph) {
       if (Photon_electronIdx[iph]==iel)
         photon_el_pico_idx[iph] = pico.out_el_pt().size()-1;
     }
@@ -404,7 +400,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
       sig_el_nano_idx.push_back(iel);
       sig_el_pico_idx.push_back(pico_idx);
       // save indices of matching jets
-      for (int ijet(0); ijet<nano.nJet(); ijet++) {
+      for (unsigned int ijet(0); ijet<nano.nJet(); ijet++) {
         if (dR(eta, nano.Jet_eta()[ijet], phi, nano.Jet_phi()[ijet])<jetDRCut &&
             fabs(Jet_pt[ijet] - nano.Electron_pt()[iel])/nano.Electron_pt()[iel] < jetpTCut)
           jet_islep_nano_idx.push_back(ijet);

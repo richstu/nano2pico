@@ -117,13 +117,14 @@ void getFatJet_particleNet_mass(nano_tree & nano, float nanoaod_version, std::ve
 void getPhoton_electronIdx(nano_tree & nano, float nanoaod_version, std::vector<int> & Photon_electronIdx);
 void getMuon_fsrPhotonIdx(nano_tree & nano, float nanoaod_version, std::vector<int> & Muon_fsrPhotonIdx);
 void getElectron_photonIdx(nano_tree & nano, float nanoaod_version, std::vector<int> & Electron_photonIdx);
+void getPhoton_genPartFlav(nano_tree & nano, std::vector<int> & Photon_pflav);
 void getFsrPhoton_muonIdx(nano_tree & nano, float nanoaod_version, std::vector<int> & FsrPhoton_muonIdx);
 void getPhoton_jetIdx(nano_tree & nano, float nanoaod_version, std::vector<int> & Photon_jetIdx);
 void getPhoton_cutBased(nano_tree & nano, float nanoaod_version, std::vector<int> & Photon_cutBased);
 void getFatJet_subJetIdx1(nano_tree & nano, float nanoaod_version, std::vector<int> & FatJet_subJetIdx1);
 void getFatJet_subJetIdx2(nano_tree & nano, float nanoaod_version, std::vector<int> & FatJet_subJetIdx2);
 void getMuon_nTrackerLayers(nano_tree & nano, float nanoaod_version, std::vector<int> & Muon_nTrackerLayers);
-void getMuon_genPartIdx(nano_tree & nano, float nanoaod_version, std::vector<int> & Muon_genPartIdx);
+void getMuon_genPartIdx(nano_tree & nano, float nanoaod_version, std::vector<unsigned int> & Muon_genPartIdx);
 void getJet_genJetIdx(nano_tree & nano, float nanoaod_version, std::vector<int> & Jet_genJetIdx);
 void getJet_hadronFlavour(nano_tree & nano, float nanoaod_version, std::vector<int> & Jet_hadronFlavour);
 void getJet_partonFlavour(nano_tree & nano, float nanoaod_version, std::vector<int> & Jet_partonFlavour);

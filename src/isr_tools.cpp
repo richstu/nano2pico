@@ -57,7 +57,7 @@ bool ISRTools::IsLastCopyBeforeFSR_or_LastCopy(nano_tree & nano, int imc){
 void ISRTools::WriteISRSystemPt(nano_tree &nano, pico_tree &pico) {
   TLorentzVector isr_p4;
   float mprod(-999), mlsp(-999);
-  for(int imc(0); imc<nano.nGenPart(); ++imc) {
+  for(unsigned int imc(0); imc<nano.GenPart_pt().size(); ++imc) {
     if (IsLastCopyBeforeFSR_or_LastCopy(nano, imc)) {
       int mc_absid = abs(nano.GenPart_pdgId().at(imc));
       //types defined in event tools
@@ -96,7 +96,7 @@ std::map<int, std::vector<int> > ISRTools::GetChildMap(nano_tree & nano)
   vector<int> GenPart_genPartIdxMother;
   if (!isData) getGenPart_genPartIdxMother(nano, nanoaod_version, GenPart_genPartIdxMother);
   map<int, vector<int> > child_map;
-  for(int imc(0); imc<nano.nGenPart(); ++imc) {
+  for(unsigned int imc(0); imc<nano.GenPart_pt().size(); ++imc) {
     int mc_mom_index = GenPart_genPartIdxMother.at(imc);
     child_map[mc_mom_index].push_back(imc);
   }
@@ -113,7 +113,7 @@ void ISRTools::WriteISRJetMultiplicity(nano_tree &nano, pico_tree &pico) {
     if (!pico.out_jet_isgood()[ijet]) continue;
 
     bool matched = false;
-    for (int imc(0); imc < nano.nGenPart(); imc++) {
+    for (unsigned int imc(0); imc < nano.GenPart_pt().size(); imc++) {
       if (matched) break;
       if (nano.GenPart_status()[imc]!=23 || abs(nano.GenPart_pdgId()[imc])>5) continue;
       int momid = abs(nano.GenPart_pdgId()[GenPart_genPartIdxMother[imc]]);

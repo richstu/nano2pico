@@ -74,7 +74,7 @@ int main(int argc, char *argv[]){
     //         Save jets ordered by deepCSV value    
     //--------------------------------------------------------------
     vector<pair<int, float>>  ordered_idx;
-    for (int ijet(0); ijet<nano.nJet(); ijet++) {
+    for (unsigned int ijet(0); ijet<nano.nJet(); ijet++) {
       if (nano.Jet_pt()[ijet] <= min_jet_pt || fabs(nano.Jet_eta()[ijet]) > max_jet_eta) continue;
       ordered_idx.push_back(make_pair(ijet, nano.Jet_btagDeepB()[ijet]));
     }
@@ -151,7 +151,7 @@ int main(int argc, char *argv[]){
     }     
 
     atto.out_nbacc() = 0;
-    for (int imc(0); imc<nano.nGenPart(); imc++) {
+    for (unsigned int imc(0); imc<nano.GenPart_pt().size(); imc++) {
       if (nano.GenPart_pdgId()[imc]==1000025) atto.out_mchi() = nano.GenPart_mass()[imc];
       else if (nano.GenPart_pdgId()[imc]==1000022) atto.out_mlsp() = nano.GenPart_mass()[imc];
       else if (nano.GenPart_pdgId()[imc]==25) {
