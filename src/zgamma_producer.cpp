@@ -705,7 +705,7 @@ void ZGammaVarProducer::WriteZGammaVars(pico_tree &pico, bool is_signal){
   if(pico.out_ll_m().at(pico.out_llphoton_ill().at(0))>=80.f && pico.out_ll_m().at(pico.out_llphoton_ill().at(0))<=100.f){baseBit+= 0b000000100000;}
   if(pico.out_photon_pt().at(pico.out_llphoton_iph().at(0))/pico.out_llphoton_m().at(0) >=15.0f/110.f){baseBit+= 0b000000010000;}
   if(pico.out_ll_m().at(pico.out_llphoton_ill().at(0))+pico.out_llphoton_m().at(0) > 185.f){baseBit+= 0b000000001000;}
-  if(pico.out_llphoton_m().at(0)>=100.f && pico.out_llphoton_m().at(0)<=180.f){baseBit+= 0b000000000100;}
+  if(pico.out_llphoton_m().at(0)>=90.f && pico.out_llphoton_m().at(0)<=180.f){baseBit+= 0b000000000100;}
   if(pico.out_pass()){baseBit+=0b000000000010;}
   if(pico.out_llphoton_m().at(0)<=120.f || pico.out_llphoton_m().at(0)>=130.f){baseBit+= 0b000000000001;}
   pico.out_zg_cutBitMap() = baseBit;
