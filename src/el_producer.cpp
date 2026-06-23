@@ -185,7 +185,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
           float scale_unc = map_smearing_->evaluate({"escale",pt,r9,
                                                      fabs(etasc)});
           float rand = rng_.Gaus();
-          scaleres_corr.push_back(1.0f+rand*rho);
+          scaleres_corr.push_back(1.0f); //+rand*rho);  undo corrections for sync purposes
           smear_syst_up.push_back(1.0f+rand*(rho+err_rho));
           smear_syst_dn.push_back(1.0f+rand*(rho-err_rho));
           scale_syst_up.push_back(1.0f+scale_unc);

@@ -183,7 +183,7 @@ EventTools::EventTools(const string &name_, int year_, bool isData_, float nanoa
     dataset = Dataset::MuonEG;
   else if(Contains(name, "Muon") && !Contains(name,"DoubleMuon") && !Contains(name,"SingleMuon") && !Contains(name,"MuonEG"))  //replaced SingleMuon and DoubleMuon starting in 2022
     dataset = Dataset::Muon;
-  else if(Contains(name, "MET")) 
+  else if(Contains(name, "MET") && !Contains(name,"JetMET")) 
     dataset = Dataset::MET;
   else if(Contains(name, "JetHT")) 
     dataset = Dataset::JetHT;
@@ -548,8 +548,14 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
   // filters directly from Nano
   pico.out_pass_goodv() = nano.Flag_goodVertices();
   pico.out_pass_cschalo_tight() = nano.Flag_globalSuperTightHalo2016Filter();
-  pico.out_pass_hbhe() = nano.Flag_HBHENoiseFilter();
-  pico.out_pass_hbheiso() = nano.Flag_HBHENoiseIsoFilter();
+  if (year>= 2022) {
+    pico.out_pass_hbhe() = true;
+    pico.out_pass_hbheiso() = true;
+  }
+  else {
+    pico.out_pass_hbhe() = nano.Flag_HBHENoiseFilter();
+    pico.out_pass_hbheiso() = nano.Flag_HBHENoiseIsoFilter();
+  }
   pico.out_pass_ecaldeadcell() = nano.Flag_EcalDeadCellTriggerPrimitiveFilter();
   pico.out_pass_badpfmu() = nano.Flag_BadPFMuonFilter();
   if (nanoaod_version+0.01 > 9) {
@@ -901,6 +907,7 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
     else if ((year<=2018) && dataset==Dataset::SingleMuon  && muon_trigs && !jetht_trigs && !met_trigs && !doubleeg_trigs && !egamma_trigs) return true;
     else if ((year>=2022) && dataset==Dataset::Muon	   && muon_trigs && !jetht_trigs && !met_trigs && !doubleeg_trigs && !egamma_trigs) return true;
     else if (dataset==Dataset::DoubleMuon)	return true; // for sync only, triggers applied later in cutflow
+    else if (dataset==Dataset::MuonEG)		return true; // for sync only
     else return false;
   }  
   else {

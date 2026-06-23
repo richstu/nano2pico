@@ -22,6 +22,10 @@ int npv
 int npv_good
 int npu_tru
 int npu_tru_mean
+float pv_x
+float pv_y
+float pv_z
+float pv_ndof
 float rho
 float ht
 float ht5
@@ -183,6 +187,8 @@ vector<bool>  jet_isgood
 vector<bool>  jet_isgood_min
 vector<bool>  jet_isvetomap
 vector<bool>  jet_isvetohem
+vector<bool>  jet_pass_jetidFix
+vector<bool>  jet_pass_jetidTightLepVeto
 vector<int>   jet_id
 vector<int>   jet_hflavor
 vector<int>   jet_pflavor
