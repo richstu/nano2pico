@@ -51,6 +51,7 @@ namespace {
   int nent_test = -1;
   string norm_file = "";
   bool debug = false;
+  bool isSplit = false;
   // requirements for jets to be counted in njet, mofified for Zgamma below
   float min_jet_pt = 30.0;
   float max_jet_eta =  2.4;
@@ -395,6 +396,12 @@ int main(int argc, char *argv[]){
     if (entry%2000==0 || entry == nentries-1) {
       cout<<"Processing event: "<<entry<<endl;
     }
+    //keep events with even event numbers in 2024, and odd event numbers in 2025
+    if (isSplit && year==2024) {
+      if(nano.event()%2==1) continue;
+    } else if (isSplit && year==2025) {
+      if(nano.event()%2==0) continue;
+    }
     //skip events that are data but not in the golden json
     if (isData) {
       if(!inJSON(VVRunLumi, nano.run(), nano.luminosityBlock())) continue; 
@@ -719,6 +726,7 @@ void GetOptions(int argc, char *argv[]){
       {"nent",    required_argument, 0, 0},
       {"norm",    required_argument, 0, 0},
       {"skim",    required_argument, 0, 0},
+      {"split2425",no_argument, 0, 't'},
       {"debug",    no_argument, 0, 'd'},
       {0, 0, 0, 0}
     };
@@ -741,6 +749,9 @@ void GetOptions(int argc, char *argv[]){
       break;
     case 'o':
       out_dir = optarg;
+      break;
+    case 't':
+      isSplit = true;
       break;
     case 0:
       optname = long_options[option_index].name;
