@@ -196,10 +196,10 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
     bool isSignal = false;
     bool isSignal_nopt = false;
     if(isZgamma) { // For Zgamma productions
-      if (pt <= PicoMuonPtCut) continue;
-      if (fabs(eta) > MuonEtaCut) continue;
-      if (fabs(nano.Muon_dz()[imu])>dzCut)  continue;
-      if (fabs(nano.Muon_dxy()[imu])>dxyCut) continue; 
+      //if (pt <= PicoMuonPtCut) continue;
+      //if (fabs(eta) > MuonEtaCut) continue;
+      //if (fabs(nano.Muon_dz()[imu])>dzCut)  continue;
+      //if (fabs(nano.Muon_dxy()[imu])>dxyCut) continue; 
       isSignal = IsSignal(nano, imu, isZgamma, pt);
       isSignal_nopt = IsSignal(nano, imu, isZgamma, pt, true);
       pico.out_mu_sip3d().push_back(nano.Muon_sip3d()[imu]);
@@ -221,6 +221,7 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
     pico.out_mu_phi().push_back(nano.Muon_phi()[imu]);
     pico.out_mu_miniso().push_back(nano.Muon_miniPFRelIso_all()[imu]);
     pico.out_mu_reliso().push_back(nano.Muon_pfRelIso03_all()[imu]);
+    pico.out_mu_reliso04().push_back(nano.Muon_pfRelIso04_all()[imu]);
     pico.out_mu_dz().push_back(nano.Muon_dz()[imu]);
     pico.out_mu_dxy().push_back(nano.Muon_dxy()[imu]);
     pico.out_mu_ip3d().push_back(nano.Muon_ip3d()[imu]);
