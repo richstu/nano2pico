@@ -204,8 +204,8 @@ EventWeighter::EventWeighter(string year, bool isSignal, const vector<float> &bt
     in_file_photon_mceff_     = "data/zgamma/2023/photon_wp80mceff_2023.json";
     in_file_muon_             = "data/zgamma/2024/hzg_muid_2024_scalefactors.json";
     in_file_pu_               = "data/zgamma/2024/puweights_BCDEFGHI.json";
-    in_file_btag_             = "data/zgamma/2023/btagging.json";
-    in_file_btag_mceff_       = "data/zgamma/2023/btag_mceff.json";
+    in_file_btag_             = "data/zgamma/2024/btagging.json";
+    in_file_btag_mceff_       = "data/zgamma/2024/btag_mceff.json";
     in_file_electron_iso0p10_ = "data/zgamma/2024/hzg_eliso0p1_2024_efficiencies.json";
     in_file_electron_iso0p15_ = "data/zgamma/2024/hzg_eliso0p15_2024_efficiencies.json";
     in_file_muon_iso0p10_     = "data/zgamma/2024/hzg_muiso0p1_2024_efficiencies.json";
@@ -213,7 +213,7 @@ EventWeighter::EventWeighter(string year, bool isSignal, const vector<float> &bt
     in_file_ggf_nnlo_         = "data/zgamma/GluGluHToZG_NNLO_reweight_run3.json";
     key_                      = "2024Prompt";
     puName_                   = "Collisions24_BCDEFGHI_goldenJSON";
-    btag_lightname            = "deepJet_light";
+    btag_lightname            = "UParTAK4_light";
     ph_shape_weighter_        = make_unique<rw_mmp_r3>();
     zgbkg_isr_weighter_       = make_unique<kinr3_weighter>();
   } else if (year=="2025"){
@@ -221,12 +221,12 @@ EventWeighter::EventWeighter(string year, bool isSignal, const vector<float> &bt
     in_file_electron_         = "data/zgamma/2025/hzg_elid_2025_scalefactors.json";
     in_file_electron_reco_    = "data/zgamma/2023/electron_recoSF2023.json";
     in_file_photon_           = "data/zgamma/2025/photon.json";
-    in_file_photon_low_       = "data/zgamma/2022EE/hzg_phidvalidate_2022EE_scalefactors.json";
+    in_file_photon_low_       = "data/zgamma/2025/hzg_phidvalidate_2025_scalefactors.json";
     in_file_photon_mceff_     = "data/zgamma/2023/photon_wp80mceff_2023.json";
     in_file_muon_             = "data/zgamma/2025/hzg_muid_2025_scalefactors.json";
     in_file_pu_               = "data/zgamma/2024/puweights_BCDEFGHI.json";
-    in_file_btag_             = "data/zgamma/2023/btagging.json";
-    in_file_btag_mceff_       = "data/zgamma/2023/btag_mceff.json";
+    in_file_btag_             = "data/zgamma/2024/btagging.json";
+    in_file_btag_mceff_       = "data/zgamma/2024/btag_mceff.json";
     in_file_electron_iso0p10_ = "data/zgamma/2025/hzg_eliso0p1_2025_efficiencies.json";
     in_file_electron_iso0p15_ = "data/zgamma/2025/hzg_eliso0p15_2025_efficiencies.json";
     in_file_muon_iso0p10_     = "data/zgamma/2025/hzg_muiso0p1_2025_efficiencies.json";
@@ -234,7 +234,7 @@ EventWeighter::EventWeighter(string year, bool isSignal, const vector<float> &bt
     in_file_ggf_nnlo_         = "data/zgamma/GluGluHToZG_NNLO_reweight_run3.json";
     key_                      = "2025Prompt";
     puName_                   = "Collisions24_BCDEFGHI_goldenJSON";
-    btag_lightname            = "deepJet_light";
+    btag_lightname            = "UParTAK4_light";
     ph_shape_weighter_        = make_unique<rw_mmp_r3>();
     zgbkg_isr_weighter_       = make_unique<kinr3_weighter>();
 
@@ -305,7 +305,9 @@ EventWeighter::EventWeighter(string year, bool isSignal, const vector<float> &bt
   map_muon_id_pass_unc_     = cs_muon_->at("unc_pass");
   map_muon_id_fail_         = cs_muon_->at("sf_fail");
   map_muon_id_fail_unc_     = cs_muon_->at("unc_fail");
-  map_btag_                 = cs_btag_->at("deepJet_comb");
+  if(year == "2024" || year == "2025" || year == "2026") {
+    map_btag_               = cs_btag_->at("UParTAK4_comb");
+  } else map_btag_          = cs_btag_->at("deepJet_comb");
   map_udsgtag_              = cs_btag_->at(btag_lightname);
   map_pileup_               = cs_pileup_->at(puName_);
   map_fakephoton_           = cs_fakephoton_->at("fakephoton_corrections");
@@ -547,10 +549,14 @@ void EventWeighter::PhotonSF(pico_tree &pico){
       ev_sfdn = map_photon_csev_->evaluate({key_, "sfdown", "MVA", category});
     }
     else if (year_=="2022" || year_=="2022EE" 
-             || year_=="2023" || year_=="2023BPix" || year_ == "2024" || year_ == "2025" || year_ == "2026") {
+             || year_=="2023" || year_=="2023BPix" || year_ == "2024") {
       ev_sf = map_photon_csev_->evaluate({key_, "sf", "MVA80", eta, r9});
       ev_sfup = map_photon_csev_->evaluate({key_, "sfup", "MVA80", eta, r9});
       ev_sfdn = map_photon_csev_->evaluate({key_, "sfdown", "MVA80", eta, r9});
+    } else if (year_ == "2025" || year_ == "2026"){
+      ev_sf = map_photon_csev_->evaluate({key_, "sf", "MVA80", eta, r9, pt});
+      ev_sfup = map_photon_csev_->evaluate({key_, "sfup", "MVA80", eta, r9, pt});
+      ev_sfdn = map_photon_csev_->evaluate({key_, "sfdown", "MVA80", eta, r9, pt});
     }
     string wpstring = "wp80";
     if (pt<20.0f)
@@ -558,7 +564,7 @@ void EventWeighter::PhotonSF(pico_tree &pico){
     float id_sf = 1.0;
     float id_sfup = 1.0;
     float id_sfdn = 1.0;
-    if (!(year_ == "2023" || year_ == "2023BPix" || year_ == "2024" || year_ == "2025" || year_ == "2026") && pt < 20.0f) {
+    if (!(year_ == "2023" || year_ == "2023BPix" || year_ == "2024") && pt < 20.0f) {//2025 low pt scale factors currently missing. Can replace with michaels or other
       id_sf = (map_photon_id_low_pass_->evaluate({pt, eta}));
       float id_unc = map_photon_id_low_pass_unc_->evaluate({pt, eta});
       id_sfup = id_sf+id_unc;
@@ -864,7 +870,10 @@ void EventWeighter::bTaggingSF(pico_tree &pico){
       l_sf_dn_uncorr = (*btag_map)->evaluate({"down_uncorrelated", "L", 
         jet_flavor, abseta, pt});
       //currently, do not propoagate MC stats (negligible WRT SFs)
-      if (pico.out_jet_deepflav().at(ijet) > btag_wp_tight_) { 
+      float btag_score = 0.f;
+      if(year_ == "2024" || year_ == "2025" || year_ == "2026") btag_score = pico.out_jet_btaguptb().at(ijet);
+      else btag_score = pico.out_jet_deepflav().at(ijet);
+      if (btag_score > btag_wp_tight_) { 
         cat_mc_eff = t_mc_eff;
         //cat_mc_eff_up = t_mc_eff+t_mc_syst;
         //cat_mc_eff_dn = t_mc_eff-t_mc_syst;
@@ -875,7 +884,7 @@ void EventWeighter::bTaggingSF(pico_tree &pico){
         cat_data_eff_up_uncorr = t_mc_eff*t_sf_up_uncorr;
         cat_data_eff_dn_uncorr = t_mc_eff*t_sf_dn_uncorr;
       }
-      else if (pico.out_jet_deepflav().at(ijet) > btag_wp_medium_) {
+      else if (btag_score > btag_wp_medium_) {
         cat_mc_eff = m_mc_eff-t_mc_eff;
         //cat_mc_eff_up = m_mc_eff+m_mc_syst-t_mc_eff-t_mc_syst;
         //cat_mc_eff_dn = m_mc_eff-m_mc_syst-t_mc_eff+t_mc_syst;
@@ -887,7 +896,7 @@ void EventWeighter::bTaggingSF(pico_tree &pico){
         cat_data_eff_dn_uncorr = (m_mc_eff*m_sf_dn_uncorr-t_mc_eff
                                   *t_sf_dn_uncorr);
       }
-      else if (pico.out_jet_deepflav().at(ijet) > btag_wp_loose_) {
+      else if (btag_score > btag_wp_loose_) {
         cat_mc_eff = l_mc_eff-m_mc_eff;
         //cat_mc_eff_up = l_mc_eff+l_mc_syst-m_mc_eff-m_mc_syst;
         //cat_mc_eff_dn = l_mc_eff-l_mc_syst-m_mc_eff+m_mc_syst;
@@ -913,7 +922,7 @@ void EventWeighter::bTaggingSF(pico_tree &pico){
       //currently we overwrite the systematic efficiencies (eff_*) with the
       //the single WP versions. These should be commented out to return to the
       //multi-WP versions
-      if (pico.out_jet_deepflav().at(ijet) > btag_wp_medium_) {
+      if (btag_score > btag_wp_medium_) {
         cat_mc_eff_wpm = m_mc_eff;
         //cat_mc_eff_up = m_mc_eff+m_mc_syst;
         //cat_mc_eff_dn = m_mc_eff-m_mc_syst;
@@ -1019,6 +1028,7 @@ void EventWeighter::bTaggingSF(pico_tree &pico){
 //      float abseta = fabs(pico.out_jet_eta().at(ijet));
 //      float pt = pico.out_jet_pt().at(ijet);
 //      float disc = pico.out_jet_deepflav().at(ijet);
+//      if(year_ == "2024" || year_ == "2025" || year_ == "2026") disc = pico.out_jet_btaguptb().at(ijet);
 //      if (jet_flavor != 5 && jet_flavor != 4) jet_flavor = 0;
 //
 //      float sf_central = map_btag_->evaluate({"central", jet_flavor, abseta, pt, disc});

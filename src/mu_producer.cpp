@@ -182,7 +182,6 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
         float sca_pt = scarekit::pt_scale(0, pt, eta, phi, charge, cs_scare_, pt_thresh);
         float re_pt = scarekit::pt_resol(sca_pt, eta, 
             static_cast<float>(nTrackerLayers), cs_scare_, pt_thresh);
-        if(fabs(pt-re_pt)>100.f) cout<<"pt: "<<pt<<" changes to "<<re_pt<<endl;
         muon_pt_corr.push_back(re_pt);
         muon_pt_scaleup.push_back(scarekit::pt_scale_var(re_pt, eta, phi, 
             charge, "up", cs_scare_));

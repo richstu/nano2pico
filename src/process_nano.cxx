@@ -51,7 +51,7 @@ namespace {
   int nent_test = -1;
   string norm_file = "";
   bool debug = false;
-  bool isSplit = false;
+  bool is25mc = false;
   // requirements for jets to be counted in njet, mofified for Zgamma below
   float min_jet_pt = 30.0;
   float max_jet_eta =  2.4;
@@ -122,6 +122,7 @@ int main(int argc, char *argv[]){
     cout<<"ERROR: Add code for new year!"<<endl;
     exit(1);
   }
+  if(is25mc == true && year == 2024) year = 2025;
 
   bool is2022preEE = false; //Classify data and MC into pre and post EE for 2022
   if(year == 2022){ 
@@ -228,8 +229,10 @@ int main(int argc, char *argv[]){
   }
 
   string in_path = in_dir+"/"+in_file;
+  string out_file = in_file;
+  if(!isData && (year==2025 || year==2026)) out_file = std::regex_replace(in_file, std::regex("2024Summer24NanoAODv15__150X_mcRun3_2024"), "2025Summer24NanoAODv15__150X_mcRun3_2024");
   string out_path;
-  out_path = out_dir+"/raw_pico/raw_pico_"+in_file;
+  out_path = out_dir+"/raw_pico/raw_pico_"+out_file;
 
   // Find nanoAOD version
   float nanoaod_version = -1;
@@ -397,9 +400,9 @@ int main(int argc, char *argv[]){
       cout<<"Processing event: "<<entry<<endl;
     }
     //keep events with even event numbers in 2024, and odd event numbers in 2025
-    if (isSplit && year==2024) {
+    if (!isData && year==2024) {
       if(nano.event()%2==1) continue;
-    } else if (isSplit && year==2025) {
+    } else if (!isData && year==2025) {
       if(nano.event()%2==0) continue;
     }
     //skip events that are data but not in the golden json
@@ -726,7 +729,7 @@ void GetOptions(int argc, char *argv[]){
       {"nent",    required_argument, 0, 0},
       {"norm",    required_argument, 0, 0},
       {"skim",    required_argument, 0, 0},
-      {"split2425",no_argument, 0, 't'},
+      {"is25mc",   no_argument, 0, 't'},
       {"debug",    no_argument, 0, 'd'},
       {0, 0, 0, 0}
     };
@@ -751,7 +754,7 @@ void GetOptions(int argc, char *argv[]){
       out_dir = optarg;
       break;
     case 't':
-      isSplit = true;
+      is25mc = true;
       break;
     case 0:
       optname = long_options[option_index].name;
