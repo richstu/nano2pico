@@ -201,7 +201,7 @@ EventWeighter::EventWeighter(string year, bool isSignal, const vector<float> &bt
     in_file_electron_reco_    = "data/zgamma/2023/electron_recoSF2023.json";
     in_file_photon_           = "data/zgamma/2024/photon.json";
     in_file_photon_low_       = "data/zgamma/2022EE/hzg_phidvalidate_2022EE_scalefactors.json";
-    in_file_photon_mceff_     = "data/zgamma/2023/photon_wp80mceff_2023.json";
+    in_file_photon_mceff_     = "data/zgamma/2024/photon_wp80mceff_2024.json";
     in_file_muon_             = "data/zgamma/2024/hzg_muid_2024_scalefactors.json";
     in_file_pu_               = "data/zgamma/2024/puweights_BCDEFGHI.json";
     in_file_btag_             = "data/zgamma/2024/btagging.json";
@@ -222,7 +222,7 @@ EventWeighter::EventWeighter(string year, bool isSignal, const vector<float> &bt
     in_file_electron_reco_    = "data/zgamma/2023/electron_recoSF2023.json";
     in_file_photon_           = "data/zgamma/2025/photon.json";
     in_file_photon_low_       = "data/zgamma/2025/hzg_phidvalidate_2025_scalefactors.json";
-    in_file_photon_mceff_     = "data/zgamma/2023/photon_wp80mceff_2023.json";
+    in_file_photon_mceff_     = "data/zgamma/2024/photon_wp80mceff_2024.json";
     in_file_muon_             = "data/zgamma/2025/hzg_muid_2025_scalefactors.json";
     in_file_pu_               = "data/zgamma/2024/puweights_BCDEFGHI.json";
     in_file_btag_             = "data/zgamma/2024/btagging.json";
