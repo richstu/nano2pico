@@ -30,6 +30,10 @@ if not os.path.exists(out_base_dir+"/raw_pico/"):
   os.mkdir(out_base_dir+"/raw_pico/")
 if not os.path.exists(out_base_dir+"/wgt_sums/"): 
   os.mkdir(out_base_dir+"/wgt_sums/")
+if (args['skim']=="ll") and not os.path.exists(out_base_dir+"/skim_ll/"):
+  os.mkdir(out_base_dir+"/skim_ll/")
+if (args['skim']=="llg") and not os.path.exists(out_base_dir+"/skim_llg/"):
+  os.mkdir(out_base_dir+"/skim_llg/")
 
 list_format = args['list_format']
 in_file_paths = []
@@ -76,9 +80,11 @@ else:
 print("Found {} input files.\n".format(len(in_file_paths)))
 
 cmdfile_name = 'process_nano_cmds.py'
+if (args['skim']=='ll'): cmdfile_name = cmdfile_name.replace('.py', '_skim_ll'+'.py')
+if (args['skim']=='llg'): cmdfile_name = cmdfile_name.replace('.py', '_skim_llg'+'.py')
 if (args['tag']!=''): cmdfile_name = cmdfile_name.replace('.py', '_'+args['tag']+'.py')
 cmdfile = open(cmdfile_name,'w')
-cmdfile.write('#!/bin/env python\n')
+cmdfile.write('#!/bin/env python3\n')
 for ifile_path in in_file_paths:
   ifile = os.path.basename(os.path.realpath(ifile_path))
   cmd = '{}/run/process_nano.exe -f {} -i {} -o {} --norm {}'.format(os.getcwd(), ifile, in_dir, out_base_dir, args['norm'])

@@ -1,4 +1,4 @@
-#include <array>
+
 #include <ctime>
 #include <fstream>
 #include <iostream>
@@ -105,7 +105,10 @@ int main(int argc, char *argv[]){
       else if (regex_search(in_file, std::regex("RunIIAutumn18"))) year = 2018;
       else if (regex_search(in_file, std::regex("Run3Summer22"))) year = 2022;
       else if (regex_search(in_file, std::regex("Run3Summer23"))) year = 2023;
-      else if (regex_search(in_file, std::regex("RunIII2024Summer24"))) year = 2024;
+      else if (regex_search(in_file, std::regex("RunIII2024Summer24"))){
+	if (Contains(in_dir, "2025")) year = 2025;
+	else year = 2024; 
+      }
     }
   } else { // Data
     if (Contains(in_file, "HIPM")) isAPV = true;
@@ -229,6 +232,8 @@ int main(int argc, char *argv[]){
   string in_path = in_dir+"/"+in_file;
   string out_path;
   out_path = out_dir+"/raw_pico/raw_pico_"+in_file;
+  if (skim_rule=="ll") out_path = out_dir+"/skim_ll/pico_ll_"+in_file;
+  else if (skim_rule=="llg") out_path = out_dir+"/skim_llg/pico_llg_"+in_file;
 
   // Find nanoAOD version
   float nanoaod_version = -1;
@@ -388,6 +393,8 @@ int main(int argc, char *argv[]){
   pico_tree pico("", out_path);
   gErrorIgnoreLevel=-1;
   cout << "Writing output to: " << out_path << endl;
+  
+  int skim_pass_events = 0;
 
   for(size_t entry(0); entry<nentries; ++entry){
     if (debug) cout << "GetEntry: " << entry <<" event = "<<pico.out_event()<< endl;
@@ -692,21 +699,37 @@ int main(int argc, char *argv[]){
 
     if (debug) cout<<"INFO:: Filling tree"<<endl;
 
+    //if (skim_rule=="ll" && pico.out_nll()<1) {
+    //  pico.Clear();
+    //}
+    //else if (skim_rule=="llg" && (pico.out_nll()<1 || pico.out_nphoton()<1)) {
+    //  pico.Clear();
+    //}
+    //else {
+    //  pico.Fill();
+    //}
+
+    bool keep_event = true;
+
     if (skim_rule=="ll" && pico.out_nll()<1) {
-      pico.Clear();
+      keep_event = false;
     }
     else if (skim_rule=="llg" && (pico.out_nll()<1 || pico.out_nphoton()<1)) {
-      pico.Clear();
+      keep_event = false;
+    }
+    if (keep_event) {
+      pico.Fill();
+      skim_pass_events++;
     }
     else {
-      pico.Fill();
+      pico.Clear();
     }
 
   } // loop over events
 
   pico.Write();
-
   cout<<endl;
+  cout<<"SKIM_PASS_EVENTS: "<< skim_pass_events << endl;
   time(&endtime); 
   cout<<"Time passed: "<<hoursMinSec(difftime(endtime, begtime))<<endl<<endl; 
 }
