@@ -225,7 +225,7 @@ EventWeighter::EventWeighter(string year, bool isSignal, const vector<float> &bt
     in_file_photon_mceff_     = "data/zgamma/2024/photon_wp80mceff_2024.json";
     in_file_muon_             = "data/zgamma/2025/hzg_muid_2025_scalefactors.json";
     in_file_pu_               = "data/zgamma/2025/puWeights_2025pp_Summer24_25ns_69200ub.json";
-    in_file_btag_             = "data/zgamma/2024/btagging.json";
+    in_file_btag_             = "data/zgamma/2025/btagging_v1.json";
     in_file_btag_mceff_       = "data/zgamma/2024/btag_mceff.json";
     in_file_electron_iso0p10_ = "data/zgamma/2025/hzg_eliso0p1_2025_efficiencies.json";
     in_file_electron_iso0p15_ = "data/zgamma/2025/hzg_eliso0p15_2025_efficiencies.json";
