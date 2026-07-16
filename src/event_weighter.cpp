@@ -214,7 +214,7 @@ EventWeighter::EventWeighter(string year, bool isSignal, const vector<float> &bt
     key_                      = "2024Prompt";
     puName_                   = "Collisions24_BCDEFGHI_goldenJSON";
     btag_lightname            = "UParTAK4_light";
-    ph_shape_weighter_        = make_unique<rw_mmp_r3>();
+    ph_shape_weighter_        = make_unique<photon_weighter_mmp2425>();
     zgbkg_isr_weighter_       = make_unique<kinr3_weighter>();
   } else if (year=="2025"){
     cout<<"2025 has not been fully implemented in event_weighter. Defaulting to 2023 or 2024 for some scale factors"<<endl;
@@ -235,7 +235,7 @@ EventWeighter::EventWeighter(string year, bool isSignal, const vector<float> &bt
     key_                      = "2025Prompt";
     puName_                   = "Collisions24_BCDEFGHI_goldenJSON";
     btag_lightname            = "UParTAK4_light";
-    ph_shape_weighter_        = make_unique<rw_mmp_r3>();
+    ph_shape_weighter_        = make_unique<photon_weighter_mmp2425>();
     zgbkg_isr_weighter_       = make_unique<kinr3_weighter>();
 
   } else {

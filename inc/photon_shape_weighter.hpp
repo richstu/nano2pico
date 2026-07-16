@@ -81,4 +81,35 @@ private:
   std::vector<std::vector<float>> bias;
 };
 
+class photon_weighter_mmp2425 : public PhotonShapeWeighter { 
+public:
+  /*!\brief Standard constrctor for initializing DNN
+ *  *    */
+  photon_weighter_mmp2425();
+
+  enum class ActivationType{relu, elu, sigmoid};
+
+  /*!\brief evaluates DNN score at a point input
+ *  *    */
+  float evaluate(std::vector<float> input) const;
+
+private:
+  std::vector<float> scale(std::vector<float> input) const;
+  float dot_product(std::vector<float> x, std::vector<float> y) const;
+  float relu(float x) const;
+  float elu(float x) const;
+  float sigmoid(float x) const;
+
+  unsigned n_layer;
+  unsigned n_input;
+  std::vector<float> scale_lamb;
+  std::vector<float> scale_mean;
+  std::vector<float> scale_stdv;
+  std::vector<unsigned> n_unit;
+  std::vector<photon_weighter_mmp2425::ActivationType> activation_type;
+  std::vector<std::vector<std::vector<float>>> weight;
+  std::vector<std::vector<float>> bias;
+};
+
+
 #endif
