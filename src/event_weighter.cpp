@@ -21,6 +21,12 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
   string photon_idmapname = "Photon-ID-SF";
   string photon_csevmapname = "Photon-CSEV-SF";
   string btag_lightname = "deepJet_incl";
+  string btag_name = "deepJet_comb";
+  if (year=="2022" || year=="2022EE" || year=="2023" || year=="2023BPix"){
+    btag_lightname = "particleNet_light";
+    btag_name = "particleNet_comb";
+  }
+
   if (year=="2016APV") {
     in_file_electron_         = "data/zgamma/2016preVFP_UL/hzg_elid_2016APV_scalefactors.json";
     in_file_electron_reco_    = "data/zgamma/2016preVFP_UL/electron_recoSF2016preVFP.json";
@@ -42,6 +48,12 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     photon_csevmapname        = "UL-Photon-CSEV-SF";
     ph_shape_weighter_        = make_unique<rw_mmp>();
     zgbkg_isr_weighter_       = make_unique<kinr2_weighter>();
+//    if (isHiggsino){
+     in_file_photon_mceff_     = "data/higgsino/2016APV/photon_wp80_mceff_2016APV.json"; 
+     in_file_pu_               = "data/higgsino/2016APV/puWeights.json";
+     in_file_btag_             = "data/higgsino/2016APV/btagging.json";
+     in_file_btag_mceff_       = "data/higgsino/2016APV/btag_mceff_2016APV.json";
+//    }
   } else if (year=="2016") {
     in_file_electron_         = "data/zgamma/2016postVFP_UL/hzg_elid_2016_scalefactors.json";
     in_file_electron_reco_    = "data/zgamma/2016postVFP_UL/electron_recoSF2016postVFP.json";
@@ -62,7 +74,13 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     photon_idmapname          = "UL-Photon-ID-SF";
     photon_csevmapname        = "UL-Photon-CSEV-SF";
     ph_shape_weighter_        = make_unique<rw_mmp>();
-    zgbkg_isr_weighter_       = make_unique<kinr2_weighter>();
+    zgbkg_isr_weighter_       = make_unique<kinr2_weighter>(); 
+//    if (isHiggsino) { 
+    in_file_photon_mceff_     = "data/higgsino/2016/photon_wp80_mceff_2016.json";
+    in_file_pu_               = "data/higgsino/2016/puWeights.json";
+    in_file_btag_             = "data/higgsino/2016/btagging.json";
+    in_file_btag_mceff_       = "data/higgsino/2016/btag_mceff_2016.json"; 
+//    }
   } else if (year=="2017") {
     in_file_electron_         = "data/zgamma/2017_UL/hzg_elid_2017_scalefactors.json";
     in_file_electron_reco_    = "data/zgamma/2017_UL/electron_recoSF2017.json";
@@ -84,6 +102,12 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     photon_csevmapname        = "UL-Photon-CSEV-SF";
     ph_shape_weighter_        = make_unique<rw_mmp>();
     zgbkg_isr_weighter_       = make_unique<kinr2_weighter>();
+//    if (isHiggsino) { 
+    in_file_photon_mceff_     = "data/higgsino/2017/photon_wp80_mceff_2017.json";
+    in_file_pu_               = "data/higgsino/2017/puWeights.json";
+    in_file_btag_             = "data/higgsino/2017/btagging.json";
+    in_file_btag_mceff_       = "data/higgsino/2017/btag_mceff_2017.json";
+//    }
   } else if (year=="2018") {
     in_file_electron_         = "data/zgamma/2018_UL/hzg_elid_2018_scalefactors.json";
     in_file_electron_reco_    = "data/zgamma/2018_UL/electron_recoSF2018.json";
@@ -105,6 +129,12 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     photon_csevmapname        = "UL-Photon-CSEV-SF";
     ph_shape_weighter_        = make_unique<rw_mmp>();
     zgbkg_isr_weighter_       = make_unique<kinr2_weighter>();
+//    if (isHiggsino) {
+    in_file_photon_mceff_     = "data/higgsino/2018/photon_wp80_mceff_2018.json";
+    in_file_pu_               = "data/higgsino/2018/puWeights.json";
+    in_file_btag_             = "data/higgsino/2018/btagging.json";
+    in_file_btag_mceff_       = "data/higgsino/2018/btag_mceff_2018.json";
+//    }
   } else if (year=="2022"){
     in_file_electron_         = "data/zgamma/2022/hzg_elid_2022_scalefactors.json";
     in_file_electron_reco_    = "data/zgamma/2022/electron_recoSF2022.json";
@@ -122,9 +152,14 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     in_file_ggf_nnlo_         = "data/zgamma/GluGluHToZG_NNLO_reweight_run3.json";
     key_                      = "2022Re-recoBCD";
     puName_                   = "Collisions2022_355100_357900_eraBCD_GoldenJson";
-    btag_lightname            = "deepJet_light";
     ph_shape_weighter_        = make_unique<rw_mmp_r3>();
     zgbkg_isr_weighter_       = make_unique<kinr3_weighter>();
+//    if (isHiggsino) {
+    in_file_photon_mceff_     = "data/higgsino/2022/photon_wp80_mceff_2022.json";
+    in_file_pu_               = "data/higgsino/2022/puWeights.json";
+    in_file_btag_             = "data/higgsino/2022/btagging.json";
+    in_file_btag_mceff_       = "data/higgsino/2022/btag_mceff_2022.json";
+//    }
   } else if (year=="2022EE"){
     in_file_electron_         = "data/zgamma/2022EE/hzg_elid_2022EE_scalefactors.json";
     in_file_electron_reco_    = "data/zgamma/2022EE/electron_recoSF2022EE.json";
@@ -142,9 +177,14 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     in_file_ggf_nnlo_         = "data/zgamma/GluGluHToZG_NNLO_reweight_run3.json";
     key_                      = "2022Re-recoE+PromptFG";
     puName_                   = "Collisions2022_359022_362760_eraEFG_GoldenJson";
-    btag_lightname            = "deepJet_light";
     ph_shape_weighter_        = make_unique<rw_mmp_r3>();
     zgbkg_isr_weighter_       = make_unique<kinr3_weighter>();
+//    if (isHiggsino) {
+    in_file_photon_mceff_     = "data/higgsino/2022EE/photon_wp80_mceff_2022EE.json";
+    in_file_pu_               = "data/higgsino/2022EE/puWeights.json";
+    in_file_btag_             = "data/higgsino/2022EE/btagging.json";
+    in_file_btag_mceff_       = "data/higgsino/2022EE/btag_mceff_2022EE.json";
+//    }
   } else if (year=="2023"){
     in_file_electron_         = "data/zgamma/2023/hzg_elid_2023_scalefactors.json";
     in_file_electron_reco_    = "data/zgamma/2023/electron_recoSF2023.json";
@@ -162,9 +202,14 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     in_file_ggf_nnlo_         = "data/zgamma/GluGluHToZG_NNLO_reweight_run3.json";
     key_                      = "2023PromptC";
     puName_                   = "Collisions2023_366403_369802_eraBC_GoldenJson";
-    btag_lightname            = "deepJet_light";
     ph_shape_weighter_        = make_unique<rw_mmp_r3>();
     zgbkg_isr_weighter_       = make_unique<kinr3_weighter>();
+//    if (isHiggsino) {
+    in_file_photon_mceff_     = "data/higgsino/2023/photon_wp80_mceff_2023.json";
+    in_file_pu_               = "data/higgsino/2023/puWeights.json";
+    in_file_btag_             = "data/higgsino/2023/btagging.json";
+    in_file_btag_mceff_       = "data/higgsino/2023/btag_mceff_2023.json";
+//    }
   } else if (year=="2023BPix"){
     in_file_electron_         = "data/zgamma/2023BPix/hzg_elid_2023BPix_scalefactors.json";
     in_file_electron_reco_    = "data/zgamma/2023BPix/electron_recoSF2023BPix.json";
@@ -182,7 +227,6 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     in_file_ggf_nnlo_         = "data/zgamma/GluGluHToZG_NNLO_reweight_run3.json";
     key_                      = "2023PromptD";
     puName_                   = "Collisions2023_369803_370790_eraD_GoldenJson";
-    btag_lightname            = "deepJet_light";
     cs_electron_bpixhole_     = correction::CorrectionSet::from_file(
         "data/zgamma/2023BPix/hzg_elid_2023BPixHole_scalefactors.json");
     cs_el_hole_iso0p10_       = correction::CorrectionSet::from_file(
@@ -191,6 +235,12 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
         "data/zgamma/2023BPix/hzg_eliso0p15_2023BPixHole_efficiencies.json");
     ph_shape_weighter_        = make_unique<rw_mmp_r3>();
     zgbkg_isr_weighter_       = make_unique<kinr3_weighter>();
+//    if (isHiggsino) {
+    in_file_photon_mceff_     = "data/higgsino/2023BPix/photon_wp80_mceff_2023BPix.json";
+    in_file_pu_               = "data/higgsino/2023BPix/puWeights.json";
+    in_file_btag_             = "data/higgsino/2023BPix/btagging.json";
+    in_file_btag_mceff_       = "data/higgsino/2023BPix/btag_mceff_2023BPix.json";
+//    }
   } else {
     cout<<"Year has not been implemented in event_weighter"<<endl;
   }
@@ -236,7 +286,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
   map_muon_id_pass_unc_     = cs_muon_->at("unc_pass");
   map_muon_id_fail_         = cs_muon_->at("sf_fail");
   map_muon_id_fail_unc_     = cs_muon_->at("unc_fail");
-  map_btag_                 = cs_btag_->at("deepJet_comb");
+  map_btag_                 = cs_btag_->at(btag_name);
   map_udsgtag_              = cs_btag_->at(btag_lightname);
   map_pileup_               = cs_pileup_->at(puName_);
   map_fakephoton_           = cs_fakephoton_->at("fakephoton_corrections");
@@ -319,7 +369,7 @@ void EventWeighter::ElectronSF(pico_tree &pico){
           sf = map_electron_id_fail_->evaluate({reco_pt,reco_eta});
           unc = -1.0*map_electron_id_fail_unc_->evaluate({reco_pt,reco_eta});
         }
-      }
+      }      
       sf_up = (sf+unc)*(sf_reco+unc_reco);
       sf_dn = (sf-unc)*(sf_reco-unc_reco);
       sf_tot *= sf*sf_reco;
@@ -469,8 +519,8 @@ void EventWeighter::PhotonSF(pico_tree &pico){
       ev_sfdn = map_photon_csev_->evaluate({key_, "sfdown", "MVA80", eta, r9});
     }
     string wpstring = "wp80";
-    if (pt<20.0f)
-      wpstring = "wp80Below20";
+    //if (pt<20.0f)
+    //  wpstring = "wp80Below20";
     float id_sf = 1.0;
     float id_sfup = 1.0;
     float id_sfdn = 1.0;
@@ -766,8 +816,13 @@ void EventWeighter::bTaggingSF(pico_tree &pico){
         jet_flavor, abseta, pt});
       l_sf_dn_uncorr = (*btag_map)->evaluate({"down_uncorrelated", "L", 
         jet_flavor, abseta, pt});
+      // added b-tagger selector for run 3
+      float btag_score_ijet = pico.out_jet_deepflav().at(ijet); // default to deepJet
+      if (year_=="2022" || year_=="2022EE" || year_=="2023" || year_=="2023BPix"){
+          btag_score_ijet = pico.out_jet_btagpnetb().at(ijet);
+      }
       //currently, do not propoagate MC stats (negligible WRT SFs)
-      if (pico.out_jet_deepflav().at(ijet) > btag_wp_tight_) { 
+      if (btag_score_ijet > btag_wp_tight_) { 
         cat_mc_eff = t_mc_eff;
         //cat_mc_eff_up = t_mc_eff+t_mc_syst;
         //cat_mc_eff_dn = t_mc_eff-t_mc_syst;
@@ -778,7 +833,7 @@ void EventWeighter::bTaggingSF(pico_tree &pico){
         cat_data_eff_up_uncorr = t_mc_eff*t_sf_up_uncorr;
         cat_data_eff_dn_uncorr = t_mc_eff*t_sf_dn_uncorr;
       }
-      else if (pico.out_jet_deepflav().at(ijet) > btag_wp_medium_) {
+      else if (btag_score_ijet > btag_wp_medium_) {
         cat_mc_eff = m_mc_eff-t_mc_eff;
         //cat_mc_eff_up = m_mc_eff+m_mc_syst-t_mc_eff-t_mc_syst;
         //cat_mc_eff_dn = m_mc_eff-m_mc_syst-t_mc_eff+t_mc_syst;
@@ -790,7 +845,7 @@ void EventWeighter::bTaggingSF(pico_tree &pico){
         cat_data_eff_dn_uncorr = (m_mc_eff*m_sf_dn_uncorr-t_mc_eff
                                   *t_sf_dn_uncorr);
       }
-      else if (pico.out_jet_deepflav().at(ijet) > btag_wp_loose_) {
+      else if (btag_score_ijet > btag_wp_loose_) {
         cat_mc_eff = l_mc_eff-m_mc_eff;
         //cat_mc_eff_up = l_mc_eff+l_mc_syst-m_mc_eff-m_mc_syst;
         //cat_mc_eff_dn = l_mc_eff-l_mc_syst-m_mc_eff+m_mc_syst;
@@ -816,25 +871,25 @@ void EventWeighter::bTaggingSF(pico_tree &pico){
       //currently we overwrite the systematic efficiencies (eff_*) with the
       //the single WP versions. These should be commented out to return to the
       //multi-WP versions
-      if (pico.out_jet_deepflav().at(ijet) > btag_wp_medium_) {
+      if (btag_score_ijet > btag_wp_medium_) {
         cat_mc_eff_wpm = m_mc_eff;
         //cat_mc_eff_up = m_mc_eff+m_mc_syst;
         //cat_mc_eff_dn = m_mc_eff-m_mc_syst;
         cat_data_eff_wpm = m_mc_eff*m_sf;
-        cat_data_eff_up = m_mc_eff*m_sf_up;
-        cat_data_eff_dn = m_mc_eff*m_sf_dn;
-        cat_data_eff_up_uncorr = m_mc_eff*m_sf_up_uncorr;
-        cat_data_eff_dn_uncorr = m_mc_eff*m_sf_dn_uncorr;
+        //cat_data_eff_up = m_mc_eff*m_sf_up;
+        //cat_data_eff_dn = m_mc_eff*m_sf_dn;
+        //cat_data_eff_up_uncorr = m_mc_eff*m_sf_up_uncorr;
+        //cat_data_eff_dn_uncorr = m_mc_eff*m_sf_dn_uncorr;
       }
       else {
         cat_mc_eff_wpm = 1.0-m_mc_eff;
         //cat_mc_eff_up = 1.0-(m_mc_eff+m_mc_syst);
         //cat_mc_eff_dn = 1.0-(m_mc_eff-m_mc_syst);
         cat_data_eff_wpm = 1.0-(m_mc_eff*m_sf);
-        cat_data_eff_up = 1.0-(m_mc_eff*m_sf_up);
-        cat_data_eff_dn = 1.0-(m_mc_eff*m_sf_dn);
-        cat_data_eff_up_uncorr = 1.0-(m_mc_eff*m_sf_up_uncorr);
-        cat_data_eff_dn_uncorr = 1.0-(m_mc_eff*m_sf_dn_uncorr);
+        //cat_data_eff_up = 1.0-(m_mc_eff*m_sf_up);
+        //cat_data_eff_dn = 1.0-(m_mc_eff*m_sf_dn);
+        //cat_data_eff_up_uncorr = 1.0-(m_mc_eff*m_sf_up_uncorr);
+        //cat_data_eff_dn_uncorr = 1.0-(m_mc_eff*m_sf_dn_uncorr);
       }
 
       //total SF is product of per-jet SFs
@@ -844,6 +899,13 @@ void EventWeighter::bTaggingSF(pico_tree &pico){
       float sf_dn = cat_data_eff_dn/cat_mc_eff_wpm;
       float sf_up_uncorr = cat_data_eff_up_uncorr/cat_mc_eff_wpm;
       float sf_dn_uncorr = cat_data_eff_dn_uncorr/cat_mc_eff_wpm;
+
+//      if (isHiggsino) { todo: incorporate isHiggsino requirement instead of forcefully changing variable for zg as well
+      sf_up = cat_data_eff_up/cat_mc_eff;
+      sf_dn = cat_data_eff_dn/cat_mc_eff;
+      sf_up_uncorr = cat_data_eff_up_uncorr/cat_mc_eff;
+      sf_dn_uncorr = cat_data_eff_dn_uncorr/cat_mc_eff;
+//      }
       if (isinf(sf_nm)||isnan(sf_nm)) sf_nm = 1.0;
       if (isinf(sf_nm_wpm)||isnan(sf_nm_wpm)) sf_nm_wpm = 1.0;
       if (isinf(sf_up)||isnan(sf_up)) sf_up = 1.0;
@@ -874,8 +936,7 @@ void EventWeighter::bTaggingSF(pico_tree &pico){
       }
     } //jet is good
   } //loop over jets
-
-  pico.out_w_bhig_df() = sf_tot_nm;
+  pico.out_w_bhig_df() = sf_tot_nm;  // slighty misleading, pnet is used for run 3
   pico.out_w_btag_df() = sf_tot_wpm;
   pico.out_sys_bchig().resize(2,1.); 
   pico.out_sys_udsghig().resize(2,1.); 

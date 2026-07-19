@@ -21,7 +21,7 @@ public:
 
   explicit JetMetProducer(int year, std::string year_string, 
                           float nanoaod_version, float min_jet_pt, 
-                          float max_jet_eta, bool isData, bool is_preUL, 
+                          float max_jet_eta, bool isData, bool is_preUL, bool isZgamma,
                           bool verbose=false);
   ~JetMetProducer();
 
@@ -35,6 +35,7 @@ public:
                                const std::vector<float> &btag_wpts, 
                                const std::vector<float> &btag_df_wpts, 
                                bool isFastsim, 
+                               bool isZgamma,
                                bool isSignal,
                                std::vector<HiggsConstructionVariables> &sys_higvars);
   void WriteFatJets(nano_tree &nano, pico_tree &pico);
@@ -68,11 +69,18 @@ private:
   MetProducer met_producer;
   TRandom3 rng_;
   std::unique_ptr<correction::CorrectionSet> cs_jerc_;
+  std::unique_ptr<correction::CorrectionSet> cs_met_;
   correction::Correction::Ref map_jes_;
   correction::Correction::Ref map_jersf_;
+  correction::Correction::Ref map_jersf_unc_;
   correction::Correction::Ref map_jermc_;
   std::vector<correction::CompoundCorrection::Ref> map_jec_;
   std::vector<correction::Correction::Ref> map_jec_l1_;
+  correction::Correction::Ref map_metpt_mc_;
+  correction::Correction::Ref map_metpt_data_;
+  correction::Correction::Ref map_metphi_mc_;
+  correction::Correction::Ref map_metphi_data_;
+  correction::Correction::Ref map_met_;
   std::vector<unsigned int> jec_run_start_;
   std::vector<unsigned int> jec_run_end_;
   std::string in_file_jetveto_;

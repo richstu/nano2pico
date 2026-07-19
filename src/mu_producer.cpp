@@ -19,23 +19,22 @@ MuonProducer::MuonProducer(string year_, bool isData_, float nanoaod_version_, s
   nanoaod_version(nanoaod_version_),
   run3(false){
   if (year=="2022") {
-    cs_scare_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2022/2022_Summer22.json");
+    cs_scare_ = correction::CorrectionSet::from_file("data/higgsino/2022/muon_scalesmearing.json");
     run3 = true;
   }
   else if (year=="2022EE") {
     cs_scare_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2022EE/2022_Summer22EE.json");
+        "data/higgsino/2022EE/muon_scalesmearing.json");
     run3 = true;
   }
   else if (year=="2023") {
     cs_scare_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2023/2023_Summer23.json");
+        "data/higgsino/2023/muon_scalesmearing.json");
     run3 = true;
   }
   else if (year=="2023BPix") {
     cs_scare_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2023BPix/2023_Summer23BPix.json");
+        "data/higgsino/2023BPix/muon_scalesmearing.json");
     run3 = true;
   }
 }
@@ -86,6 +85,9 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
   vector<float> muon_pt_scaledn;
   vector<float> muon_pt_resup;
   vector<float> muon_pt_resdn;
+
+  float pt_thresh = 26.f;
+
   for(int imu(0); imu<nano.nMuon(); ++imu){
     float eta = nano.Muon_eta()[imu];
     float phi = nano.Muon_phi()[imu];
@@ -129,12 +131,12 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
       float pt = nano.Muon_bsConstrainedPt()[imu];
       if (isData) {
         muon_pt_corr.push_back(scarekit::pt_scale(1, pt, eta, phi,
-            charge, cs_scare_));
+            charge, cs_scare_, pt_thresh));
       }
       else {
-        float sca_pt = scarekit::pt_scale(0, pt, eta, phi, charge, cs_scare_);
+        float sca_pt = scarekit::pt_scale(0, pt, eta, phi, charge, cs_scare_, pt_thresh);
         float re_pt = scarekit::pt_resol(sca_pt, eta, 
-            static_cast<float>(nTrackerLayers), cs_scare_);
+            static_cast<float>(nTrackerLayers), cs_scare_, pt_thresh);
         muon_pt_corr.push_back(re_pt);
         muon_pt_scaleup.push_back(scarekit::pt_scale_var(re_pt, eta, phi, 
             charge, "up", cs_scare_));
@@ -202,6 +204,8 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
     pico.out_mu_dxy().push_back(nano.Muon_dxy()[imu]);
     pico.out_mu_ip3d().push_back(nano.Muon_ip3d()[imu]);
     pico.out_mu_id().push_back(nano.Muon_looseId()[imu]);
+    pico.out_mu_mediumid().push_back(nano.Muon_mediumId()[imu]);
+    pico.out_mu_tightid().push_back(nano.Muon_tightId()[imu]);
     pico.out_mu_sig().push_back(isSignal);
     pico.out_mu_charge().push_back(nano.Muon_charge()[imu]);
     if (!isData) {

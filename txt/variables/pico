@@ -197,7 +197,9 @@ vector<int>   jet_h2_indices
 vector<int>   jet_h1_df_indices
 vector<int>   jet_h2_df_indices
 vector<int>   jet_ordered_pt_indices
-
+vector<bool>  jet_pass_jetidFix
+vector<bool>  jet_pass_jetidTightLepVeto
+vector<bool>  jet_puid_pass
 
 int ngenjet
 vector<float> genjet_pt
@@ -330,6 +332,7 @@ vector<int>   el_charge
 vector<int>   el_pflavor
 vector<bool>  el_ecal
 vector<int>   el_fsrphotonidx
+vector<int>   el_wpbitmap
 
 ##################   Di-Leptons   ################
 int nll

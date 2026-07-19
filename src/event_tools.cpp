@@ -548,8 +548,14 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
   // filters directly from Nano
   pico.out_pass_goodv() = nano.Flag_goodVertices();
   pico.out_pass_cschalo_tight() = nano.Flag_globalSuperTightHalo2016Filter();
-  pico.out_pass_hbhe() = nano.Flag_HBHENoiseFilter();
-  pico.out_pass_hbheiso() = nano.Flag_HBHENoiseIsoFilter();
+  if (year >= 2022) {  // hbhe and hbheiso noise filters not needed in run 3 https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFiltersRun2#Run_3_2022_and_2023_data_and_MC
+    pico.out_pass_hbhe() = true;
+    pico.out_pass_hbheiso() = true;
+  }
+  else {
+    pico.out_pass_hbhe() = nano.Flag_HBHENoiseFilter();
+    pico.out_pass_hbheiso() = nano.Flag_HBHENoiseIsoFilter();
+  }
   pico.out_pass_ecaldeadcell() = nano.Flag_EcalDeadCellTriggerPrimitiveFilter();
   pico.out_pass_badpfmu() = nano.Flag_BadPFMuonFilter();
   if (nanoaod_version+0.01 > 9) {
