@@ -749,7 +749,9 @@ namespace xsec{
     if(file.Contains("TTtoLplusNu2Q-3Jets_TuneCP5_13p6TeV_madgraphMLM-pythia8"))			xsec=923.6*0.219;
     if(file.Contains("TTtoLminusNu2Q-3Jets_TuneCP5_13p6TeV_madgraphMLM-pythia8"))			xsec=923.6*0.219;
     if(file.Contains("TTto2L2Nu-3Jets_TuneCP5_13p6TeV_madgraphMLM-pythia8"))				xsec=923.6*0.105;
-    // (need to add genMET samples)
+    if(file.Contains("TTtoLplusNu2Q-3Jets-genMET-150_TuneCP5_13p6TeV_madgraphMLM-pythia8"))		xsec=6.458;
+    if(file.Contains("TTtoLminusNu2Q-3Jets-genMET-150_TuneCP5_13p6TeV_madgraphMLM-pythia8"))		xsec=6.454;
+    if(file.Contains("TTto2L2Nu-3Jets-genMET-150_TuneCP5_13p6TeV_madgraphMLM-pythia8"))			xsec=3.802;
 
     // TT+X
     if(file.Contains("TTG-1Jets_PTG-10to100_TuneCP5_13p6TeV_amcatnloFXFXold-pythia8"))			xsec=4.126;
