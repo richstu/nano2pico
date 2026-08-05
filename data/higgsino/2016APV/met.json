@@ -1,0 +1,646 @@
+{
+  "schema_version": 2,
+  "description": "Merged from metphicorr_pfmet_data_2016pre_ul.json.gz metphicorr_pfmet_mc_2016pre_ul.json.gz metphicorr_puppimet_data_2016pre_ul.json.gz metphicorr_puppimet_mc_2016pre_ul.json.gz",
+  "corrections": [
+    { "name": "pt_metphicorr_pfmet_data",
+      "version": 1,
+      "inputs": [
+        { "name": "met_pt",
+          "type": "real",
+          "description": "Type 1 PFMET pt without XY corrections"
+        },
+        { "name": "met_phi",
+          "type": "real",
+          "description": "Type 1 PFMET phi [-pi,pi] without XY corrections"
+        },
+        { "name": "npvs",
+          "type": "real",
+          "description": "Number of reconstructed primary vertices"
+        },
+        { "name": "run",
+          "type": "real",
+          "description": "Run number"
+        }
+      ],
+      "output": {
+        "name": "corrmet_pt",
+        "type": "real",
+        "description": "Type 1 PFMET pt with XY corrections applied"
+      },
+      "generic_formulas": [
+        { "nodetype": "formula",
+          "expression": "sqrt((x*cos(y)-([0]*z+[1]))^2+(x*sin(y)-([2]*z+[3]))^2)",
+          "parser": "TFormula",
+          "variables": [ "met_pt", "met_phi", "npvs" ]
+        },
+        { "nodetype": "formula",
+          "expression": "x",
+          "parser": "TFormula",
+          "variables": [ "met_pt" ]
+        }
+      ],
+      "data": {
+        "nodetype": "binning",
+        "input": "met_pt",
+        "edges": [ 0.0, 6500.0 ],
+        "content": [
+          { "nodetype": "binning",
+            "input": "met_phi",
+            "edges": [ -3.15, 3.15 ],
+            "content": [
+              { "nodetype": "binning",
+                "input": "run",
+                "edges": [ 0.0, 272007.0, 275377.0, 275657.0, 276284.0, 276315.0, 276812.0, 276831.0, 277421.0, 277772.0, 278769.0, 278770.0, 278771.0 ],
+                "content": [
+                  { "nodetype": "formularef",
+                    "index": 1,
+                    "parameters": [ 1.0 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 0,
+                    "parameters": [ -0.0214894, -0.188255, 0.0876624, 0.812885 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 1,
+                    "parameters": [ 1.0 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 0,
+                    "parameters": [ -0.032209, 0.067288, 0.113917, 0.743906 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 1,
+                    "parameters": [ 1.0 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 0,
+                    "parameters": [ -0.0293663, 0.21106, 0.11331, 0.815787 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 1,
+                    "parameters": [ 1.0 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 0,
+                    "parameters": [ -0.0132046, 0.20073, 0.134809, 0.679068 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 1,
+                    "parameters": [ 1.0 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 0,
+                    "parameters": [ -0.0543566, 0.816597, 0.114225, 1.17266 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 1,
+                    "parameters": [ 1.0 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 0,
+                    "parameters": [ -0.0543566, 0.816597, 0.114225, 1.17266 ]
+                  }
+                ],
+                "flow": "error"
+              }
+            ],
+            "flow": "error"
+          }
+        ],
+        "flow": "error"
+      }
+    },
+    { "name": "phi_metphicorr_pfmet_data",
+      "version": 1,
+      "inputs": [
+        { "name": "met_pt",
+          "type": "real",
+          "description": "Type 1 PFMET pt without XY corrections"
+        },
+        { "name": "met_phi",
+          "type": "real",
+          "description": "Type 1 PFMET phi [-pi,pi] without XY corrections"
+        },
+        { "name": "npvs",
+          "type": "real",
+          "description": "Number of reconstructed primary vertices"
+        },
+        { "name": "run",
+          "type": "real",
+          "description": "Run number"
+        }
+      ],
+      "output": {
+        "name": "corrmet_phi",
+        "type": "real",
+        "description": "Type 1 PFMET phi [-pi,pi] with XY corrections applied"
+      },
+      "generic_formulas": [
+        { "nodetype": "formula",
+          "expression": "(((x*cos(y)-([0]*z+[1]))==0)*((x*sin(y)-([2]*z+[3]))>0))*3.14159+(((x*cos(y)-([0]*z+[1]))==0)*((x*sin(y)-([2]*z+[3]))<0))*(-3.14159)+((x*cos(y)-([0]*z+[1]))>0)*atan((x*sin(y)-([2]*z+[3]))/(x*cos(y)-([0]*z+[1])))+(((x*cos(y)-([0]*z+[1]))<0)*((x*sin(y)-([2]*z+[3]))>0))*(atan((x*sin(y)-([2]*z+[3]))/(x*cos(y)-([0]*z+[1])))+3.14159)+(((x*cos(y)-([0]*z+[1]))<0)*((x*sin(y)-([2]*z+[3]))<0))*(atan((x*sin(y)-([2]*z+[3]))/(x*cos(y)-([0]*z+[1])))-3.14159)+0",
+          "parser": "TFormula",
+          "variables": [ "met_pt", "met_phi", "npvs" ]
+        },
+        { "nodetype": "formula",
+          "expression": "x",
+          "parser": "TFormula",
+          "variables": [ "met_phi" ]
+        }
+      ],
+      "data": {
+        "nodetype": "binning",
+        "input": "met_pt",
+        "edges": [ 0.0, 6500.0 ],
+        "content": [
+          { "nodetype": "binning",
+            "input": "met_phi",
+            "edges": [ -3.15, 3.15 ],
+            "content": [
+              { "nodetype": "binning",
+                "input": "run",
+                "edges": [ 0.0, 272007.0, 275377.0, 275657.0, 276284.0, 276315.0, 276812.0, 276831.0, 277421.0, 277772.0, 278769.0, 278770.0, 278771.0 ],
+                "content": [
+                  { "nodetype": "formularef",
+                    "index": 1,
+                    "parameters": [ 1.0 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 0,
+                    "parameters": [ -0.0214894, -0.188255, 0.0876624, 0.812885 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 1,
+                    "parameters": [ 1.0 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 0,
+                    "parameters": [ -0.032209, 0.067288, 0.113917, 0.743906 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 1,
+                    "parameters": [ 1.0 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 0,
+                    "parameters": [ -0.0293663, 0.21106, 0.11331, 0.815787 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 1,
+                    "parameters": [ 1.0 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 0,
+                    "parameters": [ -0.0132046, 0.20073, 0.134809, 0.679068 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 1,
+                    "parameters": [ 1.0 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 0,
+                    "parameters": [ -0.0543566, 0.816597, 0.114225, 1.17266 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 1,
+                    "parameters": [ 1.0 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 0,
+                    "parameters": [ -0.0543566, 0.816597, 0.114225, 1.17266 ]
+                  }
+                ],
+                "flow": "error"
+              }
+            ],
+            "flow": "error"
+          }
+        ],
+        "flow": "error"
+      }
+    },
+    { "name": "pt_metphicorr_pfmet_mc",
+      "version": 1,
+      "inputs": [
+        { "name": "met_pt",
+          "type": "real",
+          "description": "Type 1 PFMET pt without XY corrections"
+        },
+        { "name": "met_phi",
+          "type": "real",
+          "description": "Type 1 PFMET phi [-pi,pi] without XY corrections"
+        },
+        { "name": "npvs",
+          "type": "real",
+          "description": "Number of reconstructed primary vertices"
+        },
+        { "name": "run",
+          "type": "real",
+          "description": "Run number"
+        }
+      ],
+      "output": {
+        "name": "corrmet_pt",
+        "type": "real",
+        "description": "Type 1 PFMET pt with XY corrections applied"
+      },
+      "generic_formulas": [
+        { "nodetype": "formula",
+          "expression": "sqrt((x*cos(y)-([0]*z+[1]))^2+(x*sin(y)-([2]*z+[3]))^2)",
+          "parser": "TFormula",
+          "variables": [ "met_pt", "met_phi", "npvs" ]
+        }
+      ],
+      "data": {
+        "nodetype": "binning",
+        "input": "met_pt",
+        "edges": [ 0.0, 6500.0 ],
+        "content": [
+          { "nodetype": "binning",
+            "input": "met_phi",
+            "edges": [ -3.15, 3.15 ],
+            "content": [
+              { "nodetype": "formularef",
+                "index": 0,
+                "parameters": [ -0.188743, 0.136539, 0.0127927, 0.117747 ]
+              }
+            ],
+            "flow": "error"
+          }
+        ],
+        "flow": "error"
+      }
+    },
+    { "name": "phi_metphicorr_pfmet_mc",
+      "version": 1,
+      "inputs": [
+        { "name": "met_pt",
+          "type": "real",
+          "description": "Type 1 PFMET pt without XY corrections"
+        },
+        { "name": "met_phi",
+          "type": "real",
+          "description": "Type 1 PFMET phi [-pi,pi] without XY corrections"
+        },
+        { "name": "npvs",
+          "type": "real",
+          "description": "Number of reconstructed primary vertices"
+        },
+        { "name": "run",
+          "type": "real",
+          "description": "Run number"
+        }
+      ],
+      "output": {
+        "name": "corrmet_phi",
+        "type": "real",
+        "description": "Type 1 PFMET phi [-pi,pi] with XY corrections applied"
+      },
+      "generic_formulas": [
+        { "nodetype": "formula",
+          "expression": "(((x*cos(y)-([0]*z+[1]))==0)*((x*sin(y)-([2]*z+[3]))>0))*3.14159+(((x*cos(y)-([0]*z+[1]))==0)*((x*sin(y)-([2]*z+[3]))<0))*(-3.14159)+((x*cos(y)-([0]*z+[1]))>0)*atan((x*sin(y)-([2]*z+[3]))/(x*cos(y)-([0]*z+[1])))+(((x*cos(y)-([0]*z+[1]))<0)*((x*sin(y)-([2]*z+[3]))>0))*(atan((x*sin(y)-([2]*z+[3]))/(x*cos(y)-([0]*z+[1])))+3.14159)+(((x*cos(y)-([0]*z+[1]))<0)*((x*sin(y)-([2]*z+[3]))<0))*(atan((x*sin(y)-([2]*z+[3]))/(x*cos(y)-([0]*z+[1])))-3.14159)+0",
+          "parser": "TFormula",
+          "variables": [ "met_pt", "met_phi", "npvs" ]
+        }
+      ],
+      "data": {
+        "nodetype": "binning",
+        "input": "met_pt",
+        "edges": [ 0.0, 6500.0 ],
+        "content": [
+          { "nodetype": "binning",
+            "input": "met_phi",
+            "edges": [ -3.15, 3.15 ],
+            "content": [
+              { "nodetype": "formularef",
+                "index": 0,
+                "parameters": [ -0.188743, 0.136539, 0.0127927, 0.117747 ]
+              }
+            ],
+            "flow": "error"
+          }
+        ],
+        "flow": "error"
+      }
+    },
+    { "name": "pt_metphicorr_puppimet_data",
+      "version": 1,
+      "inputs": [
+        { "name": "met_pt",
+          "type": "real",
+          "description": "Type 1 PuppiMET pt without XY corrections"
+        },
+        { "name": "met_phi",
+          "type": "real",
+          "description": "Type 1 PuppiMET phi [-pi,pi] without XY corrections"
+        },
+        { "name": "npvs",
+          "type": "real",
+          "description": "Number of reconstructed primary vertices"
+        },
+        { "name": "run",
+          "type": "real",
+          "description": "Run number"
+        }
+      ],
+      "output": {
+        "name": "corrmet_pt",
+        "type": "real",
+        "description": "Type 1 PuppiMET pt with XY corrections applied"
+      },
+      "generic_formulas": [
+        { "nodetype": "formula",
+          "expression": "sqrt((x*cos(y)-([0]*z+[1]))^2+(x*sin(y)-([2]*z+[3]))^2)",
+          "parser": "TFormula",
+          "variables": [ "met_pt", "met_phi", "npvs" ]
+        },
+        { "nodetype": "formula",
+          "expression": "x",
+          "parser": "TFormula",
+          "variables": [ "met_pt" ]
+        }
+      ],
+      "data": {
+        "nodetype": "binning",
+        "input": "met_pt",
+        "edges": [ 0.0, 6500.0 ],
+        "content": [
+          { "nodetype": "binning",
+            "input": "met_phi",
+            "edges": [ -3.15, 3.15 ],
+            "content": [
+              { "nodetype": "binning",
+                "input": "run",
+                "edges": [ 0.0, 272007.0, 275377.0, 275657.0, 276284.0, 276315.0, 276812.0, 276831.0, 277421.0, 277772.0, 278769.0, 278770.0, 278771.0 ],
+                "content": [
+                  { "nodetype": "formularef",
+                    "index": 1,
+                    "parameters": [ 1.0 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 0,
+                    "parameters": [ -0.00109025, -0.338093, -0.00356058, 0.128407 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 1,
+                    "parameters": [ 1.0 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 0,
+                    "parameters": [ -0.00271913, -0.342268, 0.00187386, 0.104 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 1,
+                    "parameters": [ 1.0 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 0,
+                    "parameters": [ -0.00254194, -0.305264, -0.00177408, 0.164639 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 1,
+                    "parameters": [ 1.0 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 0,
+                    "parameters": [ -0.00358835, -0.225435, -0.000444268, 0.180479 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 1,
+                    "parameters": [ 1.0 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 0,
+                    "parameters": [ 0.0056759, -0.454101, -0.00962707, 0.35731 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 1,
+                    "parameters": [ 1.0 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 0,
+                    "parameters": [ 0.0056759, -0.454101, -0.00962707, 0.35731 ]
+                  }
+                ],
+                "flow": "error"
+              }
+            ],
+            "flow": "error"
+          }
+        ],
+        "flow": "error"
+      }
+    },
+    { "name": "phi_metphicorr_puppimet_data",
+      "version": 1,
+      "inputs": [
+        { "name": "met_pt",
+          "type": "real",
+          "description": "Type 1 PuppiMET pt without XY corrections"
+        },
+        { "name": "met_phi",
+          "type": "real",
+          "description": "Type 1 PuppiMET phi [-pi,pi] without XY corrections"
+        },
+        { "name": "npvs",
+          "type": "real",
+          "description": "Number of reconstructed primary vertices"
+        },
+        { "name": "run",
+          "type": "real",
+          "description": "Run number"
+        }
+      ],
+      "output": {
+        "name": "corrmet_phi",
+        "type": "real",
+        "description": "Type 1 PuppiMET phi [-pi,pi] with XY corrections applied"
+      },
+      "generic_formulas": [
+        { "nodetype": "formula",
+          "expression": "(((x*cos(y)-([0]*z+[1]))==0)*((x*sin(y)-([2]*z+[3]))>0))*3.14159+(((x*cos(y)-([0]*z+[1]))==0)*((x*sin(y)-([2]*z+[3]))<0))*(-3.14159)+((x*cos(y)-([0]*z+[1]))>0)*atan((x*sin(y)-([2]*z+[3]))/(x*cos(y)-([0]*z+[1])))+(((x*cos(y)-([0]*z+[1]))<0)*((x*sin(y)-([2]*z+[3]))>0))*(atan((x*sin(y)-([2]*z+[3]))/(x*cos(y)-([0]*z+[1])))+3.14159)+(((x*cos(y)-([0]*z+[1]))<0)*((x*sin(y)-([2]*z+[3]))<0))*(atan((x*sin(y)-([2]*z+[3]))/(x*cos(y)-([0]*z+[1])))-3.14159)+0",
+          "parser": "TFormula",
+          "variables": [ "met_pt", "met_phi", "npvs" ]
+        },
+        { "nodetype": "formula",
+          "expression": "x",
+          "parser": "TFormula",
+          "variables": [ "met_phi" ]
+        }
+      ],
+      "data": {
+        "nodetype": "binning",
+        "input": "met_pt",
+        "edges": [ 0.0, 6500.0 ],
+        "content": [
+          { "nodetype": "binning",
+            "input": "met_phi",
+            "edges": [ -3.15, 3.15 ],
+            "content": [
+              { "nodetype": "binning",
+                "input": "run",
+                "edges": [ 0.0, 272007.0, 275377.0, 275657.0, 276284.0, 276315.0, 276812.0, 276831.0, 277421.0, 277772.0, 278769.0, 278770.0, 278771.0 ],
+                "content": [
+                  { "nodetype": "formularef",
+                    "index": 1,
+                    "parameters": [ 1.0 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 0,
+                    "parameters": [ -0.00109025, -0.338093, -0.00356058, 0.128407 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 1,
+                    "parameters": [ 1.0 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 0,
+                    "parameters": [ -0.00271913, -0.342268, 0.00187386, 0.104 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 1,
+                    "parameters": [ 1.0 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 0,
+                    "parameters": [ -0.00254194, -0.305264, -0.00177408, 0.164639 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 1,
+                    "parameters": [ 1.0 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 0,
+                    "parameters": [ -0.00358835, -0.225435, -0.000444268, 0.180479 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 1,
+                    "parameters": [ 1.0 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 0,
+                    "parameters": [ 0.0056759, -0.454101, -0.00962707, 0.35731 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 1,
+                    "parameters": [ 1.0 ]
+                  },
+                  { "nodetype": "formularef",
+                    "index": 0,
+                    "parameters": [ 0.0056759, -0.454101, -0.00962707, 0.35731 ]
+                  }
+                ],
+                "flow": "error"
+              }
+            ],
+            "flow": "error"
+          }
+        ],
+        "flow": "error"
+      }
+    },
+    { "name": "pt_metphicorr_puppimet_mc",
+      "version": 1,
+      "inputs": [
+        { "name": "met_pt",
+          "type": "real",
+          "description": "Type 1 PuppiMET pt without XY corrections"
+        },
+        { "name": "met_phi",
+          "type": "real",
+          "description": "Type 1 PuppiMET phi [-pi,pi] without XY corrections"
+        },
+        { "name": "npvs",
+          "type": "real",
+          "description": "Number of reconstructed primary vertices"
+        },
+        { "name": "run",
+          "type": "real",
+          "description": "Run number"
+        }
+      ],
+      "output": {
+        "name": "corrmet_pt",
+        "type": "real",
+        "description": "Type 1 PuppiMET pt with XY corrections applied"
+      },
+      "generic_formulas": [
+        { "nodetype": "formula",
+          "expression": "sqrt((x*cos(y)-([0]*z+[1]))^2+(x*sin(y)-([2]*z+[3]))^2)",
+          "parser": "TFormula",
+          "variables": [ "met_pt", "met_phi", "npvs" ]
+        }
+      ],
+      "data": {
+        "nodetype": "binning",
+        "input": "met_pt",
+        "edges": [ 0.0, 6500.0 ],
+        "content": [
+          { "nodetype": "binning",
+            "input": "met_phi",
+            "edges": [ -3.15, 3.15 ],
+            "content": [
+              { "nodetype": "formularef",
+                "index": 0,
+                "parameters": [ -0.0060447, -0.4183, 0.008331, -0.0990046 ]
+              }
+            ],
+            "flow": "error"
+          }
+        ],
+        "flow": "error"
+      }
+    },
+    { "name": "phi_metphicorr_puppimet_mc",
+      "version": 1,
+      "inputs": [
+        { "name": "met_pt",
+          "type": "real",
+          "description": "Type 1 PuppiMET pt without XY corrections"
+        },
+        { "name": "met_phi",
+          "type": "real",
+          "description": "Type 1 PuppiMET phi [-pi,pi] without XY corrections"
+        },
+        { "name": "npvs",
+          "type": "real",
+          "description": "Number of reconstructed primary vertices"
+        },
+        { "name": "run",
+          "type": "real",
+          "description": "Run number"
+        }
+      ],
+      "output": {
+        "name": "corrmet_phi",
+        "type": "real",
+        "description": "Type 1 PuppiMET phi [-pi,pi] with XY corrections applied"
+      },
+      "generic_formulas": [
+        { "nodetype": "formula",
+          "expression": "(((x*cos(y)-([0]*z+[1]))==0)*((x*sin(y)-([2]*z+[3]))>0))*3.14159+(((x*cos(y)-([0]*z+[1]))==0)*((x*sin(y)-([2]*z+[3]))<0))*(-3.14159)+((x*cos(y)-([0]*z+[1]))>0)*atan((x*sin(y)-([2]*z+[3]))/(x*cos(y)-([0]*z+[1])))+(((x*cos(y)-([0]*z+[1]))<0)*((x*sin(y)-([2]*z+[3]))>0))*(atan((x*sin(y)-([2]*z+[3]))/(x*cos(y)-([0]*z+[1])))+3.14159)+(((x*cos(y)-([0]*z+[1]))<0)*((x*sin(y)-([2]*z+[3]))<0))*(atan((x*sin(y)-([2]*z+[3]))/(x*cos(y)-([0]*z+[1])))-3.14159)+0",
+          "parser": "TFormula",
+          "variables": [ "met_pt", "met_phi", "npvs" ]
+        }
+      ],
+      "data": {
+        "nodetype": "binning",
+        "input": "met_pt",
+        "edges": [ 0.0, 6500.0 ],
+        "content": [
+          { "nodetype": "binning",
+            "input": "met_phi",
+            "edges": [ -3.15, 3.15 ],
+            "content": [
+              { "nodetype": "formularef",
+                "index": 0,
+                "parameters": [ -0.0060447, -0.4183, 0.008331, -0.0990046 ]
+              }
+            ],
+            "flow": "error"
+          }
+        ],
+        "flow": "error"
+      }
+    }
+  ]
+}
