@@ -761,13 +761,15 @@ namespace xsec{
 
     // 4b backgrounds at 13.6TeV (all from XSDB unless specified)
     // TT+Jets already there in bbgg above
-    //if(file.Contains("TTtoLplusNu2Q-3Jets_TuneCP5_13p6TeV_madgraphMLM-pythia8"))			xsec=833.9*0.219;
-    //if(file.Contains("TTtoLminusNu2Q-3Jets_TuneCP5_13p6TeV_madgraphMLM-pythia8"))			xsec=833.9*0.219;
-    //if(file.Contains("TTto2L2Nu-3Jets_TuneCP5_13p6TeV_madgraphMLM-pythia8"))				xsec=833.9*0.105;
-    // (need to add genMET samples)
+    if(file.Contains("TTtoLplusNu2Q-3Jets_TuneCP5_13p6TeV_madgraphMLM-pythia8"))			xsec=833.9*0.219;
+    if(file.Contains("TTtoLminusNu2Q-3Jets_TuneCP5_13p6TeV_madgraphMLM-pythia8"))			xsec=833.9*0.219;
+    if(file.Contains("TTto2L2Nu-3Jets_TuneCP5_13p6TeV_madgraphMLM-pythia8"))				xsec=833.9*0.105;
+    if(file.Contains("TTtoLplusNu2Q-3Jets-genMET-150_TuneCP5_13p6TeV_madgraphMLM-pythia8"))		xsec=6.458;
+    if(file.Contains("TTtoLminusNu2Q-3Jets-genMET-150_TuneCP5_13p6TeV_madgraphMLM-pythia8"))		xsec=6.454;
+    if(file.Contains("TTto2L2Nu-3Jets-genMET-150_TuneCP5_13p6TeV_madgraphMLM-pythia8"))			xsec=3.802;
 
-    // TT+X
-    //if(file.Contains("TTG-1Jets_PTG-10to100_TuneCP5_13p6TeV_amcatnloFXFXold-pythia8"))			xsec=4.126;
+    // TT+X 
+    //if(file.Contains("TTG-1Jets_PTG-10to100_TuneCP5_13p6TeV_amcatnloFXFXold-pythia8"))			xsec=4.126; //included in bbgg
     //if(file.Contains("TTG-1Jets_PTG-100to200_TuneCP5_13p6TeV_amcatnloFXFXold-pythia8"))			xsec=0.4114;
     //if(file.Contains("TTG-1Jets_PTG-200_TuneCP5_13p6TeV_amcatnloFXFXold-pythia8"))			xsec=0.1284;           
     if(file.Contains("TTLL_MLL-4to50_TuneCP5_13p6TeV_amcatnlo-pythia8"))				xsec=0.03949;
@@ -872,6 +874,92 @@ namespace xsec{
     if(file.Contains("ZH_Hto2B_Zto2Nu_M-125_TuneCP5_13p6TeV_powheg-minlo-pythia8"))			xsec=0.9439*Htobb*0.2;
     if(file.Contains("ZZ_TuneCP5_13p6TeV_pythia8"))							xsec=12.75;
 
+    // xsec for 2024 files with different naming conventions
+    if(file.Contains("TTtoLplusNu2Q-3Jets_Bin-genMET-150_TuneCP5_13p6TeV_madgraphMLM-pythia8"))		xsec=6.458;
+    if(file.Contains("TTtoLminusNu2Q-3Jets_Bin-genMET-150_TuneCP5_13p6TeV_madgraphMLM-pythia8"))	xsec=6.454;
+    if(file.Contains("TTto2L2Nu-3Jets_Bin-genMET-150_TuneCP5_13p6TeV_madgraphMLM-pythia8"))		xsec=3.8;
+    if(file.Contains("TTG-1Jets_TuneCP5_13p6TeV_amcatnloFXFXold-pythia8"))				xsec=4.629;
+    if(file.Contains("TTLL_Bin-MLL-4to50_TuneCP5_13p6TeV_amcatnlo-pythia8"))				xsec=0.03949;
+    if(file.Contains("TTLL_Bin-MLL-50_TuneCP5_13p6TeV_amcatnlo-pythia8"))				xsec=0.08646;
+    if(file.Contains("TTZ-ZtoQQ-1J_TuneCP5_13p6TeV_madgraphMLM-pythia8"))				xsec=1.572;
+    if(file.Contains("TTH-Hto2B_Par-M-125_TuneCP5_13p6TeV_powheg-pythia8"))				xsec=0.57*Htobb;
+
+    if(file.Contains("WtoLNu-4Jets_Bin-1J_TuneCP5_13p6TeV_madgraphMLM-pythia8"))			xsec=9141;
+    if(file.Contains("WtoLNu-4Jets_Bin-2J_TuneCP5_13p6TeV_madgraphMLM-pythia8"))			xsec=2931;
+    if(file.Contains("WtoLNu-4Jets_Bin-3J_TuneCP5_13p6TeV_madgraphMLM-pythia8"))			xsec=864.6;
+    if(file.Contains("WtoLNu-4Jets_Bin-4J_TuneCP5_13p6TeV_madgraphMLM-pythia8"))			xsec=417.8;
+    if(file.Contains("WtoLNu-4Jets_Bin-HT-40to100-MLNu-0to120_TuneCP5_13p6TeV_madgraphMLM-pythia8"))	xsec=4260;
+    if(file.Contains("WtoLNu-4Jets_Bin-HT-40to100-MLNu-120_TuneCP5_13p6TeV_madgraphMLM-pythia8"))	xsec=20.65;
+    if(file.Contains("WtoLNu-4Jets_Bin-HT-100to400-MLNu-0to120_TuneCP5_13p6TeV_madgraphMLM-pythia8"))	xsec=1636;
+    if(file.Contains("WtoLNu-4Jets_Bin-HT-100to400-MLNu-120_TuneCP5_13p6TeV_madgraphMLM-pythia8"))	xsec=10.18;
+    if(file.Contains("WtoLNu-4Jets_Bin-HT-400to800-MLNu-0to120_TuneCP5_13p6TeV_madgraphMLM-pythia8"))	xsec=59.86;
+    if(file.Contains("WtoLNu-4Jets_Bin-HT-400to800-MLNu-120_TuneCP5_13p6TeV_madgraphMLM-pythia8"))	xsec=0.526;
+    if(file.Contains("WtoLNu-4Jets_Bin-HT-800to1500-MLNu-0to120_TuneCP5_13p6TeV_madgraphMLM-pythia8"))	xsec=6.226;
+    if(file.Contains("WtoLNu-4Jets_Bin-HT-800to1500-MLNu-120_TuneCP5_13p6TeV_madgraphMLM-pythia8"))	xsec=0.06245;
+    if(file.Contains("WtoLNu-4Jets_Bin-HT-1500to2500-MLNu-0to120_TuneCP5_13p6TeV_madgraphMLM-pythia8"))	xsec=0.4503;
+    if(file.Contains("WtoLNu-4Jets_Bin-HT-1500to2500-MLNu-120_TuneCP5_13p6TeV_madgraphMLM-pythia8"))	xsec=0.005052;
+    if(file.Contains("WtoLNu-4Jets_Bin-HT-2500-MLNu-0to120_TuneCP5_13p6TeV_madgraphMLM-pythia8"))	xsec=0.03085;
+    if(file.Contains("WtoLNu-4Jets_Bin-HT-2500-MLNu-120_TuneCP5_13p6TeV_madgraphMLM-pythia8"))		xsec=0.000378;
+
+    if(file.Contains("Zto2Nu-4Jets_Bin-HT-100to200_TuneCP5_13p6TeV_madgraphMLM-pythia8"))		xsec=272.8;
+    if(file.Contains("Zto2Nu-4Jets_Bin-HT-200to400_TuneCP5_13p6TeV_madgraphMLM-pythia8"))		xsec=75.66;
+    if(file.Contains("Zto2Nu-4Jets_Bin-HT-400to800_TuneCP5_13p6TeV_madgraphMLM-pythia8"))		xsec=13.08;
+    if(file.Contains("Zto2Nu-4Jets_Bin-HT-800to1500_TuneCP5_13p6TeV_madgraphMLM-pythia8"))		xsec=1.362;
+    if(file.Contains("Zto2Nu-4Jets_Bin-HT-1500to2500_TuneCP5_13p6TeV_madgraphMLM-pythia8"))		xsec=0.09793;
+    if(file.Contains("Zto2Nu-4Jets_Bin-HT-2500_TuneCP5_13p6TeV_madgraphMLM-pythia8"))			xsec=0.006665;
+
+    if(file.Contains("QCD-4Jets_Bin-HT-100to200_TuneCP5_13p6TeV_madgraphMLM-pythia8"))			xsec=25310000;
+    if(file.Contains("QCD-4Jets_Bin-HT-200to400_TuneCP5_13p6TeV_madgraphMLM-pythia8"))			xsec=1960000;
+    if(file.Contains("QCD-4Jets_Bin-HT-400to600_TuneCP5_13p6TeV_madgraphMLM-pythia8"))			xsec=97400;
+    if(file.Contains("QCD-4Jets_Bin-HT-600to800_TuneCP5_13p6TeV_madgraphMLM-pythia8"))			xsec=13560;
+    if(file.Contains("QCD-4Jets_Bin-HT-800to1000_TuneCP5_13p6TeV_madgraphMLM-pythia8"))			xsec=3010;
+    if(file.Contains("QCD-4Jets_Bin-HT-1000to1200_TuneCP5_13p6TeV_madgraphMLM-pythia8"))		xsec=890.3;
+    if(file.Contains("QCD-4Jets_Bin-HT-1200to1500_TuneCP5_13p6TeV_madgraphMLM-pythia8"))		xsec=384.8;
+    if(file.Contains("QCD-4Jets_Bin-HT-1500to2000_TuneCP5_13p6TeV_madgraphMLM-pythia8"))		xsec=127.3;
+    if(file.Contains("QCD-4Jets_Bin-HT-2000_TuneCP5_13p6TeV_madgraphMLM-pythia8"))			xsec=26.26;
+
+    if(file.Contains("TbarBQtoLNu-t-channel-4FS_TuneCP5_13p6TeV_powheg-madspin-pythia8"))		xsec=87.2*0.3204;
+    if(file.Contains("TbarBQto2Q-t-channel-4FS_TuneCP5_13p6TeV_powheg-madspin-pythia8"))		xsec=87.2*0.6741;
+    if(file.Contains("TBbarQtoLNu-t-channel-4FS_TuneCP5_13p6TeV_powheg-madspin-pythia8"))		xsec=145.0*0.3204;
+    if(file.Contains("TBbarQto2Q-t-channel-4FS_TuneCP5_13p6TeV_powheg-madspin-pythia8"))		xsec=145.0*0.6741;
+
+    if(file.Contains("DYto2E-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8"))			xsec=5481;
+    if(file.Contains("DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8"))			xsec=5447;
+    if(file.Contains("DYto2Tau-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8"))			xsec=5448;
+    if(file.Contains("DYto2L-4Jets_Bin-HT-70to100-MLL-50to120_TuneCP5_13p6TeV_madgraphMLM-pythia8"))	xsec=140.4;
+    if(file.Contains("DYto2L-4Jets_Bin-HT-70to100-MLL-120_TuneCP5_13p6TeV_madgraphMLM-pythia8"))	xsec=2.203;
+    if(file.Contains("DYto2L-4Jets_Bin-HT-100to400-MLL-50to120_TuneCP5_13p6TeV_madgraphMLM-pythia8"))	xsec=179.9;
+    if(file.Contains("DYto2L-4Jets_Bin-HT-100to400-MLL-120_TuneCP5_13p6TeV_madgraphMLM-pythia8"))	xsec=3.351;
+    if(file.Contains("DYto2L-4Jets_Bin-HT-400to800-MLL-50to120_TuneCP5_13p6TeV_madgraphMLM-pythia8"))	xsec=6.721;
+    if(file.Contains("DYto2L-4Jets_Bin-HT-400to800-MLL-120_TuneCP5_13p6TeV_madgraphMLM-pythia8"))	xsec=0.1753;
+    if(file.Contains("DYto2L-4Jets_Bin-HT-800to1500-MLL-50to120_TuneCP5_13p6TeV_madgraphMLM-pythia8"))	xsec=0.6987;
+    if(file.Contains("DYto2L-4Jets_Bin-HT-800to1500-MLL-120_TuneCP5_13p6TeV_madgraphMLM-pythia8"))	xsec=0.02089;
+    if(file.Contains("DYto2L-4Jets_Bin-HT-1500to2500-MLL-50to120_TuneCP5_13p6TeV_madgraphMLM-pythia8"))	xsec=0.05051;
+    if(file.Contains("DYto2L-4Jets_Bin-HT-1500to2500-MLL-120_TuneCP5_13p6TeV_madgraphMLM-pythia8"))	xsec=0.001679;
+    if(file.Contains("DYto2L-4Jets_Bin-HT-2500-MLL-50to120_TuneCP5_13p6TeV_madgraphMLM-pythia8"))	xsec=0.003455;
+    if(file.Contains("DYto2L-4Jets_Bin-HT-2500-MLL-120_TuneCP5_13p6TeV_madgraphMLM-pythia8"))		xsec=0.000124;
+
+    if(file.Contains("GJ-4Jets_Bin-HT-40to100-PTG-10to100_Par-dRGJ-0p25_TuneCP5_13p6TeV_madgraphMLM-pythia8"))		xsec=123400;
+    if(file.Contains("GJ-4Jets_Bin-HT-40to200-PTG-100to200_Par-dRGJ-0p25_TuneCP5_13p6TeV_madgraphMLM-pythia8"))		xsec=554.3;
+    if(file.Contains("GJ-4Jets_Bin-HT-40to400-PTG-200_Par-dRGJ-0p25_TuneCP5_13p6TeV_madgraphMLM-pythia8"))		xsec=43.76;
+    if(file.Contains("GJ-4Jets_Bin-HT-100to200-PTG-10to100_Par-dRGJ-0p25_TuneCP5_13p6TeV_madgraphMLM-pythia8"))		xsec=32190;
+    if(file.Contains("GJ-4Jets_Bin-HT-200to400-PTG-10to100_Par-dRGJ-0p25_TuneCP5_13p6TeV_madgraphMLM-pythia8"))		xsec=5498;
+    if(file.Contains("GJ-4Jets_Bin-HT-200to400-PTG-100to200_Par-dRGJ-0p25_TuneCP5_13p6TeV_madgraphMLM-pythia8"))	xsec=200;
+    if(file.Contains("GJ-4Jets_Bin-HT-400to600-PTG-10to100_Par-dRGJ-0p25_TuneCP5_13p6TeV_madgraphMLM-pythia8"))		xsec=482.3;
+    if(file.Contains("GJ-4Jets_Bin-HT-400to600-PTG-100to200_Par-dRGJ-0p25_TuneCP5_13p6TeV_madgraphMLM-pythia8"))	xsec=29.77;
+    if(file.Contains("GJ-4Jets_Bin-HT-400to600-PTG-200_Par-dRGJ-0p25_TuneCP5_13p6TeV_madgraphMLM-pythia8"))		xsec=11.75;
+    if(file.Contains("GJ-4Jets_Bin-HT-600to1000-PTG-10to100_Par-dRGJ-0p25_TuneCP5_13p6TeV_madgraphMLM-pythia8"))	xsec=117.5;
+    if(file.Contains("GJ-4Jets_Bin-HT-600to1000-PTG-100to200_Par-dRGJ-0p25_TuneCP5_13p6TeV_madgraphMLM-pythia8"))	xsec=9.666;
+    if(file.Contains("GJ-4Jets_Bin-HT-600to1000-PTG-200_Par-dRGJ-0p25_TuneCP5_13p6TeV_madgraphMLM-pythia8"))		xsec=4.75;
+    if(file.Contains("GJ-4Jets_Bin-HT-1000-PTG-10to100_Par-dRGJ-0p25_TuneCP5_13p6TeV_madgraphMLM-pythia8"))		xsec=15.12;
+    if(file.Contains("GJ-4Jets_Bin-HT-1000-PTG-100to200_Par-dRGJ-0p25_TuneCP5_13p6TeV_madgraphMLM-pythia8"))		xsec=1.628;
+    if(file.Contains("GJ-4Jets_Bin-HT-1000-PTG-200_Par-dRGJ-0p25_TuneCP5_13p6TeV_madgraphMLM-pythia8"))			xsec=1.019;
+
+    if(file.Contains("WminusH-WtoLNu-Hto2B_Par-M-125_TuneCP5_13p6TeV_powhegMINLO-pythia8"))		xsec=0.5677*Htobb*3*WToLNu;
+    if(file.Contains("WplusH-WtoLNu-Hto2B_Par-M-125_TuneCP5_13p6TeV_powhegMINLO-pythia8"))		xsec=0.8889*Htobb*3*WToLNu;
+    if(file.Contains("WZtoL3Nu_TuneCP5_13p6TeV_powheg-pythia8"))					xsec=3.077;
+    if(file.Contains("ZH-Zto2Nu-Hto2B_Par-M-125_TuneCP5_13p6TeV_powhegMINLO-pythia8"))			xsec=0.9439*Htobb*0.2;
+
     if(xsec<=0) std::cout<<"ERROR:: Cross section not found for "<<file<<std::endl;
 
     return xsec;
@@ -947,7 +1035,23 @@ namespace xsec{
     if(file.Contains("WZtoL3Nu-1Jets-4FS_TuneCP5_13p6TeV_amcatnloFXFX-pythia8"))		fneg=0.2152;
     if(file.Contains("WZto2L2Q_TuneCP5_13p6TeV_powheg-pythia8"))				fneg=0.0005877;
     if(file.Contains("WZto3LNu_TuneCP5_13p6TeV_powheg-pythia8"))				fneg=0.001026;
-     
+    
+    if(file.Contains("TTG-1Jets_TuneCP5_13p6TeV_amcatnloFXFXold-pythia8"))			fneg=0.3002;
+    if(file.Contains("TTLL_Bin-MLL-4to50_TuneCP5_13p6TeV_amcatnlo-pythia8"))			fneg=0.2229;
+    if(file.Contains("TTLL_Bin-MLL-50_TuneCP5_13p6TeV_amcatnlo-pythia8"))			fneg=0.2392;
+    if(file.Contains("TTH-Hto2B_Par-M-125_TuneCP5_13p6TeV_powheg-pythia8"))			fneg=0.01073;
+    if(file.Contains("TbarBQtoLNu-t-channel-4FS_TuneCP5_13p6TeV_powheg-madspin-pythia8"))	fneg=0.02995;
+    if(file.Contains("TbarBQto2Q-t-channel-4FS_TuneCP5_13p6TeV_powheg-madspin-pythia8"))	fneg=0.03005;
+    if(file.Contains("TBbarQtoLNu-t-channel-4FS_TuneCP5_13p6TeV_powheg-madspin-pythia8"))	fneg=0.03095;
+    if(file.Contains("TBbarQto2Q-t-channel-4FS_TuneCP5_13p6TeV_powheg-madspin-pythia8"))	fneg=0.03201;
+    if(file.Contains("TBbartoLplusNuBbar-s-channel-4FS_TuneCP5_13p6TeV_amcatnlo-pythia8"))	fneg=0.192;
+    if(file.Contains("TbarBtoLminusNuB-s-channel-4FS_TuneCP5_13p6TeV_amcatnlo-pythia8"))	fneg=0.1942;
+ 
+    if(file.Contains("WminusH-WtoLNu-Hto2B_Par-M-125_TuneCP5_13p6TeV_powhegMINLO-pythia8"))	fneg=0.02691;
+    if(file.Contains("WplusH-WtoLNu-Hto2B_Par-M-125_TuneCP5_13p6TeV_powhegMINLO-pythia8"))	fneg=0.02802;
+    if(file.Contains("WZtoL3Nu_TuneCP5_13p6TeV_powheg-pythia8"))				fneg=0.000032;
+    if(file.Contains("ZH-Zto2Nu-Hto2B_Par-M-125_TuneCP5_13p6TeV_powhegMINLO-pythia8"))		fneg=0.02914;
+
     return fneg;
   }
 
