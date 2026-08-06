@@ -117,36 +117,6 @@ bool PhotonProducer::IsSignal(nano_tree &nano, pico_tree &pico, int nano_idx,
   return true;
 }
 
-float PhotonProducer::SCeta(bool isScEtaEB, float eta, float phi, 
-                            float pvx, float pvy, float pvz){
-    //calculate eta w.r.t. origin (SCeta)
-    float origin_eta = 0.0;
-    if (isScEtaEB) {
-      float pv_tan_theta_over_2 = exp(-1.0*eta);
-      float pv_tan_theta = 2.0*pv_tan_theta_over_2/(1.0-pv_tan_theta_over_2*pv_tan_theta_over_2);
-      float photon_unit_x = cos(phi);
-      float photon_unit_y = sin(phi);
-      float pv_ecal_dr = 130.0 - (pvx*photon_unit_x+pvy*photon_unit_y);
-      float pv_ecal_dz = pv_ecal_dr/pv_tan_theta;
-      float origin_theta = atan(130.0/(pvz+pv_ecal_dz));
-      if (origin_theta < 0) origin_theta += M_PI;
-      origin_eta = -1.0*log(tan(origin_theta/2.0));
-    }
-    else { //if (nano.Photon_isScEtaEE()[iph])
-      float pv_tan_theta_over_2 = exp(-1.0*eta);
-      float pv_tan_theta = 2.0*pv_tan_theta_over_2/(1.0-pv_tan_theta_over_2*pv_tan_theta_over_2);
-      float photon_unit_x = cos(phi);
-      float photon_unit_y = sin(phi);
-      float pv_ecal_dz = 310.0-pvz; //+ endcap
-      if (eta < 0) pv_ecal_dz = 310.0+pvz; //- endcap
-      float pv_ecal_dr = pv_ecal_dz*pv_tan_theta;
-      float origin_theta = atan(((photon_unit_x*pvx+photon_unit_y*pvy)+pv_ecal_dr)/310.0);
-      if (origin_theta < 0) origin_theta += M_PI;
-      origin_eta = -1.0*log(tan(origin_theta/2.0));
-    }
-  return origin_eta;
-}
-
 vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, 
     vector<int> &jet_isphoton_nano_idx, vector<int> &sig_el_nano_idx, 
     vector<int> &sig_mu_nano_idx, vector<int> &photon_el_pico_idx, 
@@ -190,7 +160,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico,
     float pt = nano.Photon_pt()[iph];
     float eta = nano.Photon_eta()[iph];
     float phi = nano.Photon_phi()[iph];
-    float origin_eta = SCeta(nano.Photon_isScEtaEB()[iph], eta, phi, nano.PV_x(), nano.PV_y(), nano.PV_z());
+    float origin_eta = SCeta(nano, iph, nano.Photon_isScEtaEB()[iph], eta, phi, nano.PV_x(), nano.PV_y(), nano.PV_z());
     if (year=="2016APV"||year=="2016"||year=="2017"||year=="2018") {
       scaleres_corr.push_back(1.0f);
       energy_err_corr.push_back(nano.Photon_energyErr()[iph]);
@@ -315,7 +285,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico,
     float pt = raw_pt*scaleres_corr[iph];
     float eta = nano.Photon_eta()[iph];
     float phi = nano.Photon_phi()[iph];
-    float origin_eta = SCeta(nano.Photon_isScEtaEB()[iph], eta, phi, nano.PV_x(), nano.PV_y(), nano.PV_z());
+    float origin_eta = SCeta(nano, iph, nano.Photon_isScEtaEB()[iph], eta, phi, nano.PV_x(), nano.PV_y(), nano.PV_z());
     float energy_err = energy_err_corr[iph];
     float mva = nano.Photon_mvaID()[iph];
     bool eVeto = nano.Photon_electronVeto()[iph];
@@ -496,6 +466,38 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico,
 
   return sig_photon_nano_idx;
 }
+
+float PhotonProducer::SCeta(nano_tree &nano, int idx, bool isScEtaEB, float eta, float phi,
+                            float pvx, float pvy, float pvz){
+    //calculate eta w.r.t. origin (SCeta)
+    if(nanoaod_version+0.01>15) return nano.Photon_superclusterEta()[idx];
+    float origin_eta = 0.0;
+    if (isScEtaEB) {
+      float pv_tan_theta_over_2 = exp(-1.0*eta);
+      float pv_tan_theta = 2.0*pv_tan_theta_over_2/(1.0-pv_tan_theta_over_2*pv_tan_theta_over_2);
+      float photon_unit_x = cos(phi);
+      float photon_unit_y = sin(phi);
+      float pv_ecal_dr = 130.0 - (pvx*photon_unit_x+pvy*photon_unit_y);
+      float pv_ecal_dz = pv_ecal_dr/pv_tan_theta;
+      float origin_theta = atan(130.0/(pvz+pv_ecal_dz));
+      if (origin_theta < 0) origin_theta += M_PI;
+      origin_eta = -1.0*log(tan(origin_theta/2.0));
+    }
+    else { //if (nano.Photon_isScEtaEE()[iph])
+      float pv_tan_theta_over_2 = exp(-1.0*eta);
+      float pv_tan_theta = 2.0*pv_tan_theta_over_2/(1.0-pv_tan_theta_over_2*pv_tan_theta_over_2);
+      float photon_unit_x = cos(phi);
+      float photon_unit_y = sin(phi);
+      float pv_ecal_dz = 310.0-pvz; //+ endcap
+      if (eta < 0) pv_ecal_dz = 310.0+pvz; //- endcap
+      float pv_ecal_dr = pv_ecal_dz*pv_tan_theta;
+      float origin_theta = atan(((photon_unit_x*pvx+photon_unit_y*pvy)+pv_ecal_dr)/310.0);
+      if (origin_theta < 0) origin_theta += M_PI;
+      origin_eta = -1.0*log(tan(origin_theta/2.0));
+    }
+  return origin_eta;
+}
+
 
 bool PhotonProducer::idPhoton(int bitmap, int level){
   // decision for each cut represented by 1 bit

@@ -246,6 +246,7 @@ array<float> Photon_eCorr
 array<float> Photon_energyErr
 array<float> Photon_energyRaw
 array<float> Photon_eta
+array<float> Photon_superclusterEta
 array<float> Photon_hoe
 array<float> Photon_esEffSigmaRR
 array<float> Photon_esEnergyOverRawE

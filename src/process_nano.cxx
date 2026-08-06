@@ -51,6 +51,7 @@ namespace {
   int nent_test = -1;
   string norm_file = "";
   bool debug = false;
+  bool is25mc = false;
   // requirements for jets to be counted in njet, mofified for Zgamma below
   float min_jet_pt = 30.0;
   float max_jet_eta =  2.4;
@@ -121,6 +122,7 @@ int main(int argc, char *argv[]){
     cout<<"ERROR: Add code for new year!"<<endl;
     exit(1);
   }
+  if(is25mc == true && year == 2024) year = 2025;
 
   bool is2022preEE = false; //Classify data and MC into pre and post EE for 2022
   if(year == 2022){ 
@@ -227,8 +229,10 @@ int main(int argc, char *argv[]){
   }
 
   string in_path = in_dir+"/"+in_file;
+  string out_file = in_file;
+  if(!isData && (year==2025 || year==2026)) out_file = std::regex_replace(in_file, std::regex("2024Summer24NanoAODv15__150X_mcRun3_2024"), "2025Summer24NanoAODv15__150X_mcRun3_2024");
   string out_path;
-  out_path = out_dir+"/raw_pico/raw_pico_"+in_file;
+  out_path = out_dir+"/raw_pico/raw_pico_"+out_file;
 
   // Find nanoAOD version
   float nanoaod_version = -1;
@@ -255,7 +259,6 @@ int main(int argc, char *argv[]){
   // Updated Values May-28-2024 from https://btv-wiki.docs.cern.ch/ScaleFactors/
   // 2024 values from https://indico.cern.ch/event/1556659/contributions/6559758/attachments/3083466/5458488/BTag_250610_Summer24WPs.pdf
   // btag_df: WPs for deepJet (DeepFlavourB)
-  cout<<"B tag weighting using temporary values for 2024, 2025, 2026"<<endl;
   map<string, vector<float>> btag_df_wpts{
     {"2016APV", vector<float>({0.0508, 0.2598, 0.6502})},
     {"2016", vector<float>({0.0480, 0.2489, 0.6377})},
@@ -341,14 +344,20 @@ int main(int argc, char *argv[]){
   PrefireWeighter prefire_weighter(year, true);
   // Pre-UL scale factors
   const vector<BTagEntry::OperatingPoint> op_all = {BTagEntry::OP_LOOSE, BTagEntry::OP_MEDIUM, BTagEntry::OP_TIGHT};
-  BTagWeighter btag_weighter(year, isFastsim, false, btag_wpts[year_string]);
+  BTagWeighter btag_weighter(year, isFastsim, false, btag_wpts[year_string]);//This is pre-UL stuff. Can we remove?
   BTagWeighter btag_df_weighter(year, isFastsim, true, btag_df_wpts[year_string]);
   LeptonWeighter lep_weighter(year, isZgamma);
   LeptonWeighter lep_weighter16gh(year, isZgamma, true);
   PhotonWeighter photon_weighter(year, isZgamma || isHiggsino);
   // UL scale factors
-  EventWeighter event_weighter(year_string, isSignal, 
-                               btag_df_wpts[year_string]);
+  vector<float> wpts;
+  if(year==2024 || year==2025 || year==2026){
+    wpts = btag_upt_wpts[year_string];
+  } else{
+    wpts = btag_df_wpts[year_string];
+  }
+  EventWeighter event_weighter(year_string, isSignal, wpts); 
+  
   TriggerWeighter trigger_weighter(year_string, isSignal);
   //cout<<"Is APV: "<<isAPV<<endl;
   // Other tools
@@ -394,6 +403,15 @@ int main(int argc, char *argv[]){
     nano.GetEntry(entry);
     if (entry%2000==0 || entry == nentries-1) {
       cout<<"Processing event: "<<entry<<endl;
+    }
+    double sf_splitfactor=1;
+    //keep events with even event numbers in 2024, and odd event numbers in 2025
+    if (!isData && year==2024) {
+      if(nano.event()%2==1) continue;
+      sf_splitfactor=2;
+    } else if (!isData && year==2025) {
+      if(nano.event()%2==0) continue;
+      sf_splitfactor=2;
     }
     //skip events that are data but not in the golden json
     if (isData) {
@@ -656,7 +674,7 @@ int main(int argc, char *argv[]){
     // Note: genEventSumw is calculated from genWeight not Generator_weight
     if (!isData) {
       pico.out_w_lumi() = cross_section*nano.genWeight()
-                          /mc_metadata.gen_event_sumw;
+                          /mc_metadata.gen_event_sumw * sf_splitfactor;
       if (isSignal) {
         pico.out_sys_murf().resize(MURF_VARIATIONS,1.); 
         for (int imurf = 0; imurf < MURF_VARIATIONS; imurf++) {
@@ -719,6 +737,7 @@ void GetOptions(int argc, char *argv[]){
       {"nent",    required_argument, 0, 0},
       {"norm",    required_argument, 0, 0},
       {"skim",    required_argument, 0, 0},
+      {"is25mc",   no_argument, 0, 't'},
       {"debug",    no_argument, 0, 'd'},
       {0, 0, 0, 0}
     };
@@ -741,6 +760,9 @@ void GetOptions(int argc, char *argv[]){
       break;
     case 'o':
       out_dir = optarg;
+      break;
+    case 't':
+      is25mc = true;
       break;
     case 0:
       optname = long_options[option_index].name;
