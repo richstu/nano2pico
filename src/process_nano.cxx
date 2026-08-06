@@ -350,13 +350,14 @@ int main(int argc, char *argv[]){
   LeptonWeighter lep_weighter16gh(year, isZgamma, true);
   PhotonWeighter photon_weighter(year, isZgamma || isHiggsino);
   // UL scale factors
+  vector<float> wpts;
   if(year==2024 || year==2025 || year==2026){
-    EventWeighter event_weighter(year_string, isSignal, 
-                                 btag_upt_wpts[year_string]);
+    wpts = btag_upt_wpts[year_string];
   } else{
-        EventWeighter event_weighter(year_string, isSignal,
-                                 btag_df_wpts[year_string]);
+    wpts = btag_df_wpts[year_string];
   }
+  EventWeighter event_weighter(year_string, isSignal, wpts); 
+  
   TriggerWeighter trigger_weighter(year_string, isSignal);
   //cout<<"Is APV: "<<isAPV<<endl;
   // Other tools
