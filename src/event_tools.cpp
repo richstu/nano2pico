@@ -94,16 +94,16 @@ EventTools::EventTools(const string &name_, int year_, bool isData_, float nanoa
     isGJet = true;
 
   // add names for Run 3 samples
-  if((Contains(name, "TTtoLplusNu2Q-3Jets") || Contains(name, "TTtoLminusNu2Q-3Jets")) && !Contains(name, "genMET-"))
+  if((Contains(name, "TTtoLplusNu2Q-3Jets") || Contains(name, "TTtoLminusNu2Q-3Jets") || Contains(name, "TTto2L2Nu-3Jets")) && !Contains(name, "genMET-"))
     isTTJets_LO_Incl = true;
   
-  if((Contains(name, "TTtoLplusNu2Q-3Jets") || Contains(name, "TTtoLminusNu2Q-3Jets")) && Contains(name, "genMET-"))
+  if((Contains(name, "TTtoLplusNu2Q-3Jets") || Contains(name, "TTtoLminusNu2Q-3Jets") || Contains(name, "TTto2L2Nu-3Jets")) && Contains(name, "genMET-"))
     isTTJets_LO_MET = true;
 
-  if(Contains(name, "WtoLNu-4Jets_Tune"))
+  if(Contains(name, "WtoLNu-4Jets") && !Contains(name, "HT-"))
     isWJets_LO = true;
   
-  if(Contains(name, "DYto2L-4Jets_MLL-50_Tune"))
+  if(Contains(name, "DYto2L-4Jets_MLL-50_Tune") || Contains(name, "DYto2E-4Jets") || Contains(name, "DYto2Mu-4Jets") || Contains(name, "DYto2Tau-4Jets"))
     isDYJets_LO = true;
 
   //These four variables control the generator settings of the overlap removal variable in MC
@@ -182,7 +182,7 @@ EventTools::EventTools(const string &name_, int year_, bool isData_, float nanoa
     dataset = Dataset::MuonEG;
   else if(Contains(name, "Muon") && !Contains(name,"DoubleMuon") && !Contains(name,"SingleMuon") && !Contains(name,"MuonEG"))  //replaced SingleMuon and DoubleMuon starting in 2022
     dataset = Dataset::Muon;
-  else if(Contains(name, "MET")) 
+  else if(Contains(name, "MET") && !Contains(name,"JetMET")) 
     dataset = Dataset::MET;
   else if(Contains(name, "JetHT")) 
     dataset = Dataset::JetHT;
@@ -548,8 +548,14 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
   // filters directly from Nano
   pico.out_pass_goodv() = nano.Flag_goodVertices();
   pico.out_pass_cschalo_tight() = nano.Flag_globalSuperTightHalo2016Filter();
-  pico.out_pass_hbhe() = nano.Flag_HBHENoiseFilter();
-  pico.out_pass_hbheiso() = nano.Flag_HBHENoiseIsoFilter();
+  if (year>=2022) { // hbhe and hbheiso noise filters not needed in run 3 https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFiltersRun2#Run_3_2022_and_2023_data_and_MC
+    pico.out_pass_hbhe() = true;
+    pico.out_pass_hbheiso() = true;
+  }
+  else {
+    pico.out_pass_hbhe() = nano.Flag_HBHENoiseFilter();
+    pico.out_pass_hbheiso() = nano.Flag_HBHENoiseIsoFilter();
+  }
   pico.out_pass_ecaldeadcell() = nano.Flag_EcalDeadCellTriggerPrimitiveFilter();
   pico.out_pass_badpfmu() = nano.Flag_BadPFMuonFilter();
   if (nanoaod_version+0.01 > 9) {

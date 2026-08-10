@@ -27,6 +27,8 @@ float ht
 float ht5
 float mht
 float mht_phi
+float met_t1
+float met_phi_t1
 float met
 float met_phi
 float met_calo
@@ -206,7 +208,9 @@ vector<int>   jet_h2_indices
 vector<int>   jet_h1_df_indices
 vector<int>   jet_h2_df_indices
 vector<int>   jet_ordered_pt_indices
-
+vector<bool>  jet_pass_jetidFix
+vector<bool>  jet_pass_PUjetid
+vector<bool>  jet_pass_jetidTightLepVeto
 
 int ngenjet
 vector<float> genjet_pt
@@ -336,6 +340,7 @@ vector<bool>  el_idLoose
 vector<bool>  el_sig
 vector<bool>  el_ispf
 vector<int>   el_charge
+vector<int>   el_wpbitmap
 vector<int>   el_pflavor
 vector<bool>  el_ecal
 vector<int>   el_fsrphotonidx

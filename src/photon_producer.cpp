@@ -43,7 +43,7 @@ PhotonProducer::PhotonProducer(string year_, bool isData_,
   }
   else if (year=="2022") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2022/photonSS_EtDependent.json");
+        "data/higgsino/2022/photonSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
         "Scale");
     map_smearing_ = cs_scale_syst_->at(
@@ -51,7 +51,7 @@ PhotonProducer::PhotonProducer(string year_, bool isData_,
   }
   else if (year=="2022EE") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2022EE/photonSS_EtDependent.json");
+        "data/higgsino/2022EE/photonSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
         "Scale");
     map_smearing_ = cs_scale_syst_->at(
@@ -59,7 +59,7 @@ PhotonProducer::PhotonProducer(string year_, bool isData_,
   }
   else if (year=="2023") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2023/photonSS_EtDependent.json");
+        "data/higgsino/2023/photonSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
         "Scale");
     map_smearing_ = cs_scale_syst_->at(
@@ -67,7 +67,7 @@ PhotonProducer::PhotonProducer(string year_, bool isData_,
   }
   else if (year=="2023BPix") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2023BPix/photonSS_EtDependent.json");
+        "data/higgsino/2023BPix/photonSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
         "Scale");
     map_smearing_ = cs_scale_syst_->at(
@@ -75,7 +75,7 @@ PhotonProducer::PhotonProducer(string year_, bool isData_,
   }
   else if (year=="2024") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2024/photonSS_EtDependent.json");
+        "data/higgsino/2024/photonSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
         "Scale");
     map_smearing_ = cs_scale_syst_->at(
@@ -83,7 +83,7 @@ PhotonProducer::PhotonProducer(string year_, bool isData_,
   }
   else if (year=="2025") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2025/EGMScalesSmearing_Pho_2025_forEGM.v1.json");
+        "data/higgsino/2025/photonSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
         "Scale");
     map_smearing_ = cs_scale_syst_->at(
