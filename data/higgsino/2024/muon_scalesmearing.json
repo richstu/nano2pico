@@ -14207,43 +14207,6 @@
                 ],
                 "flow": "clamp"
             }
-        },
-        {
-            "name": "RandomSmearing",
-            "description": "Deterministic random number for smearing",
-            "version": 2,
-            "inputs": [
-                {
-                    "name": "evtNr",
-                    "type": "int",
-                    "description": "Event number"
-                },
-                {
-                    "name": "lumiNr",
-                    "type": "int",
-                    "description": "Lumisection"
-                },
-                {
-                    "name": "phi",
-                    "type": "real",
-                    "description": "phi"
-                }
-            ],
-            "output": {
-                "name": "random_number",
-                "type": "real",
-                "description": "random number"
-            },
-            "generic_formulas": [],
-            "data": {
-                "nodetype": "hashprng",
-                "inputs": [
-                    "evtNr",
-                    "lumiNr",
-                    "phi"
-                ],
-                "distribution": "stdflat"
-            }
         }
     ],
     "compound_corrections": []
