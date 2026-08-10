@@ -42,7 +42,7 @@ ElectronProducer::ElectronProducer(string year_, bool isData_, float nanoaod_ver
   }
   else if (year=="2022") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2022/electronSS_EtDependent.json");
+        "data/higgsino/2022/electronSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
         "Scale");
     map_smearing_ = cs_scale_syst_->at(
@@ -50,7 +50,7 @@ ElectronProducer::ElectronProducer(string year_, bool isData_, float nanoaod_ver
   }
   else if (year=="2022EE") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2022EE/electronSS_EtDependent.json");
+        "data/higgsino/2022EE/electronSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
         "Scale");
     map_smearing_ = cs_scale_syst_->at(
@@ -58,7 +58,7 @@ ElectronProducer::ElectronProducer(string year_, bool isData_, float nanoaod_ver
   }
   else if (year=="2023") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2023/electronSS_EtDependent.json");
+        "data/higgsino/2023/electronSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
         "Scale");
     map_smearing_ = cs_scale_syst_->at(
@@ -66,7 +66,7 @@ ElectronProducer::ElectronProducer(string year_, bool isData_, float nanoaod_ver
   }
   else if (year=="2023BPix") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2023BPix/electronSS_EtDependent.json");
+        "data/higgsino/2023BPix/electronSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
         "Scale");
     map_smearing_ = cs_scale_syst_->at(
@@ -74,7 +74,7 @@ ElectronProducer::ElectronProducer(string year_, bool isData_, float nanoaod_ver
   }
   else if (year=="2024") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2024/electronSS_EtDependent.json");
+        "data/higgsino/2024/electronSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
         "Scale");
     map_smearing_ = cs_scale_syst_->at(
@@ -82,7 +82,7 @@ ElectronProducer::ElectronProducer(string year_, bool isData_, float nanoaod_ver
   }
   else if (year=="2025") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2025/EGMScalesSmearing_Ele_2025_forEGM.v1.json");
+        "data/higgsino/2025/electronSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
         "Scale");
     map_smearing_ = cs_scale_syst_->at(
@@ -128,7 +128,7 @@ bool ElectronProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma, fl
   }
   else {
     //pt = nano.Electron_pt()[nano_idx]/nano.Electron_eCorr()[nano_idx];
-    pt = nano.Electron_pt()[nano_idx];
+    pt = nano.Electron_pt()[nano_idx]*scaleres_corr;
     int bitmap = nano.Electron_vidNestedWPBitmap()[nano_idx];
     bool isBarrel = fabs(eta) <= 1.479;
     bool id = idElectron_noIso(bitmap,3);
@@ -304,7 +304,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
     else {
       // Redefine pt and eta to match RA2B ntuples
       //pt = nano.Electron_pt()[iel]/nano.Electron_eCorr()[iel];
-      pt = nano.Electron_pt()[iel];
+      pt = nano.Electron_pt()[iel]*scaleres_corr[iel];
       if (pt <= VetoElectronPtCut) continue;
       if (fabs(eta) > ElectronEtaCut) continue;
       int bitmap = nano.Electron_vidNestedWPBitmap()[iel];
@@ -330,6 +330,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
     pico.out_el_sig().push_back(isSignal);
     pico.out_el_ispf().push_back(nano.Electron_isPFcand()[iel]);
     pico.out_el_charge().push_back(nano.Electron_charge()[iel]);
+    pico.out_el_wpbitmap().push_back(nano.Electron_vidNestedWPBitmap()[iel]);
     if (!isData) {
       pico.out_el_pflavor().push_back(nano.Electron_genPartFlav()[iel]);
     }

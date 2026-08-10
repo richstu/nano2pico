@@ -338,7 +338,7 @@ int main(int argc, char *argv[]){
   IsoTrackProducer tk_producer(year);
   PhotonProducer photon_producer(year_string, isData, nanoaod_version);
   JetMetProducer jetmet_producer(year, year_string, nanoaod_version, min_jet_pt, max_jet_eta, 
-                                 isData, is_preUL);
+                                 isData, isZgamma, is_preUL);
   HigVarProducer hig_producer(year);
   ZGammaVarProducer zgamma_producer(year);
   GammaGammaVarProducer gammagamma_producer(year);
@@ -372,6 +372,7 @@ int main(int argc, char *argv[]){
     exit(1);
   }
   EventWeighter event_weighter(year_string, btag_sf_wpts);
+
   TriggerWeighter trigger_weighter(year_string);
   //cout<<"Is APV: "<<isAPV<<endl;
   // Other tools
@@ -494,7 +495,7 @@ int main(int argc, char *argv[]){
     vector<int> sig_jet_nano_idx = jetmet_producer.WriteJetMet(nano, pico, 
         jet_islep_nano_idx, jet_isvlep_nano_idx, jet_isphoton_nano_idx,
         btag_wpts[year_string], btag_df_wpts[year_string], btag_upt_wpts[year_string],
-        isFastsim, isSignal, sys_higvars);
+        isFastsim, isSignal, isZgamma, sys_higvars);
     jetmet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year_string][1], isFastsim); // usually w.r.t. medium WP
     jetmet_producer.WriteFatJets(nano, pico, ddb_wpts[year_string], mdak8_wpts[year_string], pnetmd_wpts[year_string]); // jetmet_producer.SetVerbose(nano.nSubJet()>0);
     jetmet_producer.WriteSubJets(nano, pico);
