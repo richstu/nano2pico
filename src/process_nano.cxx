@@ -46,6 +46,7 @@ namespace {
   string out_dir = "";
   int nent_test = -1;
   bool debug = false;
+  bool is25mc = false;  
   // requirements for jets to be counted in njet, mofified for Zgamma below
   float min_jet_pt = 30.0;
   float max_jet_eta =  2.4;
@@ -113,6 +114,7 @@ int main(int argc, char *argv[]){
     cout<<"ERROR: Add code for new year!"<<endl;
     exit(1);
   }
+  if (is25mc && year == 2024) year = 2025;
 
   bool is2022preEE = false; //Classify data and MC into pre and post EE for 2022
   if(year == 2022){ 
@@ -336,7 +338,7 @@ int main(int argc, char *argv[]){
   IsoTrackProducer tk_producer(year);
   PhotonProducer photon_producer(year_string, isData, nanoaod_version);
   JetMetProducer jetmet_producer(year, year_string, nanoaod_version, min_jet_pt, max_jet_eta, 
-                                 isData, isZgamma, is_preUL);
+                                 isData, is_preUL);
   HigVarProducer hig_producer(year);
   ZGammaVarProducer zgamma_producer(year);
   GammaGammaVarProducer gammagamma_producer(year);
@@ -354,10 +356,22 @@ int main(int argc, char *argv[]){
   LeptonWeighter lep_weighter16gh(year, isZgamma, true);
   PhotonWeighter photon_weighter(year, isZgamma || isHiggsino);
   // UL scale factors
-  map<string, vector<float>> btagging_wpts = btag_df_wpts;
-  if (year>=2022) { btagging_wpts = btag_wpts; }
-  if (year>=2024) { btagging_wpts = btag_upt_wpts; }
-  EventWeighter event_weighter(year_string, btagging_wpts[year_string]);
+  // b-tag working points must match the tagger EventWeighter loads SFs for:
+  // DeepJet for Run 2, ParticleNet for 2022-2023, UParT for 2024 onward.
+  // GetBTagAlgo is the single source of truth, shared with event_weighter.cpp.
+  vector<float> btag_sf_wpts;
+  switch (GetBTagAlgo(year_string)) {
+    case BTagAlgo::pnetb:    btag_sf_wpts = btag_wpts[year_string];     break;
+    case BTagAlgo::uptb:     btag_sf_wpts = btag_upt_wpts[year_string]; break;
+    case BTagAlgo::deepflav: //fallthrough: DeepJet is also the default
+    default:                 btag_sf_wpts = btag_df_wpts[year_string];  break;
+  }
+  if (btag_sf_wpts.size() != 3) {
+    cout<<"ERROR:: No b-tag working points defined for year "<<year_string
+        <<" and the tagger selected by GetBTagAlgo."<<endl;
+    exit(1);
+  }
+  EventWeighter event_weighter(year_string, btag_sf_wpts);
   TriggerWeighter trigger_weighter(year_string);
   //cout<<"Is APV: "<<isAPV<<endl;
   // Other tools
@@ -388,13 +402,16 @@ int main(int argc, char *argv[]){
   corrections_tree wgt_sums("", wgt_sums_path);
   cout << "Writing sum-of-weights to: " << wgt_sums_path << endl;
   Initialize(wgt_sums);
-  wgt_sums.out_nent() = nentries;
+  //wgt_sums.out_nent() = nentries;
+  if (isData) wgt_sums.out_nent() = nentries; //NEW
   for(size_t entry(0); entry<nentries; ++entry){
     if (debug) cout << "GetEntry: " << entry <<" event = "<<pico.out_event()<< endl;
     nano.GetEntry(entry);
     if (entry%2000==0 || entry == nentries-1) {
       cout<<"Processing event: "<<entry<<endl;
     }
+    if (!isData && year==2024 && nano.event()%2==1) continue;      // NEW
+    if (!isData && year==2025 && nano.event()%2==0) continue;     
     //skip events that are data but not in the golden json
     if (isData) {
       if(!inJSON(VVRunLumi, nano.run(), nano.luminosityBlock())) 
@@ -477,7 +494,7 @@ int main(int argc, char *argv[]){
     vector<int> sig_jet_nano_idx = jetmet_producer.WriteJetMet(nano, pico, 
         jet_islep_nano_idx, jet_isvlep_nano_idx, jet_isphoton_nano_idx,
         btag_wpts[year_string], btag_df_wpts[year_string], btag_upt_wpts[year_string],
-        isFastsim, isSignal, isZgamma, sys_higvars);
+        isFastsim, isSignal, sys_higvars);
     jetmet_producer.WriteJetSystemPt(nano, pico, sig_jet_nano_idx, btag_wpts[year_string][1], isFastsim); // usually w.r.t. medium WP
     jetmet_producer.WriteFatJets(nano, pico, ddb_wpts[year_string], mdak8_wpts[year_string], pnetmd_wpts[year_string]); // jetmet_producer.SetVerbose(nano.nSubJet()>0);
     jetmet_producer.WriteSubJets(nano, pico);
@@ -510,7 +527,6 @@ int main(int argc, char *argv[]){
         }
       }
     } 
-
     if (debug) cout<<"INFO:: Writing filters"<<endl;
     // N.B. Jets: pico.out_pass_jets() and pico.out_pass_fsjets() filled in jetmet_producer
     event_tools.WriteDataQualityFilters(nano, pico, sig_jet_nano_idx, min_jet_pt, isFastsim, is_preUL);
@@ -660,16 +676,7 @@ int main(int argc, char *argv[]){
         pico.out_sys_prefire() = sys_prefire;
       } // Pre-UL
     } // MC
-    if (!isZgamma) {
-      pico.out_w_photon() = 1.;
-      pico.out_w_phshape() = 1.;
-      pico.out_w_fakephoton() = 1.;
-      //piece of histotical machinery for madgraph tt and gluino samples
-      //probably should be deprecated
-
-      isr_tools.WriteISRWeights(pico);
-    }
-
+    
     // to be calculated in Step 2: merge_corrections
     if (!isData)
       pico.out_w_lumi() = nano.Generator_weight()>0 ? 1:-1;
@@ -692,12 +699,8 @@ int main(int argc, char *argv[]){
                           pico.out_w_trig() * pico.out_w_phshape() * 
                           pico.out_w_prefire() * pico.out_w_fakephoton() *
                           pico.out_w_nnlo();
-    } else {
-      // for non Z-gamma: do not put anything that will not be renormalized
-      // in weight
-      pico.out_weight() = pico.out_w_lumi() *
-                          pico.out_w_lep() * pico.out_w_fs_lep() * pico.out_w_bhig() *
-                          pico.out_w_isr() * pico.out_w_pu();
+    } else if(isHiggsino) {
+      pico.out_weight() = pico.out_w_lumi() * pico.out_w_photon() * pico.out_w_phshape();
     }
     // ----------------------------------------------------------------------------------------------
     //              *** Add up weights to save for renormalization step ***
@@ -705,6 +708,7 @@ int main(int argc, char *argv[]){
     
     if (debug) cout<<"INFO:: Writing sum of weights"<<endl;
     if (!isData) {
+      wgt_sums.out_nent() += 1.;                     // NEW
       wgt_sums.out_weight() += pico.out_weight();
       
       if (Contains(in_path, "DiPhotonJetsBox") || Contains(in_path,"GG-Box")){
@@ -797,6 +801,7 @@ int main(int argc, char *argv[]){
 }
 void Initialize(corrections_tree &wgt_sums){
   wgt_sums.out_neff()              = 0;
+  wgt_sums.out_nent()              = 0;
   wgt_sums.out_nent_zlep()         = 0;
   wgt_sums.out_nent_isr()          = 0;
   wgt_sums.out_neff_el()           = 0;
@@ -853,6 +858,7 @@ void GetOptions(int argc, char *argv[]){
       {"out_dir", required_argument, 0,'o'},
       {"nent",    required_argument, 0, 0},
       {"debug",    no_argument, 0, 'd'},
+      {"is25mc",   no_argument, 0, 't'},
       {0, 0, 0, 0}
     };
 
@@ -874,6 +880,9 @@ void GetOptions(int argc, char *argv[]){
       break;
     case 'o':
       out_dir = optarg;
+      break;
+    case 't':                                             // NEW
+      is25mc = true;
       break;
     case 0:
       optname = long_options[option_index].name;

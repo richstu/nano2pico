@@ -2069,7 +2069,7 @@ namespace xsec{
 
   // xsec is pb, xsec_unc is relative uncertainty
   void higgsino2DCrossSection(int hig_mass, double &xsec, double &xsec_unc, int year) {
-    if((year == 2022 || year == 2023 || year == 2024)){
+    if((year == 2022 || year == 2023 || year == 2024 || year == 2025 || year == 2026)){
       // note: from https://twiki.cern.ch/twiki/bin/view/LHCPhysics/SUSYCrossSections13x6TeVhinosplit
       // xsec binning is not as fine as before, unavailable mass points are commented out
       //if(hig_mass == 127) { xsec = 1.44725; xsec_unc = 0.0395277; return;}
@@ -2191,7 +2191,7 @@ namespace xsec{
   
   // xsec is pb, xsec_unc is relative uncertainty
   void higgsinoCrossSection(int hig_mass, double &xsec, double &xsec_unc, int year) {
-    if((year == 2022 || year == 2023 || year == 2024)){ 
+    if((year == 2022 || year == 2023 || year == 2024 || year == 2025 || year == 2026)){
       // these are still the same as Run 2 cross sections, update later. 
       if(hig_mass ==127) { xsec = 7.6022; xsec_unc = 0.0393921; return;}
       else if(hig_mass ==150) { xsec = 3.83231; xsec_unc = 0.0413612; return;}

@@ -62,3 +62,12 @@ auto*.json
 *slim*cmds.json*
 *slim*cmds.py*
 
+# credentials
+voms_proxy.txt
+# local CMSSW area
+CMSSW_*/
+# pipeline outputs
+test_sf_higgsino_allyears/
+job_submit_commands/
+plots/
+*.root

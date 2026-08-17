@@ -94,16 +94,16 @@ EventTools::EventTools(const string &name_, int year_, bool isData_, float nanoa
     isGJet = true;
 
   // add names for Run 3 samples
-  if((Contains(name, "TTtoLplusNu2Q-3Jets") || Contains(name, "TTtoLminusNu2Q-3Jets") || Contains(name, "TTto2L2Nu-3Jets")) && !Contains(name, "genMET-"))
+  if((Contains(name, "TTtoLplusNu2Q-3Jets") || Contains(name, "TTtoLminusNu2Q-3Jets")) && !Contains(name, "genMET-"))
     isTTJets_LO_Incl = true;
   
-  if((Contains(name, "TTtoLplusNu2Q-3Jets") || Contains(name, "TTtoLminusNu2Q-3Jets") || Contains(name, "TTto2L2Nu-3Jets")) && Contains(name, "genMET-"))
+  if((Contains(name, "TTtoLplusNu2Q-3Jets") || Contains(name, "TTtoLminusNu2Q-3Jets")) && Contains(name, "genMET-"))
     isTTJets_LO_MET = true;
 
-  if(Contains(name, "WtoLNu-4Jets") && !Contains(name, "HT-"))
+  if(Contains(name, "WtoLNu-4Jets_Tune"))
     isWJets_LO = true;
   
-  if(Contains(name, "DYto2L-4Jets_MLL-50_Tune") || Contains(name, "DYto2E-4Jets") || Contains(name, "DYto2Mu-4Jets") || Contains(name, "DYto2Tau-4Jets"))
+  if(Contains(name, "DYto2L-4Jets_MLL-50_Tune"))
     isDYJets_LO = true;
 
   //These four variables control the generator settings of the overlap removal variable in MC
@@ -182,7 +182,7 @@ EventTools::EventTools(const string &name_, int year_, bool isData_, float nanoa
     dataset = Dataset::MuonEG;
   else if(Contains(name, "Muon") && !Contains(name,"DoubleMuon") && !Contains(name,"SingleMuon") && !Contains(name,"MuonEG"))  //replaced SingleMuon and DoubleMuon starting in 2022
     dataset = Dataset::Muon;
-  else if(Contains(name, "MET") && !Contains(name,"JetMET")) 
+  else if(Contains(name, "MET")) 
     dataset = Dataset::MET;
   else if(Contains(name, "JetHT")) 
     dataset = Dataset::JetHT;
@@ -548,14 +548,8 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
   // filters directly from Nano
   pico.out_pass_goodv() = nano.Flag_goodVertices();
   pico.out_pass_cschalo_tight() = nano.Flag_globalSuperTightHalo2016Filter();
-  if (year>=2022) { // hbhe and hbheiso noise filters not needed in run 3 https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFiltersRun2#Run_3_2022_and_2023_data_and_MC
-    pico.out_pass_hbhe() = true;
-    pico.out_pass_hbheiso() = true;
-  }
-  else {
-    pico.out_pass_hbhe() = nano.Flag_HBHENoiseFilter();
-    pico.out_pass_hbheiso() = nano.Flag_HBHENoiseIsoFilter();
-  }
+  pico.out_pass_hbhe() = nano.Flag_HBHENoiseFilter();
+  pico.out_pass_hbheiso() = nano.Flag_HBHENoiseIsoFilter();
   pico.out_pass_ecaldeadcell() = nano.Flag_EcalDeadCellTriggerPrimitiveFilter();
   pico.out_pass_badpfmu() = nano.Flag_BadPFMuonFilter();
   if (nanoaod_version+0.01 > 9) {
@@ -903,12 +897,12 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
     // this assumes that we process either all the datasets or at least an ordered subset starting with the DoubleEG
     if (dataset==Dataset::DoubleEG                              					  	         && doubleeg_trigs) return true;
     else if (dataset==Dataset::EGamma                      	     					                 && doubleeg_trigs) return true; 
-    else if ((year>=2018) && dataset==Dataset::EGamma               		  			   		   && egamma_trigs) return true;
+    //else if ((year>=2018) && dataset==Dataset::EGamma               		  			   		   && egamma_trigs) return true;
     else if ((year==2016||year==2017) && dataset==Dataset::SingleElectron 				    		   && egamma_trigs) return true;
-    else if ((year<=2022) && dataset==Dataset::MET 			 	          && met_trigs && !doubleeg_trigs && !egamma_trigs) return true;
-    else if ((year<=2022) && dataset==Dataset::JetHT 	    		  && jetht_trigs && !met_trigs && !doubleeg_trigs && !egamma_trigs) return true;
+    else if ((year<=2018) && dataset==Dataset::MET 			 	          && met_trigs && !doubleeg_trigs && !egamma_trigs) return true;
+    else if ((year<=2018) && dataset==Dataset::JetHT 	    		  && jetht_trigs && !met_trigs && !doubleeg_trigs && !egamma_trigs) return true;
     else if ((year>=2022) && dataset==Dataset::JetMET	   		 && (jetht_trigs || met_trigs) && !doubleeg_trigs && !egamma_trigs) return true;
-    else if ((year<=2022) && dataset==Dataset::SingleMuon  && muon_trigs && !jetht_trigs && !met_trigs && !doubleeg_trigs && !egamma_trigs) return true;
+    else if ((year<=2018) && dataset==Dataset::SingleMuon  && muon_trigs && !jetht_trigs && !met_trigs && !doubleeg_trigs && !egamma_trigs) return true;
     else if ((year>=2022) && dataset==Dataset::Muon	   && muon_trigs && !jetht_trigs && !met_trigs && !doubleeg_trigs && !egamma_trigs) return true;
     else return false;
   }  

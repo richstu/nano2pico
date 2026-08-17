@@ -20,32 +20,27 @@ MuonProducer::MuonProducer(string year_, bool isData_, float nanoaod_version_, s
   run3(false){
   if (year=="2022") {
     cs_scare_ = correction::CorrectionSet::from_file(
-        "data/higgsino/2022/muon_scalesmearing.json");
+        "data/zgamma/2022/muon_scalesmearing.json");
     run3 = true;
   }
   else if (year=="2022EE") {
     cs_scare_ = correction::CorrectionSet::from_file(
-        "data/higgsino/2022EE/muon_scalesmearing.json");
+        "data/zgamma/2022EE/muon_scalesmearing.json");
     run3 = true;
   }
   else if (year=="2023") {
     cs_scare_ = correction::CorrectionSet::from_file(
-        "data/higgsino/2023/muon_scalesmearing.json");
+        "data/zgamma/2023/muon_scalesmearing.json");
     run3 = true;
   }
   else if (year=="2023BPix") {
     cs_scare_ = correction::CorrectionSet::from_file(
-        "data/higgsino/2023BPix/muon_scalesmearing.json");
+        "data/zgamma/2023BPix/muon_scalesmearing.json");
     run3 = true;
   }
   else if (year=="2024") {
     cs_scare_ = correction::CorrectionSet::from_file(
-        "data/higgsino/2024/muon_scalesmearing.json");
-    run3 = true;
-  }
-  else if (year=="2025") {
-    cs_scare_ = correction::CorrectionSet::from_file(
-        "data/higgsino/2025/muon_scalesmearing.json");
+        "data/zgamma/2024/muon_scalesmearing.json");
     run3 = true;
   }
 }

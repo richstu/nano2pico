@@ -535,9 +535,6 @@ float RawPuppiMET_pt
 float TkMET_phi
 float TkMET_pt
 float TkMET_sumEt
-float TrkMET_phi
-float TrkMET_pt
-float TrkMET_sumEt
 
 float MET_T1Smear_pt_jerUp
 float MET_T1Smear_pt_jerDown

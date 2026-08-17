@@ -56,7 +56,7 @@ int main(int argc, char *argv[]){
   for(long entry(0); entry<pico.GetEntries(); entry++){
 
     pico.GetEntry(entry);
-    if (entry%100000==0) {
+    if (entry%10000==0) {
       cout<<"Processing event: "<<entry<<endl;
     }
 
@@ -93,7 +93,7 @@ int main(int argc, char *argv[]){
       pico.out_w_isr()      = pico.w_isr()*static_cast<float>(corr.w_isr());
     }
 
-    float btag_weight = pico.w_bhig();
+    float btag_weight = pico.w_bhig_df();
     if (is_zgamma) {
       pico.out_w_lep() = pico.w_el()*pico.w_mu();
       pico.out_w_fs_lep() = 1.0;
@@ -136,12 +136,18 @@ int main(int argc, char *argv[]){
     pico.out_w_lumi() = pico.w_lumi()>0 ? 1. : -1.; //get the generator weight sign
     pico.out_w_lumi() *= static_cast<float>(corr.w_lumi());
 
-    pico.out_weight() = static_cast<float>(corr.weight()) * pico.out_w_lumi() *
-                     pico.out_w_lep() * pico.out_w_fs_lep() * //post-corr values in order for 0l to be correct
-                     btag_weight * pico.w_jetpuid() * pico.out_w_trig() * 
-                     pico.out_w_isr() * pico.out_w_pu() * pico.w_prefire() * 
-                     pico.w_photon() *  pico.out_w_phshape() * pico.w_fakephoton() * 
-                     pico.out_w_nnlo();
+
+
+    pico.out_weight() = pico.out_w_lumi() * pico.w_photon() *
+                        btag_weight * pico.w_jetpuid();
+    /*} else {
+      pico.out_weight() = static_cast<float>(corr.weight()) * pico.out_w_lumi() *
+                      pico.out_w_lep() * pico.out_w_fs_lep() * //post-corr values in order for 0l to be correct
+                      btag_weight * pico.w_jetpuid() * pico.out_w_trig() * 
+                      pico.out_w_isr() * pico.out_w_pu() * pico.w_prefire() * 
+                      pico.w_photon() *  pico.out_w_phshape() * pico.w_fakephoton() * 
+                      pico.out_w_nnlo();               
+    }*/
 
     pico.out_sys_isr().resize(2); pico.out_sys_pu().resize(2);
     //pico.out_sys_photon().resize(2); pico.out_sys_photon_csev().resize(2);

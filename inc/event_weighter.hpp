@@ -14,6 +14,18 @@
 #include "photon_shape_weighter.hpp"
 #include "pico_tree.hpp"
 
+//b-tagging algorithm used for scale factors, working points, and MC
+//efficiencies. Run 2 uses DeepJet (DeepFlavour), 2022-2023 use ParticleNet,
+//2024 onward use UParT. Only these sets exist in the respective btagging.json
+//files, so the choice is not free.
+enum class BTagAlgo { deepflav, pnetb, uptb };
+
+//maps a year string ("2016APV", "2022EE", "2024", ...) onto the tagger used
+//for that year. Shared by process_nano (to pick working points) and
+//EventWeighter (to pick correction sets and pico branches) so the two cannot
+//drift apart.
+BTagAlgo GetBTagAlgo(const std::string &year);
+
 class EventWeighter{
 public:
   EventWeighter(std::string year, const std::vector<float> &btag_wpts);
@@ -113,6 +125,10 @@ private:
   float btag_wp_loose_;
   float btag_wp_medium_;
   float btag_wp_tight_;
+  BTagAlgo btag_algo_;
+  //returns the b-tag discriminator for jet ijet from whichever pico branch
+  //corresponds to btag_algo_
+  float GetBTagDisc(pico_tree &pico, unsigned ijet);
   bool post_bpix_;
 };
 
