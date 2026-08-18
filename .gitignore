@@ -71,3 +71,9 @@ test_sf_higgsino_allyears/
 job_submit_commands/
 plots/
 *.root
+voms_proxy.txt
+CMSSW_*/
+test_sf_higgsino_allyears/
+job_submit_commands/
+plots/
+*.root
