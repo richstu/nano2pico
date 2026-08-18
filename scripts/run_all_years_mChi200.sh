@@ -121,7 +121,8 @@ process_year() {
   echo "${log_prefix} DONE -> ${out_dir}/unskimmed/pico_${in_file}"
 }
 
-years=("${!YEAR_DIRS[@]}")
+if [ -n "${YEARS:-}" ]; then read -ra years <<< "$YEARS"
+else years=("${!YEAR_DIRS[@]}"); fi
 n=${#years[@]}
 echo "Processing ${n} years, up to ${MAX_PARALLEL} in parallel at a time. DRY_RUN=${DRY_RUN}"
 echo ""

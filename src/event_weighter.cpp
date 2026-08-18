@@ -46,7 +46,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
   if (year=="2016APV") {
     in_file_electron_         = "data/zgamma/2016preVFP_UL/hzg_elid_2016APV_scalefactors.json";
     in_file_electron_reco_    = "data/zgamma/2016preVFP_UL/electron_recoSF2016preVFP.json";
-    in_file_photon_           = "data/zgamma/2016preVFP_UL/photon.json";
+    in_file_photon_           = "data/higgsino/2016APV/photon.json";
     in_file_photon_low_       = "data/zgamma/2016preVFP_UL/hzg_phidel_2016APV_scalefactors.json";
     in_file_photon_mceff_     = "data/zgamma/2016preVFP_UL/photon_wp80mceff_2016APV.json";
     in_file_muon_             = "data/zgamma/2016postVFP_UL/muid_2016_2016APV.json";
@@ -68,7 +68,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
   } else if (year=="2016") {
     in_file_electron_         = "data/zgamma/2016postVFP_UL/hzg_elid_2016_scalefactors.json";
     in_file_electron_reco_    = "data/zgamma/2016postVFP_UL/electron_recoSF2016postVFP.json";
-    in_file_photon_           = "data/zgamma/2016postVFP_UL/photon.json";
+    in_file_photon_           = "data/higgsino/2016/photon.json";
     in_file_photon_low_       = "data/zgamma/2016postVFP_UL/hzg_phidvalidate_2016_scalefactors.json";
     in_file_photon_mceff_     = "data/zgamma/2016postVFP_UL/photon_wp80mceff_2016.json";
     in_file_muon_             = "data/zgamma/2016postVFP_UL/muid_2016_2016APV.json";
@@ -90,7 +90,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
   } else if (year=="2017") {
     in_file_electron_         = "data/zgamma/2017_UL/hzg_elid_2017_scalefactors.json";
     in_file_electron_reco_    = "data/zgamma/2017_UL/electron_recoSF2017.json";
-    in_file_photon_           = "data/zgamma/2017_UL/photon.json";
+    in_file_photon_           = "data/higgsino/2017/photon.json";
     in_file_photon_low_       = "data/zgamma/2017_UL/hzg_phidvalidate_2017_scalefactors.json";
     in_file_photon_mceff_     = "data/zgamma/2017_UL/photon_wp80mceff_2017.json";
     in_file_muon_             = "data/zgamma/2017_UL/muid_2017.json";
@@ -112,7 +112,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
   } else if (year=="2018") {
     in_file_electron_         = "data/zgamma/2018_UL/hzg_elid_2018_scalefactors.json";
     in_file_electron_reco_    = "data/zgamma/2018_UL/electron_recoSF2018.json";
-    in_file_photon_           = "data/zgamma/2018_UL/photon.json";
+    in_file_photon_           = "data/higgsino/2018/photon.json";
     in_file_photon_low_       = "data/zgamma/2018_UL/hzg_phidvalidate_2018_scalefactors.json";
     in_file_photon_mceff_     = "data/zgamma/2018_UL/photon_wp80mceff_2018.json";
     in_file_muon_             = "data/zgamma/2018_UL/muid_2018.json";
@@ -134,7 +134,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
   } else if (year=="2022"){
     in_file_electron_         = "data/zgamma/2022/hzg_elid_2022_scalefactors.json";
     in_file_electron_reco_    = "data/zgamma/2022/electron_recoSF2022.json";
-    in_file_photon_           = "data/zgamma/2022/photon.json";
+    in_file_photon_           = "data/higgsino/2022/photon.json";
     in_file_photon_low_       = "data/zgamma/2022/hzg_phidvalidate_2022_scalefactors.json";
     in_file_photon_mceff_     = "data/zgamma/2022/photon_wp80mceff_2022.json";
     in_file_muon_             = "data/zgamma/2022/muid_2022.json";
@@ -154,7 +154,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
   } else if (year=="2022EE"){
     in_file_electron_         = "data/zgamma/2022EE/hzg_elid_2022EE_scalefactors.json";
     in_file_electron_reco_    = "data/zgamma/2022EE/electron_recoSF2022EE.json";
-    in_file_photon_           = "data/zgamma/2022EE/photon.json";
+    in_file_photon_           = "data/higgsino/2022EE/photon.json";
     in_file_photon_low_       = "data/zgamma/2022EE/hzg_phidvalidate_2022EE_scalefactors.json";
     in_file_photon_mceff_     = "data/zgamma/2022EE/photon_wp80mceff_2022EE.json";
     in_file_muon_             = "data/zgamma/2022EE/muid_2022EE.json";
@@ -174,7 +174,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
   } else if (year=="2023"){
     in_file_electron_         = "data/zgamma/2023/hzg_elid_2023_scalefactors.json";
     in_file_electron_reco_    = "data/zgamma/2023/electron_recoSF2023.json";
-    in_file_photon_           = "data/zgamma/2023/photon.json";
+    in_file_photon_           = "data/higgsino/2023/photon.json";
     in_file_photon_low_       = "data/zgamma/2022EE/hzg_phidvalidate_2022EE_scalefactors.json";
     in_file_photon_mceff_     = "data/zgamma/2023/photon_wp80mceff_2023.json";
     in_file_muon_             = "data/zgamma/2023/hzg_muid_2023_scalefactors.json";
@@ -194,7 +194,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
   } else if (year=="2023BPix"){
     in_file_electron_         = "data/zgamma/2023BPix/hzg_elid_2023BPix_scalefactors.json";
     in_file_electron_reco_    = "data/zgamma/2023BPix/electron_recoSF2023BPix.json";
-    in_file_photon_           = "data/zgamma/2023BPix/photon.json";
+    in_file_photon_           = "data/higgsino/2023BPix/photon.json";
     in_file_photon_low_       = "data/zgamma/2022EE/hzg_phidvalidate_2022EE_scalefactors.json";
     in_file_photon_mceff_     = "data/zgamma/2023BPix/photon_wp80mceff_2023BPix.json";
     in_file_muon_             = "data/zgamma/2023BPix/hzg_muid_2023BPix_scalefactors.json";
@@ -221,7 +221,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     cout<<"2025 has not been fully implemented in event_weighter. Defaulting to 2024 for some scale factors"<<endl;
     in_file_electron_         = "data/zgamma/2024/hzg_elid_2024_scalefactors.json";
     in_file_electron_reco_    = "data/zgamma/2023/electron_recoSF2023.json";
-    in_file_photon_           = "data/zgamma/2024/photon.json";
+    in_file_photon_           = "data/higgsino/2024/photon.json";
     in_file_photon_low_       = "data/zgamma/2022EE/hzg_phidvalidate_2022EE_scalefactors.json";
     in_file_photon_mceff_     = "data/zgamma/2024/photon_wp80mceff_2024.json";
     in_file_muon_             = "data/zgamma/2024/hzg_muid_2024_scalefactors.json";
@@ -243,7 +243,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     cout<<"2025 has not been fully implemented in event_weighter. Defaulting to 2024 for some scale factors"<<endl;
     in_file_electron_         = "data/zgamma/2025/hzg_elid_2025_scalefactors.json";
     in_file_electron_reco_    = "data/zgamma/2023/electron_recoSF2023.json";
-    in_file_photon_           = "data/zgamma/2025/photon.json";
+    in_file_photon_           = "data/higgsino/2025/photon.json";
     in_file_photon_low_       = "data/zgamma/2025/hzg_phidvalidate_2025_scalefactors.json";
     in_file_photon_mceff_     = "data/zgamma/2024/photon_wp80mceff_2024.json";
     in_file_muon_             = "data/zgamma/2025/hzg_muid_2025_scalefactors.json";
@@ -265,7 +265,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     cout<<"Year has not been implemented in event_weighter. Defaulting to 2023"<<endl;
     in_file_electron_         = "data/zgamma/2023/hzg_elid_2023_scalefactors.json";
     in_file_electron_reco_    = "data/zgamma/2023/electron_recoSF2023.json";
-    in_file_photon_           = "data/zgamma/2023/photon.json";
+    in_file_photon_           = "data/higgsino/2023/photon.json";
     in_file_photon_low_       = "data/zgamma/2022EE/hzg_phidvalidate_2022EE_scalefactors.json";
     in_file_photon_mceff_     = "data/zgamma/2023/photon_wp80mceff_2023.json";
     in_file_muon_             = "data/zgamma/2023/hzg_muid_2023_scalefactors.json";
@@ -605,7 +605,7 @@ void EventWeighter::PhotonSF(pico_tree &pico){
     float id_sf = 1.0;
     float id_sfup = 1.0;
     float id_sfdn = 1.0;
-    if (!(year_ == "2023" || year_ == "2023BPix" || year_ == "2024" || year_ == "2025" || year_ == "2026") && pt < 20.0f) {
+    if (!(year_ == "2023" || year_ == "2023BPix" || year_ == "2024") && pt < 20.0f) {
       id_sf = (map_photon_id_low_pass_->evaluate({pt, eta}));
       float id_unc = map_photon_id_low_pass_unc_->evaluate({pt, eta});
       id_sfup = id_sf+id_unc;
