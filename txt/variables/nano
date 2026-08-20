@@ -881,6 +881,7 @@ bool HLT_Mu37_TkMu27
 #Photon Triggers
 bool HLT_Mu17_Photon30_IsoCaloId
 bool HLT_Photon175
+bool HLT_Photon50
 bool HLT_DoublePhoton70
 bool HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId
 bool HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId_Mass55

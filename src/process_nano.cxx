@@ -51,7 +51,7 @@ namespace {
   int nent_test = -1;
   string norm_file = "";
   bool debug = false;
-  bool is25mc = false;
+  int mcyear = 2024;//defaults 2024 nanos to 2024 picos
   // requirements for jets to be counted in njet, mofified for Zgamma below
   float min_jet_pt = 30.0;
   float max_jet_eta =  2.4;
@@ -117,12 +117,14 @@ int main(int argc, char *argv[]){
     else if (Contains(in_file, "Run2023")) year = 2023;
     else if (Contains(in_file, "Run2024")) year = 2024;
     else if (Contains(in_file, "Run2025")) year = 2025;
+    else if (Contains(in_file, "Run2026")) year = 2026;
   }
   if (year < 0) {
     cout<<"ERROR: Add code for new year!"<<endl;
     exit(1);
   }
-  if(is25mc == true && year == 2024) year = 2025;
+  if(mcyear==2025) year = 2025;
+  else if(mcyear==2026) year = 2026;
 
   bool is2022preEE = false; //Classify data and MC into pre and post EE for 2022
   if(year == 2022){ 
@@ -222,6 +224,8 @@ int main(int argc, char *argv[]){
       case 2025:
         if (Contains(in_file, "2025")) VVRunLumi = MakeVRunLumi("golden2025");
         break;
+      case 2026:
+        break;
       default:
         cout << "ERROR: no golden cert for given year" << endl;
         exit(1);
@@ -230,7 +234,8 @@ int main(int argc, char *argv[]){
 
   string in_path = in_dir+"/"+in_file;
   string out_file = in_file;
-  if(!isData && (year==2025 || year==2026)) out_file = std::regex_replace(in_file, std::regex("2024Summer24NanoAODv15__150X_mcRun3_2024"), "2025Summer24NanoAODv15__150X_mcRun3_2024");
+  if(!isData && (year==2025)) out_file = std::regex_replace(in_file, std::regex("2024Summer24NanoAODv15__150X_mcRun3_2024"), "2025Summer24NanoAODv15__150X_mcRun3_2024");
+  else if(!isData && (year==2026)) out_file = std::regex_replace(in_file, std::regex("2024Summer24NanoAODv15__150X_mcRun3_2024"), "2026Summer24NanoAODv15__150X_mcRun3_2024");
   string out_path;
   out_path = out_dir+"/raw_pico/raw_pico_"+out_file;
 
@@ -407,14 +412,17 @@ int main(int argc, char *argv[]){
     double sf_splitfactor=1;
     //keep events with even event numbers in 2024, and odd event numbers in 2025
     if (!isData && year==2024) {
-      if(nano.event()%2==1) continue;
-      sf_splitfactor=2;
+      if(nano.event()%25>=11) continue;
+      sf_splitfactor=25/11.0;
     } else if (!isData && year==2025) {
-      if(nano.event()%2==0) continue;
-      sf_splitfactor=2;
+      if(nano.event()%25<11 && nano.event()%25>=22) continue;
+      sf_splitfactor=25/11.0;
+    } else if (!isData && year==2026) {
+      if(nano.event()%25<22) continue;
+      sf_splitfactor=25/3.0;
     }
     //skip events that are data but not in the golden json
-    if (isData) {
+    if (isData && year!=2026) {
       if(!inJSON(VVRunLumi, nano.run(), nano.luminosityBlock())) continue; 
     }
     bool passed_trig = event_tools.SaveTriggerDecisions(nano, pico, isZgamma);
@@ -737,7 +745,7 @@ void GetOptions(int argc, char *argv[]){
       {"nent",    required_argument, 0, 0},
       {"norm",    required_argument, 0, 0},
       {"skim",    required_argument, 0, 0},
-      {"is25mc",   no_argument, 0, 't'},
+      {"mcyear",  required_argument, 0, 0},
       {"debug",    no_argument, 0, 'd'},
       {0, 0, 0, 0}
     };
@@ -761,9 +769,6 @@ void GetOptions(int argc, char *argv[]){
     case 'o':
       out_dir = optarg;
       break;
-    case 't':
-      is25mc = true;
-      break;
     case 0:
       optname = long_options[option_index].name;
       if(optname == "nent"){
@@ -772,6 +777,8 @@ void GetOptions(int argc, char *argv[]){
         norm_file = optarg;
       }else if(optname == "skim"){
         skim_rule = optarg;
+      }else if(optname == "mcyear"){
+        mcyear = optarg;
       }else{
         printf("Bad option! Found option name %s\n", optname.c_str());
         exit(1);

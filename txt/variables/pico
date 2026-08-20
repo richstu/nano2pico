@@ -649,6 +649,7 @@ bool HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL
 # Photon triggers
 bool HLT_Mu17_Photon30_IsoCaloId
 bool HLT_Photon175
+bool HLT_Photon50
 
 # Diphoton triggers
 bool HLT_DoublePhoton70

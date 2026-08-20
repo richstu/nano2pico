@@ -68,6 +68,7 @@ private:
   correction::Correction::Ref map_jes_;
   correction::Correction::Ref map_jersf_;
   correction::Correction::Ref map_jermc_;
+  correction::Correction::Ref map_jerunc_;
   std::vector<correction::CompoundCorrection::Ref> map_jec_;
   std::vector<correction::Correction::Ref> map_jec_l1_;
   std::vector<unsigned int> jec_run_start_;
