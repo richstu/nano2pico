@@ -106,7 +106,7 @@ ElectronProducer::~ElectronProducer(){
 bool ElectronProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma, float scaleres_corr, bool skip_pt) {
   float pt = nano.Electron_pt()[nano_idx]*scaleres_corr;
   float eta = nano.Electron_eta()[nano_idx];
-  float etasc = nano.Electron_deltaEtaSC()[nano_idx] + nano.Electron_eta()[nano_idx];
+  float etasc = superclusterEta(nano, nano_idx);
   float dz = nano.Electron_dz()[nano_idx];
   float dxy = nano.Electron_dxy()[nano_idx];
   float miniiso = nano.Electron_miniPFRelIso_all()[nano_idx];
@@ -174,7 +174,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
     else {
       float pt = nano.Electron_pt()[iel];
       float eta = nano.Electron_eta()[iel];
-      float etasc = nano.Electron_deltaEtaSC()[iel] + nano.Electron_eta()[iel];
+      float etasc = superclusterEta(nano, iel);
       float energy = pt*cosh(eta);
       //deal with scale/smearing (systematics only for NanoAODv9 [run 2], full
       //correction for NanoAODv10+ [run3])
@@ -284,7 +284,7 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
   for(int iel : ordered_nano_indices) {
     float pt = nano.Electron_pt()[iel];
     float eta = nano.Electron_eta()[iel];
-    float etasc = nano.Electron_deltaEtaSC()[iel] + nano.Electron_eta()[iel];
+    float etasc = superclusterEta(nano, iel);
     float phi = nano.Electron_phi()[iel];
     float dz = nano.Electron_dz()[iel];
     float dxy = nano.Electron_dxy()[iel];
@@ -467,6 +467,12 @@ bool ElectronProducer::HzzId_WP2022(float pt, float etasc, float hzzmvaid) {
       return (hzzmvaid > ConvertMVA(-0.5444));
     }
   }
+}
+
+float ElectronProducer::superclusterEta(nano_tree &nano, int idx) {
+  float etaSC = nano.Electron_deltaEtaSC()[idx] + nano.Electron_eta()[idx];
+  if(nanoaod_version+0.1>15) etaSC = nano.Electron_superclusterEta()[idx];
+  return etaSC;
 }
 
 bool ElectronProducer::EcalDriven(int bitmap){

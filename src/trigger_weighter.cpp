@@ -128,15 +128,33 @@ TriggerWeighter::TriggerWeighter(string year, bool isSignal) {
     cs_elsi_hole_ = correction::CorrectionSet::from_file(in_file_path
         +"hzg_eltrig30_2023BPixHole_efficiencies.json");
   }
-  else { //2018
-    cout << "WARNING: No trigger weights, defaulting to 2018" << endl;
-    in_file_path = "data/zgamma/2018_UL/";
-    in_file_ello = "hzg_eltrig12_2018_efficiencies";
-    in_file_elup = "hzg_eltrig23_2018_efficiencies";
-    in_file_elsi = "hzg_eltrig32_2018_efficiencies";
-    in_file_mulo = "hzg_mutrig8_2018_efficiencies";
-    in_file_muup = "hzg_mutrig17_2018_efficiencies";
-    in_file_musi = "hzg_mutrig24_2018_efficiencies";
+  else if (year=="2024") {
+    in_file_path = "data/zgamma/2024/";
+    in_file_ello = "hzg_dielleg12trigger_2024_efficiencies";
+    in_file_elup = "hzg_dielleg23trigger_2024_efficiencies";
+    in_file_elsi = "hzg_sielleg30trigger_2024_efficiencies";
+    in_file_mulo = "hzg_mutrig8_2024_efficiencies";
+    in_file_muup = "hzg_mutrig17_2024_efficiencies";
+    in_file_musi = "hzg_mutrig24_2024_efficiencies";
+  }
+  else if (year=="2025") {
+    in_file_path = "data/zgamma/2025/";
+    in_file_ello = "hzg_dielleg12trigger_2025_efficiencies";
+    in_file_elup = "hzg_dielleg23trigger_2025_efficiencies";
+    in_file_elsi = "hzg_sielleg30trigger_2025_efficiencies";
+    in_file_mulo = "hzg_mutrig8_2025_efficiencies";
+    in_file_muup = "hzg_mutrig17_2025_efficiencies";
+    in_file_musi = "hzg_mutrig24_2025_efficiencies";
+  }
+  else { //2025
+    cout << "WARNING: No trigger weights, defaulting to 2025" << endl;
+    in_file_path = "data/zgamma/2025/";
+    in_file_ello = "hzg_dielleg12trigger_2025_efficiencies";
+    in_file_elup = "hzg_dielleg23trigger_2025_efficiencies";
+    in_file_elsi = "hzg_sielleg30trigger_2025_efficiencies";
+    in_file_mulo = "hzg_mutrig8_2025_efficiencies";
+    in_file_muup = "hzg_mutrig17_2025_efficiencies";
+    in_file_musi = "hzg_mutrig24_2025_efficiencies";
   } 
   post_bpix_ = false;
   cs_ello_ = correction::CorrectionSet::from_file(in_file_path+in_file_ello

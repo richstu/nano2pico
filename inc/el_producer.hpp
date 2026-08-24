@@ -39,6 +39,7 @@ public:
 
   float ConvertMVA(float mva_mini);
   bool HzzId_WP2022(float pt, float etasc, float hzzmvaid);
+  float superclusterEta(nano_tree &nano, int idx);
 
 private:
   std::string year;
