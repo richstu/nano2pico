@@ -165,6 +165,7 @@ bool isetavetoevt
 
 vector<float> jet_pt
 vector<float> jet_nanopt
+vector<float> jet_jeccor
 vector<float> jet_eta
 vector<float> jet_phi
 vector<float> jet_m

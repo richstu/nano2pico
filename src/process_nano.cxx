@@ -51,7 +51,7 @@ namespace {
   int nent_test = -1;
   string norm_file = "";
   bool debug = false;
-  int mcyear = 2024;//defaults 2024 nanos to 2024 picos
+  string mcyear = "2024";//defaults 2024 nanos to 2024 picos
   // requirements for jets to be counted in njet, mofified for Zgamma below
   float min_jet_pt = 30.0;
   float max_jet_eta =  2.4;
@@ -123,8 +123,8 @@ int main(int argc, char *argv[]){
     cout<<"ERROR: Add code for new year!"<<endl;
     exit(1);
   }
-  if(mcyear==2025) year = 2025;
-  else if(mcyear==2026) year = 2026;
+  if(!isData && mcyear=="2025") year = 2025;
+  else if(!isData && mcyear=="2026") year = 2026;
 
   bool is2022preEE = false; //Classify data and MC into pre and post EE for 2022
   if(year == 2022){ 
@@ -294,7 +294,8 @@ int main(int argc, char *argv[]){
   // WPs for Particle Transformer (UParT) in NanoAODv15
   map<string, vector<float>> btag_upt_wpts{
     {"2024", vector<float>({0.0246, 0.1272, 0.4648})},
-    {"2025", vector<float>({0.0246, 0.1272, 0.4648})}
+    {"2025", vector<float>({0.0246, 0.1272, 0.4648})},
+    {"2026", vector<float>({0.0246, 0.1272, 0.4648})}
   };
 
   // Rochester corrections
@@ -321,7 +322,6 @@ int main(int argc, char *argv[]){
     //else
     //  cout<<"INFO: No rochester corrections for year."<<endl;
   }
-
   //Initialize object producers
   GenParticleProducer mc_producer(year, nanoaod_version);
   ElectronProducer el_producer(year_string, isData, nanoaod_version);
@@ -701,12 +701,16 @@ int main(int argc, char *argv[]){
     }
 
     if (isZgamma) {
-      pico.out_weight() = pico.out_w_lumi() * pico.out_w_lep() * 
-                          pico.out_w_btag_df() * pico.out_w_jetpuid() *
-                          pico.out_w_photon()  * pico.out_w_isr() * 
-                          pico.out_w_pu() * pico.out_w_trig() * 
-                          pico.out_w_phshape() * pico.out_w_prefire() * 
-                          pico.out_w_fakephoton() * pico.out_w_nnlo();
+      if(!isData){
+        pico.out_weight() = pico.out_w_lumi() * pico.out_w_lep() * 
+                            pico.out_w_btag_df() * pico.out_w_jetpuid() *
+                            pico.out_w_photon()  * pico.out_w_isr() * 
+                            pico.out_w_pu() * pico.out_w_trig() * 
+                            pico.out_w_phshape() * pico.out_w_prefire() * 
+                            pico.out_w_fakephoton() * pico.out_w_nnlo();
+      } else{
+        pico.out_weight() = 1.0;
+      }
     } else {
       // for non Z-gamma: do not put anything that will not be renormalized
       // in weight
