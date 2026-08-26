@@ -225,13 +225,13 @@ int main(int argc, char *argv[]){
         if (Contains(in_file, "2025")) VVRunLumi = MakeVRunLumi("golden2025");
         break;
       case 2026:
+        if (Contains(in_file, "2026")) VVRunLumi = MakeVRunLumi("golden2026");
         break;
       default:
         cout << "ERROR: no golden cert for given year" << endl;
         exit(1);
     }
   }
-
   string in_path = in_dir+"/"+in_file;
   string out_file = in_file;
   if(!isData && (year==2025)) out_file = std::regex_replace(in_file, std::regex("2024Summer24NanoAODv15__150X_mcRun3_2024"), "2025Summer24NanoAODv15__150X_mcRun3_2024");
@@ -422,8 +422,8 @@ int main(int argc, char *argv[]){
       sf_splitfactor=25/3.0;
     }
     //skip events that are data but not in the golden json
-    if (isData && year!=2026) {
-      if(!inJSON(VVRunLumi, nano.run(), nano.luminosityBlock())) continue; 
+    if (isData) {
+      if(!inJSON(VVRunLumi, nano.run(), nano.luminosityBlock())) continue;
     }
     bool passed_trig = event_tools.SaveTriggerDecisions(nano, pico, isZgamma);
     if (isData && !passed_trig) {
@@ -446,7 +446,6 @@ int main(int argc, char *argv[]){
       pico.out_npu_tru() = nano.Pileup_nPU();
       pico.out_npu_tru_mean() = nano.Pileup_nTrueInt();
     }
-
     //pileup energy density
     if (nanoaod_version >= 11) pico.out_rho() = nano.Rho_fixedGridRhoAll();
     else if (nanoaod_version == 9.5) pico.out_rho() = nano.fixedGridRhoAll();

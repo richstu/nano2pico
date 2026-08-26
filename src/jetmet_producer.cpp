@@ -146,6 +146,8 @@ JetMetProducer::JetMetProducer(int year_, string year_string_,
     if (isData) {
       map_jec_ = cs_jerc_->compound().at("Summer24Prompt24_V5_DATA_L1L2L3Res_AK4PFPuppi");
       map_jec_l1_ = cs_jerc_->at("Summer24Prompt24_V5_DATA_L1FastJet_AK4PFPuppi");
+      map_jec_l2_ = cs_jerc_->at("Summer24Prompt24_V5_DATA_L2Relative_AK4PFPuppi");
+      map_jec_l2l3res_ = cs_jerc_->at("Summer24Prompt24_V5_DATA_L2L3Residual_AK4PFPuppi");
     }
     else {
       map_jes_ = cs_jerc_->at("Summer24Prompt24_V5_MC_Total_AK4PFPuppi");
@@ -246,7 +248,7 @@ float JetMetProducer::GetJEC(float jet_area, float jet_eta, float jet_phi,
                              float jet_pt, float rho, unsigned int run, 
                              JECType jec_type) {
    if (year_string == "2022EE" || year_string == "2022" || year_string == "2023" || year_string == "2023BPix") {
-     if (jec_type == JECType::L1L2L3) {
+     if (jec_type == JECType::L1L2L3Res) {
        if (isData)
          return map_jec_->evaluate({jet_area, jet_eta, jet_pt, rho, 
                                        static_cast<float>(run)});
@@ -255,17 +257,23 @@ float JetMetProducer::GetJEC(float jet_area, float jet_eta, float jet_phi,
        return map_jec_l1_->evaluate({jet_area, jet_eta, jet_pt, rho});
      }
    } else if (year_string == "2024" || year_string == "2025" || year_string == "2026"){
-     if (jec_type == JECType::L1L2L3) {
-       if (isData)
+     if (jec_type == JECType::L1L2L3Res) {
+       if (isData){
+         float run_cap = static_cast<float>(run);
+         if(static_cast<float>(run) >= 398904.f) run_cap = 398903.f; 
          return map_jec_->evaluate({jet_area, jet_eta, jet_pt, rho,
-                                       jet_phi, static_cast<float>(run)});
+                                       jet_phi, run_cap});
+       }
        return map_jec_->evaluate({jet_area, jet_eta, jet_pt, rho, jet_phi});
-     } else {
+     } else if (jec_type == JECType::L2){
+       return map_jec_l2_->evaluate({jet_eta, jet_phi, jet_pt});
+     } else if (jec_type == JECType::L2L3Res){
+       return map_jec_l2l3res_->evaluate({static_cast<float>(run), jet_eta, jet_pt});
+     } else { //jec_l1
        return map_jec_l1_->evaluate({jet_area, jet_eta, jet_pt, rho});
      }
-   }
-   else {
-     if (jec_type == JECType::L1L2L3) {
+   } else {
+     if (jec_type == JECType::L1L2L3Res) {
        return map_jec_->evaluate({jet_area, jet_eta, jet_pt, rho});
      }
      else {
@@ -352,20 +360,20 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
       float jet_raw_pt = jet_type_pt[ijet]/jec_default;
       if (jet_type==1 || year > 2018) {
         jec = GetJEC(jet_type_area[ijet],jet_type_eta[ijet],jet_type_phi[ijet],
-                     jet_raw_pt,rho,nano.run(),JECType::L1L2L3);
+                     jet_raw_pt,rho,nano.run(),JECType::L1L2L3Res);
         if (year > 2018)
           jec_l1 = GetJEC(jet_type_area[ijet],jet_type_eta[ijet],
                           jet_type_phi[ijet],jet_raw_pt,rho,nano.run(),
                           JECType::L1);
         
-        if(year==2024 && !isData && jet_raw_pt < 30.f && fabs(jet_type_eta[ijet])>2.0f && fabs(jet_type_eta[ijet])<2.5f){
+        if(year==2024 && isData && jet_raw_pt < 30.f && fabs(jet_type_eta[ijet])>2.0f && fabs(jet_type_eta[ijet])<2.5f){
           //Jet eta corrections recommendation https://indico.cern.ch/event/1624984/contributions/6896120/attachments/3208048/5713070/20260127_JetMET_PerformanceRun3_HIGMeeting.pdf
           jec_cor = (GetJEC(jet_type_area[ijet],jet_type_eta[ijet],
-                       jet_type_phi[ijet],30.f,
-                       rho,nano.run(),JECType::L1L2L3) * 
-                      jec_l1/(GetJEC(jet_type_area[ijet],jet_type_eta[ijet],
+                       jet_type_phi[ijet],jet_raw_pt,
+                       rho,nano.run(),JECType::L2) * 
+                      GetJEC(jet_type_area[ijet],jet_type_eta[ijet],
                                      jet_type_phi[ijet],30.f,rho,nano.run(),
-                                     JECType::L1)))/jec;
+                                     JECType::L2L3Res))/jec;
           jec = jec*jec_cor;
           
         }
