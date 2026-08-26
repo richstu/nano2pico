@@ -247,16 +247,17 @@ JetMetProducer::~JetMetProducer(){
 float JetMetProducer::GetJEC(float jet_area, float jet_eta, float jet_phi, 
                              float jet_pt, float rho, unsigned int run, 
                              JECType jec_type) {
-   if (year_string == "2022EE" || year_string == "2022" || year_string == "2023" || year_string == "2023BPix") {
+   if (year_string == "2022EE" || year_string == "2022" || year_string == "2023") {
      if (jec_type == JECType::L1L2L3Res) {
-       if (isData)
+       if (isData){
          return map_jec_->evaluate({jet_area, jet_eta, jet_pt, rho, 
                                        static_cast<float>(run)});
+         }
        return map_jec_->evaluate({jet_area, jet_eta, jet_pt, rho});
      } else {
        return map_jec_l1_->evaluate({jet_area, jet_eta, jet_pt, rho});
      }
-   } else if (year_string == "2024" || year_string == "2025" || year_string == "2026"){
+   } else if (year_string == "2023BPix" || year_string == "2024" || year_string == "2025" || year_string == "2026"){
      if (jec_type == JECType::L1L2L3Res) {
        if (isData){
          float run_cap = static_cast<float>(run);
@@ -365,11 +366,11 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
           jec_l1 = GetJEC(jet_type_area[ijet],jet_type_eta[ijet],
                           jet_type_phi[ijet],jet_raw_pt,rho,nano.run(),
                           JECType::L1);
-        float l2_corrected = GetJEC(jet_type_area[ijet],jet_type_eta[ijet],
+        if(year==2024){
+          float l2_corrected = GetJEC(jet_type_area[ijet],jet_type_eta[ijet],
                        jet_type_phi[ijet],jet_raw_pt,
                        rho,nano.run(),JECType::L2)*jet_raw_pt;
-        
-        if(year==2024 && isData && l2_corrected < 30.f && fabs(jet_type_eta[ijet])>2.0f && fabs(jet_type_eta[ijet])<2.5f){
+          if(isData && l2_corrected < 30.f && fabs(jet_type_eta[ijet])>2.0f && fabs(jet_type_eta[ijet])<2.5f){
           //Jet eta corrections recommendation https://indico.cern.ch/event/1624984/contributions/6896120/attachments/3208048/5713070/20260127_JetMET_PerformanceRun3_HIGMeeting.pdf
           jec_cor = (GetJEC(jet_type_area[ijet],jet_type_eta[ijet],
                        jet_type_phi[ijet],jet_raw_pt,
@@ -378,7 +379,7 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
                                      jet_type_phi[ijet],30.f,rho,nano.run(),
                                      JECType::L2L3Res))/jec;
           jec = jec*jec_cor;
-          
+          }
         }
       }
       float jet_l1_pt = jet_raw_pt*jec_l1;
