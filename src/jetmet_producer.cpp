@@ -365,8 +365,11 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
           jec_l1 = GetJEC(jet_type_area[ijet],jet_type_eta[ijet],
                           jet_type_phi[ijet],jet_raw_pt,rho,nano.run(),
                           JECType::L1);
+        float l2_corrected = GetJEC(jet_type_area[ijet],jet_type_eta[ijet],
+                       jet_type_phi[ijet],jet_raw_pt,
+                       rho,nano.run(),JECType::L2)*jet_raw_pt;
         
-        if(year==2024 && isData && jet_raw_pt < 30.f && fabs(jet_type_eta[ijet])>2.0f && fabs(jet_type_eta[ijet])<2.5f){
+        if(year==2024 && isData && l2_corrected < 30.f && fabs(jet_type_eta[ijet])>2.0f && fabs(jet_type_eta[ijet])<2.5f){
           //Jet eta corrections recommendation https://indico.cern.ch/event/1624984/contributions/6896120/attachments/3208048/5713070/20260127_JetMET_PerformanceRun3_HIGMeeting.pdf
           jec_cor = (GetJEC(jet_type_area[ijet],jet_type_eta[ijet],
                        jet_type_phi[ijet],jet_raw_pt,
