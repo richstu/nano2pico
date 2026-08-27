@@ -730,6 +730,7 @@ bool EventTools::SaveTriggerDecisions(nano_tree& nano, pico_tree& pico, bool isZ
   // Photon triggers
   pico.out_HLT_Mu17_Photon30_IsoCaloId()               = nano.HLT_Mu17_Photon30_IsoCaloId();
   pico.out_HLT_Photon175()                             = nano.HLT_Photon175();
+  pico.out_HLT_Photon50()                              = nano.HLT_Photon50();
   // Double and di photon trigger
   pico.out_HLT_DoublePhoton70()                        = nano.HLT_DoublePhoton70();
   pico.out_HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId() = nano.HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId();

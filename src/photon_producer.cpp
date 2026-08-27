@@ -89,6 +89,15 @@ PhotonProducer::PhotonProducer(string year_, bool isData_,
     map_smearing_ = cs_scale_syst_->at(
         "SmearAndSyst");
   }
+  else if (year=="2026") {
+    cout<<"WARNING: No dedicated EGM scale/smearing yet for 2026. Defaulting to 2025."<<std::endl;
+    cs_scale_syst_ = correction::CorrectionSet::from_file(
+        "data/zgamma/2025/photonSS_EtDependent.json");
+    map_scale_ = cs_scale_syst_->compound().at(
+        "Scale");
+    map_smearing_ = cs_scale_syst_->at(
+        "SmearAndSyst");
+  }
   else {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
         "data/zgamma/2023BPix/photonSS_EtDependent.json");

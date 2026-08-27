@@ -61,7 +61,7 @@ double CrystalBall::invcdf(double u) const{
     return m - sqrt2 * s * boost::math::erf_inv((D - u/Ns )/sqrtPiOver2);
 }
 
-double get_rndm(double eta, float nL, unique_ptr<correction::CorrectionSet>& cset) {
+double get_rndm(double eta, double phi, float nL, int evtNumber, int lumiNumber, unique_ptr<correction::CorrectionSet>& cset) {
 
     // obtain parameters from correctionlib
     double mean = cset->at("cb_params")->evaluate({abs(eta), nL, 0});
@@ -71,8 +71,8 @@ double get_rndm(double eta, float nL, unique_ptr<correction::CorrectionSet>& cse
     
     // instantiate CB and get random number following the CB
     CrystalBall cb(mean, sigma, alpha, n);
-    TRandom3 rnd(time(0));
-    double rndm = gRandom->Rndm();
+    double rndm = cset->at("RandomSmearing")->evaluate({(int)evtNumber, (int)lumiNumber, phi});
+
     return cb.invcdf(rndm);
 }
 
@@ -105,10 +105,10 @@ double get_k(double eta, string var, unique_ptr<correction::CorrectionSet>& cset
 }
 
 
-double pt_resol(double pt, double eta, float nL, unique_ptr<correction::CorrectionSet>& cset, double low_pt_threshold = 26) {
+double pt_resol(double pt, double eta, double phi, float nL, int evtNumber, int lumiNumber, unique_ptr<correction::CorrectionSet>& cset, double low_pt_threshold = 26) {
 
     // load correction values
-    double rndm = static_cast<double>(get_rndm(eta, nL, cset));
+    double rndm = static_cast<double>(get_rndm(eta, phi, nL, evtNumber, lumiNumber, cset));
     double std = static_cast<double>(get_std(pt, eta, nL, cset));
     double k = static_cast<double>(get_k(eta, "nom", cset));
 

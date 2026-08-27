@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
-  "description": "These are the jet veto maps for ['Winter25Prompt25_RunCDEFG_V1']. The recommended veto maps to be applied to both data and MC for analysis is 'jetvetomap'.",
+  "description": "These are the jet veto maps for ['Summer24Prompt25_RunCDEFG_V1']. The recommended veto maps to be applied to both data and MC for analysis is 'jetvetomap'.",
   "corrections": [
     {
-      "name": "Winter25Prompt25_RunCDEFG_V1",
+      "name": "Summer24Prompt25_RunCDEFG_V1",
       "description": "These are the jet veto maps showing regions with an excess of jets (hot zones) and lack of jets (cold zones). Using the phi-symmetry of the CMS detector, these areas with detector and/or calibration issues can be pinpointed.",
       "version": 1,
       "inputs": [

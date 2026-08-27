@@ -47,6 +47,11 @@ MuonProducer::MuonProducer(string year_, bool isData_, float nanoaod_version_, s
     cs_scare_ = correction::CorrectionSet::from_file(
         "data/zgamma/2025/muon_scalesmearing.json");
   }
+  else if (year=="2026") {
+    cout<<"WARNING: Muon SaS not implemented yet for 2026. Defaulting to 2025"<<std::endl;
+    cs_scare_ = correction::CorrectionSet::from_file(
+        "data/zgamma/2025/muon_scalesmearing.json");
+  }
   else if(year=="2016" || year=="2016APV" || year=="2017" || year=="2018"){
     std::cout << "Run 2 sample, ScaRe file is not used nor set. " << std::endl;
   } else {
@@ -179,9 +184,11 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
             charge, cs_scare_, pt_thresh));
       }
       else {
+        int evtNumber = nano.event();
+        int lumiNumber = nano.luminosityBlock();
         float sca_pt = scarekit::pt_scale(0, pt, eta, phi, charge, cs_scare_, pt_thresh);
-        float re_pt = scarekit::pt_resol(sca_pt, eta, 
-            static_cast<float>(nTrackerLayers), cs_scare_, pt_thresh);
+        float re_pt = scarekit::pt_resol(sca_pt, eta, phi, 
+            static_cast<float>(nTrackerLayers), evtNumber, lumiNumber, cs_scare_, pt_thresh);
         muon_pt_corr.push_back(re_pt);
         muon_pt_scaleup.push_back(scarekit::pt_scale_var(re_pt, eta, phi, 
             charge, "up", cs_scare_));
