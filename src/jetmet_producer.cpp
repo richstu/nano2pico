@@ -190,23 +190,23 @@ JetMetProducer::JetMetProducer(int year_, string year_string_,
     map_jetid_tightlepveto_ = cs_jetid_->at("AK4PUPPI_TightLeptonVeto");
   }
   else if (year_string=="2026") {
-    cout << "WARNING: No dedicated JEC/JER for 2026, defaulting to 2025 NanoAODv15 treatment." << endl;
-    cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2025/jet_jerc.json");
+    //cout << "WARNING: No dedicated JEC/JER for 2026, defaulting to 2025 NanoAODv15 treatment." << endl;
+    cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2026/jet_jerc.json");
     if(isData) {
-      map_jec_ = cs_jerc_->compound().at("Summer24Prompt25_V3_DATA_L1L2L3Res_AK4PFPuppi");
-      map_jec_l1_ = cs_jerc_->at("Summer24Prompt25_V3_DATA_L1FastJet_AK4PFPuppi");
+      map_jec_ = cs_jerc_->compound().at("Summer24Prompt26_V1_DATA_L1L2L3Res_AK4PFPuppi");
+      map_jec_l1_ = cs_jerc_->at("Summer24Prompt26_V1_DATA_L1FastJet_AK4PFPuppi");
     }
     else {
-      map_jes_ = cs_jerc_->at("Summer24Prompt25_V3_MC_Total_AK4PFPuppi");
-      map_jersf_ = cs_jerc_->at("Summer24Prompt25_JRV2_MC_ScaleFactor_AK4PFPuppi");
-      map_jermc_ = cs_jerc_->at("Summer24Prompt25_JRV2_MC_PtResolution_AK4PFPuppi");
-      map_jerunc_ = cs_jerc_->at("Summer24Prompt25_JRV2_MC_SFUncertainty_AK4PFPuppi");
-      map_jec_ = cs_jerc_->compound().at("Summer24Prompt25_V3_MC_L1L2L3Res_AK4PFPuppi");
-      map_jec_l1_ = cs_jerc_->at("Summer24Prompt25_V3_MC_L1FastJet_AK4PFPuppi");
+      map_jes_ = cs_jerc_->at("Summer24Prompt26_V1_MC_Total_AK4PFPuppi");
+      map_jersf_ = cs_jerc_->at("Summer24Prompt26_RunBD_JRV1_MC_ScaleFactor_AK4PFPuppi");
+      map_jermc_ = cs_jerc_->at("Summer24Prompt26_RunBD_JRV1_MC_PtResolution_AK4PFPuppi");
+      map_jerunc_ = cs_jerc_->at("Summer24Prompt26_RunBD_JRV1_MC_SFUncertainty_AK4PFPuppi");
+      map_jec_ = cs_jerc_->compound().at("Summer24Prompt26_V1_MC_L1L2L3Res_AK4PFPuppi");
+      map_jec_l1_ = cs_jerc_->at("Summer24Prompt26_V1_MC_L1FastJet_AK4PFPuppi");
     }
-    in_file_jetveto_ = "data/zgamma/2025/jetvetomaps.json";
+    in_file_jetveto_ = "data/zgamma/2026/jetvetomaps.json";
     cs_jetveto_ = correction::CorrectionSet::from_file(in_file_jetveto_);
-    map_jetveto_ = cs_jetveto_->at("Summer24Prompt25_RunCDEFG_V1");
+    map_jetveto_ = cs_jetveto_->at("Summer24Prompt26_RunBCD_V1");
 
     in_file_jetid_ = "data/zgamma/2024/JetID_Run3_Rereco2022CDE_v2.json";//2025 Jet ID in file is the same as 2024
     cs_jetid_ = correction::CorrectionSet::from_file(in_file_jetid_);
@@ -261,7 +261,7 @@ float JetMetProducer::GetJEC(float jet_area, float jet_eta, float jet_phi,
      if (jec_type == JECType::L1L2L3Res) {
        if (isData){
          float run_cap = static_cast<float>(run);
-         if(static_cast<float>(run) >= 398904.f) run_cap = 398903.f; 
+         //if(static_cast<float>(run) >= 398904.f) run_cap = 398903.f; 
          return map_jec_->evaluate({jet_area, jet_eta, jet_pt, rho,
                                        jet_phi, run_cap});
        }
