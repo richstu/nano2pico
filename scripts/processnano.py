@@ -16,6 +16,7 @@ if __name__=='__main__':
   argument_parser = ArgumentParser(prog='processnano')
   argument_parser.add_argument('-i','--input_file')
   argument_parser.add_argument('-n','--nent')
+  argument_parser.add_argument('-s','--skim')
   args = argument_parser.parse_args()
 
   path_pos = args.input_file.rfind('/')
@@ -24,5 +25,7 @@ if __name__=='__main__':
   cmd = './run/process_nano.exe --in_file '+infile+' --in_dir '+indir+' --out_dir out/zgamma/'
   if args.nent != None:
     cmd += ' --nent {}'.format(args.nent)
+  if args.skim != None:
+    cmd += ' --skim {}'.format(args.skim)
   print_and_run(cmd)
 
