@@ -244,7 +244,33 @@ def processData(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR
   print("[Info] log file: "+LOG_FILENAME)
   if dataset_list=='':
     dataset_list = ('txt/datasets/'+NANOAOD_VERSION+'_htozgamma_'+YEAR+'_data_dataset_paths')
-  process_commands = [
+  if args.direct_to_skim:
+    process_commands = [
+    #0                                                                                                                                                                                                                                          
+    [notify_script+' "Start process nano direct-to-skim_llg '+data_tag+'"',
+    './scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/data/ --production '+PRODUCTION_NAME+' --dataset_list '+dataset_list+' --data --tag '+data_tag+' -s llg',
+    'auto_submit_jobs.py process_nano_cmds_skim_llg_'+data_tag+'.json -c scripts/check_direct_to_skim.py -f',
+    notify_script+' "Finished process nano direct-to-skim_llg '+data_tag+'"'],
+    #1                                                                                                                                                                                                                                          
+    [notify_script+' "Start merge llg '+data_tag+'"',
+    './scripts/write_slim_and_merge_cmds.py -f --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/skim_llg/ --slim_name zgdata --tag '+data_tag,
+    'auto_submit_jobs.py '+data_tag+'_slim_zgdata_llg_cmds.json -f',
+    './scripts/confirm_slim.py '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/skim_llg '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/merged_zgdata_llg',
+    notify_script+' "Finished merge llg '+data_tag+'"'],
+    #2                                                                                                                                                                                                                                          
+    [notify_script+' "Start process nano direct-to-skim_ll '+data_tag+'"',
+    './scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/data/ --production '+PRODUCTION_NAME+' --dataset_list '+dataset_list+' --data --tag '+data_tag+' -s ll',
+    'auto_submit_jobs.py process_nano_cmds_skim_ll_'+data_tag+'.json -c scripts/check_direct_to_skim.py -f',
+    notify_script+' "Finished process nano direct-to-skim_ll'+data_tag+'"'],
+    #3                                                                                                                                                                                                                                          
+    [notify_script+' "Start merge ll '+data_tag+'"',
+    './scripts/write_slim_and_merge_cmds.py -f --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/skim_ll/ --slim_name zgdata --tag '+data_tag,
+    'auto_submit_jobs.py '+data_tag+'_slim_zgdata_ll_cmds.json -f',
+    './scripts/confirm_slim.py '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/skim_ll '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/merged_zgdata_ll',
+    notify_script+' "Finished merge ll '+data_tag+'"']
+    ]
+  else:
+    process_commands = [
     # signal
     #0
     [notify_script+' "Started process nano '+data_tag+'"',
@@ -323,7 +349,7 @@ Pico files: BASE_FOLDERNAME/NANOAOD_VERSION/TAG_NAME/(2016,2017,2018)/(data,mc,s
   parser.add_argument('-l','--dataset_list', default='', help='Datasets to process')
   parser.add_argument('-f', '--fake_run', action="store_true", help='Do not run commands. Only print commands to run.')
   parser.add_argument('-u', '--untagged', action="store_true", help='Do not use git tag')
-  parser.add_argument('-s','--direct_to_skim', default=False, help='Direct to skim')
+  parser.add_argument('-s','--direct_to_skim', action="store_true", help='Direct to skim')
   parser.add_argument('--use_telegram', action="store_true", help='Uses telegram script to notify about steps. Requires telegram setup.')
   parser.add_argument('--email', help='Uses email to notify about steps. Type in your email.')
   
