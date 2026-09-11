@@ -51,9 +51,9 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     in_file_photon_mceff_     = "data/zgamma/2016preVFP_UL/photon_wp80mceff_2016APV.json";
     in_file_muon_             = "data/zgamma/2016postVFP_UL/muid_2016_2016APV.json";
     in_file_pu_               = "data/zgamma/2016preVFP_UL/puWeights.json";
-    in_file_btag_             = "data/zgamma/2016preVFP_UL/btagging.json"; //the higgsino file is corrupt for some reason..
+    in_file_btag_             = "data/higgsino/2016APV/btagging.json"; //the higgsino file is corrupt for some reason..
     in_file_btag_mceff_       = "data/higgsino/2016APV/btag_mceff_2016APV.json";
-    in_file_jetpuid_          = "data/zgamma/2016preVFP_UL/UL16preVFP_jmar.json";
+    in_file_jetpuid_          = "data/higgsino/2016APV/jmar.json";
     in_file_electron_iso0p10_ = "data/zgamma/2016preVFP_UL/hzg_eliso0p1_2016APV_efficiencies.json";
     in_file_electron_iso0p15_ = "data/zgamma/2016preVFP_UL/hzg_eliso0p15_2016APV_efficiencies.json";
     in_file_muon_iso0p10_     = "data/zgamma/2016preVFP_UL/hzg_muiso0p1_2016APV_efficiencies.json";
@@ -75,7 +75,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     in_file_pu_               = "data/zgamma/2016postVFP_UL/puWeights.json";
     in_file_btag_             = "data/higgsino/2016/btagging.json";
     in_file_btag_mceff_       = "data/higgsino/2016/btag_mceff_2016.json";
-    in_file_jetpuid_          = "data/zgamma/2016postVFP_UL/UL16postVFP_jmar.json";
+    in_file_jetpuid_          = "data/higgsino/2016/jmar.json";
     in_file_electron_iso0p10_ = "data/zgamma/2016postVFP_UL/hzg_eliso0p1_2016_efficiencies.json";
     in_file_electron_iso0p15_ = "data/zgamma/2016postVFP_UL/hzg_eliso0p15_2016_efficiencies.json";
     in_file_muon_iso0p10_     = "data/zgamma/2016postVFP_UL/hzg_muiso0p1_2016_efficiencies.json";
@@ -97,7 +97,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     in_file_pu_               = "data/zgamma/2017_UL/puWeights.json";
     in_file_btag_             = "data/higgsino/2017/btagging.json";
     in_file_btag_mceff_       = "data/higgsino/2017/btag_mceff_2017.json";
-    in_file_jetpuid_          = "data/zgamma/2017_UL/UL17_jmar.json";
+    in_file_jetpuid_          = "data/higgsino/2017/jmar.json";
     in_file_electron_iso0p10_ = "data/zgamma/2017_UL/hzg_eliso0p1_2017_efficiencies.json";
     in_file_electron_iso0p15_ = "data/zgamma/2017_UL/hzg_eliso0p15_2017_efficiencies.json";
     in_file_muon_iso0p10_     = "data/zgamma/2017_UL/hzg_muiso0p1_2017_efficiencies.json";
@@ -119,7 +119,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     in_file_pu_               = "data/zgamma/2018_UL/puWeights.json";
     in_file_btag_             = "data/higgsino/2018/btagging.json";
     in_file_btag_mceff_       = "data/higgsino/2018/btag_mceff_2018.json";
-    in_file_jetpuid_          = "data/zgamma/2018_UL/UL18_jmar.json";
+    in_file_jetpuid_          = "data/higgsino/2018/jmar.json";
     in_file_electron_iso0p10_ = "data/zgamma/2018_UL/hzg_eliso0p1_2018_efficiencies.json";
     in_file_electron_iso0p15_ = "data/zgamma/2018_UL/hzg_eliso0p15_2018_efficiencies.json";
     in_file_muon_iso0p10_     = "data/zgamma/2018_UL/hzg_muiso0p1_2018_efficiencies.json";

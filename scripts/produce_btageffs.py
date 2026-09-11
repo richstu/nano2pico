@@ -168,11 +168,11 @@ def generate_mchists(pico_filename, algo, year):
   df = df.Define('jet_absflavor','ROOT::VecOps::abs(jet_hflavor)')
 
   bden_histptr, bloo_histptr, bmed_histptr, btig_histptr = book_btagwp_hists(
-          df, 'b', 'jet_absflavor==5', algo, year)
+          df, 'b', 'jet_absflavor==5&&jet_isgood', algo, year)
   cden_histptr, cloo_histptr, cmed_histptr, ctig_histptr = book_btagwp_hists(
-          df, 'c', 'jet_absflavor==4', algo, year)
+          df, 'c', 'jet_absflavor==4&&jet_isgood', algo, year)
   lden_histptr, lloo_histptr, lmed_histptr, ltig_histptr = book_btagwp_hists(
-          df, 'l', 'jet_absflavor<=3', algo, year)
+          df, 'l', 'jet_absflavor<=3&&jet_isgood', algo, year)
   print('Processing n-tuples, this may take a while.')
 
   bden_hist = bden_histptr.GetValue()
