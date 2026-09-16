@@ -43,11 +43,11 @@ PhotonProducer::PhotonProducer(string year_, bool isData_,
   }
   else if (year=="2022") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2022/photonSS_EtDependent.json");
+        "data/higgsino/2022/photonSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
-        "EGMScale_Compound_Pho_2022preEE");
+        "Scale"); //"EGMScale_Compound_Pho_2022preEE");
     map_smearing_ = cs_scale_syst_->at(
-        "EGMSmearAndSyst_PhoPTsplit_2022preEE");
+        "SmearAndSyst"); //"EGMSmearAndSyst_PhoPTsplit_2022preEE");
   }
   else if (year=="2022EE") {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
@@ -151,20 +151,20 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico, vecto
       }
     }
     else if ((year=="2022"||year=="2022EE"||year=="2023"||year=="2023BPix") 
-             && pt>20) {
+             && pt>15) {
       float run = static_cast<float>(nano.run());
       float r9 = fmin(fmax(nano.Photon_r9()[iph],0.0),1.0);
       float seedGain = static_cast<float>(nano.Photon_seedGain()[iph]);
       if (isData) {
         //scale corrections applied to data
         scaleres_corr.push_back(map_scale_->evaluate({"scale",run,eta,r9,
-            fabs(eta),pt,seedGain}));
+            pt,seedGain})); 
       }
       else {
         //smearing corrections applied to MC, syst.s also calculated
-        float rho = map_smearing_->evaluate({"smear",pt,r9,fabs(eta)});
-        float err_rho = map_smearing_->evaluate({"esmear",pt,r9,fabs(eta)});
-        float scale_unc = map_smearing_->evaluate({"escale",pt,r9,fabs(eta)});
+        float rho = map_smearing_->evaluate({"smear",pt,r9,eta});
+        float err_rho = map_smearing_->evaluate({"esmear",pt,r9,eta});
+        float scale_unc = map_smearing_->evaluate({"escale",pt,r9,eta});
         float rand = rng_.Gaus();
         scaleres_corr.push_back(1.0f+rand*rho);
         smear_syst_up.push_back(1.0f+rand*(rho+err_rho));

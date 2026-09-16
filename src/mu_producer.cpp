@@ -87,6 +87,9 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
   vector<float> muon_pt_scaledn;
   vector<float> muon_pt_resup;
   vector<float> muon_pt_resdn;
+
+  float pt_thresh = 26.f;
+
   for(int imu(0); imu<nano.nMuon(); ++imu){
     float eta = nano.Muon_eta()[imu];
     float phi = nano.Muon_phi()[imu];
@@ -130,12 +133,12 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
       float pt = nano.Muon_bsConstrainedPt()[imu];
       if (isData) {
         muon_pt_corr.push_back(scarekit::pt_scale(1, pt, eta, phi,
-            charge, cs_scare_));
+            charge, cs_scare_, pt_thresh)); 
       }
       else {
-        float sca_pt = scarekit::pt_scale(0, pt, eta, phi, charge, cs_scare_);
+        float sca_pt = scarekit::pt_scale(0, pt, eta, phi, charge, cs_scare_, pt_thresh);
         float re_pt = scarekit::pt_resol(sca_pt, eta, 
-            static_cast<float>(nTrackerLayers), cs_scare_);
+            static_cast<float>(nTrackerLayers), cs_scare_, pt_thresh);
         muon_pt_corr.push_back(re_pt);
         muon_pt_scaleup.push_back(scarekit::pt_scale_var(re_pt, eta, phi, 
             charge, "up", cs_scare_));
@@ -193,6 +196,7 @@ vector<int> MuonProducer::WriteMuons(nano_tree &nano, pico_tree &pico, vector<in
       isSignal = IsSignal(nano, imu, isZgamma, pt);
     }
     pico.out_mu_raw_pt().push_back(nano.Muon_pt()[imu]);
+    pico.out_mu_bs_pt().push_back(nano.Muon_bsConstrainedPt()[imu]);
     pico.out_mu_pt().push_back(pt);
     pico.out_mu_eta().push_back(eta);
     pico.out_mu_phi().push_back(nano.Muon_phi()[imu]);

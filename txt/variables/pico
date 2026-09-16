@@ -170,6 +170,11 @@ vector<float> jet_pt
 vector<float> jet_eta
 vector<float> jet_phi
 vector<float> jet_m
+vector<float> jet_raw_pt
+vector<float> jet_jec
+vector<float> jet_sjer
+vector<float> jet_sigma_jer
+vector<float> jet_jer_nm
 vector<float> jet_breg_corr
 vector<float> jet_breg_res
 vector<float> jet_deepcsv
@@ -306,6 +311,7 @@ vector<int>   mu_charge
 vector<int>   mu_pflavor
 vector<int>   mu_fsrphotonid
 vector<float> mu_raw_pt
+vector<float> mu_bs_pt
 
 int nel
 int nvel

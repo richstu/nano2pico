@@ -55,7 +55,8 @@ private:
                      std::vector<float> &jer_up_factor,
                      std::vector<float> &jer_dn_factor,
                      std::vector<float> &jes_up_factor,
-                     std::vector<float> &jes_dn_factor);
+                     std::vector<float> &jes_dn_factor,
+                     std::vector<std::vector<float>> &jec_components);
 
   int year;
   std::string year_string;
@@ -70,6 +71,7 @@ private:
   std::unique_ptr<correction::CorrectionSet> cs_jerc_;
   correction::Correction::Ref map_jes_;
   correction::Correction::Ref map_jersf_;
+  correction::Correction::Ref map_jersf_unc_;
   correction::Correction::Ref map_jermc_;
   std::vector<correction::CompoundCorrection::Ref> map_jec_;
   std::vector<correction::Correction::Ref> map_jec_l1_;

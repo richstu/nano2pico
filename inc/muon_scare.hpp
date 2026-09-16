@@ -44,11 +44,11 @@ double get_std(double pt, double eta, float nL, std::unique_ptr<correction::Corr
 
 double get_k(double eta, std::string var, std::unique_ptr<correction::CorrectionSet>& cset);
 
-double pt_resol(double pt, double eta, float nL, std::unique_ptr<correction::CorrectionSet>& cset);
+double pt_resol(double pt, double eta, float nL, std::unique_ptr<correction::CorrectionSet>& cset, double low_pt_threshold);
 
 double pt_resol_var(double pt_woresol, double pt_wresol, double eta, std::string updn, std::unique_ptr<correction::CorrectionSet>& cset);
 
-double pt_scale(bool is_data, double pt, double eta, double phi, int charge, std::unique_ptr<correction::CorrectionSet>& cset);
+double pt_scale(bool is_data, double pt, double eta, double phi, int charge, std::unique_ptr<correction::CorrectionSet>& cset, double low_pt_threshold);
 
 double pt_scale_var(double pt, double eta, double phi, int charge, std::string updn, std::unique_ptr<correction::CorrectionSet>& cset);
 
