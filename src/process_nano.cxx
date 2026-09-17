@@ -687,8 +687,8 @@ int main(int argc, char *argv[]){
     // Deal with overall weights (nominal, scale/PDF/PS variations)
     // Note: genEventSumw is calculated from genWeight not Generator_weight
     if (!isData) {
-      pico.out_w_lumi() = cross_section*nano.genWeight()
-                          /mc_metadata.gen_event_sumw * sf_splitfactor;
+      pico.out_w_lumi() = cross_section*nano.genWeight()*sf_splitfactor
+                          /mc_metadata.gen_event_sumw;
       if (isSignal) {
         pico.out_sys_murf().resize(MURF_VARIATIONS,1.); 
         for (int imurf = 0; imurf < MURF_VARIATIONS; imurf++) {
