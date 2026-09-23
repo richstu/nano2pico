@@ -14,8 +14,8 @@
 
 KinZfitter::KinZfitter() {
 
-  //params_json_ = "./txt/constrained_fit_input/kin_refit_params2.json";
-  params_json_ = "./txt/constrained_fit_input/kin_refit_params2_pelai_v3.json";
+  params_json_ = "./txt/constrained_fit_input/kin_refit_params2.json";
+  //params_json_ = "./txt/constrained_fit_input/kin_refit_params2_pelai_v3.json";
   cs_params_ = correction::CorrectionSet::from_file(params_json_);
   map_params_ = cs_params_->at("params");
   //Default values drawn from HZg_Crystal_ball_and_3Gaussian_fit.txt
