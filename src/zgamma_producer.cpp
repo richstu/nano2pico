@@ -7,8 +7,8 @@
 
 using namespace std;
 
-ZGammaVarProducer::ZGammaVarProducer(int year_){
-    year = year_;
+ZGammaVarProducer::ZGammaVarProducer(string year_string_){
+    year = year_string_;
     kinZfitter = new KinZfitter();
 }
 
@@ -174,7 +174,16 @@ ZGammaVarProducer::RefitResults ZGammaVarProducer::PerformKinematicRefit(
     leptons_pterr_map[0] = pico.out_el_energyErr()[idx_l1]*l1.Pt()/l1.P();
     leptons_pterr_map[1] = pico.out_el_energyErr()[idx_l2]*l2.Pt()/l2.P();
   }
-  kinZfitter->Setup(leptons_map, fsrphotons_map, leptons_pterr_map, flavor);
+  double alt1 = 0;
+  double alt2 = 0;
+  if(flavor==11){
+    alt1 = pico.out_el_etPt()[idx_l1];
+    alt2 = pico.out_el_etPt()[idx_l2];
+  } else if(flavor==13){
+    alt1 = pico.out_mu_dxy()[idx_l1];
+    alt2 = pico.out_mu_dxy()[idx_l2];
+  }
+  kinZfitter->Setup(leptons_map, fsrphotons_map, leptons_pterr_map, flavor, year, alt1, alt2);
   kinZfitter->KinRefitZ1();
   refit_leptons = kinZfitter->GetRefitP4s();
   RefitResults result = {refit_leptons[0], refit_leptons[1], status, 
@@ -273,7 +282,7 @@ void ZGammaVarProducer::WriteZGammaVars(pico_tree &pico, bool is_signal){
   //Generate pT cut summary branches here so they are useful even for unskimmed files
   pico.out_trig_el_pt() = false;
   pico.out_trig_mu_pt() = false;
-  if (year==2016) {
+  if (year=="2016" || year=="2016APV") {
     if(pico.out_nel() > 1){
       if((pico.out_trig_double_el() && pico.out_el_pt().at(0)>25.f && pico.out_el_pt().at(1)>15.f) || (pico.out_trig_single_el() && pico.out_el_pt().at(0)>30.f)){
         pico.out_trig_el_pt() = true;
@@ -295,7 +304,7 @@ void ZGammaVarProducer::WriteZGammaVars(pico_tree &pico, bool is_signal){
     }
   }
 
-  if (year==2017) {
+  if (year=="2017") {
     if(pico.out_nel() > 1){
       if((pico.out_trig_double_el() && pico.out_el_pt().at(0)>25.f && pico.out_el_pt().at(1)>15.f) || (pico.out_trig_single_el() && pico.out_el_pt().at(0)>35.f)){
         pico.out_trig_el_pt() = true;
@@ -317,7 +326,7 @@ void ZGammaVarProducer::WriteZGammaVars(pico_tree &pico, bool is_signal){
     }
   }
 
-  if (year==2018 || year==2022 || year==2023 || year==2024 || year==2025 || year == 2026) {
+  if (year=="2018" || year=="2022" || year=="2022EE" || year=="2023" || year=="2023BPix" || year=="2024" || year=="2025" || year == "2026") {
     if(pico.out_nel() > 1){
       if((pico.out_trig_double_el() && pico.out_el_pt().at(0)>25.f && pico.out_el_pt().at(1)>15.f) || (pico.out_trig_single_el() && pico.out_el_pt().at(0)>35.f)){
         pico.out_trig_el_pt() = true;

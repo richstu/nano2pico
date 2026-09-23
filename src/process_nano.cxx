@@ -337,7 +337,7 @@ int main(int argc, char *argv[]){
   JetMetProducer jetmet_producer(year, year_string, nanoaod_version, min_jet_pt, max_jet_eta, 
                                  isData, is_preUL);
   HigVarProducer hig_producer(year);
-  ZGammaVarProducer zgamma_producer(year);
+  ZGammaVarProducer zgamma_producer(year_string);
   GammaGammaVarProducer gammagamma_producer(year);
   BBVarProducer bb_producer(year);
   BBGammaGammaVarProducer bbgammagamma_producer(year);
