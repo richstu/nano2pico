@@ -97,7 +97,7 @@ int main(int argc, char *argv[]){
       pico.out_w_fs_lep() = 1.0;
       pico.out_sys_fs_lep()[0] = 1.0;
       pico.out_sys_fs_lep()[1] = 1.0;
-      btag_weight = pico.w_btag_df();
+      btag_weight = pico.w_btag_nm();
     }
 
     pico.out_sys_trig().resize(2);

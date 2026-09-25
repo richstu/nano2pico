@@ -1062,7 +1062,7 @@ void EventWeighter::bTaggingSF(pico_tree &pico){
   } //loop over jets
 
   pico.out_w_bhig_df() = sf_tot_nm;
-  pico.out_w_btag_df() = sf_tot_wpm;
+  pico.out_w_btag_nm() = sf_tot_wpm;
   if (is_signal_) {
     pico.out_sys_bchig().resize(2,1.); 
     pico.out_sys_udsghig().resize(2,1.); 
