@@ -402,7 +402,7 @@ void KinZfitter::Setup(std::map<unsigned int, TLorentzVector> selectedLeptons, s
   lepid_ = lepid;
   year_ = year;
   year_ = year_.substr(0,4);
-  //if(year_=="2016APV") year_="2016preVFP";
+  if(year_=="2025" || year_=="2026") year_="2024";
   alt1_ = alt1;
   alt2_ = alt2;
   if(debug_){ cout << "Setup complete" << endl;} 
