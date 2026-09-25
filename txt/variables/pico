@@ -479,13 +479,11 @@ float w_mu
 float w_fs_lep
 float w_photon
 float w_phshape
-float w_btag
-float w_btag_df
+float w_btag_nm
 float w_bhig
 float w_bhig_df
 float w_jetpuid
 float w_isr
-float w_btag_dc
 float w_pu
 float w_prefire
 float w_trig

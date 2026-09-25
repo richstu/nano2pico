@@ -95,10 +95,7 @@ private:
   correction::Correction::Ref map_electron_hole_id_pass_unc_;
   correction::Correction::Ref map_electron_hole_id_fail_;
   correction::Correction::Ref map_electron_hole_id_fail_unc_;
-  correction::Correction::Ref map_electron_reco_pass_;
-  correction::Correction::Ref map_electron_reco_pass_unc_;
-  correction::Correction::Ref map_electron_reco_fail_;
-  correction::Correction::Ref map_electron_reco_fail_unc_;
+  correction::Correction::Ref map_electron_reco_;
   correction::Correction::Ref map_muon_id_pass_;
   correction::Correction::Ref map_muon_id_pass_unc_;
   correction::Correction::Ref map_muon_id_fail_;
