@@ -429,6 +429,7 @@ void EventWeighter::ElectronSF(pico_tree &pico){
           unc = -1.0*map_electron_id_fail_unc_->evaluate({reco_pt,reco_eta});
         }
       }
+
       string yearkey = "2016";
       if(year_=="2016APV")       yearkey = "2016preVFP";
       else if(year_=="2016")      yearkey = "2016postVFP";
@@ -442,7 +443,6 @@ void EventWeighter::ElectronSF(pico_tree &pico){
       else if(year_=="2025")      yearkey = "2025Prompt";
       else if(year_=="2026")      yearkey = "2025Prompt";
 
-      //Modify this in the case of failing?
       if(reco_pt<20.f && reco_pt>10.f){
         if(year_=="2023" || year_=="2023BPix"){
           sf_reco = map_electron_reco_->evaluate({yearkey,"sf","RecoBelow20",reco_eta,reco_pt,reco_phi});
@@ -492,22 +492,23 @@ void EventWeighter::ElectronSF(pico_tree &pico){
       }
       sf_up = (sf+unc)*(sf_reco_up);
       sf_dn = (sf-unc)*(sf_reco_dn);
-
       float mc_eff = map_electron_mceff_->evaluate({reco_pt, reco_eta});
+      float mc_effunc = map_electron_mcunc_->evaluate({reco_pt, reco_eta});
+      float mc_effup = mc_eff+mc_effunc;
+      float mc_effdn = mc_eff-mc_effunc;
       float fail_sf_reco = 1.0;
       float fail_sf_recoup = 1.0;
       float fail_sf_recodn = 1.0;
       if (mc_eff < 1.0) {
-        fail_sf_reco= (1.0-sf_reco*mc_eff)/(1.0-mc_eff);
-        fail_sf_recoup = (1.0-sf_reco_up*mc_eff)/(1.0-mc_eff);
-        fail_sf_recodn = (1.0-sf_reco_dn*mc_eff)/(1.0-mc_eff);
+        fail_sf_reco= max(0.0,((1.0-sf_reco*mc_eff)/(1.0-mc_eff)));
+        fail_sf_recoup = max(0.0,min((1.0-sf_reco_up*mc_effup)/(1.0-mc_effup), (1.0-sf_reco_up*mc_effdn)/(1.0-mc_effdn)));
+        fail_sf_recodn = max(0.0,max((1.0-sf_reco_dn*mc_effdn)/(1.0-mc_effdn), (1.0-sf_reco_dn*mc_effup)/(1.0-mc_effup)));
       } 
       if(!pass_reco){
         sf_reco = fail_sf_reco;
         sf_up = fail_sf_recoup;
         sf_dn = fail_sf_recodn;
       }
- 
       if (isinf(sf) || isnan(sf)) sf = 1.0;
       if (isinf(sf_reco) || isnan(sf_reco)) sf_reco = 1.0;
       if (isinf(sf_up) || isnan(sf_up)) sf_up = 1.0;
