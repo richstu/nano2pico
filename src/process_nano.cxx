@@ -213,9 +213,9 @@ int main(int argc, char *argv[]){
   if(!isData && (year==2025)) out_file = std::regex_replace(in_file, std::regex("2024Summer24NanoAODv15__150X_mcRun3_2024"), "2025Summer24NanoAODv15__150X_mcRun3_2024");
   else if(!isData && (year==2026)) out_file = std::regex_replace(in_file, std::regex("2024Summer24NanoAODv15__150X_mcRun3_2024"), "2026Summer24NanoAODv15__150X_mcRun3_2024");
   string out_path;
-  out_path = out_dir+"/raw_pico/raw_pico_"+in_file;
-  if (skim_rule=="ll") out_path = out_dir+"/skim_ll/pico_ll_"+in_file;
-  else if (skim_rule=="llg") out_path = out_dir+"/skim_llg/pico_llg_"+in_file;
+  out_path = out_dir+"/raw_pico/raw_pico_"+out_file;
+  if (skim_rule=="ll") out_path = out_dir+"/skim_ll/pico_ll_"+out_file;
+  else if (skim_rule=="llg") out_path = out_dir+"/skim_llg/pico_llg_"+out_file;
 
   // Find nanoAOD version
   float nanoaod_version = -1;
