@@ -11,43 +11,13 @@
 #include "RooHelpers.h"
 #include <chrono>
 
-void KinZfitter::set_consts(double ptl1, double phil1, double etal1, double sigmal1, double ml1,
-                            double ptl2, double phil2, double etal2, double sigmal2, double ml2,
-                            unsigned int nfsrph,
-                            double ptg3, double phig3, double etag3, double sigmag3,
-                            double ptg4, double phig4, double etag4, double sigmag4){
-  pTl1_      = ptl1;
-  pTl2_      = ptl2;
-  phil1_     = phil1;
-  phil2_     = phil2;
-  etal1_     = etal1;
-  etal2_     = etal2;
-  if(lepid_ == 11){//Left in place in case we want to investigate lepton split refit in future.
-    sigmal1_   = sigmal1;
-    sigmal2_   = sigmal2;
-  }else {
-    sigmal1_   = sigmal1;
-    sigmal2_   = sigmal2;
-  }
-  ml1_       = ml1;
-  ml2_       = ml2;
-  if(nfsrph>0){
-    pTg3_    = ptg3;
-    phig3_   = phig3;
-    etag3_   = etag3;
-    sigmag3_ = sigmag3;
-  }
-  if(nfsrph>1){
-    pTg4_    = ptg4;
-    phig4_   = phig4;
-    etag4_   = etag4;
-    sigmag4_ = sigmag4;
-  }
-}
 
 KinZfitter::KinZfitter() {
 
-
+  params_json_ = "./txt/constrained_fit_input/kin_refit_params2.json";
+  //params_json_ = "./txt/constrained_fit_input/kin_refit_params2_pelai_v3.json";
+  cs_params_ = correction::CorrectionSet::from_file(params_json_);
+  map_params_ = cs_params_->at("params");
   //Default values drawn from HZg_Crystal_ball_and_3Gaussian_fit.txt
   PDFName_ = "./txt/constrained_fit_input/HZg_Crystal_ball_and_3Gaussian_fit.txt";
   meanCB_      = 90.8919;
@@ -80,46 +50,101 @@ KinZfitter::KinZfitter(TString pdf_txtfile){
   std::string line;
   if(debug_) cout<<"PDFName_ in "<<PDFName_<<endl;
 
-  if(PDFName_.Contains("3G")){
-    threegauss_ = true;
-    while (!input.eof() && std::getline(input,line))
-      {
-        std::istringstream iss(line);
-        string p; double val;
-        if(iss >> p >> val) {
-          if(p=="meanCB")      { meanCB_ = val;}
-          if(p=="sigmaCB")     { sigmaCB_ = val;}
-          if(p=="alphaCB")     { alphaCB_ = val;}
-          if(p=="nCB")         { nCB_ = val;}
-          if(p=="meanGauss1")  { meanGauss1_ = val;}
-          if(p=="sigmaGauss1") { sigmaGauss1_ = val;}
-          if(p=="f1")          { f1_ = val;}
-          if(p=="meanGauss2")  { meanGauss2_ = val; }
-          if(p=="sigmaGauss2") { sigmaGauss2_ = val;}
-          if(p=="f2")          { f2_ = val;}
-          if(p=="meanGauss3")  { meanGauss3_ = val;}
-          if(p=="sigmaGauss3") { sigmaGauss3_ = val;}
-          if(p=="f3")          { f3_ = val;}
-        }
-      }
-  }
-  else {
-    threegauss_ = false;
-    while (!input.eof() && std::getline(input,line))
-      {
+  threegauss_ = true;
+  while (!input.eof() && std::getline(input,line))
+    {
       std::istringstream iss(line);
       string p; double val;
       if(iss >> p >> val) {
-        if(p=="bwMean")  { BWmean_ = val; }
-        if(p=="bwGamma" ){ BWgamma_ = val;  }
-        if(p=="Gsigma" ) { sigmaValG_ = val; }
+        if(p=="meanCB")      { meanCB_ = val;}
+        if(p=="sigmaCB")     { sigmaCB_ = val;}
+        if(p=="alphaCB")     { alphaCB_ = val;}
+        if(p=="nCB")         { nCB_ = val;}
+        if(p=="meanGauss1")  { meanGauss1_ = val;}
+        if(p=="sigmaGauss1") { sigmaGauss1_ = val;}
+        if(p=="f1")          { f1_ = val;}
+        if(p=="meanGauss2")  { meanGauss2_ = val; }
+        if(p=="sigmaGauss2") { sigmaGauss2_ = val;}
+        if(p=="f2")          { f2_ = val;}
+        if(p=="meanGauss3")  { meanGauss3_ = val;}
+        if(p=="sigmaGauss3") { sigmaGauss3_ = val;}
+        if(p=="f3")          { f3_ = val;}
       }
     }
-  }
   input.close();
   if(debug_) std::cout << "KinZfitter. The debug flag is ON with "<<PDFName_<< std::endl;
 }
 
+void KinZfitter::set_consts(double ptl1, double phil1, double etal1, double sigmal1, double ml1,
+                            double ptl2, double phil2, double etal2, double sigmal2, double ml2,
+                            unsigned int nfsrph,
+                            double ptg3, double phig3, double etag3, double sigmag3,
+                            double ptg4, double phig4, double etag4, double sigmag4){
+  pTl1_      = ptl1;
+  pTl2_      = ptl2;
+  phil1_     = phil1;
+  phil2_     = phil2;
+  etal1_     = etal1;
+  etal2_     = etal2;
+  ml1_       = ml1;
+  ml2_       = ml2;
+  sigmal1_   = sigmal1;//pT error of each lepton
+  sigmal2_   = sigmal2;
+  if(nfsrph>0){
+    pTg3_    = ptg3;
+    phig3_   = phig3;
+    etag3_   = etag3;
+    sigmag3_ = sigmag3;
+  }
+  if(nfsrph>1){
+    pTg4_    = ptg4;
+    phig4_   = phig4;
+    etag4_   = etag4;
+    sigmag4_ = sigmag4;
+  }
+  double dummy_input = 0.1;
+  string leplabel = "mu";
+  if(lepid_ == 11){//Left in place in case we want to investigate lepton split refit in future.
+    leplabel = "el";
+    etptl1_ = alt1_;
+    etptl2_ = alt2_;
+  } else if(lepid_ == 13){
+    dxyl1_ = alt1_;
+    dxyl2_ = alt2_;
+  }
+  if(lepid_ == 11){
+  p_sig_1_ = map_params_->evaluate({"sigma",year_,leplabel,pTl1_,fabs(etal1_),etptl1_,dummy_input});//DSCB sigma for binned refit parameters
+  p_sig_2_ = map_params_->evaluate({"sigma",year_,leplabel,pTl2_,fabs(etal2_),etptl2_,dummy_input});
+  p_mu_1_ = map_params_->evaluate({"mean",year_,leplabel,pTl1_,fabs(etal1_),etptl1_,dummy_input});
+  p_mu_2_ = map_params_->evaluate({"mean",year_,leplabel,pTl2_,fabs(etal2_),etptl2_,dummy_input});
+  p_alphal_1_ = map_params_->evaluate({"alpha_l",year_,leplabel,pTl1_,fabs(etal1_),etptl1_,dummy_input});
+  p_alphar_1_ = map_params_->evaluate({"alpha_r",year_,leplabel,pTl1_,fabs(etal1_),etptl1_,dummy_input});
+  p_alphal_2_ = map_params_->evaluate({"alpha_l",year_,leplabel,pTl2_,fabs(etal2_),etptl2_,dummy_input});
+  p_alphar_2_ = map_params_->evaluate({"alpha_r",year_,leplabel,pTl2_,fabs(etal2_),etptl2_,dummy_input});
+  p_nl_1_ = map_params_->evaluate({"n_l",year_,leplabel,pTl1_,fabs(etal1_),etptl1_,dummy_input});
+  p_nr_1_ = map_params_->evaluate({"n_r",year_,leplabel,pTl1_,fabs(etal1_),etptl1_,dummy_input});
+  p_nl_2_ = map_params_->evaluate({"n_l",year_,leplabel,pTl2_,fabs(etal2_),etptl2_,dummy_input});
+  p_nr_2_ = map_params_->evaluate({"n_r",year_,leplabel,pTl2_,fabs(etal2_),etptl2_,dummy_input});
+  p_norm_1_ = map_params_->evaluate({"norm",year_,leplabel,pTl1_,fabs(etal1_),etptl1_,dummy_input});
+  p_norm_2_ = map_params_->evaluate({"norm",year_,leplabel,pTl2_,fabs(etal2_),etptl2_,dummy_input});
+  }
+  else if(lepid_ == 13){
+  p_sig_1_ = map_params_->evaluate({"sigma",year_,leplabel,pTl1_,fabs(etal1_),dummy_input,fabs(dxyl1_)});//DSCB sigma for binned refit parameters
+  p_sig_2_ = map_params_->evaluate({"sigma",year_,leplabel,pTl2_,fabs(etal2_),dummy_input,fabs(dxyl2_)});
+  p_mu_1_ = map_params_->evaluate({"mean",year_,leplabel,pTl1_,fabs(etal1_),dummy_input,fabs(dxyl1_)});
+  p_mu_2_ = map_params_->evaluate({"mean",year_,leplabel,pTl2_,fabs(etal2_),dummy_input,fabs(dxyl2_)});
+  p_alphal_1_ = map_params_->evaluate({"alpha_l",year_,leplabel,pTl1_,fabs(etal1_),dummy_input,fabs(dxyl1_)});
+  p_alphar_1_ = map_params_->evaluate({"alpha_r",year_,leplabel,pTl1_,fabs(etal1_),dummy_input,fabs(dxyl1_)});
+  p_alphal_2_ = map_params_->evaluate({"alpha_l",year_,leplabel,pTl2_,fabs(etal2_),dummy_input,fabs(dxyl2_)});
+  p_alphar_2_ = map_params_->evaluate({"alpha_r",year_,leplabel,pTl2_,fabs(etal2_),dummy_input,fabs(dxyl2_)});
+  p_nl_1_ = map_params_->evaluate({"n_l",year_,leplabel,pTl1_,fabs(etal1_),dummy_input,fabs(dxyl1_)});
+  p_nr_1_ = map_params_->evaluate({"n_r",year_,leplabel,pTl1_,fabs(etal1_),dummy_input,fabs(dxyl1_)});
+  p_nl_2_ = map_params_->evaluate({"n_l",year_,leplabel,pTl2_,fabs(etal2_),dummy_input,fabs(dxyl2_)});
+  p_nr_2_ = map_params_->evaluate({"n_r",year_,leplabel,pTl2_,fabs(etal2_),dummy_input,fabs(dxyl2_)});
+  p_norm_1_ = map_params_->evaluate({"norm",year_,leplabel,pTl1_,fabs(etal1_),dummy_input,fabs(dxyl1_)});
+  p_norm_2_ = map_params_->evaluate({"norm",year_,leplabel,pTl2_,fabs(etal2_),dummy_input,fabs(dxyl2_)});
+  }
+}
 
 void KinZfitter::setEs(double pT1, double pT2, unsigned int nfsrph, double pT3, double pT4){
   En1_ = sqrt(pow(pT1,2)*(1 + pow(sinh(etal1_),2)) + pow(ml1_,2));
@@ -150,15 +175,39 @@ double KinZfitter::gaussian(double x, double mu, double sigma){
   return exp(-0.5*pow(x - mu,2)/pow(sigma,2))/(sigma*sqrt(2*PI));
 }
 
+double KinZfitter::DSCB(double x, double mu, double sigma, double alphal, double alphar, double nl, double nr, double norm){
+  //Double sided crystal ball function, centered around 0. 
+  //Parameters obtained from pull distributions. Normalization comes from json.
+  double CBAl = pow(nl/alphal,nl)*exp(-pow(alphal,2)/2);
+  double CBAr = pow(nr/alphar,nr)*exp(-pow(alphar,2)/2);
+
+  double CBBl = nl/alphal - alphal;
+  double CBBr = nr/alphar - alphar;
+
+  double CBt = 0;
+  if((x - mu > -1*alphal * sigma) && (x - mu < alphar*sigma)){
+    CBt = 1*exp(-0.5*pow(x - mu,2)/pow(sigma,2));
+  } else if(x - mu <= -1*alphal * sigma){
+    CBt = 1*CBAl*pow((CBBl - (x-mu)/sigma),-1*nl);
+  } else if(x - mu >= alphar * sigma){
+    CBt = 1*CBAr*pow((CBBr - (mu-x)/sigma),-1*nr);
+  }
+  if(CBt<0 || norm < 0) cout<<"CB: "<<CBt<<" norm: "<<norm<<endl;
+  CBt = CBt*norm;
+  return CBt;
+}
+
+/*
 void KinZfitter::evaluateShape(double mll){
   double gausst1, gausst2, gausst3;
   gausst1 = gaussian(mll, meanGauss1_, sigmaGauss1_);
   gausst2 = gaussian(mll, meanGauss2_, sigmaGauss2_);
   gausst3 = gaussian(mll, meanGauss3_, sigmaGauss3_);
+  //Single sided crystal ball:
   double CBA = pow(nCB_/alphaCB_,nCB_)*exp(-pow(alphaCB_,2)/2);
   double CBB = nCB_/alphaCB_ - alphaCB_; 
-  double CBC = (nCB_/alphaCB_)*(1/(nCB_-1))*exp(-pow(alphaCB_,2)/2);
-  double CBD = sqrt(PI/2)*(1+erf(alphaCB_/sqrt(2)));
+  //double CBC = (nCB_/alphaCB_)*(1/(nCB_-1))*exp(-pow(alphaCB_,2)/2);
+  //double CBD = sqrt(PI/2)*(1+erf(alphaCB_/sqrt(2)));
 
   double CBt = 0;
   if(mll - meanCB_ > -1*alphaCB_ * sigmaCB_){
@@ -166,24 +215,43 @@ void KinZfitter::evaluateShape(double mll){
   } else if(mll - meanCB_ <= -1*alphaCB_ * sigmaCB_){
     CBt = 1*CBA*pow((CBB - (mll-meanCB_)/sigmaCB_),-1*nCB_);
   }
-  CBt = CBt/(sigmaCB_*(CBC+CBD));
+  //CBt = CBt/(sigmaCB_*(CBC+CBD));
+  CBt = CBt;
   shapeEval_ = (((f1_*CBt + (1-f1_)*gausst1)*f2_ + (1-f2_)*gausst2)*f3_ + (1-f3_)*gausst3);
+}*/
+
+
+void KinZfitter::evaluateShape(double mll){
+  double Gamma_Z = 2.497766904;
+  double m_Z = 91.1876;
+  double m_H = 125;
+  double m_thr = 1.2535919305329255;
+  double eps = 1e-10;
+  double Gamma = Gamma_Z*sqrt(std::max((mll*mll - m_thr*m_thr)/(m_Z*m_Z-m_thr*m_thr),0.0));
+  double num = 2*mll*mll*Gamma;
+  double denom = pow((mll*mll-m_Z*m_Z),2) + pow(mll*Gamma,2)+eps;
+  double factor = sqrt(std::max(1.0-(mll*mll/(m_H*m_H)),0.0));
+
+  shapeEval_ = num*factor/denom;
 }
 
 double KinZfitter::NLL_0(const double *pTs){
   double pTl1r = pTs[0];
   double pTl2r = pTs[1];
-  double gauss1, gauss2, full, NLL;
+  double dscb1, dscb2, full, NLL;
   setEs(pTl1r, pTl2r, 0);
   setmZ(pTl1r, pTl2r, 0);
   double mll = mll_;
 
-  gauss1 = gaussian(pTl1r, pTl1_, sigmal1_);
-  gauss2 = gaussian(pTl2r, pTl2_, sigmal2_);
+
+  double pulll1, pulll2;
+  pulll1 = (pTl1_-pTl1r)/sigmal1_;
+  pulll2 = (pTl2_-pTl2r)/sigmal2_;
+  dscb1 = DSCB(pulll1, p_mu_1_, p_sig_1_, p_alphal_1_, p_alphar_1_, p_nl_1_, p_nr_1_, p_norm_1_);
+  dscb2 = DSCB(pulll2, p_mu_2_, p_sig_2_, p_alphal_2_, p_alphar_2_, p_nl_2_, p_nr_2_, p_norm_2_);
   
   evaluateShape(mll); 
-
-  full = gauss1*gauss2*shapeEval_;
+  full = dscb1*dscb2*shapeEval_;
   NLL = -log(full);
   return NLL;
 }
@@ -193,18 +261,21 @@ double KinZfitter::NLL_1(const double *pTs){
   double pTl2r = pTs[1];
   double pTg3r = pTs[2];
 
-  double gauss1, gauss2, gauss3, full, NLL;
+  double dscb1, dscb2, gauss3, full, NLL;
   setEs(pTl1r, pTl2r, 1, pTg3r);
   setmZ(pTl1r, pTl2r, 1, pTg3r);
   double mll = mll_;
 
-  gauss1 = gaussian(pTl1r, pTl1_, sigmal1_);
-  gauss2 = gaussian(pTl2r, pTl2_, sigmal2_);
+  double pulll1, pulll2;
+  pulll1 = (pTl1_-pTl1r)/sigmal1_;
+  pulll2 = (pTl2_-pTl2r)/sigmal2_;
+  dscb1 = DSCB(pulll1, p_mu_1_, p_sig_1_, p_alphal_1_, p_alphar_1_, p_nl_1_, p_nr_1_, p_norm_1_);
+  dscb2 = DSCB(pulll2, p_mu_2_, p_sig_2_, p_alphal_2_, p_alphar_2_, p_nl_2_, p_nr_2_, p_norm_2_);
   gauss3 = gaussian(pTg3r, pTg3_, sigmag3_);
 
   evaluateShape(mll);
 
-  full = gauss1*gauss2*gauss3*shapeEval_;
+  full = dscb1*dscb2*gauss3*shapeEval_;
   NLL = -log(full);
   return NLL;
 }
@@ -215,19 +286,22 @@ double KinZfitter::NLL_2(const double *pTs){
   double pTg3r = pTs[2];
   double pTg4r = pTs[3];
 
-  double gauss1, gauss2, gauss3, gauss4, full, NLL;
+  double dscb1, dscb2, gauss3, gauss4, full, NLL;
   setEs(pTl1r, pTl2r, 2, pTg3r, pTg4r);
   setmZ(pTl1r, pTl2r, 2, pTg3r, pTg4r);
   double mll = mll_;
 
-  gauss1 = gaussian(pTl1r, pTl1_, sigmal1_);
-  gauss2 = gaussian(pTl2r, pTl2_, sigmal2_);
+  double pulll1, pulll2;
+  pulll1 = (pTl1_-pTl1r)/sigmal1_;
+  pulll2 = (pTl2_-pTl2r)/sigmal2_;
+  dscb1 = DSCB(pulll1, p_mu_1_, p_sig_1_, p_alphal_1_, p_alphar_1_, p_nl_1_, p_nr_1_, p_norm_1_);
+  dscb2 = DSCB(pulll2, p_mu_2_, p_sig_2_, p_alphal_2_, p_alphar_2_, p_nl_2_, p_nr_2_, p_norm_2_);
   gauss3 = gaussian(pTg3r, pTg3_, sigmag3_);
   gauss4 = gaussian(pTg4r, pTg4_, sigmag4_);
 
   evaluateShape(mll);
   
-  full = gauss1*gauss2*gauss3*gauss4*shapeEval_;
+  full = dscb1*dscb2*gauss3*gauss4*shapeEval_;
   NLL = -log(full);
   return NLL;
 }
@@ -309,7 +383,7 @@ double KinZfitter::pterr(TLorentzVector ph){
 }
 
 
-void KinZfitter::Setup(std::map<unsigned int, TLorentzVector> selectedLeptons, std::map<unsigned int, TLorentzVector> selectedFsrPhotons, std::map<unsigned int, double> errorLeptons, int lepid) {
+void KinZfitter::Setup(std::map<unsigned int, TLorentzVector> selectedLeptons, std::map<unsigned int, TLorentzVector> selectedFsrPhotons, std::map<unsigned int, double> errorLeptons, int lepid, string year, double alt1, double alt2) {
 
   // reset everything for each event
   p4sZ1_.clear();
@@ -322,10 +396,15 @@ void KinZfitter::Setup(std::map<unsigned int, TLorentzVector> selectedLeptons, s
   pTerrsZ1REFIT_.clear();
   pTerrsZ1phREFIT_.clear();
 
-  gErrorIgnoreLevel = kWarning;
-  RooMsgService::instance().setStreamStatus(1,false);
+  //gErrorIgnoreLevel = kWarning;
+  //RooMsgService::instance().setStreamStatus(1,false);
   initZs(selectedLeptons, selectedFsrPhotons, errorLeptons);
   lepid_ = lepid;
+  year_ = year;
+  year_ = year_.substr(0,4);
+  if(year_=="2025" || year_=="2026") year_="2024";
+  alt1_ = alt1;
+  alt2_ = alt2;
   if(debug_){ cout << "Setup complete" << endl;} 
 }
 
@@ -576,6 +655,7 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
 
   //auto startTime = std::chrono::steady_clock::now();
   //Set global fit constants
+
   if(p4sZ1ph_.size()==0){
     set_consts(Z1_1.Pt(), Z1_1.Phi(), Z1_1.Eta(), pTerrZ1_1, Z1_1.M(),
                Z1_2.Pt(), Z1_2.Phi(), Z1_2.Eta(), pTerrZ1_2, Z1_2.M(),
@@ -595,14 +675,13 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
                p4sZ1ph_.size(),
                Z1_ph1.Pt(), Z1_ph1.Phi(), Z1_ph1.Eta(), pTerrZ1_ph1,
                Z1_ph2.Pt(), Z1_ph2.Phi(), Z1_ph2.Eta(), pTerrZ1_ph2);
-    setEs(Z1_1.Pt(), Z1_2.Pt(), 1, Z1_ph1.Pt(), Z1_ph2.Pt());
-    setmZ(Z1_1.Pt(), Z1_2.Pt(), 1, Z1_ph1.Pt(), Z1_ph2.Pt());
+    setEs(Z1_1.Pt(), Z1_2.Pt(), 2, Z1_ph1.Pt(), Z1_ph2.Pt());
+    setmZ(Z1_1.Pt(), Z1_2.Pt(), 2, Z1_ph1.Pt(), Z1_ph2.Pt());
   }
 
 
   //If mll is outside the bounds of the fit return mll without a fit
   if(mll_ < 60 || mll_ > 120) return mll_;
-
   int status_my = -1;
   int covstatus_my = -1;
   double minnll_my = 1;
@@ -616,7 +695,7 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
   //Do the fits
   if(p4sZ1ph_.size()==0){
     minimum->SetMaxFunctionCalls(1000); // for Minuit/Minuit2
-    minimum->SetTolerance(1);
+    minimum->SetTolerance(0.01);
     minimum->SetPrintLevel(-1);
     minimum->SetErrorDef(0.5); //0.5 for NLL, 1 for Chi2
  
@@ -638,7 +717,7 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
     minnll_my = minimum->MinValue();
   } else if(p4sZ1ph_.size()==1){
     minimum->SetMaxFunctionCalls(1000); 
-    minimum->SetTolerance(1);
+    minimum->SetTolerance(0.01);
     minimum->SetPrintLevel(-1);
     minimum->SetErrorDef(0.5);
 
@@ -663,7 +742,7 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
     minnll_my = minimum->MinValue();
   } else if(p4sZ1ph_.size()==2){
     minimum->SetMaxFunctionCalls(1000);
-    minimum->SetTolerance(1);
+    minimum->SetTolerance(0.01);
     minimum->SetPrintLevel(-1);
     minimum->SetErrorDef(0.5);
   
@@ -698,9 +777,15 @@ int KinZfitter::PerZ1Likelihood(double & l1, double & l2, double & lph1, double 
   double pTerrZ1REFIT2;
   l1 = xs[0]/RECOpT1;
   l2 = xs[1]/RECOpT2;
+/*
+  if(fabs(xs[0]-RECOpT1)<0.01 && fabs(xs[1]-RECOpT2)<0.01 && fabs(91.18-mll_)>0.2){
+    cout<<"lep1: "<<RECOpT1<<" w error: "<<pTerrZ1_1<<" refit to: "<<xs[0]<<endl;
+    cout<<"lep2: "<<RECOpT2<<" w error: "<<pTerrZ1_2<<" refit to: "<<xs[1]<<endl;
+    cout<<mll_<<endl;   
+  }
+*/
   pTerrZ1REFIT1 = errs[0];
   pTerrZ1REFIT2 = errs[1];
-  //cout<<"l1,l2: "<<xs[0]<<", "<<xs[1]<<endl;
   pTerrsZ1REFIT_.push_back(pTerrZ1REFIT1);
   pTerrsZ1REFIT_.push_back(pTerrZ1REFIT2);
   

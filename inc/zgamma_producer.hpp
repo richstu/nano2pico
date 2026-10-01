@@ -12,7 +12,7 @@
 class ZGammaVarProducer{
 public:
 
-  explicit ZGammaVarProducer(int year);
+  explicit ZGammaVarProducer(string year_string_);
   ~ZGammaVarProducer();
 
   void WriteZGammaVars(pico_tree &pico, bool is_signal);
@@ -32,7 +32,7 @@ public:
       TLorentzVector lminus, TLorentzVector ph);
 
 private:
-  int year;
+  string year;
   KinZfitter *kinZfitter; 
   const float el_m = 0.000511f;
   const float mu_m = 0.10566f;

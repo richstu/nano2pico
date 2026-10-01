@@ -89,9 +89,8 @@ ElectronProducer::ElectronProducer(string year_, bool isData_, float nanoaod_ver
         "SmearAndSyst");
   }
   else if (year=="2026") {
-    cout<<"WARNING: No dedicated EGM scale/smearing implemented yet for 2026. Defaulting to 2025 values."<<std::endl;
     cs_scale_syst_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2025/electronSS_EtDependent.json");
+        "data/zgamma/2026/electronSS_EtDependent.json");
     map_scale_ = cs_scale_syst_->compound().at(
         "Scale");
     map_smearing_ = cs_scale_syst_->at(

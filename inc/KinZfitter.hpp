@@ -36,6 +36,7 @@
 #include "RooFitResult.h"
 #include "RooVoigtian.h"
 #include "RooMsgService.h"
+#include "correction.h"
 
 //alt fit method:
 #include "Math/Minimizer.h"
@@ -60,7 +61,7 @@ class KinZfitter {
   KinZfitter(TString pdf_filename);
 
   /// Kinematic fit of lepton momenta
-  void Setup(std::map<unsigned int, TLorentzVector> selectedLeptons, std::map<unsigned int, TLorentzVector> selectedFsrPhotons, std::map<unsigned int, double> errorLeptons, int lepid);
+  void Setup(std::map<unsigned int, TLorentzVector> selectedLeptons, std::map<unsigned int, TLorentzVector> selectedFsrPhotons, std::map<unsigned int, double> errorLeptons, int lepid, string year, double alt1, double alt2);
 
   ///
   void KinRefitZ1();
@@ -73,6 +74,7 @@ class KinZfitter {
   void setEs(double pT1, double pT2, unsigned int nfsrph, double pT3 = 0, double pT4 = 0);
   void setmZ(double pT1, double pT2, unsigned int nfsrph, double pT3 = 0, double pT4 = 0);
   double gaussian(double x, double mu, double sigma);
+  double DSCB(double x, double mu, double sigma, double alphal, double alphar, double nl, double nr, double norm); 
   void evaluateShape(double mll);
 
   double NLL_0(const double *pTs);
@@ -113,6 +115,9 @@ class KinZfitter {
 
   /// True mZ/mZ1 shape
   TString PDFName_;
+  string params_json_;
+  std::unique_ptr<correction::CorrectionSet> cs_params_;
+  correction::Correction::Ref map_params_;
 
   /// debug flag
   bool debug_;
@@ -131,11 +136,16 @@ class KinZfitter {
   std::vector<TLorentzVector> p4sZ1REFIT_, p4sZ1phREFIT_;
 
   int lepid_;
+  string year_;
   double pTl1_, pTl2_, pTg3_, pTg4_, 
          phil1_, phil2_, phig3_, phig4_, 
          etal1_, etal2_, etag3_, etag4_,
          sigmal1_, sigmal2_, sigmag3_, sigmag4_,
-         ml1_, ml2_;
+         ml1_, ml2_,
+         alt1_, alt2_, etptl1_, etptl2_, dxyl1_, dxyl2_;
+  double p_mu_1_, p_mu_2_, p_norm_1_, p_norm_2_, p_sig_1_, p_sig_2_,
+         p_alphal_1_, p_alphar_1_, p_alphal_2_, p_alphar_2_,
+         p_nl_1_, p_nr_1_, p_nl_2_, p_nr_2_;
   double En1_, En2_, En3_, En4_, mll_, shapeEval_;
   const long double PI = acos(-1.L);
   /// pTerr vector

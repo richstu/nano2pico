@@ -46,11 +46,13 @@ MuonProducer::MuonProducer(string year_, bool isData_, float nanoaod_version_, s
   else if (year=="2025") {
     cs_scare_ = correction::CorrectionSet::from_file(
         "data/zgamma/2025/muon_scalesmearing.json");
+    run3 = true;
   }
   else if (year=="2026") {
     cout<<"WARNING: Muon SaS not implemented yet for 2026. Defaulting to 2025"<<std::endl;
     cs_scare_ = correction::CorrectionSet::from_file(
         "data/zgamma/2025/muon_scalesmearing.json");
+    run3 = true;
   }
   else if(year=="2016" || year=="2016APV" || year=="2017" || year=="2018"){
     std::cout << "Run 2 sample, ScaRe file is not used nor set. " << std::endl;

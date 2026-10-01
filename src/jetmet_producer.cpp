@@ -367,18 +367,20 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
                           jet_type_phi[ijet],jet_raw_pt,rho,nano.run(),
                           JECType::L1);
         if(year==2024){
-          float l2_corrected = GetJEC(jet_type_area[ijet],jet_type_eta[ijet],
-                       jet_type_phi[ijet],jet_raw_pt,
-                       rho,nano.run(),JECType::L2)*jet_raw_pt;
-          if(isData && l2_corrected < 30.f && fabs(jet_type_eta[ijet])>2.0f && fabs(jet_type_eta[ijet])<2.5f){
-          //Jet eta corrections recommendation https://indico.cern.ch/event/1624984/contributions/6896120/attachments/3208048/5713070/20260127_JetMET_PerformanceRun3_HIGMeeting.pdf
-          jec_cor = (GetJEC(jet_type_area[ijet],jet_type_eta[ijet],
-                       jet_type_phi[ijet],jet_raw_pt,
-                       rho,nano.run(),JECType::L2) * 
-                      GetJEC(jet_type_area[ijet],jet_type_eta[ijet],
-                                     jet_type_phi[ijet],30.f,rho,nano.run(),
-                                     JECType::L2L3Res))/jec;
-          jec = jec*jec_cor;
+          if (isData){
+            float l2_corrected = GetJEC(jet_type_area[ijet],jet_type_eta[ijet],
+                         jet_type_phi[ijet],jet_raw_pt,
+                         rho,nano.run(),JECType::L2)*jet_raw_pt;
+            if(l2_corrected < 30.f && fabs(jet_type_eta[ijet])>2.0f && fabs(jet_type_eta[ijet])<2.5f){
+            //Jet eta corrections recommendation https://indico.cern.ch/event/1624984/contributions/6896120/attachments/3208048/5713070/20260127_JetMET_PerformanceRun3_HIGMeeting.pdf
+            jec_cor = (GetJEC(jet_type_area[ijet],jet_type_eta[ijet],
+                         jet_type_phi[ijet],jet_raw_pt,
+                         rho,nano.run(),JECType::L2) * 
+                        GetJEC(jet_type_area[ijet],jet_type_eta[ijet],
+                                       jet_type_phi[ijet],30.f,rho,nano.run(),
+                                       JECType::L2L3Res))/jec;
+            jec = jec*jec_cor;
+            }
           }
         }
       }
