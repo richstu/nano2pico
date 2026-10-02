@@ -13,6 +13,7 @@ parser.add_argument("-d","--dataset_list", default="",
                     help="File with the list of dataset names as they appear in DAS or the list of filenames (with wildcards). If not specified will run on all files in input folder")
 parser.add_argument('-t', '--tag', default='',
                     help='Optionally specify a tag to be used to differentiate helper files for batch submission.')
+parser.add_argument('-m','--mcyear', default="2024", help="Optional year for 2024 MC to be converted to. Only affects 2024 input mc")
 parser.add_argument("-l","--list_format", default="DAS", choices=["DAS","filename"],
                     help="Sets whether the dataset list is in DAS format or filename format.")
 parser.add_argument("--data", action="store_true", help='For DAS data datasets')
@@ -87,7 +88,7 @@ cmdfile = open(cmdfile_name,'w')
 cmdfile.write('#!/bin/env python3\n')
 for ifile_path in in_file_paths:
   ifile = os.path.basename(os.path.realpath(ifile_path))
-  cmd = '{}/run/process_nano.exe -f {} -i {} -o {} --norm {}'.format(os.getcwd(), ifile, in_dir, out_base_dir, args['norm'])
+  cmd = '{}/run/process_nano.exe -f {} -i {} -o {} --norm {} --mcyear {}'.format(os.getcwd(), ifile, in_dir, out_base_dir, args['norm'], args["mcyear"])
   if args['skim'] != '':
     cmd += (' --skim '+args['skim'])
   cmdfile.write('print(\"'+cmd+'\")\n')
