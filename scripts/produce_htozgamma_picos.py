@@ -160,7 +160,7 @@ def processSteps(process_commands, YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG
 
   return FIRST_COMMAND
 
-def processMc(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, NANOAOD_VERSION, FIRST_COMMAND, notify_script, dataset_list=''):
+def processMc(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, NANOAOD_VERSION, FIRST_COMMAND, MC_YEAR, notify_script, dataset_list=''):
   print("[Info] pico dir: "+PICO_DIR)
   print("[Info] step file: "+STEP_FILEBASENAME)
   print("[Info] log file: "+LOG_FILENAME)
@@ -173,7 +173,7 @@ def processMc(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, 
     process_commands = [
     #0
     [notify_script+' "Start process nano direct-to-skim_llg '+mc_tag+'"',
-    './scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/mc --production '+PRODUCTION_NAME+' --dataset_list '+dataset_list+' --tag '+mc_tag+' -s llg',
+    './scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/mc --production '+PRODUCTION_NAME+' --dataset_list '+dataset_list+' --tag '+mc_tag+' --mcyear '+ MCYEAR+' -s llg',
     'auto_submit_jobs.py process_nano_cmds_skim_llg_'+mc_tag+'.json -c scripts/check_direct_to_skim.py -f',
     notify_script+' "Finished process nano direct-to-skim_llg '+mc_tag+'"'],
 
@@ -186,7 +186,7 @@ def processMc(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, 
 
     #2
     [notify_script+' "Start process nano direct-to-skim_ll '+mc_tag+'"',
-    './scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/mc --production '+PRODUCTION_NAME+' --dataset_list '+dataset_list+' --tag '+mc_tag+' -s ll',
+    './scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/mc --production '+PRODUCTION_NAME+' --dataset_list '+dataset_list+' --tag '+mc_tag+' --mcyear '+ MCYEAR+' -s ll',
     'auto_submit_jobs.py process_nano_cmds_skim_ll_'+mc_tag+'.json -c scripts/check_direct_to_skim.py -f',
     notify_script+' "Finished process nano direct-to-skim_ll'+mc_tag+'"'],
 
@@ -202,7 +202,7 @@ def processMc(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, 
       process_commands = [
     #0
     [notify_script+' "Start process nano '+mc_tag+'"',
-    './scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/mc --production '+PRODUCTION_NAME+' --dataset_list '+dataset_list+' --tag '+mc_tag,
+    './scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/mc --production '+PRODUCTION_NAME+' --dataset_list '+dataset_list+' --tag '+mc_tag+' --mcyear '+ MCYEAR,
     'auto_submit_jobs.py process_nano_cmds_'+mc_tag+'.json -c scripts/check_process_nano_job.py -f',
     notify_script+' "Finished process nano '+mc_tag+'"'], 
     
@@ -346,6 +346,7 @@ Pico files: BASE_FOLDERNAME/NANOAOD_VERSION/TAG_NAME/(2016,2017,2018)/(data,mc,s
   parser.add_argument('-n','--nanoaod_version', required=True, help='Nanoaod version for production')
   parser.add_argument('-b','--base_foldername', required=True, help='Base folder for ntuple files. Ex) /net/cms17/cms17r0/pico')
   parser.add_argument('-d','--data', default='mc,data', help='Data type for production. Example: --data mc,data')
+  parser.add_argument('-m','--mcyear', default="2024", help="Optional year for 2024 MC to be converted to. Only affects 2024 input mc")
   parser.add_argument('-l','--dataset_list', default='', help='Datasets to process')
   parser.add_argument('-f', '--fake_run', action="store_true", help='Do not run commands. Only print commands to run.')
   parser.add_argument('-u', '--untagged', action="store_true", help='Do not use git tag')
@@ -446,7 +447,7 @@ Pico files: BASE_FOLDERNAME/NANOAOD_VERSION/TAG_NAME/(2016,2017,2018)/(data,mc,s
   # Step is the step that is running. Will run the next step.
   if 'mc' in datas:
     for year in years:
-      FIRST_COMMAND = processMc(YEAR=year, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.'+year+'.mc.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.'+year+'.mc.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script,dataset_list=args.dataset_list)
+      FIRST_COMMAND = processMc(YEAR=year, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.'+year+'.mc.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.'+year+'.mc.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, MCYEAR=args.mcyear, notify_script=notify_script,dataset_list=args.dataset_list)
 
   if 'data' in datas:
     for year in years:
