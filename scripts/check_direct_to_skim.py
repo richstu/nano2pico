@@ -23,13 +23,17 @@ print(job_argument_string)
 
 args = job_argument_string.split('--command="')[1].split('"')[0]
 tmp = args.split(' ')
+if("ll" in tmp):
+    skim_type = "ll"
+elif("llg" in tmp):
+    skim_type = "llg"
 
 infile_name = tmp[2]
 in_dir = tmp[4]
 out_dir = tmp[6]
 
 infile_path = os.path.join(in_dir, infile_name)
-outfile_path = os.path.join(out_dir,'skim_'+tmp[10],'pico_'+tmp[10]+'_'+infile_name)
+outfile_path = os.path.join(out_dir,'skim_'+skim_type,'pico_'+skim_type+'_'+infile_name)
 print("infile: ", infile_path)
 print("outfile: ", outfile_path)
 
