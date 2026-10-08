@@ -32,7 +32,6 @@ void HigVarProducer::WriteHigVars(pico_tree &pico, bool doDeepFlav, bool isSigna
         discr = doDeepFlav ? pico.out_jet_deepflav()[ijet] : pico.out_jet_deepcsv()[ijet];
       } else if (nanoaod_version+0.01 > 13){ // NanoAODv15 uses upart
         discr = doDeepFlav ? pico.out_jet_deepflav()[ijet] : pico.out_jet_btaguptb()[ijet];
-      }
       } else {
         discr = doDeepFlav ? pico.out_jet_deepflav()[ijet] : pico.out_jet_btagpnetb()[ijet];
       }
