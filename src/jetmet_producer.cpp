@@ -384,14 +384,14 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
                                    vector<float> &jes_up_factor,
                                    vector<float> &jes_dn_factor) {
 
-//  if (year <= 2018 && isData) {
+  if (year <= 2018 && isData) {
     //JECs already correct- no updating needed
-//    pico.out_met() = nano.MET_pt();
+//    pico.out_met() = nano.MET_pt();  try adding MET-xy corrections to run 2 data
 //    pico.out_met_phi() = nano.MET_phi();
-//    jet_nm_factor.resize(nano.nJet(),1.0);
-//    WriteMetVariations(nano, pico);
+    jet_nm_factor.resize(nano.nJet(),1.0);
+    WriteMetVariations(nano, pico);
 //    return;
-//  }
+  }
 
   //implementation originally based on the following:
   //https://github.com/cms-nanoAOD/nanoAOD-tools/blob/master/python/postprocessing/modules/jme/jetmetUncertainties.py
@@ -603,11 +603,12 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
     pico.out_met_phi_t1() = atan2(met_y_nom, met_x_nom);
   }
 
+
   float met_nom_u = sqrt(met_x_nom*met_x_nom+met_y_nom*met_y_nom); // "uncorrected" met and metphi
   float met_phi_u = atan2(met_y_nom, met_x_nom);
   float met_nom_corr = 0.0;
   float met_phi_corr = 0.0;
-  if (year_string == "2024" || year_string == "2025" || year_string == "2026") { // no met-xy corrections for 2024 onwards yet
+  if (year_string == "2022" || year_string == "2022EE" || year_string == "2023" || year_string == "2023BPix" || year_string == "2024" || year_string == "2025" || year_string == "2026") { // do not apply met xy corrections to run 3
     met_nom_corr = met_nom_u;
     met_phi_corr = met_phi_u;
   }
@@ -625,7 +626,7 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
       met_phi_corr = map_metphi_mc_->evaluate({met_nom_u, met_phi_u, npvs, run});
     }
   }
-  else {
+/*  else {
     float npvs_good = static_cast<float>(nano.PV_npvsGood());
     if (isData) {
       met_nom_corr = map_met_->evaluate({"pt", "PuppiMET", year_string, "DATA", "nom", met_nom_u, met_phi_u, npvs_good});
@@ -636,7 +637,7 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
       met_phi_corr = map_met_->evaluate({"phi", "PuppiMET", year_string, "MC", "nom", met_nom_u, met_phi_u, npvs_good});
     }
   }
-
+*/
   pico.out_met() = met_nom_corr;
   pico.out_met_phi() = met_phi_corr;
 
