@@ -436,7 +436,7 @@ int main(int argc, char *argv[]){
       if(nano.event()%25>=11) continue;
 //      sf_splitfactor=25/11.0;
     } else if (!isData && year==2025) {
-      if(nano.event()%25<11 && nano.event()%25>=22) continue;
+      if(nano.event()%25<11 || nano.event()%25>=22) continue;
 //      sf_splitfactor=25/11.0;
     } else if (!isData && year==2026) {
       if(nano.event()%25<22) continue;
