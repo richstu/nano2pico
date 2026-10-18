@@ -98,7 +98,11 @@ int main(int argc, char *argv[]){
       else if (regex_search(in_file, std::regex("RunIIAutumn18"))) year = 2018;
       else if (regex_search(in_file, std::regex("Run3Summer22"))) year = 2022;
       else if (regex_search(in_file, std::regex("Run3Summer23"))) year = 2023;
-      else if (regex_search(in_file, std::regex("RunIII2024Summer24"))) year = 2024;
+      else if (regex_search(in_file, std::regex("RunIII2024Summer24"))) {
+        if (Contains(in_dir, "2025")) year = 2025;
+        else if (Contains(in_dir, "2026")) year = 2026;
+        else year = 2024;
+      }
     }
   } else { // Data
     if (Contains(in_file, "HIPM")) isAPV = true;
@@ -109,6 +113,7 @@ int main(int argc, char *argv[]){
     else if (Contains(in_file, "Run2023")) year = 2023;
     else if (Contains(in_file, "Run2024")) year = 2024;
     else if (Contains(in_file, "Run2025")) year = 2025;
+    else if (Contains(in_file, "Run2026")) year = 2026;
   }
   if (year < 0) {
     cout<<"ERROR: Add code for new year!"<<endl;
@@ -213,6 +218,9 @@ int main(int argc, char *argv[]){
       case 2025:
         if (Contains(in_file, "2025")) VVRunLumi = MakeVRunLumi("golden2025");
         break;
+      case 2026:
+        if (Contains(in_file, "2026")) VVRunLumi = MakeVRunLumi("golden2026");
+        break;
       default:
         cout << "ERROR: no golden cert for given year" << endl;
         exit(1);
@@ -220,9 +228,17 @@ int main(int argc, char *argv[]){
   }
 
   string in_path = in_dir+"/"+in_file;
-  string wgt_sums_path = out_dir+"/wgt_sums/wgt_sums_"+in_file;
+  string out_file = in_file;
+  if(!isData && (year==2025)) out_file = std::regex_replace(in_file, std::regex("2024Summer24NanoAODv15__150X_mcRun3_2024"), "2025Summer24NanoAODv15__150X_mcRun3_2024");
+  else if(!isData && (year==2026)) out_file = std::regex_replace(in_file, std::regex("2024Summer24NanoAODv15__150X_mcRun3_2024"), "2026Summer24NanoAODv15__150X_mcRun3_2024");
   string out_path;
-  out_path = out_dir+"/raw_pico/raw_pico_"+in_file;
+  out_path = out_dir+"/raw_pico/raw_pico_"+out_file;
+  string wgt_sums_path = out_dir+"/wgt_sums/wgt_sums_"+out_file;
+
+//  string in_path = in_dir+"/"+in_file;
+//  string wgt_sums_path = out_dir+"/wgt_sums/wgt_sums_"+in_file;
+//  string out_path;
+//  out_path = out_dir+"/raw_pico/raw_pico_"+in_file;
 
   // Find nanoAOD version
   float nanoaod_version = -1;
@@ -279,7 +295,8 @@ int main(int argc, char *argv[]){
   // WPs for Particle Transformer (UParT) in NanoAODv15
   map<string, vector<float>> btag_upt_wpts{
     {"2024", vector<float>({0.0246, 0.1272, 0.4648})},
-    {"2025", vector<float>({0.0246, 0.1272, 0.4648})}
+    {"2025", vector<float>({0.0246, 0.1272, 0.4648})},
+    {"2026", vector<float>({0.0246, 0.1272, 0.4648})}
   };
 
   // Double b-tagger working points
@@ -411,8 +428,20 @@ int main(int argc, char *argv[]){
     if (entry%2000==0 || entry == nentries-1) {
       cout<<"Processing event: "<<entry<<endl;
     }
-    if (!isData && year==2024 && nano.event()%2==1) continue;      // NEW
-    if (!isData && year==2025 && nano.event()%2==0) continue;     
+//    if (!isData && year==2024 && nano.event()%2==1) continue;      // NEW
+//    if (!isData && year==2025 && nano.event()%2==0) continue;     
+//  Update MC sample split to include 2026
+//    double sf_splitfactor=1;
+    if (!isData && year==2024) {
+      if(nano.event()%25>=11) continue;
+//      sf_splitfactor=25/11.0;
+    } else if (!isData && year==2025) {
+      if(nano.event()%25<11 && nano.event()%25>=22) continue;
+//      sf_splitfactor=25/11.0;
+    } else if (!isData && year==2026) {
+      if(nano.event()%25<22) continue;
+//      sf_splitfactor=25/3.0;
+    }
     //skip events that are data but not in the golden json
     if (isData) {
       if(!inJSON(VVRunLumi, nano.run(), nano.luminosityBlock())) 

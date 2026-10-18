@@ -215,7 +215,7 @@ void FixLumi(corrections_tree &corr, const string &corr_path, int year){
   } else if (Contains(corr_path, "SMS-TChi")){
     double exsec(0.);
     int mglu = GetHiggsinoMass(corr_path);
-    xsec::higgsinoCrossSection(mglu, xsec, exsec, year);
+    xsec::higgsino2DCrossSection(mglu, xsec, exsec, year);
   } else if (Contains(corr_path, "SMS-T5qqqqZH_HToBB")) {
     double exsec(0.);
     int mglu = GetGluinoMass(corr_path);

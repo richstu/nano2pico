@@ -16,7 +16,7 @@
 class JetMetProducer{
 public:
 
-  enum class JECType {L1L2L3, L1};
+  enum class JECType {L1L2L3, L1, L2, L2L3Res};
 
   explicit JetMetProducer(int year, std::string year_string, 
                           float nanoaod_version, float min_jet_pt, 
@@ -76,6 +76,8 @@ private:
   correction::Correction::Ref map_jermc_;
   std::vector<correction::CompoundCorrection::Ref> map_jec_;
   std::vector<correction::Correction::Ref> map_jec_l1_;
+  correction::Correction::Ref map_jec_l2_;
+  correction::Correction::Ref map_jec_l2l3res_;
   correction::Correction::Ref map_metpt_mc_;
   correction::Correction::Ref map_metpt_data_;
   correction::Correction::Ref map_metphi_mc_;
