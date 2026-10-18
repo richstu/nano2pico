@@ -88,6 +88,14 @@ ElectronProducer::ElectronProducer(string year_, bool isData_, float nanoaod_ver
     map_smearing_ = cs_scale_syst_->at(
         "SmearAndSyst");
   }
+ else if (year=="2026") {
+    cs_scale_syst_ = correction::CorrectionSet::from_file(
+        "data/higgsino/2026/electronSS_EtDependent.json");
+    map_scale_ = cs_scale_syst_->compound().at(
+        "Scale");
+    map_smearing_ = cs_scale_syst_->at(
+        "SmearAndSyst");
+  }
   else {
     cs_scale_syst_ = correction::CorrectionSet::from_file(
         "data/zgamma/2023BPix/electronSS_EtDependent.json");

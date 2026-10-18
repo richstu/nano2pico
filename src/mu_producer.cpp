@@ -48,6 +48,11 @@ MuonProducer::MuonProducer(string year_, bool isData_, float nanoaod_version_, s
         "data/higgsino/2025/muon_scalesmearing.json");
     run3 = true;
   }
+  else if (year=="2026") {
+    cs_scare_ = correction::CorrectionSet::from_file(
+        "data/higgsino/2025/muon_scalesmearing.json"); // update when 2026 files are available
+    run3 = true;
+  }
 }
 
 MuonProducer::~MuonProducer(){

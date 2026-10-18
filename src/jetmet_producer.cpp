@@ -209,6 +209,8 @@ JetMetProducer::JetMetProducer(int year_, string year_string_,
     if (isData) {
       map_jec_.push_back(cs_jerc_->compound().at("Summer24Prompt24_V5_DATA_L1L2L3Res_AK4PFPuppi"));
       map_jec_l1_.push_back(cs_jerc_->at("Summer24Prompt24_V5_DATA_L1FastJet_AK4PFPuppi"));
+      map_jec_l2_ = cs_jerc_->at("Summer24Prompt24_V5_DATA_L2Relative_AK4PFPuppi");
+      map_jec_l2l3res_ = cs_jerc_->at("Summer24Prompt24_V5_DATA_L2L3Residual_AK4PFPuppi");
     }
     else {
       map_jes_ = cs_jerc_->at("Summer24Prompt24_V5_MC_Total_AK4PFPuppi");
@@ -251,26 +253,25 @@ JetMetProducer::JetMetProducer(int year_, string year_string_,
     map_jetid_tight_ = cs_jetid_->at("AK4PUPPI_Tight");
     map_jetid_tightlepveto_ = cs_jetid_->at("AK4PUPPI_TightLeptonVeto");
   }
-  else if (year_string=="2025") {
+  else if (year_string=="2026") {
     if(isData) {
-      cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2025/jet_jerc.json");
-      map_jec_.push_back(cs_jerc_->compound().at("Winter25Prompt25_V3_DATA_L1L2L3Res_AK4PFPuppi"));
-      map_jec_l1_.push_back(cs_jerc_->at("Winter25Prompt25_V3_DATA_L1FastJet_AK4PFPuppi"));
+      cs_jerc_ = correction::CorrectionSet::from_file("data/higgsino/2026/jet_jerc.json");
+      map_jec_.push_back(cs_jerc_->compound().at("Summer24Prompt26_V1_DATA_L1L2L3Res_AK4PFPuppi"));
+      map_jec_l1_.push_back(cs_jerc_->at("Summer24Prompt26_V1_DATA_L1FastJet_AK4PFPuppi"));
     }
     else {
-      cs_jerc_ = correction::CorrectionSet::from_file("data/zgamma/2024/jet_jerc.json");//2024 MC being used for both 2024 and 2025
-      map_jes_ = cs_jerc_->at("Summer24Prompt24_V2_MC_Total_AK4PFPuppi");
-      //jet_jerc json has these two branches from 2023BPix. . .
-      map_jersf_ = cs_jerc_->at("Summer23BPixPrompt23_RunD_JRV1_MC_ScaleFactor_AK4PFPuppi");
-      map_jermc_ = cs_jerc_->at("Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi");
-      map_jec_.push_back(cs_jerc_->compound().at("Summer24Prompt24_V2_MC_L1L2L3Res_AK4PFPuppi"));
-      map_jec_l1_.push_back(cs_jerc_->at("Summer24Prompt24_V2_MC_L1FastJet_AK4PFPuppi"));
+      map_jes_ = cs_jerc_->at("Summer24Prompt26_V1_MC_Total_AK4PFPuppi");
+      map_jersf_ = cs_jerc_->at("Summer24Prompt26_RunBD_JRV1_MC_ScaleFactor_AK4PFPuppi");
+      map_jersf_unc_ = cs_jerc_->at("Summer24Prompt26_RunBD_JRV1_MC_SFUncertainty_AK4PFPuppi");
+      map_jermc_ = cs_jerc_->at("Summer24Prompt26_RunC_JRV1_MC_PtResolution_AK4PFPuppi");
+      map_jec_.push_back(cs_jerc_->compound().at("Summer24Prompt26_V1_MC_L1L2L3Res_AK4PFPuppi"));
+      map_jec_l1_.push_back(cs_jerc_->at("Summer24Prompt26_V1_MC_L1FastJet_AK4PFPuppi"));
     }
-    in_file_jetveto_ = "data/zgamma/2025/jetvetomaps.json";
+    in_file_jetveto_ = "data/higgsino/2026/jetvetomaps.json";
     cs_jetveto_ = correction::CorrectionSet::from_file(in_file_jetveto_);
-    map_jetveto_ = cs_jetveto_->at("Winter25Prompt25_RunCDEFG_V1");
+    map_jetveto_ = cs_jetveto_->at("Summer24Prompt26_RunBCD_V1");
 
-    in_file_jetid_ = "data/zgamma/2024/JetID_Run3_Rereco2022CDE_v2.json";//No jetID jsons for 2025 yet.
+    in_file_jetid_ = "data/higgsino/2026/jetid.json";
     cs_jetid_ = correction::CorrectionSet::from_file(in_file_jetid_);
     map_jetid_tight_ = cs_jetid_->at("AK4PUPPI_Tight");
     map_jetid_tightlepveto_ = cs_jetid_->at("AK4PUPPI_TightLeptonVeto");
@@ -332,6 +333,12 @@ float JetMetProducer::GetJEC(float jet_area, float jet_eta, float jet_phi,
          return map_jec_[0]->evaluate({jet_area, jet_eta, jet_pt, rho,
                                        jet_phi, static_cast<float>(run)});
        return map_jec_[0]->evaluate({jet_area, jet_eta, jet_pt, rho, jet_phi});
+     } 
+     else if (jec_type == JECType::L2){
+       return map_jec_l2_->evaluate({jet_eta, jet_phi, jet_pt});
+     } 
+     else if (jec_type == JECType::L2L3Res){
+       return map_jec_l2l3res_->evaluate({static_cast<float>(run), jet_eta, jet_pt});
      }
      else {
        return map_jec_l1_[0]->evaluate({jet_area, jet_eta, jet_pt, rho});
@@ -451,6 +458,7 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
       float jec_default = 1.0/(1.0-jet_type_rawfactor[ijet]);
       float jec_l1 = 1.0;
       float jec = jec_default;
+      float jec_cor = 1.0;//a factor that can be removed for 2024
       float jet_raw_pt = jet_type_pt[ijet]/jec_default;
       if (jet_type==1 || year > 2018) {
         jec = GetJEC(jet_type_area[ijet],jet_type_eta[ijet],jet_type_phi[ijet],
@@ -459,6 +467,23 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
           jec_l1 = GetJEC(jet_type_area[ijet],jet_type_eta[ijet],
                           jet_type_phi[ijet],jet_raw_pt,rho,nano.run(),
                           JECType::L1);
+        if(year==2024){
+          if (isData){
+            float l2_corrected = GetJEC(jet_type_area[ijet],jet_type_eta[ijet],
+                         jet_type_phi[ijet],jet_raw_pt,
+                         rho,nano.run(),JECType::L2)*jet_raw_pt;
+            if(l2_corrected < 30.f && fabs(jet_type_eta[ijet])>2.0f && fabs(jet_type_eta[ijet])<2.5f){
+            //Jet eta corrections recommendation https://indico.cern.ch/event/1624984/contributions/6896120/attachments/3208048/5713070/20260127_JetMET_PerformanceRun3_HIGMeeting.pdf
+            jec_cor = (GetJEC(jet_type_area[ijet],jet_type_eta[ijet],
+                         jet_type_phi[ijet],jet_raw_pt,
+                         rho,nano.run(),JECType::L2) * 
+                        GetJEC(jet_type_area[ijet],jet_type_eta[ijet],
+                                       jet_type_phi[ijet],30.f,rho,nano.run(),
+                                       JECType::L2L3Res))/jec;
+            jec = jec*jec_cor;
+            }
+          }
+        } 
       }
       float jet_l1_pt = jet_raw_pt*jec_l1;
       float jet_l1l2l3_pt = jet_raw_pt*jec;
