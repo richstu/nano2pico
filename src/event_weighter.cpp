@@ -22,7 +22,7 @@ BTagAlgo GetBTagAlgo(const string &year) {
     return BTagAlgo::deepflav;
   if (year=="2022" || year=="2022EE" || year=="2023" || year=="2023BPix")
     return BTagAlgo::pnetb;
-  if (year=="2024" || year=="2025")
+  if (year=="2024" || year=="2025" || year=="2026")
     return BTagAlgo::uptb;
   //unimplemented years fall back to the 2023 correction files, which contain
   //DeepJet but not UParT, so DeepJet is the only safe default here
@@ -241,6 +241,28 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     zgbkg_isr_weighter_       = make_unique<kinr3_weighter>();
   } else if (year=="2025"){
     cout<<"2025 has not been fully implemented in event_weighter. Defaulting to 2024 for some scale factors"<<endl;
+    in_file_electron_         = "data/zgamma/2025/hzg_elid_2025_scalefactors.json";
+    in_file_electron_reco_    = "data/zgamma/2023/electron_recoSF2023.json";
+    in_file_photon_           = "data/higgsino/2025/photon.json";
+    in_file_photon_low_       = "data/zgamma/2025/hzg_phidvalidate_2025_scalefactors.json";
+    in_file_photon_mceff_     = "data/zgamma/2024/photon_wp80mceff_2024.json";
+    in_file_muon_             = "data/zgamma/2025/hzg_muid_2025_scalefactors.json";
+    in_file_pu_               = "data/zgamma/2025/puWeights_2025pp_Summer24_25ns_69200ub.json";
+    in_file_btag_             = "data/higgsino/2025/btagging.json";
+    in_file_btag_mceff_       = "data/zgamma/2024/btag_mceff.json";
+    in_file_electron_iso0p10_ = "data/zgamma/2025/hzg_eliso0p1_2025_efficiencies.json";
+    in_file_electron_iso0p15_ = "data/zgamma/2025/hzg_eliso0p15_2025_efficiencies.json";
+    in_file_muon_iso0p10_     = "data/zgamma/2025/hzg_muiso0p1_2025_efficiencies.json";
+    in_file_muon_iso0p15_     = "data/zgamma/2025/hzg_muiso0p15_2025_efficiencies.json";
+    in_file_ggf_nnlo_         = "data/zgamma/GluGluHToZG_NNLO_reweight_run3.json";
+    key_                      = "2025Prompt";
+    puName_                   = "Collisions25_goldenJSON";
+    btag_lightname            = "UParTAK4_light";
+    btag_combname             = "UParTAK4_comb";
+    ph_shape_weighter_        = make_unique<photon_weighter_mmp2425>();
+    zgbkg_isr_weighter_       = make_unique<kinr3_weighter>();
+  } else if (year=="2026"){
+    cout<<"2025 has not been fully implemented in event_weighter. Defaulting to 2025 for some scale factors"<<endl;
     in_file_electron_         = "data/zgamma/2025/hzg_elid_2025_scalefactors.json";
     in_file_electron_reco_    = "data/zgamma/2023/electron_recoSF2023.json";
     in_file_photon_           = "data/higgsino/2025/photon.json";

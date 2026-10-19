@@ -254,8 +254,8 @@ JetMetProducer::JetMetProducer(int year_, string year_string_,
     map_jetid_tightlepveto_ = cs_jetid_->at("AK4PUPPI_TightLeptonVeto");
   }
   else if (year_string=="2026") {
+    cs_jerc_ = correction::CorrectionSet::from_file("data/higgsino/2026/jet_jerc.json");
     if(isData) {
-      cs_jerc_ = correction::CorrectionSet::from_file("data/higgsino/2026/jet_jerc.json");
       map_jec_.push_back(cs_jerc_->compound().at("Summer24Prompt26_V1_DATA_L1L2L3Res_AK4PFPuppi"));
       map_jec_l1_.push_back(cs_jerc_->at("Summer24Prompt26_V1_DATA_L1FastJet_AK4PFPuppi"));
     }
@@ -263,7 +263,7 @@ JetMetProducer::JetMetProducer(int year_, string year_string_,
       map_jes_ = cs_jerc_->at("Summer24Prompt26_V1_MC_Total_AK4PFPuppi");
       map_jersf_ = cs_jerc_->at("Summer24Prompt26_RunBD_JRV1_MC_ScaleFactor_AK4PFPuppi");
       map_jersf_unc_ = cs_jerc_->at("Summer24Prompt26_RunBD_JRV1_MC_SFUncertainty_AK4PFPuppi");
-      map_jermc_ = cs_jerc_->at("Summer24Prompt26_RunC_JRV1_MC_PtResolution_AK4PFPuppi");
+      map_jermc_ = cs_jerc_->at("Summer24Prompt26_RunBD_JRV1_MC_PtResolution_AK4PFPuppi");
       map_jec_.push_back(cs_jerc_->compound().at("Summer24Prompt26_V1_MC_L1L2L3Res_AK4PFPuppi"));
       map_jec_l1_.push_back(cs_jerc_->at("Summer24Prompt26_V1_MC_L1FastJet_AK4PFPuppi"));
     }
