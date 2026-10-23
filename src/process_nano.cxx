@@ -64,7 +64,7 @@ int main(int argc, char *argv[]){
     exit(1);
   }
   //bool isData = Contains(in_file, "Run201") ? true : false;
-  bool isData = Contains(in_file, "Run20") ? true : false; //Changed to allow for Run 3 data
+  bool isData = Contains(in_file, "Run20") ? true : false; //Changed to allow for Run 3 data 
   //bool isFastsim = Contains(in_file, "Fast") ? true : false;  // new fastsim filenames use "FSUL" instead
   //isFastsim = Contains(in_file, "FSUL") ? true : false;
   bool isFastsim = false;
