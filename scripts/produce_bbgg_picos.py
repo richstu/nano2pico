@@ -229,8 +229,9 @@ def processSig(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR,
   print("[Info] step file: "+STEP_FILEBASENAME)
   print("[Info] log file: "+LOG_FILENAME)
   YEAR = str(YEAR)
-  mc_tag=PRODUCTION_NAME+'_'+YEAR+'_mc'
-  # Add mc commands
+  # D1 (higgsino_bhagirathi_2026_v1): own tag per signal folder, and merge/apply run on the signal folder (was mc/)
+  mc_tag=PRODUCTION_NAME+'_'+YEAR+'_'+SigFolder.split('-')[1]
+  # Add signal commands
   process_commands = [
     #0 STEP 0 FOR SPECIFIC DATASETS ##########################
     #[notify_script+' "Start process nano '+mc_tag+'"',
@@ -247,12 +248,12 @@ def processSig(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR,
 
     #1
     [notify_script+' "Start merge corrections '+mc_tag+'"',
-    './scripts/merge_corrections.py --wgt_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/wgt_sums/ --corr_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/corrections/',
+    './scripts/merge_corrections.py --wgt_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/'+SigFolder+'/wgt_sums/ --corr_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/'+SigFolder+'/corrections/',
     notify_script+' "Finished merge corrections '+mc_tag+'"'],
     
     #2
     [notify_script+' "Start applied corrections '+mc_tag+'"',
-    './scripts/write_apply_corrections_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/raw_pico/ --tag '+mc_tag,
+    './scripts/write_apply_corrections_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/'+SigFolder+'/raw_pico/ --tag '+mc_tag,
     'auto_submit_jobs.py '+mc_tag+'_apply_corr_cmds.json -c scripts/check_apply_corrections_job.py -f',
     notify_script+' "Finished applied corrections '+mc_tag+'"'],
     
@@ -374,8 +375,18 @@ Pico files: BASE_FOLDERNAME/NANOAOD_VERSION/TAG_NAME/(2016,2017,2018)/(data,mc,s
   parser.add_argument('-f', '--fake_run', action="store_true", help='Do not run commands. Only print commands to run.')
   parser.add_argument('--use_telegram', action="store_true", help='Uses telegram script to notify about steps. Requires telegram setup.')
   parser.add_argument('--email', help='Uses email to notify about steps. Type in your email.')
+  # D1 (higgsino_bhagirathi_2026_v1): choose the sample types; each type has its own step/log file and job tags,
+  # so mc, data and sig can run one after the other or in parallel (separate screen sessions).
+  parser.add_argument('-s','--samples', default='mc', help='Comma-separated sample types: mc, data, sig. Default: mc')
+  parser.add_argument('--signal_folders', default='SMS-TChiHH-Hto2G-FullSIM-Central-Run2_split,SMS-TChiZH-Hto2G-FullSIM-Central-Run2_split',
+                      help='Signal input folders under <base>/<nanoaod_version>/nano/<year>/ (used with --samples sig)')
   
   args = parser.parse_args()
+  samples = args.samples.split(',')
+  for sample in samples:
+    if sample not in ['mc','data','sig']:
+      print('[Error] unknown sample type: '+sample+'. Use mc, data, sig. Exiting.')
+      sys.exit()
 
   # Check if base_folder exists
   if not os.path.exists(args.base_foldername):
@@ -387,9 +398,13 @@ Pico files: BASE_FOLDERNAME/NANOAOD_VERSION/TAG_NAME/(2016,2017,2018)/(data,mc,s
   # Check if dataset_list (nanoaod files to process) exist
   dataset_list_files = []
   for year in years:
-    #dataset_list_files.append(f'txt/datasets/{args.nanoaod_version}_bbgg_higgsino_{year}_mc_dataset_paths')
-    #dataset_list_files.append(f'txt/datasets/{args.nanoaod_version}_bbgg_higgsino_{year}_sig_dataset_paths')
-    dataset_list_files.append(f'txt/datasets/{args.nanoaod_version}_bbgg_higgsino_{year}_data_dataset_paths')
+    if 'mc' in samples: dataset_list_files.append(f'txt/datasets/{args.nanoaod_version}_bbgg_higgsino_{year}_mc_dataset_paths')
+    if 'data' in samples: dataset_list_files.append(f'txt/datasets/{args.nanoaod_version}_bbgg_higgsino_{year}_data_dataset_paths')
+    if 'sig' in samples:
+      for sig_folder in args.signal_folders.split(','):
+        if not os.path.isdir(f'{args.base_foldername}/{args.nanoaod_version}/nano/{year}/{sig_folder}'):
+          print(f'[Error] signal folder {args.base_foldername}/{args.nanoaod_version}/nano/{year}/{sig_folder} does not exist. Exiting.')
+          sys.exit()
   for dataset_list_file in dataset_list_files:
     if not os.path.exists(dataset_list_file): 
       print('[Error] '+dataset_list_file+' does not exist. Existing.')
@@ -479,10 +494,17 @@ Pico files: BASE_FOLDERNAME/NANOAOD_VERSION/TAG_NAME/(2016,2017,2018)/(data,mc,s
   # There is also a memory list of commands from this script. 
   # They are compared and missing steps are ran.
   # Step is the step that is running. Will run the next step.
+  STEP_BASE = PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_bbgg_higgsino_picos.py.'+PRODUCTION_NAME
   for year in years:
-    #FIRST_COMMAND = processMc(YEAR=year, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_bbgg_higgsino_picos.py.'+PRODUCTION_NAME+ '.' + str(year) + '.mc.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_bbgg_higgsino_picos.py.'+PRODUCTION_NAME+ '.' + str(year) + '.mc.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
-    #FIRST_COMMAND = processSig(YEAR=year, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_bbgg_higgsino_picos.py.'+PRODUCTION_NAME+ '.' + str(year) + '.mc.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_bbgg_higgsino_picos.py.'+PRODUCTION_NAME+ '.' + str(year) + '.mc.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
-    FIRST_COMMAND = processData(YEAR=year, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_bbgg_higgsino_picos.py.'+PRODUCTION_NAME+'.' + str(year) + '.mc.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_bbgg_higgsino_picos.py.'+PRODUCTION_NAME+'.' + str(year) + '.mc.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
+    year = str(year)
+    if 'mc' in samples:
+      FIRST_COMMAND = processMc(YEAR=year, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=STEP_BASE+'.'+year+'.mc.step', LOG_FILENAME=STEP_BASE+'.'+year+'.mc.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
+    if 'sig' in samples:
+      for sig_folder in args.signal_folders.split(','):
+        sig_name = sig_folder.split('-')[1]
+        FIRST_COMMAND = processSig(YEAR=year, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=STEP_BASE+'.'+year+'.'+sig_name+'.step', LOG_FILENAME=STEP_BASE+'.'+year+'.'+sig_name+'.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script, SigFolder=sig_folder)
+    if 'data' in samples:
+      FIRST_COMMAND = processData(YEAR=year, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=STEP_BASE+'.'+year+'.data.step', LOG_FILENAME=STEP_BASE+'.'+year+'.data.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
   #for year in years:
   #  FIRST_COMMAND = processData(YEAR=year, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2016.data.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2016.data.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
 
@@ -502,4 +524,4 @@ Pico files: BASE_FOLDERNAME/NANOAOD_VERSION/TAG_NAME/(2016,2017,2018)/(data,mc,s
   #FIRST_COMMAND = processData(YEAR='2023', PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2022EE.data.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.2022EE.data.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script)
 
   # Change permission of directories
-  os.system("find "+PICO_DIR+"/"+NANOAOD_VERSION+'/'+PRODUCTION_NAME+" -type d -exec chmod 775 {} \;")
+  os.system("find "+PICO_DIR+"/"+NANOAOD_VERSION+'/'+PRODUCTION_NAME+" -type d -exec chmod 775 {} \\;")
