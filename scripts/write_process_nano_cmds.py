@@ -38,6 +38,7 @@ if args['dataset_list']!='':
     #print(datasets)
   if (list_format == "DAS"):
     wanted_file_substr = []
+    wanted_dirs = []
     if args['data']:
       for ds in datasets:
         ds_split = ds.split("/")
@@ -46,21 +47,32 @@ if args['dataset_list']!='':
         run, condition =  re.search('(Run.+?)-(.*)', run_condition).groups()
         wanted_file_substr.append(dataset+"__"+run+"__"+condition)
     else:
-      for ds in datasets: 
-        if ds[0]!="/": # in case of empty lines or comments
+      # S8 (higgsino_bhagirathi_2026_v1): a line may start with its own input directory,
+      # "<in_dir> /<dataset>/<campaign>/NANOAODSIM", for samples read from another disk or NanoAOD version.
+      # Outputs still go to out_base_dir (derived from --in_dir). One-column lines use --in_dir as before.
+      for ds in datasets:
+        fields = ds.split()
+        if len(fields) == 2 and fields[1][0] == "/":
+          ds_dir, ds = fields
+        elif len(fields) == 1 and fields[0][0] == "/":
+          ds_dir, ds = in_dir, fields[0]
+        else: # empty lines or comments
           continue
         tmp_ = ds.split("/")
         wanted_file_substr.append(re.sub(r'(NanoAODv\d+|NanoAODAPVv\d+|NanoAODv9UCSB1|NanoAODAPVv9UCSB1)-', r'\1__',tmp_[1]+'__'+tmp_[2]))
-    for istr in wanted_file_substr:
+        wanted_dirs.append(ds_dir)
+    if not wanted_dirs: wanted_dirs = [in_dir]*len(wanted_file_substr)
+    files_in_dir = {}
+    for istr, idir in zip(wanted_file_substr, wanted_dirs):
+      if idir not in files_in_dir: files_in_dir[idir] = glob(os.path.join(idir,'*.root'))
       found=False
-      for ifile in all_file_paths:
+      for ifile in files_in_dir[idir]:
         #For all files checking that it matches a wanted dataset. The '/' removes possiblity of one file being added multiple times
         if (('/' + istr) in ifile):
           in_file_paths.append(ifile)
           found=True
-          #print(ifile)
-        if(not found and (ifile==all_file_paths[-1])):
-          print("Dataset not found, there may be a typo: " + istr)
+      if not found:
+        print("Dataset not found, there may be a typo: " + istr + " (in " + idir + ")")
   else:
     print(datasets)
     for ds in datasets:
@@ -80,7 +92,8 @@ cmdfile = open(cmdfile_name,'w')
 cmdfile.write('#!/bin/env python\n')
 for ifile_path in in_file_paths:
   ifile = os.path.basename(os.path.realpath(ifile_path))
-  cmd = '{}/run/process_nano.exe -f {} -i {} -o {}'.format(os.getcwd(), ifile, in_dir, out_base_dir)
+  ifile_dir = os.path.dirname(ifile_path) # S8: the file's own input directory (may differ from --in_dir)
+  cmd = '{}/run/process_nano.exe -f {} -i {} -o {}'.format(os.getcwd(), ifile, ifile_dir, out_base_dir)
   cmdfile.write('print(\"'+cmd+'\")\n')
 
 cmdfile.close()

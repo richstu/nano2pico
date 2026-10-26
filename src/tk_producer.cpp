@@ -97,7 +97,7 @@ bool IsoTrackProducer::IsGoodTk(pico_tree &pico, bool isNanoElectron, bool isNan
   pico.out_tk_dxy().push_back(dxy);
   pico.out_tk_miniso_chg().push_back(miniso_chg);
   pico.out_tk_reliso_chg().push_back(reliso_chg);
-  pico.out_tk_dxy().push_back(dxy);
+  // U5 (higgsino_bhagirathi_2026_v1): removed a second tk_dxy push here; tk_dxy had 2 entries per track.
   pico.out_tk_dz().push_back(dz);
   pico.out_tk_mt().push_back(mt); 
   pico.out_tk_nano_electron().push_back(isNanoElectron); 

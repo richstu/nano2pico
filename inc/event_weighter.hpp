@@ -34,7 +34,7 @@ public:
 
   void ElectronMinisoSF(pico_tree &pico);
 
-  void PhotonSF(pico_tree &pico);
+  void PhotonSF(pico_tree &pico, bool apply_fail_sf = true);
 
   void MuonSF(pico_tree &pico);
 
@@ -44,7 +44,7 @@ public:
 
   void bTaggingSF(pico_tree &pico);
 
-  void jetpuIdSF(pico_tree &pico);
+  void jetpuIdSF(pico_tree &pico, float min_jet_pt = 0.f);
 
   void PhotonShapeSF(pico_tree &pico);
 
@@ -94,6 +94,7 @@ private:
   std::unique_ptr<correction::CorrectionSet> cs_ggf_nnlo_;
   correction::Correction::Ref map_photon_id_;
   correction::Correction::Ref map_photon_csev_;
+  correction::Correction::Ref map_photon_pixveto_; // S2
   correction::Correction::Ref map_photon_mceff_;
   correction::Correction::Ref map_photon_mcunc_;
   correction::Correction::Ref map_photon_id_low_pass_;

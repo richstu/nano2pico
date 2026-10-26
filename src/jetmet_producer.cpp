@@ -34,6 +34,10 @@ JetMetProducer::JetMetProducer(int year_, string year_string_,
   if (year_string=="2016APV") {
     cs_jerc_ = correction::CorrectionSet::from_file("data/higgsino/2016APV/jet_jerc.json");
     cs_met_ = correction::CorrectionSet::from_file("data/higgsino/2016APV/met.json");
+    // S1 (higgsino_bhagirathi_2026_v1): Run 2 UL jet veto map (flag only, see WriteJetMet)
+    in_file_jetveto_ = "data/higgsino/2016APV/jetvetomaps.json";
+    cs_jetveto_ = correction::CorrectionSet::from_file(in_file_jetveto_);
+    map_jetveto_ = cs_jetveto_->at("Summer19UL16_V1");
     if (isData) {
       map_jec_.push_back(cs_jerc_->compound().at("Summer19UL16APV_V7_DATA_L1L2L3Res_AK4PFchs"));
       map_jec_l1_.push_back(cs_jerc_->at("Summer19UL16APV_V7_DATA_L1FastJet_AK4PFchs"));
@@ -54,6 +58,10 @@ JetMetProducer::JetMetProducer(int year_, string year_string_,
   else if (year_string=="2016") {
     cs_jerc_ = correction::CorrectionSet::from_file("data/higgsino/2016/jet_jerc.json");
     cs_met_ = correction::CorrectionSet::from_file("data/higgsino/2016/met.json");
+    // S1 (higgsino_bhagirathi_2026_v1): Run 2 UL jet veto map (flag only, see WriteJetMet)
+    in_file_jetveto_ = "data/higgsino/2016/jetvetomaps.json";
+    cs_jetveto_ = correction::CorrectionSet::from_file(in_file_jetveto_);
+    map_jetveto_ = cs_jetveto_->at("Summer19UL16_V1");
     if (isData) {
       map_jec_.push_back(cs_jerc_->compound().at("Summer19UL16_V7_DATA_L1L2L3Res_AK4PFchs"));
       map_jec_l1_.push_back(cs_jerc_->at("Summer19UL16_V7_DATA_L1FastJet_AK4PFchs"));
@@ -74,6 +82,10 @@ JetMetProducer::JetMetProducer(int year_, string year_string_,
   else if (year_string=="2017") {
     cs_jerc_ = correction::CorrectionSet::from_file("data/higgsino/2017/jet_jerc.json");
     cs_met_ = correction::CorrectionSet::from_file("data/higgsino/2017/met.json");
+    // S1 (higgsino_bhagirathi_2026_v1): Run 2 UL jet veto map (flag only, see WriteJetMet)
+    in_file_jetveto_ = "data/higgsino/2017/jetvetomaps.json";
+    cs_jetveto_ = correction::CorrectionSet::from_file(in_file_jetveto_);
+    map_jetveto_ = cs_jetveto_->at("Summer19UL17_V1");
     if (isData) {
       map_jec_.push_back(cs_jerc_->compound().at("Summer19UL17_V5_DATA_L1L2L3Res_AK4PFchs"));
       map_jec_l1_.push_back(cs_jerc_->at("Summer19UL17_V5_DATA_L1FastJet_AK4PFchs"));
@@ -94,6 +106,10 @@ JetMetProducer::JetMetProducer(int year_, string year_string_,
   else if (year_string=="2018") {
     cs_jerc_ = correction::CorrectionSet::from_file("data/higgsino/2018/jet_jerc.json");
     cs_met_ = correction::CorrectionSet::from_file("data/higgsino/2018/met.json");
+    // S1 (higgsino_bhagirathi_2026_v1): Run 2 UL jet veto map (flag only, see WriteJetMet)
+    in_file_jetveto_ = "data/higgsino/2018/jetvetomaps.json";
+    cs_jetveto_ = correction::CorrectionSet::from_file(in_file_jetveto_);
+    map_jetveto_ = cs_jetveto_->at("Summer19UL18_V1");
     if (isData) {
       map_jec_.push_back(cs_jerc_->compound().at("Summer19UL18_V5_MC_L1L2L3Res_AK4PFchs"));
       map_jec_l1_.push_back(cs_jerc_->at("Summer19UL18_V5_MC_L1FastJet_AK4PFchs"));
@@ -316,7 +332,9 @@ float JetMetProducer::GetJEC(float jet_area, float jet_eta, float jet_phi,
        return map_jec_l1_[0]->evaluate({jet_area, jet_eta, jet_pt, rho});
      }
    }
-   else if (year_string == "2022" || year_string == "2022EE" || year_string == " 2023"){
+   // U4 (higgsino_bhagirathi_2026_v1): was " 2023" (leading space), so 2023 (pre-BPix) never matched
+   // this branch and fell to the final else, which omits the run number for data.
+   else if (year_string == "2022" || year_string == "2022EE" || year_string == "2023"){
      if (jec_type == JECType::L1L2L3) {
        if (isData) {
          return map_jec_[0]->evaluate({jet_area, jet_eta, jet_pt, rho, static_cast<float>(run)});
@@ -390,6 +408,7 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
                                    vector<float> &jer_dn_factor,
                                    vector<float> &jes_up_factor,
                                    vector<float> &jes_dn_factor) {
+  rng_.SetSeed(EventSeed(nano.run(), nano.luminosityBlock(), nano.event(), 1)); // S9: JER smearing
 
   if (year <= 2018 && isData) {
     //JECs already correct- no updating needed
@@ -585,8 +604,14 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
           && emef < 0.9f) {
         float jet_nom_pt = jet_type_pt[ijet]*jet_factor;
         if (year <= 2018) {
-          met_x_nom -= jet_cosphi*jet_type_pt[ijet]*(jet_factor-1.0);
-          met_y_nom -= jet_sinphi*jet_type_pt[ijet]*(jet_factor-1.0);
+          // L1 (higgsino_bhagirathi_2026_v1): the Run 2 starting point is NanoAOD's Type-1 MET, which already
+          // contains the Type-1 correction of every jet with corrected pT > 15 GeV, including the low-pT jets
+          // stored as CorrT1METJet. Only the JER smearing is propagated: -pT_corr*(JER-1). Before, CorrT1METJets
+          // got -(pT_corr*JER - pT_raw), i.e. their full Type-1 correction a second time (MC only: Run 2 data
+          // uses NanoAOD MET directly).
+          float jet_corr_pt = (jet_type==0) ? jet_type_pt[ijet] : jet_l1l2l3_pt;
+          met_x_nom -= jet_cosphi*jet_corr_pt*(indiv_jer_nm-1.0);
+          met_y_nom -= jet_sinphi*jet_corr_pt*(indiv_jer_nm-1.0);
         }
         else {
           met_x_nom -= jet_cosphi*(jet_nom_pt-jet_l1_pt);
@@ -698,6 +723,31 @@ void JetMetProducer::WriteMetVariations(nano_tree &nano, pico_tree &pico) {
   }
   pico.out_met_tru()     = nano.GenMET_pt();
   pico.out_met_tru_phi() = nano.GenMET_phi();
+  // U8 (higgsino_bhagirathi_2026_v1): NanoAOD PF MET, its significance and covariance (data and MC).
+  // In Run 3 `met` is PUPPI MET; these describe PF MET (NanoAOD has no PUPPI MET significance/covariance).
+  if (nanoaod_version + 0.01 < 15) {
+    pico.out_pfmet()              = nano.MET_pt();
+    pico.out_pfmet_phi()          = nano.MET_phi();
+    pico.out_pfmet_significance() = nano.MET_significance();
+    pico.out_pfmet_covxx()        = nano.MET_covXX();
+    pico.out_pfmet_covxy()        = nano.MET_covXY();
+    pico.out_pfmet_covyy()        = nano.MET_covYY();
+  } else {
+    pico.out_pfmet() = pico.out_pfmet_phi() = pico.out_pfmet_significance() = -999.f;
+    pico.out_pfmet_covxx() = pico.out_pfmet_covxy() = pico.out_pfmet_covyy() = -999.f;
+  }
+  // Significance of the analysis MET (`met`, after JER/xy re-correction) with the PF MET covariance:
+  // S = v^T C^-1 v, v = (met_x, met_y). Run 2 only: in Run 3 `met` is PUPPI MET.
+  pico.out_met_significance() = -999.f;
+  if (year <= 2018 && nanoaod_version + 0.01 < 15) {
+    float cxx = nano.MET_covXX(), cxy = nano.MET_covXY(), cyy = nano.MET_covYY();
+    float det = cxx*cyy - cxy*cxy;
+    if (det > 0.f) {
+      float mx = pico.out_met()*cos(pico.out_met_phi());
+      float my = pico.out_met()*sin(pico.out_met_phi());
+      pico.out_met_significance() = (cyy*mx*mx - 2.f*cxy*mx*my + cxx*my*my)/det;
+    }
+  }
   pico.out_ht_isr_me()   = nano.LHE_HTIncoming();
   if (isData) {
     return;
@@ -884,6 +934,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
   vector<bool> jet_inetahornveto;
   vector<bool> jet_inhemveto;
   vector<bool> jet_invetomap;
+  vector<bool> jet_flagvetomap; // S1: jet in a veto-map region (Run 2 and Run 3), for jet_isvetomap
   vector<bool> jet_isgood_min; //!lep, !pho, eta cut, ID(fix), eta horn
   vector<bool> jet_isgood; //same as isgood_min + HEM/Run3 veto + pT cut
 
@@ -993,17 +1044,20 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
                                        phicorr});
     }
     else {
-      if (year>=2022 && nano.Jet_pt()[ijet]>15.0f && jet_abseta<5.191f && jet_pass_jetidTightLepVeto.back() && (nano.Jet_chEmEF()[ijet]+nano.Jet_neEmEF()[ijet])<0.9) {
+      // S1: Run 2 UL maps evaluated too (flag only: event flag + jet_isvetomap, jet_isgood unchanged)
+      if ((year>=2022 || year<=2018) && nano.Jet_pt()[ijet]>15.0f && jet_abseta<5.191f && jet_pass_jetidTightLepVeto.back() && (nano.Jet_chEmEF()[ijet]+nano.Jet_neEmEF()[ijet])<0.9) {
         if (nano.Jet_phi()[ijet] > 3.1415926f || nano.Jet_phi()[ijet] < -3.1415926f) {veto = 0.0;}
         else {veto = map_jetveto_->evaluate({"jetvetomap", nano.Jet_eta()[ijet], nano.Jet_phi()[ijet]});}
       }
     }
     if(veto!=0.0 && isgood_min) {
       pico.out_ismapvetoevt()=true;
-      jet_invetomap.push_back(true);
+      jet_invetomap.push_back(year >= 2022); // Run 3: jet removed from good jets; Run 2 (S1): flag only
+      jet_flagvetomap.push_back(true);
     }
     else {
       jet_invetomap.push_back(false);
+      jet_flagvetomap.push_back(false);
     }
     jet_isgood_min.push_back(isgood_min && !jet_inetahornveto.back());
     jet_isgood.push_back(jet_isgood_min.back() && !jet_invetomap.back() 
@@ -1183,7 +1237,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
         pico.out_jet_isphoton().push_back(jet_isphoton[ijet]);
         pico.out_jet_isgood().push_back(jet_isgood[ijet]);
         pico.out_jet_isgood_min().push_back(jet_isgood_min[ijet]);
-        pico.out_jet_isvetomap().push_back(jet_invetomap[ijet]);
+        pico.out_jet_isvetomap().push_back(jet_flagvetomap[ijet]);
         pico.out_jet_isvetohem().push_back(jet_inhemveto[ijet]);
         pico.out_jet_isvetoeta().push_back(jet_inetahornveto[ijet]);
         pico.out_jet_id().push_back(Jet_jetId[ijet]);
@@ -1248,7 +1302,7 @@ vector<int> JetMetProducer::WriteJetMet(nano_tree &nano, pico_tree &pico,
         pico.out_jet_isphoton().push_back(jet_isphoton[ijet]);
         pico.out_jet_isgood().push_back(jet_isgood[ijet]);
         pico.out_jet_isgood_min().push_back(jet_isgood_min[ijet]);
-        pico.out_jet_isvetomap().push_back(jet_invetomap[ijet]);
+        pico.out_jet_isvetomap().push_back(jet_flagvetomap[ijet]);
         pico.out_jet_isvetohem().push_back(jet_inhemveto[ijet]);
         pico.out_jet_isvetoeta().push_back(jet_inetahornveto[ijet]);
         pico.out_jet_id().push_back(Jet_jetId[ijet]);

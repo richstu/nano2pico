@@ -36,6 +36,18 @@ float met_tru
 float met_tru_phi
 float met_tk
 float met_tk_phi
+# U8 (higgsino_bhagirathi_2026_v1): NanoAOD PF MET (Type-1) with its significance and covariance (GeV^2).
+# Run 2: the same MET as `met` before nano2pico's JER/xy re-correction. Run 3: PF MET, NOT the PUPPI MET in `met`.
+# -999 where the NanoAOD has no PF MET collection (NanoAOD >= v15).
+float pfmet
+float pfmet_phi
+float pfmet_significance
+float pfmet_covxx
+float pfmet_covxy
+float pfmet_covyy
+# MET significance of `met` (after JER/xy re-correction) using the PF MET covariance: v^T C^-1 v.
+# Run 2 only; -999 in Run 3 (the PF covariance does not describe the PUPPI MET in `met`).
+float met_significance
 float mt
 float mt_tru
 float ht_isr_me
@@ -511,6 +523,8 @@ float w_el
 float w_mu
 float w_fs_lep
 float w_photon
+# S2: alternative to w_photon when the photon pixel-seed veto is applied: prod over selected real photons of ID SF x pixel-veto SF
+float w_photon_pixveto
 float w_phshape
 float w_btag
 float w_btag_df
@@ -703,6 +717,7 @@ vector<float> sys_fs_lep
 
 vector<float> sys_photon
 vector<float> sys_photon_csev
+vector<float> sys_photon_pixveto
 
 vector<float> sys_bchig
 vector<float> sys_udsghig

@@ -151,6 +151,7 @@ bool ElectronProducer::IsSignal(nano_tree &nano, int nano_idx, bool isZgamma, fl
 }
 
 vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, vector<int> &jet_islep_nano_idx, vector<int> &jet_isvlep_nano_idx, vector<int> &sig_el_pico_idx, vector<int> &photon_el_pico_idx, bool isZgamma, bool is_signal_sample, bool isFastsim){
+  rng_.SetSeed(EventSeed(nano.run(), nano.luminosityBlock(), nano.event(), 3)); // S9: electron smearing (Run 3)
   vector<float> Jet_pt, Jet_mass;
   getJetWithJEC(nano, isFastsim, Jet_pt, Jet_mass);
   vector<int> Electron_photonIdx;
@@ -195,10 +196,15 @@ vector<int> ElectronProducer::WriteElectrons(nano_tree &nano, pico_tree &pico, v
               "scaleup",etasc,nano.Electron_seedGain()[iel]}));
           scale_syst_dn.push_back(map_scale_syst_->evaluate({str_scale_syst_,
               "scaledown",etasc,nano.Electron_seedGain()[iel]}));
-          smear_syst_up.push_back(1.0f
-              -nano.Electron_dEsigmaUp()[iel]/cosh(eta)/pt);
-          smear_syst_dn.push_back(1.0f
-              -nano.Electron_dEsigmaDown()[iel]/cosh(eta)/pt);
+          if (isNanoV2UL(nanoaod_version)) { // Electron_dEsigmaUp/Down not in UL NanoAODv2
+            smear_syst_up.push_back(1.0f);
+            smear_syst_dn.push_back(1.0f);
+          } else {
+            smear_syst_up.push_back(1.0f
+                -nano.Electron_dEsigmaUp()[iel]/cosh(eta)/pt);
+            smear_syst_dn.push_back(1.0f
+                -nano.Electron_dEsigmaDown()[iel]/cosh(eta)/pt);
+          }
           energy_err_scale_up.push_back(nano.Electron_energyErr()[iel]
                                         *scale_syst_up[iel]);
           energy_err_scale_dn.push_back(nano.Electron_energyErr()[iel]

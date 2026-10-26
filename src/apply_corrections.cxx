@@ -42,7 +42,7 @@ int main(int argc, char *argv[]){
   corr_file = CopyReplaceAll(in_dir, "/raw_pico/","/corrections/")+corr_file;
 
   bool is_zgamma = Contains(in_dir, "zgamma");
-  //bool is_higgsino = Contains(in_dir, "higgsino");
+  bool is_higgsino = Contains(in_dir, "higgsino"); // U1: higgsino (bbgg and 4b) nominal weight
 
   cout<<"Corrections file: "<<corr_file<<endl;
   corrections_tree corr(corr_file);
@@ -133,21 +133,29 @@ int main(int argc, char *argv[]){
       pico.out_sys_trig_mu()[0] = pico.sys_trig_mu()[0];
       pico.out_sys_trig_mu()[1] = pico.sys_trig_mu()[1];
     }
-    pico.out_w_lumi() = pico.w_lumi()>0 ? 1. : -1.; //get the generator weight sign
-    pico.out_w_lumi() *= static_cast<float>(corr.w_lumi());
+    // U2 (higgsino_bhagirathi_2026_v1): use the full generator weight, not only its sign.
+    // corr.w_lumi() = xsec*1000/sum(genWeight) (merge_corrections), so w_lumi sums to xsec*1 fb^-1
+    // for any generator, including Sherpa with event-dependent weights.
+    pico.out_w_lumi() = pico.mc_weight() * static_cast<float>(corr.w_lumi());
 
 
 
-    pico.out_weight() = pico.out_w_lumi() * pico.w_photon() *
-                        btag_weight * pico.w_jetpuid();
-    /*} else {
+    if (is_higgsino) {
+      // U1 (higgsino_bhagirathi_2026_v1): nominal weight for higgsino productions (bbgg and 4b).
+      // w_trig is NOT included: for higgsino it holds the 4b MET-trigger efficiency, which the 4b analysis
+      // applies itself; bbgg uses no trigger weight (U3). w_lep, w_isr, w_phshape, w_fakephoton, w_nnlo
+      // are not part of the higgsino weight.
+      pico.out_weight() = pico.out_w_lumi() * pico.out_w_pu() * pico.w_prefire() *
+                          pico.w_photon() * btag_weight * pico.w_jetpuid();
+    } else {
+      // Other productions: full product as before bc071c2.
       pico.out_weight() = static_cast<float>(corr.weight()) * pico.out_w_lumi() *
                       pico.out_w_lep() * pico.out_w_fs_lep() * //post-corr values in order for 0l to be correct
-                      btag_weight * pico.w_jetpuid() * pico.out_w_trig() * 
-                      pico.out_w_isr() * pico.out_w_pu() * pico.w_prefire() * 
-                      pico.w_photon() *  pico.out_w_phshape() * pico.w_fakephoton() * 
-                      pico.out_w_nnlo();               
-    }*/
+                      btag_weight * pico.w_jetpuid() * pico.out_w_trig() *
+                      pico.out_w_isr() * pico.out_w_pu() * pico.w_prefire() *
+                      pico.w_photon() *  pico.out_w_phshape() * pico.w_fakephoton() *
+                      pico.out_w_nnlo();
+    }
 
     pico.out_sys_isr().resize(2); pico.out_sys_pu().resize(2);
     //pico.out_sys_photon().resize(2); pico.out_sys_photon_csev().resize(2);

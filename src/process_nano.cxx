@@ -77,6 +77,11 @@ int main(int argc, char *argv[]){
                 Contains(in_file, "HToMuMu") || Contains(in_file, "Hto2Mu") ? 
                 true : false);
   bool isHiggsino = Contains(out_dir, "higgsino");
+  // S5 (higgsino_bhagirathi_2026_v1): SM Higgs samples (resonant m_gg backgrounds) also get the per-object
+  // photon/electron energy-scale and resolution variations (needed for their m_gg shape systematics).
+  bool isSMHiggsGG = isHiggsino && (Contains(in_file, "HToGG") || Contains(in_file, "HtoGG") ||
+                                    Contains(in_file, "HHTo2B2G") || Contains(in_file, "THQ_"));
+  bool store_eg_syst = isSignal || isSMHiggsGG;
 
   int year = -1;
   int isAPV = false;
@@ -252,7 +257,10 @@ int main(int argc, char *argv[]){
   if (Contains(in_dir, "NanoAODv9UCSB")) nanoaod_version = 9.5;
   if (Contains(in_dir, "NanoAODv12") || Contains(in_dir, "NanoAODv13")) nanoaod_version = 12;
   if (Contains(in_dir, "NanoAODv15")) nanoaod_version = 15;
-  cout<<"Using NanoAOD version: "<<nanoaod_version<<endl;
+  // UL NanoAODv2 (e.g. RunIISummer20UL18NanoAODv2): UL content, treat as v9 with guards for the branches it
+  // lacks (isNanoV2UL in utilities.hpp). Without this it would be taken as pre-UL v7 ("< 9" code paths).
+  if (version_found && nanoaod_version > 1.5f && nanoaod_version < 2.5f && !is_preUL) nanoaod_version = 9.2;
+  cout<<"Using NanoAOD version: "<<nanoaod_version<<(isNanoV2UL(nanoaod_version) ? " (UL NanoAODv2)" : "")<<endl;
 
   time_t begtime, endtime;
   time(&begtime);
@@ -483,7 +491,7 @@ int main(int argc, char *argv[]){
     vector<int> sig_mu_pico_idx = vector<int>();
     vector<int> photon_el_pico_idx = vector<int>();
     
-    vector<int> sig_el_nano_idx = el_producer.WriteElectrons(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, sig_el_pico_idx, photon_el_pico_idx, isZgamma, isSignal, isFastsim);
+    vector<int> sig_el_nano_idx = el_producer.WriteElectrons(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, sig_el_pico_idx, photon_el_pico_idx, isZgamma, store_eg_syst, isFastsim);
     vector<int> sig_mu_nano_idx = mu_producer.WriteMuons(nano, pico, jet_islep_nano_idx, jet_isvlep_nano_idx, sig_mu_pico_idx, isZgamma, isSignal, isFastsim);
     // save a separate vector with just signal leptons ordered by pt
     struct SignalLepton{ float pt; float eta; float phi; int pdgid;};
@@ -508,7 +516,7 @@ int main(int argc, char *argv[]){
     if(isZgamma || isHiggsino) 
       vector<int> sig_ph_nano_idx = photon_producer.WritePhotons(nano, pico, 
           jet_isphoton_nano_idx, sig_el_nano_idx, sig_mu_nano_idx,
-          photon_el_pico_idx, isSignal);
+          photon_el_pico_idx, store_eg_syst);
     event_tools.WriteStitch(nano, pico);
     tk_producer.WriteIsoTracks(nano, pico, sig_el_nano_idx, sig_mu_nano_idx, isFastsim, is_preUL);
     if(isZgamma) dilep_producer.WriteDileptons(pico, isSignal);
@@ -613,6 +621,8 @@ int main(int argc, char *argv[]){
       pico.out_w_pu() = 1.;
       pico.out_sys_pu().resize(2, 0);
       pico.out_w_photon() = 1.;
+      pico.out_w_photon_pixveto() = 1.; // S2
+      pico.out_sys_photon_pixveto().resize(2,1.);
       pico.out_w_trig() = 1.;
       pico.out_w_isr() = 1.;
       pico.out_sys_photon().resize(2,0);
@@ -628,8 +638,8 @@ int main(int argc, char *argv[]){
         event_weighter.MuonMinisoSF(pico);
         event_weighter.PileupSF(pico);
         event_weighter.bTaggingSF(pico);
-        event_weighter.jetpuIdSF(pico);
-        event_weighter.PhotonSF(pico);
+        event_weighter.jetpuIdSF(pico, min_jet_pt);
+        event_weighter.PhotonSF(pico, /*apply_fail_sf=*/!isHiggsino);
         event_weighter.PhotonShapeSF(pico);
         event_weighter.FakePhotonSF(pico);
         event_weighter.ZISRSF(pico);
@@ -647,6 +657,13 @@ int main(int argc, char *argv[]){
         pico.out_w_bhig()    = 1.; 
         pico.out_w_fs_lep()  = 1.;
         if (year >= 2022) {
+          pico.out_w_prefire()      = 1.0;
+          pico.out_sys_prefire()[0] = 1.0;
+          pico.out_sys_prefire()[1] = 1.0;
+        }
+        else if (isNanoV2UL(nanoaod_version) && year == 2018) {
+          // UL NanoAODv2 2018 has no L1PreFiringWeight (no ECAL prefiring in 2018; muon part negligible with a
+          // lepton veto)
           pico.out_w_prefire()      = 1.0;
           pico.out_sys_prefire()[0] = 1.0;
           pico.out_sys_prefire()[1] = 1.0;
@@ -681,6 +698,8 @@ int main(int argc, char *argv[]){
         }
         photon_weighter.FullSim(pico, w_photon, sys_photon);
         pico.out_w_photon() = w_photon;
+        pico.out_w_photon_pixveto() = 1.; // S2: not computed pre-UL
+        pico.out_sys_photon_pixveto().resize(2,1.);
         pico.out_sys_photon() = sys_photon;
         if (isZgamma)  { 
           if (year==2016) {
@@ -741,12 +760,10 @@ int main(int argc, char *argv[]){
       wgt_sums.out_nent() += 1.;                     // NEW
       wgt_sums.out_weight() += pico.out_weight();
       
-      if (Contains(in_path, "DiPhotonJetsBox") || Contains(in_path,"GG-Box")){
-        wgt_sums.out_neff() += nano.Generator_weight(); //changed neff to double instead of int
-      }
-      else{
-        wgt_sums.out_neff() += nano.Generator_weight()>0 ? 1:-1;
-      }
+      // U2 (higgsino_bhagirathi_2026_v1): sum of generator weights for every sample.
+      // Used as the denominator of w_lumi (merge_corrections); exact for any generator, and equal to the
+      // old sign-based sum (up to the constant |genWeight|) for samples with constant |genWeight|.
+      wgt_sums.out_neff() += nano.Generator_weight();
       // leptons, keeping track of 0l and 1l totals separately to determine the SF for 0l events
       if(pico.out_nlep()==0){
         wgt_sums.out_nent_zlep() += 1.;
@@ -775,7 +792,9 @@ int main(int argc, char *argv[]){
       wgt_sums.out_w_btag_df() += pico.out_w_btag_df();
       wgt_sums.out_w_bhig()    += pico.out_w_bhig();
       wgt_sums.out_w_bhig_df() += pico.out_w_bhig_df();
-      wgt_sums.out_w_pu()      += pico.out_w_pu();
+      // U1 (higgsino_bhagirathi_2026_v1): genWeight-weighted, so that w_pu is renormalised as
+      // sum(genWeight)/sum(genWeight*w_pu), consistent with w_lumi (U2).
+      wgt_sums.out_w_pu()      += nano.Generator_weight()*pico.out_w_pu();
       wgt_sums.out_w_trig()    += pico.out_w_trig();
 
       if (isZgamma) {
@@ -805,7 +824,7 @@ int main(int argc, char *argv[]){
         wgt_sums.out_sys_fs_bchig()[i]     += pico.out_sys_fs_bchig()[i];
         wgt_sums.out_sys_fs_udsghig()[i]   += pico.out_sys_fs_udsghig()[i];
         wgt_sums.out_sys_isr()[i]          += pico.out_sys_isr()[i];
-        wgt_sums.out_sys_pu()[i]           += pico.out_sys_pu()[i];
+        wgt_sums.out_sys_pu()[i]           += nano.Generator_weight()*pico.out_sys_pu()[i]; // U1: genWeight-weighted
         wgt_sums.out_sys_bchig_uncorr()[i] += pico.out_sys_bchig_uncorr()[i];
         wgt_sums.out_sys_udsghig_uncorr()[i] += pico.out_sys_udsghig_uncorr()[i];
       }

@@ -333,12 +333,13 @@ void Normalize(corrections_tree &corr){
     
 
   // w_isr done in FixISR()
-  Normalize(corr.out_w_pu(), nent);
+  // U1 (higgsino_bhagirathi_2026_v1): w_pu sums are genWeight-weighted (process_nano), so normalise to sum(genWeight).
+  Normalize(corr.out_w_pu(), corr.out_neff());
 
   Normalize(corr.out_w_phshape(), nent);
   Normalize(corr.out_w_nnlo(), nent);
 
-  Normalize(corr.out_sys_pu(), nent);
+  Normalize(corr.out_sys_pu(), corr.out_neff()); // U1: see w_pu
 
   Normalize(corr.out_sys_murf(), nent);
   Normalize(corr.out_sys_ps(), nent);

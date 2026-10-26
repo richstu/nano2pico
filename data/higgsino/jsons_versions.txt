@@ -123,7 +123,7 @@ B-tagging scale factors
 
 Pileup weights
 2016APV: /cvmfs/cms-griddata.cern.ch/cat/metadata/LUM/Run2-2016preVFP-UL-NanoAODv9/2021-09-10/puWeights.json.gz
-2016: /cvmfs/cms-griddata.cern.ch/cat/metadata/JME/Run3-25Prompt-Summer24-NanoAODv15/2026-07-16/jetvetomaps.json.gz
+2016: /cvmfs/cms-griddata.cern.ch/cat/metadata/LUM/Run2-2016postVFP-UL-NanoAODv9/2021-09-10/puWeights.json.gz
 2017: /cvmfs/cms-griddata.cern.ch/cat/metadata/LUM/Run2-2017-UL-NanoAODv9/2021-09-10/puWeights.json.gz
 2018: /cvmfs/cms-griddata.cern.ch/cat/metadata/LUM/Run2-2018-UL-NanoAODv9/2021-09-10/puWeights.json.gz
 2022: /cvmfs/cms-griddata.cern.ch/cat/metadata/LUM/Run3-22CDSep23-Summer22-NanoAODv12/2024-01-31/puWeights.json.gz
@@ -131,7 +131,7 @@ Pileup weights
 2023: /cvmfs/cms-griddata.cern.ch/cat/metadata/LUM/Run3-23CSep23-Summer23-NanoAODv12/2024-01-31/puWeights.json.gz
 2023BPix: /cvmfs/cms-griddata.cern.ch/cat/metadata/LUM/Run3-23DSep23-Summer23BPix-NanoAODv12/2024-01-31/puWeights.json.gz
 2024: /cvmfs/cms-griddata.cern.ch/cat/metadata/LUM/Run3-24CDEReprocessingFGHIPrompt-Summer24-NanoAODv15/2026-04-15/puWeights_BCDEFGHI.json.gz
-2025: not available
+2025: not available from LUM POG; puWeights_2025pp_Summer24_25ns_69200ub.json copied from data/zgamma/2025 (also on the master branch), used for 2025 and 2026
 
 b-tagging mc efficiencies: derived using higgsino_4b_gentoo_v1 4b private signal samples
 photon mc efficiencies: derived using higgsino_run3_blanc_v4_signal bbgg central signal samples

@@ -70,6 +70,22 @@ long double GetMT(long double m1, long double pt1, long double phi1,
 long double GetMT(long double pt1, long double phi1,
                   long double pt2, long double phi2);
 bool Contains(const std::string& text, const std::string& pattern);
+// UL NanoAODv2 (MiniAODv1 underneath; used for GJet_Pt-40toInf, which has no NanoAODv9) is encoded as
+// nanoaod_version = 9.2: it behaves like v9 everywhere except where these branches are missing.
+// S9 (higgsino_bhagirathi_2026_v1): per-event random seed from (run, lumi, event) and a producer-specific salt,
+// so that smearing is reproducible: the same event gets the same random numbers in any job, rerun or file split.
+inline unsigned long long SplitMix64(unsigned long long x) {
+  x += 0x9E3779B97F4A7C15ULL;
+  x = (x ^ (x >> 30)) * 0xBF58476D1CE4E5B9ULL;
+  x = (x ^ (x >> 27)) * 0x94D049BB133111EBULL;
+  return x ^ (x >> 31);
+}
+inline unsigned EventSeed(unsigned run, unsigned lumi, unsigned long long event, unsigned salt) {
+  unsigned long long x = SplitMix64(SplitMix64(SplitMix64(SplitMix64(salt) ^ run) ^ lumi) ^ event);
+  unsigned seed = static_cast<unsigned>(x ^ (x >> 32));
+  return seed ? seed : 1u;                        // TRandom3::SetSeed(0) would mean "random from the clock"
+}
+inline bool isNanoV2UL(float nanoaod_version) { return nanoaod_version > 9.19f && nanoaod_version < 9.21f; }
 
 std::vector<std::string> Tokenize(const std::string& input,
                                   const std::string& tokens=" ");

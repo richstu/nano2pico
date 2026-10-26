@@ -7,6 +7,63 @@ using namespace std;
 
 namespace xsec{
   //Cross sections for primary signals and backgrounds for H->Zgamma updated 2024-03-14. Other xsec values not guaranteed.
+  // ===================================================================================================
+  // Higgsino bb gamma gamma + MET (higgsino_bhagirathi_2026_v1, review U7a): cross sections of every
+  // sample used only by this analysis, in one place. Matched on the FULL dataset name (a name in this
+  // list is never a substring of another, so there are no accidental matches). Called last in
+  // crossSection(): a listed sample always gets this value. Samples shared with other analyses
+  // (tt, tW, V+jets, VV, ttV, V+gamma, ...) stay in the general table above.
+  // Each entry: sigma in pb at 13 TeV (13.6 TeV: U7b), source, review status.
+  // Status: UNCHECKED = value as in the previous production, not yet verified;
+  //         PROPOSED  = new value, to be confirmed; CHECKED <date> = verified against the quoted source;
+  //         MISSING = no sourced value yet; EXCLUDED = not used by the analysis (reason given).
+  // ===================================================================================================
+  bool higgsinoBBGGCrossSection(const TString &file, int year, float &xsec){
+    const float BR_Hgg = 0.00227f, BR_Hbb = 0.5824f;            // LHCHWG YR4, m_H = 125 GeV
+    const float BR_Wlnu = 0.3258f, BR_Wqq = 0.6742f;           // PDG (W -> l nu summed over e, mu, tau)
+    struct Entry { const char *dataset; float xs13; };
+    static const Entry entries[] = {
+      // --- diphoton continuum (Sherpa box, stitched on the number of generator b quarks)
+      {"DiPhotonJetsBox_MGG-80toInf_13TeV-sherpa",                                   86.96f},   // XSDB UL17 (+-1.155), all eras       CHECKED 2026-10-25
+      {"DiPhotonJetsBox1BJet_MGG-80toInf_13TeV-sherpa",                              0.8167f},  // XSDB UL17 (+-0.0098), all eras      CHECKED 2026-10-25
+      {"DiPhotonJetsBox2BJets_MGG-80toInf_13TeV-sherpa",                             0.4853f},  // XSDB UL17 (+-0.0018), all eras      CHECKED 2026-10-25
+      // DiPhotonJets aMC@NLO: EXCLUDED from the analysis (2026-10-25, alternative diphoton model not used; the Sherpa
+      // box is the nominal). No value checked; kept at -999999 so that w_lumi is visibly invalid if ever produced.
+      {"DiPhotonJets_MGG-80toInf_TuneCP5_13TeV-amcatnloFXFX-pythia8",                -999999.f},// not used, see above         EXCLUDED
+      // --- gamma + jets and QCD with fake photons (double-EM enriched, m_gg > 80)
+      {"GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8",          233.4f},   // XSDB UL17 (+-2.31), all eras        CHECKED 2026-10-25
+      {"GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8",         874.2f},   // XSDB Spring18 CP5 (+-2.7), no UL    CHECKED 2026-10-25
+      {"QCD_Pt-30to40_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV-pythia8",           24960.f},  // XSDB UL17 (+-249.5), all eras      CHECKED 2026-10-25
+      {"QCD_Pt-40ToInf_DoubleEMEnriched_MGG-80ToInf_TuneCP5_13TeV-pythia8",          116400.f}, // XSDB UL17 (+-1137), all eras       CHECKED 2026-10-25
+      // --- top + photon(s). TTGamma_* are LO (own photon phase space, incl. photons from top decays): not directly
+  //     comparable in rate to TTGJets (NLO); use as an alternative model with care.
+      {"TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8",                         3.757f},   // XSDB UL16 (+-0.022), all eras       CHECKED 2026-10-25
+      {"TTGG_0Jets_TuneCP5_13TeV-amcatnlo-madspin-pythia8",                          0.01696f}, // XSDB UL17 (+-1.2e-5), all eras      CHECKED 2026-10-25
+      {"TTGamma_Dilept_TuneCP5_13TeV-madgraph-pythia8",                              1.502f},   // XSDB UL16 LO (+-0.0011), all eras CHECKED 2026-10-25
+      {"TTGamma_SingleLept_TuneCP5_13TeV-madgraph-pythia8",                          5.095f},   // XSDB UL16 LO (+-0.0034), all eras CHECKED 2026-10-25
+      // --- SM single Higgs -> gamma gamma (YR4 production x BR)
+      {"GluGluHToGG_M125_TuneCP5_13TeV-amcatnloFXFX-pythia8",                        48.58f*BR_Hgg},  // YR4 N3LO (XSDB NLO: 36.2)   CHECKED 2026-10-25
+      {"VBFHToGG_M125_TuneCP5_13TeV-amcatnlo-pythia8",                               3.782f*BR_Hgg},  // YR4 (XSDB NLO: 4.05)        CHECKED 2026-10-25
+      {"VHToGG_M125_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8",                     2.2567f*BR_Hgg}, // YR4 W+H+W-H+ZH(incl. ggZH)  CHECKED 2026-10-25
+      {"ttHJetToGG_M125_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8",                 0.5071f*BR_Hgg}, // YR4 (XSDB NLO: 0.4998)      CHECKED 2026-10-25
+      {"bbHToGG_M-125_4FS_yb2_TuneCP5-13TeV-amcatnlo-pythia8",                       0.4880f*BR_Hgg}, // YR4 (XSDB 4FS NLO: 0.3668)  CHECKED 2026-10-25
+      // bbH y_b*y_t interference: EXCLUDED from the analysis (2026-10-25). No XSDB entry and no sourced value; the
+      // term is negative (68% negative weights, sum of genWeight < 0), so with w_lumi = genWeight*xsec/sum(genWeight)
+      // it would need a negative xsec. Effect of leaving it out: bbH overestimated by ~8% of ~1.1 fb (negligible).
+      // Kept at -999999 so that w_lumi is visibly invalid if the sample is ever produced.
+      {"bbHToGG_M-125_4FS_ybyt_TuneCP5-13TeV-amcatnlo-pythia8",                      -999999.f},      // excluded, see above         EXCLUDED
+      {"THQ_TToLNu_HToGG_k1_ktilde0_4f_M-125_TuneCP5_13TeV-amcatnlo-madspin-pythia8", 0.07425f*BR_Wlnu*BR_Hgg}, // YR4 tHq, tau incl. CHECKED 2026-10-25
+      {"THQ_TToQQ_HToGG_k1_ktilde0_4f_M-125_TuneCP5_13TeV-amcatnlo-madspin-pythia8",  0.07425f*BR_Wqq*BR_Hgg},  // YR4 tHq           CHECKED 2026-10-25
+      // --- SM HH -> bb gamma gamma (k_lambda = 1)
+      {"GluGluToHHTo2B2G_kl-1p00_kt-1p00_c2-0p00_TuneCP5_13TeV-powheg-pythia8",      0.03105f*2.f*BR_Hbb*BR_Hgg},  // LHCHWG NNLO FTapprox CHECKED 2026-10-25
+      {"VBFHHTo2B2G_kl_1p00_cv_1p00_c2v_1p00_TuneCP5_13TeV_madgraph-pythia8",         0.001726f*2.f*BR_Hbb*BR_Hgg}, // LHCHWG N3LO          CHECKED 2026-10-25
+    };
+    if (year >= 2022) return false;                          // 13.6 TeV entries: U7b
+    for (const Entry &e : entries)
+      if (file.Contains(e.dataset)) { xsec = e.xs13; return true; }
+    return false;
+  }
+
   float crossSection(const TString &file, int year){
     float xsec(-999999.), Htobb(0.5824), HToZG(0.001533), ZToLL(0.100974);
     float HToGG(0.00227), HToMM(0.000218), HToTT(0.06256);
@@ -456,7 +513,7 @@ namespace xsec{
     if(file.Contains("ZGToLLG_01J_5f_lowMLL_lowGPt")) xsec = 172.4; // Other sample name
 
     if(file.Contains("TTJets_Tune") && file.Contains("madgraphMLM"))  xsec = 833.9;
-    if(file.Contains("TGJets") && !file.Contains("TTGJets")) xsec = 2.997;
+    if(file.Contains("TGJets") && !file.Contains("TTGJets")) xsec = 2.997; // XSDB UL16/UL17 (+-0.012), checked 2026-10-25
     if(file.Contains("ST_s-channel_4f_leptonDecays_TuneCP5_13TeV")) xsec = 3.549; // from XSDB
     if(file.Contains("ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV")) xsec = 32.51; // from XSDB
     if(file.Contains("ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV")) xsec = 32.45; // from XSDB
@@ -610,7 +667,7 @@ namespace xsec{
     if(file.Contains("ttHtoZG_Zto2L_M-130"))              xsec = H120ToZG * ZToLL / HToZG_onshellfrac * 0.5107 ;
 
     // With cmssw GenXSecAnalyzer (pb)
-    if(file.Contains("ST_tWAto2L2Nu_5f_TuneCP5_13TeV-madgraph-pythia8")) xsec = 0.1523;
+    if(file.Contains("ST_tWAto2L2Nu_5f_TuneCP5_13TeV-madgraph-pythia8")) xsec = 0.1523; // XSDB UL18 LO: 0.1524 (+-0.0001), checked 2026-10-25
     if(file.Contains("TTtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8")) xsec = 762.1 * 2.0 * WToLNu * WToQQ;
     if(file.Contains("TWminusto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8")) xsec = 35.99 * WToLNu * WToLNu;
     if(file.Contains("TWminustoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8")) xsec = 35.99 * 2.0 * WToLNu * WToQQ;
@@ -708,6 +765,11 @@ namespace xsec{
     if(file.Contains("QCD_HT2000toInf_TuneCP5"))					xsec=21.74; //XSDB
 
     // Single top background
+    // Note (higgsino_bhagirathi_2026_v1, 2026-10-25): values below kept as they are for now. 32.45 / 32.51 pb is the
+    // POWHEG NLO inclusive tW sigma from XSDB (UL16/UL17; the same number as the inclusiveDecays samples), and 0.530775
+    // could not be reproduced. The usual CMS normalisation is the approx. NNLO tW sigma, 71.7 pb for t + tbar (35.85 pb
+    // each, m_t = 172.5, TOP SingleTopRefXsec) times the PDG no-fully-hadronic fraction 1 - 0.6741^2 = 0.5456, i.e.
+    // 19.56 pb each (+13.6%). Revisit together with the 4b analysis (shared lines).
     if(file.Contains("ST_tW_antitop_5f_NoFullyHadronicDecays"))				xsec=32.51*0.530775; //XSDB
     if(file.Contains("ST_tW_top_5f_NoFullyHadronicDecays"))				xsec=32.45*0.530775; //XSDB
     // t-channel cross sections from https://twiki.cern.ch/twiki/bin/view/LHCPhysics/SingleTopNNLORef
@@ -960,6 +1022,8 @@ namespace xsec{
     if(file.Contains("WZtoL3Nu_TuneCP5_13p6TeV_powheg-pythia8"))					xsec=3.077;
     if(file.Contains("ZH-Zto2Nu-Hto2B_Par-M-125_TuneCP5_13p6TeV_powhegMINLO-pythia8"))			xsec=0.9439*Htobb*0.2;
 
+    float xsec_bbgg(0.);
+    if (higgsinoBBGGCrossSection(file, year, xsec_bbgg)) xsec = xsec_bbgg;  // U7a: higgsino bbgg samples, listed above
     if(xsec<=0) std::cout<<"ERROR:: Cross section not found for "<<file<<std::endl;
 
     return xsec;

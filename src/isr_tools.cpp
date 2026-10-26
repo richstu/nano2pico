@@ -139,6 +139,10 @@ void ISRTools::WriteISRJetMultiplicity(nano_tree &nano, pico_tree &pico) {
   } // Loop over jets
 }
 
+// Note (higgsino_bhagirathi_2026_v1, 2026-10-26): deliberately not called. The TChi table below is the 2016
+// (CUETP8M1) SUSY EWK ISR correction; for the CP5/UL higgsino signal no nominal ISR weight is applied
+// (w_isr = 1) and the ISR uncertainty is taken from the PS weights (sys_ps). To be confirmed with the
+// SUSY group's UL recommendation.
 void ISRTools::WriteISRWeights(pico_tree &pico) {
   pico.out_w_isr() = 1.; pico.out_sys_isr().resize(2,1.);
   if (isGluino || (year==2016 && isTTJets_LO)){

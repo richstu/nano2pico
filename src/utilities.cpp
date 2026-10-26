@@ -317,7 +317,9 @@ void getFatJet_particleNet_mass(nano_tree & nano, float nanoaod_version,
                                           vector<float> & FatJet_particleNet_mass) {
   FatJet_particleNet_mass.resize(nano.nFatJet());
   for(int ijet(0); ijet<nano.nFatJet(); ++ijet){
-    if (nanoaod_version+0.01 < 11.9) 
+    if (isNanoV2UL(nanoaod_version)) // not in UL NanoAODv2
+      FatJet_particleNet_mass[ijet] = -999.f;
+    else if (nanoaod_version+0.01 < 11.9) 
       FatJet_particleNet_mass[ijet] = nano.FatJet_particleNet_mass()[ijet];
     else 
       FatJet_particleNet_mass[ijet] = nano.FatJet_particleNet_massCorr()[ijet];

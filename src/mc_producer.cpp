@@ -133,6 +133,12 @@ void GenParticleProducer::WriteGenParticles(nano_tree &nano, pico_tree &pico, bo
       }
     }
 
+    // S6 (higgsino_bhagirathi_2026_v1): every final-state neutrino NanoAOD keeps (prompt, from tau decays, and from
+    // b/c-hadron decays where kept), for real-MET truth studies. Origin from mc_mom (pdgId of the mother, e.g.
+    // W, tau, B/D hadron) and mc_statusflag (bit 0 isPrompt, bit 5 isDirectPromptTauDecayProduct).
+    if ((abs(mc_id) == 12 || abs(mc_id) == 14 || abs(mc_id) == 16) && nano.GenPart_status().at(imc) == 1)
+      save_index = true;
+
     // store information
     if (save_index) {
       interested_mc_indices.push_back(imc);
@@ -185,13 +191,16 @@ void GenParticleProducer::WriteGenParticles(nano_tree &nano, pico_tree &pico, bo
     pico.out_mc_momidx().push_back(mc_mom_idx);
     pico.out_mc_status().push_back(mc_status);
     pico.out_mc_statusflag().push_back(mc_statusflag);
-    pico.out_ntrulep()  = ntrulep;
-    pico.out_ntruel()   = ntruel;
-    pico.out_ntrumu()   = ntrumu;
-    pico.out_ntrutaul() = ntrutaul;
-    pico.out_ntrutauh() = ntrutauh;
-    pico.out_mc_weight() = nano.Generator_weight(); //only for undoing enhance factors for DiPhoton samples.
   }
+  // S7 (higgsino_bhagirathi_2026_v1): set once per event, after the loop over saved particles.
+  // Inside the loop they were only set if at least one particle was saved; otherwise they stayed at
+  // the tree's default (-999). mc_weight is now used for w_lumi (U2), so it must always be set.
+  pico.out_ntrulep()  = ntrulep;
+  pico.out_ntruel()   = ntruel;
+  pico.out_ntrumu()   = ntrumu;
+  pico.out_ntrutaul() = ntrutaul;
+  pico.out_ntrutauh() = ntrutauh;
+  pico.out_mc_weight() = nano.Generator_weight();
 
   return;
 }

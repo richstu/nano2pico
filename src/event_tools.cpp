@@ -558,7 +558,10 @@ void EventTools::WriteDataQualityFilters(nano_tree& nano, pico_tree& pico, vecto
   }
   pico.out_pass_ecaldeadcell() = nano.Flag_EcalDeadCellTriggerPrimitiveFilter();
   pico.out_pass_badpfmu() = nano.Flag_BadPFMuonFilter();
-  if (nanoaod_version+0.01 > 9) {
+  if (isNanoV2UL(nanoaod_version)) { // not in UL NanoAODv2: filter not available, do not reject
+    pico.out_pass_badpfmudz() = true;
+    pico.out_pass_hfnoisyhits() = true;
+  } else if (nanoaod_version+0.01 > 9) {
     pico.out_pass_badpfmudz() = nano.Flag_BadPFMuonDzFilter();
     pico.out_pass_hfnoisyhits() = nano.Flag_hfNoisyHitsFilter();
   }
@@ -1210,6 +1213,10 @@ int EventTools::GetEventType(){
 
 void EventTools::WriteTriggerEfficiency(pico_tree &pico) {
   // trigger efficiency and uncertainty - @todo, needs to be updated to full Run 2 trig eff. measurement
+  // U3 (higgsino_bhagirathi_2026_v1): this is the 4b analysis' MET-trigger efficiency (bins of MET x HT).
+  // It is NOT part of the higgsino nominal weight (apply_corrections); the 4b analysis applies it itself.
+  // bbgg (diphoton triggers) uses no trigger weight: SF = 1 with the HLT bits required in MC and data,
+  // uncertainty in the datacards.
   pico.out_w_trig() = hig_trig_eff::eff(pico);
   float effunc = hig_trig_eff::eff_unc(pico);
   pico.out_sys_trig().resize(2,0);

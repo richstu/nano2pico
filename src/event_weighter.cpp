@@ -50,7 +50,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     in_file_photon_low_       = "data/zgamma/2016preVFP_UL/hzg_phidel_2016APV_scalefactors.json";
     in_file_photon_mceff_     = "data/zgamma/2016preVFP_UL/photon_wp80mceff_2016APV.json";
     in_file_muon_             = "data/zgamma/2016postVFP_UL/muid_2016_2016APV.json";
-    in_file_pu_               = "data/zgamma/2016preVFP_UL/puWeights.json";
+    in_file_pu_               = "data/higgsino/2016APV/puWeights.json";
     in_file_btag_             = "data/higgsino/2016APV/btagging.json"; //the higgsino file is corrupt for some reason..
     in_file_btag_mceff_       = "data/higgsino/2016APV/btag_mceff_2016APV.json";
     in_file_jetpuid_          = "data/higgsino/2016APV/jmar.json";
@@ -72,7 +72,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     in_file_photon_low_       = "data/zgamma/2016postVFP_UL/hzg_phidvalidate_2016_scalefactors.json";
     in_file_photon_mceff_     = "data/zgamma/2016postVFP_UL/photon_wp80mceff_2016.json";
     in_file_muon_             = "data/zgamma/2016postVFP_UL/muid_2016_2016APV.json";
-    in_file_pu_               = "data/zgamma/2016postVFP_UL/puWeights.json";
+    in_file_pu_               = "data/higgsino/2016/puWeights.json";
     in_file_btag_             = "data/higgsino/2016/btagging.json";
     in_file_btag_mceff_       = "data/higgsino/2016/btag_mceff_2016.json";
     in_file_jetpuid_          = "data/higgsino/2016/jmar.json";
@@ -94,7 +94,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     in_file_photon_low_       = "data/zgamma/2017_UL/hzg_phidvalidate_2017_scalefactors.json";
     in_file_photon_mceff_     = "data/zgamma/2017_UL/photon_wp80mceff_2017.json";
     in_file_muon_             = "data/zgamma/2017_UL/muid_2017.json";
-    in_file_pu_               = "data/zgamma/2017_UL/puWeights.json";
+    in_file_pu_               = "data/higgsino/2017/puWeights.json";
     in_file_btag_             = "data/higgsino/2017/btagging.json";
     in_file_btag_mceff_       = "data/higgsino/2017/btag_mceff_2017.json";
     in_file_jetpuid_          = "data/higgsino/2017/jmar.json";
@@ -116,7 +116,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     in_file_photon_low_       = "data/zgamma/2018_UL/hzg_phidvalidate_2018_scalefactors.json";
     in_file_photon_mceff_     = "data/zgamma/2018_UL/photon_wp80mceff_2018.json";
     in_file_muon_             = "data/zgamma/2018_UL/muid_2018.json";
-    in_file_pu_               = "data/zgamma/2018_UL/puWeights.json";
+    in_file_pu_               = "data/higgsino/2018/puWeights.json";
     in_file_btag_             = "data/higgsino/2018/btagging.json";
     in_file_btag_mceff_       = "data/higgsino/2018/btag_mceff_2018.json";
     in_file_jetpuid_          = "data/higgsino/2018/jmar.json";
@@ -138,7 +138,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     in_file_photon_low_       = "data/zgamma/2022/hzg_phidvalidate_2022_scalefactors.json";
     in_file_photon_mceff_     = "data/zgamma/2022/photon_wp80mceff_2022.json";
     in_file_muon_             = "data/zgamma/2022/muid_2022.json";
-    in_file_pu_               = "data/zgamma/2022/puWeights.json";
+    in_file_pu_               = "data/higgsino/2022/puWeights.json";
     in_file_btag_             = "data/higgsino/2022/btagging.json";
     in_file_btag_mceff_       = "data/higgsino/2022/btag_mceff_2022.json";
     in_file_electron_iso0p10_ = "data/zgamma/2022/hzg_eliso0p1_2022_efficiencies.json";
@@ -158,7 +158,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     in_file_photon_low_       = "data/zgamma/2022EE/hzg_phidvalidate_2022EE_scalefactors.json";
     in_file_photon_mceff_     = "data/zgamma/2022EE/photon_wp80mceff_2022EE.json";
     in_file_muon_             = "data/zgamma/2022EE/muid_2022EE.json";
-    in_file_pu_               = "data/zgamma/2022EE/puWeights.json";
+    in_file_pu_               = "data/higgsino/2022EE/puWeights.json";
     in_file_btag_             = "data/higgsino/2022EE/btagging.json";
     in_file_btag_mceff_       = "data/higgsino/2022EE/btag_mceff_2022EE.json";
     in_file_electron_iso0p10_ = "data/zgamma/2022EE/hzg_eliso0p1_2022EE_efficiencies.json";
@@ -178,7 +178,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     in_file_photon_low_       = "data/zgamma/2022EE/hzg_phidvalidate_2022EE_scalefactors.json";
     in_file_photon_mceff_     = "data/zgamma/2023/photon_wp80mceff_2023.json";
     in_file_muon_             = "data/zgamma/2023/hzg_muid_2023_scalefactors.json";
-    in_file_pu_               = "data/zgamma/2023/puWeights.json";
+    in_file_pu_               = "data/higgsino/2023/puWeights.json";
     in_file_btag_             = "data/higgsino/2023/btagging.json";
     in_file_btag_mceff_       = "data/higgsino/2023/btag_mceff_2023.json";
     in_file_electron_iso0p10_ = "data/zgamma/2023/hzg_eliso0p1_2023_efficiencies.json";
@@ -198,7 +198,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     in_file_photon_low_       = "data/zgamma/2022EE/hzg_phidvalidate_2022EE_scalefactors.json";
     in_file_photon_mceff_     = "data/zgamma/2023BPix/photon_wp80mceff_2023BPix.json";
     in_file_muon_             = "data/zgamma/2023BPix/hzg_muid_2023BPix_scalefactors.json";
-    in_file_pu_               = "data/zgamma/2023BPix/puWeights.json";
+    in_file_pu_               = "data/higgsino/2023BPix/puWeights.json";
     in_file_btag_             = "data/higgsino/2023BPix/btagging.json";
     in_file_btag_mceff_       = "data/higgsino/2023BPix/btag_mceff_2023BPix.json";
     in_file_electron_iso0p10_ = "data/zgamma/2023BPix/hzg_eliso0p1_2023BPix_efficiencies.json";
@@ -225,7 +225,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     in_file_photon_low_       = "data/zgamma/2022EE/hzg_phidvalidate_2022EE_scalefactors.json";
     in_file_photon_mceff_     = "data/zgamma/2024/photon_wp80mceff_2024.json";
     in_file_muon_             = "data/zgamma/2024/hzg_muid_2024_scalefactors.json";
-    in_file_pu_               = "data/zgamma/2024/puweights_BCDEFGHI.json";
+    in_file_pu_               = "data/higgsino/2024/puWeights_BCDEFGHI.json";
     in_file_btag_             = "data/higgsino/2024/btagging.json";
     in_file_btag_mceff_       = "data/zgamma/2024/btag_mceff.json";
     in_file_electron_iso0p10_ = "data/zgamma/2024/hzg_eliso0p1_2024_efficiencies.json";
@@ -247,7 +247,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     in_file_photon_low_       = "data/zgamma/2025/hzg_phidvalidate_2025_scalefactors.json";
     in_file_photon_mceff_     = "data/zgamma/2024/photon_wp80mceff_2024.json";
     in_file_muon_             = "data/zgamma/2025/hzg_muid_2025_scalefactors.json";
-    in_file_pu_               = "data/zgamma/2025/puWeights_2025pp_Summer24_25ns_69200ub.json";
+    in_file_pu_               = "data/higgsino/2025/puWeights_2025pp_Summer24_25ns_69200ub.json";
     in_file_btag_             = "data/higgsino/2025/btagging.json";
     in_file_btag_mceff_       = "data/zgamma/2024/btag_mceff.json";
     in_file_electron_iso0p10_ = "data/zgamma/2025/hzg_eliso0p1_2025_efficiencies.json";
@@ -269,7 +269,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     in_file_photon_low_       = "data/zgamma/2025/hzg_phidvalidate_2025_scalefactors.json";
     in_file_photon_mceff_     = "data/zgamma/2024/photon_wp80mceff_2024.json";
     in_file_muon_             = "data/zgamma/2025/hzg_muid_2025_scalefactors.json";
-    in_file_pu_               = "data/zgamma/2025/puWeights_2025pp_Summer24_25ns_69200ub.json";
+    in_file_pu_               = "data/higgsino/2025/puWeights_2025pp_Summer24_25ns_69200ub.json";
     in_file_btag_             = "data/higgsino/2025/btagging.json";
     in_file_btag_mceff_       = "data/zgamma/2024/btag_mceff.json";
     in_file_electron_iso0p10_ = "data/zgamma/2025/hzg_eliso0p1_2025_efficiencies.json";
@@ -291,7 +291,7 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
     in_file_photon_low_       = "data/zgamma/2022EE/hzg_phidvalidate_2022EE_scalefactors.json";
     in_file_photon_mceff_     = "data/zgamma/2023/photon_wp80mceff_2023.json";
     in_file_muon_             = "data/zgamma/2023/hzg_muid_2023_scalefactors.json";
-    in_file_pu_               = "data/zgamma/2023/puWeights.json";
+    in_file_pu_               = "data/higgsino/2023/puWeights.json";
     in_file_btag_             = "data/higgsino/2023/btagging.json";
     in_file_btag_mceff_       = "data/zgamma/2023/btag_mceff.json";
     in_file_electron_iso0p10_ = "data/zgamma/2023/hzg_eliso0p1_2023_efficiencies.json";
@@ -325,6 +325,10 @@ EventWeighter::EventWeighter(string year, const vector<float> &btag_wpts){
   cs_ggf_nnlo_              = correction::CorrectionSet::from_file(in_file_ggf_nnlo_);
   map_photon_id_            = cs_photon_->at(photon_idmapname);
   map_photon_csev_          = cs_photon_->at(photon_csevmapname);
+  // S2 (higgsino_bhagirathi_2026_v1): pixel-veto SF, same EGM file and binning as the CSEV SF
+  string photon_pixvetomapname = photon_csevmapname;
+  photon_pixvetomapname.replace(photon_pixvetomapname.find("CSEV"), 4, "PixVeto");
+  map_photon_pixveto_       = cs_photon_->at(photon_pixvetomapname);
   map_photon_mceff_         = cs_photon_mceff_->at("effmc");
   map_photon_mcunc_         = cs_photon_mceff_->at("systmc");
   map_electron_id_pass_     = cs_electron_->at("sf_pass");
@@ -578,12 +582,13 @@ void EventWeighter::ElectronMinisoSF(pico_tree &pico){
 }
 
 // Photon Total Scale Factors
-void EventWeighter::PhotonSF(pico_tree &pico){
+void EventWeighter::PhotonSF(pico_tree &pico, bool apply_fail_sf){
   double sf_tot = 1.0;
   double sf_tot_idup = 1.0;
   double sf_tot_iddn = 1.0;
   double sf_tot_evup = 1.0;
   double sf_tot_evdn = 1.0;
+  double sf_tot_pv = 1.0, sf_tot_pvup = 1.0, sf_tot_pvdn = 1.0; // S2: ID x pixel-veto SF
   //loop over reco photons since ~100% reco efficiency, only pt/eta cuts 
   //between NanoAOD and pico
   for (unsigned iph = 0; iph < pico.out_photon_pt().size(); iph++) {
@@ -604,22 +609,32 @@ void EventWeighter::PhotonSF(pico_tree &pico){
     else
       category += "LowR9";
     float ev_sf(1.0), ev_sfup(1.0), ev_sfdn(1.0);
+    float pv_sf(1.0), pv_sfup(1.0), pv_sfdn(1.0); // S2
     if (year_=="2016APV" || year_=="2016"
         || year_=="2017" || year_=="2018") {
       ev_sf = map_photon_csev_->evaluate({key_, "sf", "MVA", category});
       ev_sfup = map_photon_csev_->evaluate({key_, "sfup", "MVA", category});
       ev_sfdn = map_photon_csev_->evaluate({key_, "sfdown", "MVA", category});
+      pv_sf   = map_photon_pixveto_->evaluate({key_, "sf", "MVA", category});
+      pv_sfup = map_photon_pixveto_->evaluate({key_, "sfup", "MVA", category});
+      pv_sfdn = map_photon_pixveto_->evaluate({key_, "sfdown", "MVA", category});
     }
     else if (year_=="2022" || year_=="2022EE" 
              || year_=="2023" || year_=="2023BPix" || year_ == "2024") {
       ev_sf = map_photon_csev_->evaluate({key_, "sf", "MVA80", eta, r9});
       ev_sfup = map_photon_csev_->evaluate({key_, "sfup", "MVA80", eta, r9});
       ev_sfdn = map_photon_csev_->evaluate({key_, "sfdown", "MVA80", eta, r9});
+      pv_sf   = map_photon_pixveto_->evaluate({key_, "sf", "MVA80", eta, r9});
+      pv_sfup = map_photon_pixveto_->evaluate({key_, "sfup", "MVA80", eta, r9});
+      pv_sfdn = map_photon_pixveto_->evaluate({key_, "sfdown", "MVA80", eta, r9});
     }
     else if (year_=="2025" || year_=="2026") {
       ev_sf   = map_photon_csev_->evaluate({key_, "sf",      "MVA80", eta, r9, pt});
       ev_sfup = map_photon_csev_->evaluate({key_, "sfup",    "MVA80", eta, r9, pt});
       ev_sfdn = map_photon_csev_->evaluate({key_, "sfdown",  "MVA80", eta, r9, pt});
+      pv_sf   = map_photon_pixveto_->evaluate({key_, "sf",      "MVA80", eta, r9, pt});
+      pv_sfup = map_photon_pixveto_->evaluate({key_, "sfup",    "MVA80", eta, r9, pt});
+      pv_sfdn = map_photon_pixveto_->evaluate({key_, "sfdown",  "MVA80", eta, r9, pt});
     }
     string wpstring = "wp80";
     if (pt<20.0f)
@@ -662,13 +677,18 @@ void EventWeighter::PhotonSF(pico_tree &pico){
       fail_sf_evdn = (1.0-pass_sf_evdn*mc_eff)/(1.0-mc_eff);
     }
     if (pico.out_photon_sig().at(iph)) {
+      sf_tot_pv   *= id_sf*pv_sf;   // S2: selected real photon, pixel veto instead of CSEV
+      sf_tot_pvup *= id_sf*pv_sfup;
+      sf_tot_pvdn *= id_sf*pv_sfdn;
       sf_tot *= pass_sf;
       sf_tot_idup *= pass_sf_idup;
       sf_tot_iddn *= pass_sf_iddn;
       sf_tot_evup *= pass_sf_evup;
       sf_tot_evdn *= pass_sf_evdn;
     }
-    else {
+    else if (apply_fail_sf) {
+      // Inefficiency factor for real photons failing the signal-photon selection: only meaningful for analyses
+      // that veto such photons. Not applied for higgsino (S3, higgsino_bhagirathi_2026_v1).
       sf_tot *= fail_sf;
       sf_tot_idup *= fail_sf_idup;
       sf_tot_iddn *= fail_sf_iddn;
@@ -683,6 +703,10 @@ void EventWeighter::PhotonSF(pico_tree &pico){
   pico.out_sys_photon_csev().resize(2,1.); 
   pico.out_sys_photon_csev()[0] = sf_tot_evup;
   pico.out_sys_photon_csev()[1] = sf_tot_evdn;
+  pico.out_w_photon_pixveto() = sf_tot_pv;
+  pico.out_sys_photon_pixveto().resize(2,1.);
+  pico.out_sys_photon_pixveto()[0] = sf_tot_pvup;
+  pico.out_sys_photon_pixveto()[1] = sf_tot_pvdn;
 }
 
 // Muon Scale Factors
@@ -1122,7 +1146,7 @@ void EventWeighter::bTaggingSFshape(pico_tree &pico){
   pico.out_sys_udsghig()[1] = sf_tot_dn_udsg;
 }
 */
-void EventWeighter::jetpuIdSF(pico_tree &pico){
+void EventWeighter::jetpuIdSF(pico_tree &pico, float min_jet_pt){
   float sf_tot_nm = 1.0;
   float sf_tot_up = 1.0;
   float sf_tot_dn = 1.0;
@@ -1130,7 +1154,9 @@ void EventWeighter::jetpuIdSF(pico_tree &pico){
   string wp_string = "L";
   if(year_ == "2016APV" || year_ == "2016" || year_ == "2017" || year_ == "2018"){
     for (unsigned ijet = 0; ijet < pico.out_jet_pt().size(); ijet++) {
-      if(pico.out_jet_isgood_min().at(ijet)){
+      // U1 (higgsino_bhagirathi_2026_v1): only jets above the analysis jet pT threshold (as in jet_isgood);
+      // jets below it never enter the selection, so their PU ID outcome must not change the weight.
+      if(pico.out_jet_isgood_min().at(ijet) && pico.out_jet_pt().at(ijet) > min_jet_pt){
         float pt = pico.out_jet_nanopt().at(ijet);
         float eta = pico.out_jet_eta().at(ijet);
         float phi = pico.out_jet_phi().at(ijet);

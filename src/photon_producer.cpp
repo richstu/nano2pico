@@ -163,6 +163,7 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico,
     vector<int> &jet_isphoton_nano_idx, vector<int> &sig_el_nano_idx, 
     vector<int> &sig_mu_nano_idx, vector<int> &photon_el_pico_idx, 
     bool is_signal_sample) {
+  rng_.SetSeed(EventSeed(nano.run(), nano.luminosityBlock(), nano.event(), 2)); // S9: photon smearing (Run 3)
   pico.out_nphoton() = 0;
   // pico.out_nfsrphoton() = 0;
   vector<int> sig_photon_nano_idx;
@@ -211,10 +212,15 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico,
             "scaleup",eta,nano.Photon_seedGain()[iph]}));
         scale_syst_dn.push_back(map_scale_syst_->evaluate({str_scale_syst_,
             "scaledown",eta,nano.Photon_seedGain()[iph]}));
-        smear_syst_up.push_back(1.0f
-                                -nano.Photon_dEsigmaUp()[iph]/cosh(eta)/pt);
-        smear_syst_dn.push_back(1.0f
-                                -nano.Photon_dEsigmaDown()[iph]/cosh(eta)/pt);
+        if (isNanoV2UL(nanoaod_version)) { // Photon_dEsigmaUp/Down not in UL NanoAODv2: no resolution variation
+          smear_syst_up.push_back(1.0f);
+          smear_syst_dn.push_back(1.0f);
+        } else {
+          smear_syst_up.push_back(1.0f
+                                  -nano.Photon_dEsigmaUp()[iph]/cosh(eta)/pt);
+          smear_syst_dn.push_back(1.0f
+                                  -nano.Photon_dEsigmaDown()[iph]/cosh(eta)/pt);
+        }
         energy_err_scale_up.push_back(nano.Photon_energyErr()[iph]
                                       *scale_syst_up[iph]);
         energy_err_scale_dn.push_back(nano.Photon_energyErr()[iph]
@@ -432,7 +438,9 @@ vector<int> PhotonProducer::WritePhotons(nano_tree &nano, pico_tree &pico,
       }
     }
     if (year=="2016APV"||year=="2016"||year=="2017"||year=="2018") {
-      pico.out_photon_ecorr().push_back(nano.Photon_eCorr()[iph]);
+      // Photon_eCorr not in UL NanoAODv2 for 2016APV/2016/2017 (pT there is already the corrected pT)
+      if (isNanoV2UL(nanoaod_version) && year != "2018") pico.out_photon_ecorr().push_back(-999.f);
+      else pico.out_photon_ecorr().push_back(nano.Photon_eCorr()[iph]);
       pico.out_photon_reliso().push_back(nano.Photon_pfRelIso03_all()[iph]);
       pico.out_photon_pudisc().push_back(photon_puid_disc);
     }

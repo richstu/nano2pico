@@ -7,6 +7,7 @@
 
 namespace xsec{
 
+  bool higgsinoBBGGCrossSection(const TString &file, int year, float &xsec);
   float crossSection(const TString &file, int year);
   void gluinoCrossSection(int glu_mass, double &xsec, double &xsec_unc, int year);
   void higgsinoCrossSection(int hig_mass, double &xsec, double &xsec_unc, int year);

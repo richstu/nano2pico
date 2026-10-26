@@ -1,7 +1,36 @@
-/DiPhotonJetsBox_MGG-80toInf_13TeV-sherpa/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM
-/DiPhotonJetsBox1BJet_MGG-80toInf_13TeV-sherpa/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM
-/DiPhotonJetsBox2BJets_MGG-80toInf_13TeV-sherpa/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM
-/GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM
-/TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM
-/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM
-/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM
+# higgsino_bhagirathi_2026_v1 (S8), generated 2026-10-26 from SamplesCatalogue analysis_catalogue.csv:
+# role nominal + TTGamma LO (roles as in SamplesCatalogue/lib/analysis_samples.py); not: unused (bbH ybyt, DiPhotonJets amcatnlo), minor, cross-checks.
+# Format: <input directory> <DAS dataset>  (input directory = the read-from copy)
+/net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc /DiPhotonJetsBox_MGG-80toInf_13TeV-sherpa/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM
+/net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc /DiPhotonJetsBox1BJet_MGG-80toInf_13TeV-sherpa/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM
+/net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc /DiPhotonJetsBox2BJets_MGG-80toInf_13TeV-sherpa/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM
+/net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc /GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM
+/net/cms11/cms11r0/pico/NanoAODv2/nano/2018/mc /GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV_Pythia8/RunIISummer20UL18NanoAODv2-106X_upgrade2018_realistic_v15_L1v1-v1/NANOAODSIM
+/net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc /QCD_Pt-30to40_DoubleEMEnriched_MGG-80toInf_TuneCP5_13TeV-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM
+/net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc /QCD_Pt-40ToInf_DoubleEMEnriched_MGG-80ToInf_TuneCP5_13TeV-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM
+/net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc /TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM
+/net/cms11/cms11r1/pico/NanoAODv9/nano/2018/mc /TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM
+/net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc /TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM
+/net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc /TTGJets_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1_ext1-v1/NANOAODSIM
+/net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc /TTGG_0Jets_TuneCP5_13TeV-amcatnlo-madspin-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM
+/net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc /GluGluHToGG_M125_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM
+/net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc /VBFHToGG_M125_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v2/NANOAODSIM
+/net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc /VHToGG_M125_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v2/NANOAODSIM
+/net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc /ttHJetToGG_M125_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v2/NANOAODSIM
+/net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc /bbHToGG_M-125_4FS_yb2_TuneCP5-13TeV-amcatnlo-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v2/NANOAODSIM
+/net/cms18/cms18r0/pico/NanoAODv9/nano/2018/mc /ST_tW_top_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM
+/net/cms18/cms18r0/pico/NanoAODv9/nano/2018/mc /ST_tW_antitop_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM
+/net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc /TGJets_TuneCP5_13TeV-amcatnlo-madspin-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v2/NANOAODSIM
+/net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc /ST_tWAto2L2Nu_5f_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM
+/net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc /WGToLNuG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM
+/net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc /ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM
+/net/cms18/cms18r0/pico/NanoAODv9/nano/2018/mc /TTZToLLNuNu_M-10_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM
+/net/cms18/cms18r0/pico/NanoAODv9/nano/2018/mc /TTZToQQ_TuneCP5_13TeV-amcatnlo-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM
+/net/cms18/cms18r0/pico/NanoAODv9/nano/2018/mc /TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM
+/net/cms18/cms18r0/pico/NanoAODv9/nano/2018/mc /TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM
+/net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc /TTGamma_Dilept_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM
+/net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc /TTGamma_SingleLept_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM
+/net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc /GluGluToHHTo2B2G_kl-1p00_kt-1p00_c2-0p00_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL18NanoAODv9-PowhegBugFix_106X_upgrade2018_realistic_v16_L1v1-v2/NANOAODSIM
+/net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc /VBFHHTo2B2G_kl_1p00_cv_1p00_c2v_1p00_TuneCP5_13TeV_madgraph-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v2/NANOAODSIM
+/net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc /THQ_TToLNu_HToGG_k1_ktilde0_4f_M-125_TuneCP5_13TeV-amcatnlo-madspin-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v2/NANOAODSIM
+/net/cms11/cms11r0/pico/NanoAODv9/nano/2018/mc /THQ_TToQQ_HToGG_k1_ktilde0_4f_M-125_TuneCP5_13TeV-amcatnlo-madspin-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v2/NANOAODSIM
