@@ -111,8 +111,10 @@ JetMetProducer::JetMetProducer(int year_, string year_string_,
     cs_jetveto_ = correction::CorrectionSet::from_file(in_file_jetveto_);
     map_jetveto_ = cs_jetveto_->at("Summer19UL18_V1");
     if (isData) {
-      map_jec_.push_back(cs_jerc_->compound().at("Summer19UL18_V5_MC_L1L2L3Res_AK4PFchs"));
-      map_jec_l1_.push_back(cs_jerc_->at("Summer19UL18_V5_MC_L1FastJet_AK4PFchs"));
+      // B2 (higgsino_bhagirathi_2026_v1): 2018 data loaded the MC JEC (4 inputs), but GetJEC evaluates Run 2 data
+      // with the run number (5 inputs) -> "Too many inputs" at the first CorrT1METJet. DATA JEC as in 2016/2017.
+      map_jec_.push_back(cs_jerc_->compound().at("Summer19UL18_V5_DATA_L1L2L3Res_AK4PFchs"));
+      map_jec_l1_.push_back(cs_jerc_->at("Summer19UL18_V5_DATA_L1FastJet_AK4PFchs"));
     }
     else {
       map_jes_ = cs_jerc_->at("Summer19UL18_V5_MC_Total_AK4PFchs");
