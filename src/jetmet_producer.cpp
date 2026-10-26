@@ -670,6 +670,15 @@ void JetMetProducer::PropagateJERC(nano_tree &nano, pico_tree &pico,
     if (isData) {
       met_nom_u = nano.MET_pt();
       met_phi_u = nano.MET_phi();
+    }
+    // B3 (higgsino_bhagirathi_2026_v1): the Run 2 xy-correction JSONs are binned in met_pt 0-6500 GeV with flow "error";
+    // a noise event with MET above that (seen: 19.7 TeV, 2016APV data) threw and killed the job. Such events keep the
+    // uncorrected MET. Pre-existing in eeaee33.
+    if (!(met_nom_u < 6500.f) || !(fabs(met_phi_u) < 3.15f)) {
+      met_nom_corr = met_nom_u;
+      met_phi_corr = met_phi_u;
+    }
+    else if (isData) {
       met_nom_corr = map_metpt_data_->evaluate({met_nom_u, met_phi_u, npvs, run});
       met_phi_corr = map_metphi_data_->evaluate({met_nom_u, met_phi_u, npvs, run});
     }
