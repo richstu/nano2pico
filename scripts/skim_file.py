@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import sys
 import ROOT
 import argparse
 
@@ -78,6 +79,7 @@ if __name__ == '__main__':
   parser.add_argument('-k','--skim_name', default = "")
   parser.add_argument('-i','--input_paths', required=True, default = "")
   parser.add_argument('-o','--output_dir', required=True, default = "")
+  parser.add_argument('--from_skim', default = "", help="Creating skim llg from skim ll")
   args = vars(parser.parse_args())
   
   file_paths_string = args['input_paths']
@@ -101,7 +103,13 @@ if __name__ == '__main__':
   elif args['skim_name'] !="":
     cut_string = get_cuts(args['skim_name'])
     out_filename = os.path.basename(os.path.realpath(file_paths_string))
-    out_file_path = os.path.join(args['output_dir'], out_filename.replace('pico_','pico_'+args['skim_name']+'_'))
+    if args['from_skim'] !="":#Sets the output skims to have the correct name format
+      from_prefix = 'pico_'+args['from_skim']+'_'
+      if not out_filename.startswith(from_prefix):
+        sys.exit('Input file name '+out_filename+' does not start with '+from_prefix)
+      out_file_path = os.path.join(args['output_dir'], 'pico_'+args['skim_name']+'_'+out_filename[len(from_prefix):])
+    else:
+      out_file_path = os.path.join(args['output_dir'], out_filename.replace('pico_','pico_'+args['skim_name']+'_'))
     treename = 'tree'
   else:
     sys.exit("You have to specify either mass or cut string.")

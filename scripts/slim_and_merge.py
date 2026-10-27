@@ -19,6 +19,7 @@ def getRules(slim_rules_file_name):
     good_rules = [ rule for rule in good_rules if len(rule)>=2 ]
     for rule in bad_rules:
         utilities.ePrint("Invalid rule:",rule,"\n")
+        print("Invalid rule:",rule,"\n",file=sys.stderr)
     return good_rules
 
 def passRules(branch, rules):

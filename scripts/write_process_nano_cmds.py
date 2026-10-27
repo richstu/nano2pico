@@ -40,6 +40,9 @@ list_format = args['list_format']
 in_file_paths = []
 all_file_paths = glob(os.path.join(in_dir,'*.root'))
 if args['dataset_list']!='':
+  if not os.path.isfile(args['dataset_list']):
+    print('[Error] dataset list does not exist: '+args['dataset_list']+' (path is relative to the current directory)')
+    sys.exit(1)
   datasets = []
   with open(args['dataset_list']) as f:
     datasets = f.readlines()
@@ -48,10 +51,15 @@ if args['dataset_list']!='':
     wanted_file_substr = []
     if args['data']:
       for ds in datasets:
+        if ds[0:1]!="/": # in case of empty lines or comments
+          continue
         ds_split = ds.split("/")
         dataset = ds_split[1]
         run_condition = ds_split[2]
-        run, condition =  re.search('(Run.+?)-(.*)', run_condition).groups()
+        run_match = re.searchh('(Run.+?)-(.*)', run_condition)
+        if run_match is None:
+          print("[Warning] Could not parse run/condition, skipping: " + ds.strip())
+        run, condition = run_match.groups()
         wanted_file_substr.append(dataset+"__"+run+"__"+condition)
     else:
       for ds in datasets: 
@@ -79,6 +87,9 @@ else:
   in_file_paths = all_file_paths
 
 print("Found {} input files.\n".format(len(in_file_paths)))
+if len(in_file_paths)==0:
+  print("[Error] No input files found in "+in_dir+". Check the input directory, year and dataset list.")
+  sys.exit(1)
 
 cmdfile_name = 'process_nano_cmds.py'
 if (args['skim']=='ll'): cmdfile_name = cmdfile_name.replace('.py', '_skim_ll'+'.py')
@@ -97,7 +108,9 @@ cmdfile.close()
 os.chmod(cmdfile_name, 0o755)
 
 json_name = cmdfile_name.replace('.py','.json')
-os.system('convert_cl_to_jobs_info.py -f '+cmdfile_name+' '+json_name)
+if os.system('convert_cl_to_jobs_info.py -f '+cmdfile_name+' '+json_name) != 0:
+  print("[Error] convert_cl_to_jobs_info.py failed")
+  sys.exit(1)
 
 print("To generate job json and submit jobs do: ")
 print('auto_submit_jobs.py '+json_name+' -c scripts/check_process_nano_job.py')
