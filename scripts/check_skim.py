@@ -62,7 +62,11 @@ if (tmp[1]=='-m'):
     infile_path = tmp[6]
     lsp_mass = int(tmp[4])
 
-if '/merged_' in infile_path or '/raw_pico_' in infile_path: 
+if '--from_skim' in tmp:
+  # skim derived from another skim, e.g. pico_ll_X.root -> pico_llg_X.root
+  from_prefix = 'pico_'+tmp[tmp.index('--from_skim')+1]+'_'
+  outfile_path = tmp[6]+'pico_'+tmp[2]+'_'+os.path.basename(infile_path)[len(from_prefix):]
+elif '/merged_' in infile_path or '/raw_pico_' in infile_path: 
   in_dir = os.path.dirname(infile_path)
   skim_name = tmp[2]
   out_dir = tmp[6]

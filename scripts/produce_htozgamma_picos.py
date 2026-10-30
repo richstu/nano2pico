@@ -198,7 +198,7 @@ def processMc(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, 
     #1
     [notify_script+' "Start skim llg from ll'+mc_tag+'"',
     './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/skim_ll/ --skim_name llg --from_skim ll --tag '+mc_tag,
-    'auto_submit_jobs.py -r '+JOBS+' skim_llg_cmds_'+mc_tag+'.json -c scripts/check_skim.py -f',
+    'auto_submit_jobs.py -r '+JOBS+' skim_llg_cmds_'+mc_tag+'.json -c scripts/check_derived_skim.py -f',
     notify_script+' "Finished skim llg from ll'+mc_tag+'"'],
 
     #3                                                                                                                                              
@@ -271,10 +271,10 @@ def processData(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR
     './scripts/confirm_slim.py '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/skim_ll '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/merged_zgdata_ll',
     notify_script+' "Finished merge ll '+data_tag+'"'],
 
-    #1
+    #2
     [notify_script+' "Started skim llg from ll'+data_tag+'"',
     './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/skim_ll/ --skim_name llg --from_skim ll --tag '+data_tag,
-    'auto_submit_jobs.py -r '+JOBS+' skim_llg_cmds_'+data_tag+'.json -c scripts/check_skim.py -f',
+    'auto_submit_jobs.py -r '+JOBS+' skim_llg_cmds_'+data_tag+'.json -c scripts/check_derived_skim.py -f',
     notify_script+' "Finished skim llg from ll'+data_tag+'"'],
 
 

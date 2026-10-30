@@ -120,6 +120,7 @@ if __name__ == '__main__':
   nent_total = chain.GetEntries()
   nent_skim = chain.GetEntries(cut_string)
   print('Found {} events satisfying the skim requirements.'.format(nent_skim))
+  print('SKIM_PASS_EVENTS: {}'.format(nent_skim)) # used when deriving skim_llg from skim_ll
 
   out_file = ROOT.TFile(out_file_path, "recreate") # in case we want compression 
   if (args['mass']!=-1): 
