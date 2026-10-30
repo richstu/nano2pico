@@ -56,7 +56,7 @@ if args['dataset_list']!='':
         ds_split = ds.split("/")
         dataset = ds_split[1]
         run_condition = ds_split[2]
-        run_match = re.searchh('(Run.+?)-(.*)', run_condition)
+        run_match = re.search('(Run.+?)-(.*)', run_condition)
         if run_match is None:
           print("[Warning] Could not parse run/condition, skipping: " + ds.strip())
         run, condition = run_match.groups()
