@@ -1,4 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+# B4 (higgsino_bhagirathi_2026_v1): python3 (python2 has no ROOT in the CMSSW_14 env; the import error crashed
+# auto_submit_jobs.py right after submission in every apply step) and bytes-safe arguments, as check_process_nano_job.py.
 # The ./jobscript_check.py should return 'success' or 'fail' or 'to_submit' or 'submitted' for a job_log_string
 # The input is given as sys.argv[1] = queue_system.compress_string(job_log_string) sys.argv[2] = queue_system.compress_string(job_argument_string)
 import sys
@@ -12,6 +14,7 @@ job_argument_string = queue_system.decompress_string(sys.argv[2])
 
 print(job_argument_string)
 
+if isinstance(job_argument_string, bytes): job_argument_string = job_argument_string.decode('utf-8')
 args = job_argument_string.split('--command="')[1].split('"')[0]
 tmp = args.split(' ')
 infile_path = tmp[4]+'/'+tmp[2]
