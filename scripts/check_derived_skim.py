@@ -9,7 +9,7 @@ import sys
 import os
 import re
 import zlib
-from ROOT import TChain
+from pico_count import count_entries
 
 
 def decompress_string(compressed_string):
@@ -53,10 +53,7 @@ in_nent = int(match.group(1))
 if not os.path.exists(outfile_path):
   print('[For queue_system] fail: output ({}) does not exist.'.format(outfile_path))
   sys.exit(0)
-chain = TChain('tree')
-chain.Add(outfile_path)
-out_nent = chain.GetEntries()
-nbranches = chain.GetNbranches()
+out_nent, nbranches = count_entries(outfile_path, 'tree')
 print('DEBUG: expected entries = {}, output entries = {}'.format(in_nent, out_nent))
 if nbranches == 0:
   print('[For queue_system] fail: output ({}) has no branches.'.format(outfile_path))

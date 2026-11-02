@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import os
 import sys
-import ROOT
 import argparse
 
 # Input:   root_files/SMS-TChiHH_HToBB_HToBB_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16NanoAODv5_PUSummer16v3Fast_94X_mcRun2_asymptotic_v3-v1_0.root
@@ -72,7 +71,7 @@ def get_cuts(skim_name):
   return cuts
 
 if __name__ == '__main__':
-
+  import ROOT #only needed when skimming
   parser = argparse.ArgumentParser()
   parser.add_argument('-m','--mass', default = -1)
   parser.add_argument('-l','--mass_lsp', default = 0)

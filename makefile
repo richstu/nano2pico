@@ -54,6 +54,9 @@ $(OBJDIR)/%.a:
 $(EXEDIR)/generate_tree_classes.exe: $(OBJDIR)/generate_tree_classes.o
 	$(LINK)
 
+$(EXEDIR)/count_entries.exe: $(OBJDIR)/count_entries.o
+	$(LD) $(shell root-config --ldflags) -o $@ $^ $(shell root-config --libs) -lTreePlayer
+
 $(EXEDIR)/%.exe: $(OBJDIR)/%.o $(LIBFILE)
 	$(LINK)
 
