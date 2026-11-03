@@ -12,7 +12,7 @@ _KERNEL = os.uname()[2].split('-')[0]
 _CANDIDATES = [os.path.join(_TOP, 'kernel', _KERNEL, 'run', 'count_entries.exe'),
                os.path.join(_TOP, 'run', 'count_entries.exe')]
 EXE = next((path for path in _CANDIDATES if os.access(path, os.X_OK)), None)
-
+INPROCESS = False
 
 def _count_exe(path, tree, cut):
   cmd = [EXE, '-t', tree] + (['-c', cut] if cut else []) + [path]
@@ -36,6 +36,9 @@ def _count_pyroot(path, tree, cut):
 
 def count_entries(path, tree='tree', cut=''):
   """Return (number of entries passing cut, number of branches) of TChain(tree) over path."""
+  # run_checks_batch.py sets this: ROOT is already imported in that process, so count here
+  if INPROCESS:
+    return _count_pyroot(path, tree, cut)
   if EXE is not None:
     try:
       return _count_exe(path, tree, cut)

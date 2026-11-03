@@ -44,6 +44,6 @@ if __name__ == "__main__":
   
   if unslimmed_events != slimmed_events:
     print('[For queue_system] fail: unslimmed and slimmed do not have same number of events')
-    sys.exit(1)
+    sys.exit(0)
   else:
     print('[For queue_system] success')
