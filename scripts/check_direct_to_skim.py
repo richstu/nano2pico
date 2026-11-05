@@ -6,7 +6,6 @@ import sys
 import os
 import re
 import zlib
-import time
 from pico_count import count_entries
 
 
@@ -16,14 +15,8 @@ from pico_count import count_entries
 def decompress_string(compressed_string):
   return zlib.decompress(bytes.fromhex(compressed_string)).decode('utf-8')
 
-start = time.time()
-with open("/net/cms37/data1/jdg282/nano2pico-prod/timelog.txt", "a") as timelogfile:
-  timelogfile.write("Started at: "+str(start)+'\n')
 job_log_string = decompress_string(sys.argv[1])
 job_argument_string = decompress_string(sys.argv[2])
-
-with open("/net/cms37/data1/jdg282/nano2pico-prod/timelog.txt", "a") as timelogfile:
-  timelogfile.write("decompression: "+str(time.time()))
 
 print(job_argument_string)
 
@@ -50,9 +43,6 @@ if ('error' in job_log_string.lower()) or ('segmentation fault' in job_log_strin
 # Extract expected number of skimmed events from log
 match = re.search(r'SKIM_PASS_EVENTS:\s*(\d+)', job_log_string)
 
-with open("/net/cms37/data1/jdg282/nano2pico-prod/timelog.txt", "a") as timelogfile:
-  timelogfile.write("Searched for matches: "+str(time.time())+'\n')
-
 if match is None:
   print('[For queue_system] fail: Could not find SKIM_PASS_EVENTS in job log.')
   sys.exit(0)
@@ -66,9 +56,6 @@ if os.path.exists(outfile_path):
 else:
     out_nent = 0
     nbranches = 0
-
-with open("/net/cms37/data1/jdg282/nano2pico-prod/timelog.txt", "a") as timelogfile:
-  timelogfile.write("Opened root: "+str(time.time())+'\n')
 
 print('DEBUG: expected entries = {}, output entries = {}'.format(in_nent, out_nent))
 

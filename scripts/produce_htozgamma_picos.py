@@ -121,8 +121,6 @@ def processSteps(process_commands, YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG
       print('Will run below command')
       print('  '+command)
       if NO_RUN: continue
-      #error += os.system(command)
-      #error += runAndLogCommand(command, log_file)
       return_code = runAndLogCommand(command, log_file)
       if return_code != 0:
         #telegram failure won't kill production
@@ -195,7 +193,7 @@ def processMc(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, 
     './scripts/confirm_slim.py '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/skim_ll '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/merged_zgmc_ll',
     notify_script+' "Finished merge ll '+mc_tag+'"'],
 
-    #1
+    #2
     [notify_script+' "Start skim llg from ll'+mc_tag+'"',
     './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/skim_ll/ --skim_name llg --from_skim ll --tag '+mc_tag,
     'auto_submit_jobs.py -r '+JOBS+' skim_llg_cmds_'+mc_tag+'.json -c scripts/check_derived_skim.py -f',
@@ -368,7 +366,7 @@ Pico files: BASE_FOLDERNAME/NANOAOD_VERSION/TAG_NAME/(2016,2017,2018)/(data,mc,s
   parser.add_argument('-f', '--fake_run', action="store_true", help='Do not run commands. Only print commands to run.')
   parser.add_argument('-u', '--untagged', action="store_true", help='Do not use git tag')
   parser.add_argument('-s','--direct_to_skim', action="store_true", help='Direct to skim')
-  parser.add_argument('-r','--num_jobs', default=50, help='Number of simultaneous jobs to run')
+  parser.add_argument('-r','--num_jobs', default=20, help='Number of simultaneous jobs to run')
   parser.add_argument('--use_telegram', action="store_true", help='Uses telegram script to notify about steps. Requires telegram setup.')
   parser.add_argument('--email', help='Uses email to notify about steps. Type in your email.')
   

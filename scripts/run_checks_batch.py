@@ -10,10 +10,6 @@ Usage: run_checks_batch.py <commands.json> <results.json>
                  by one, e.g. "scripts/check_skim.py <compressed log> <compressed arguments>"
   results.json:  list with the stdout of each command, in the same order.
 
-Each command is run with runpy as if it were started from the shell (same argv, SystemExit
-handled), and pico_count is switched to count entries with PyROOT in this process rather than
-starting count_entries.exe for every job. A command that raises or exits non-zero gets the
-same "check script crashed" result queue_system gives to a failing command.
 """
 import contextlib
 import io

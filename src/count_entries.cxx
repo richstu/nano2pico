@@ -2,7 +2,8 @@
   \brief Prints the number of entries and branches of a TTree (chained over the
   given path, wildcards allowed), optionally with a selection applied.
   Credit: Claude
-  Lightweight cpp implementation to avoid pyROOT import
+  Lightweight cpp implementation to avoid pyROOT import. Not used in batch methods,
+  but present as a backup in case batching fails.
 
   Usage: count_entries.exe [-t tree_name] [-c selection] path [path...]
   Output, one line per path, to stdout:  COUNT <entries> <branches> <path>
