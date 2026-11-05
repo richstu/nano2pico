@@ -37,8 +37,6 @@ else:
 outfile_path = os.path.join(out_dir, out_name)
 print('outfile: ', outfile_path)
 
-# skim_file.py has no "Error" output of its own, so only look for crash signatures
-# (a bare 'error' match would also trip on harmless ROOT messages)
 low = job_log_string.lower()
 if 'traceback (most recent call last)' in low or 'segmentation fault' in low or 'error in <' in low:
   print('[For queue_system] fail: Error in job_log')

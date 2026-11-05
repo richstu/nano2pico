@@ -36,8 +36,8 @@ if __name__ == "__main__":
   unslimmed_path = command_args['i']
   slimmed_path = command_args['o']
 
-  unslimmed_events, _ = count_entries(unslimmed_path, "tree")
-  slimmed_events, _ = count_entries(slimmed_path, "tree")  
+  unslimmed_events, unslimmed_branches = count_entries(unslimmed_path, "tree")
+  slimmed_events, slimmed_branches = count_entries(slimmed_path, "tree")  
   
   print(unslimmed_path+' has '+str(unslimmed_events)+' events')
   print(slimmed_path+' has '+str(slimmed_events)+' events')
