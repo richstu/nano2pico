@@ -33,6 +33,11 @@ out_dir = tmp[6]
 
 infile_path = os.path.join(in_dir, infile_name)
 outfile_path = os.path.join(out_dir,'skim_'+skim_type,'pico_'+skim_type+'_'+infile_name)
+# process_nano can give the output a different name than the input (2024 MC written as 2025 or
+# 2026 MC), and prints where it writes. Use that path when the log has it.
+written_match = re.search(r'Writing output to:\s*(\S+)', job_log_string)
+if written_match is not None:
+  outfile_path = written_match.group(1)
 print("infile: ", infile_path)
 print("outfile: ", outfile_path)
 
