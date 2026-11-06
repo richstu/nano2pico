@@ -6,7 +6,7 @@ import os
 import argparse
 import shlex
 import zlib
-from ROOT import TChain
+from pico_count import count_entries
 from skim_file import get_cuts
 
 # Decompress string for passed things through posix
@@ -62,7 +62,11 @@ if (tmp[1]=='-m'):
     infile_path = tmp[6]
     lsp_mass = int(tmp[4])
 
-if '/merged_' in infile_path or '/raw_pico_' in infile_path: 
+if '--from_skim' in tmp:
+  # skim derived from another skim, e.g. pico_ll_X.root -> pico_llg_X.root
+  from_prefix = 'pico_'+tmp[tmp.index('--from_skim')+1]+'_'
+  outfile_path = tmp[6]+'pico_'+tmp[2]+'_'+os.path.basename(infile_path)[len(from_prefix):]
+elif '/merged_' in infile_path or '/raw_pico_' in infile_path: 
   in_dir = os.path.dirname(infile_path)
   skim_name = tmp[2]
   out_dir = tmp[6]
@@ -86,32 +90,24 @@ else:
 
 
 if tmp[1]=='-m':
-  infile = TChain("Events");
-  infile.Add(infile_path);
   cut_string = "(MaxIf$(GenPart_mass,GenPart_pdgId==1000023)>"+str(int(tmp[2])-10)+"&&MaxIf$(GenPart_mass,GenPart_pdgId==1000023)<"+str(int(tmp[2])+10)+")"
   cut_string += "&&(MaxIf$(GenPart_mass,GenPart_pdgId==1000022)>"+str(lsp_mass-10)+"&&MaxIf$(GenPart_mass,GenPart_pdgId==1000022)<"+str(lsp_mass+10)+")"
-  in_nent = infile.GetEntries(cut_string)
+  in_nent, nbranches_in = count_entries(infile_path, "Events", cut_string)
   if os.path.exists(outfile_path):
-    outfile = TChain("Events");
-    outfile.Add(outfile_path);
-    out_nent = outfile.GetEntries()
+    out_nent, nbranches = count_entries(outfile_path, "Events")
   else:
     out_nent = 0
-  if outfile.GetNbranches() == 0:
+    nbranches = 0
+  if os.path.exists(outfile_path) and nbranches == 0:
     print('[For queue_system] fail: output ({}) has no branches.'.format(outfile_path))
   elif in_nent == out_nent:
     print('[For queue_system] success')
   else:
     print('[For queue_system] fail: Input ({}) has {} entries, while output ({}) has {} entries.'.format(infile_path, in_nent, outfile_path, out_nent))
-else: 
-  infile = TChain("tree");
-  infile.Add(infile_path);
-  in_nent = infile.GetEntries(get_cuts(tmp[2]))
+else:
+  in_nent, nbranches_in = count_entries(infile_path, "tree", get_cuts(tmp[2])) 
   if os.path.exists(outfile_path):
-    outfile = TChain("tree");
-    outfile.Add(outfile_path);
-    out_nent = outfile.GetEntries()
-    nbranches = outfile.GetNbranches()
+    out_nent, nbranches = count_entries(outfile_path, "tree")
   else:
     out_nent = 0
     nbranches = 0

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import os
-import ROOT
+import sys
 import argparse
 
 # Input:   root_files/SMS-TChiHH_HToBB_HToBB_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16NanoAODv5_PUSummer16v3Fast_94X_mcRun2_asymptotic_v3-v1_0.root
@@ -71,13 +71,14 @@ def get_cuts(skim_name):
   return cuts
 
 if __name__ == '__main__':
-
+  import ROOT #only needed when skimming
   parser = argparse.ArgumentParser()
   parser.add_argument('-m','--mass', default = -1)
   parser.add_argument('-l','--mass_lsp', default = 0)
   parser.add_argument('-k','--skim_name', default = "")
   parser.add_argument('-i','--input_paths', required=True, default = "")
   parser.add_argument('-o','--output_dir', required=True, default = "")
+  parser.add_argument('--from_skim', default = "", help="Creating skim llg from skim ll")
   args = vars(parser.parse_args())
   
   file_paths_string = args['input_paths']
@@ -101,7 +102,13 @@ if __name__ == '__main__':
   elif args['skim_name'] !="":
     cut_string = get_cuts(args['skim_name'])
     out_filename = os.path.basename(os.path.realpath(file_paths_string))
-    out_file_path = os.path.join(args['output_dir'], out_filename.replace('pico_','pico_'+args['skim_name']+'_'))
+    if args['from_skim'] !="":#Sets the output skims to have the correct name format
+      from_prefix = 'pico_'+args['from_skim']+'_'
+      if not out_filename.startswith(from_prefix):
+        sys.exit('Input file name '+out_filename+' does not start with '+from_prefix)
+      out_file_path = os.path.join(args['output_dir'], 'pico_'+args['skim_name']+'_'+out_filename[len(from_prefix):])
+    else:
+      out_file_path = os.path.join(args['output_dir'], out_filename.replace('pico_','pico_'+args['skim_name']+'_'))
     treename = 'tree'
   else:
     sys.exit("You have to specify either mass or cut string.")
@@ -112,6 +119,7 @@ if __name__ == '__main__':
   nent_total = chain.GetEntries()
   nent_skim = chain.GetEntries(cut_string)
   print('Found {} events satisfying the skim requirements.'.format(nent_skim))
+  print('SKIM_PASS_EVENTS: {}'.format(nent_skim)) # used when deriving skim_llg from skim_ll
 
   out_file = ROOT.TFile(out_file_path, "recreate") # in case we want compression 
   if (args['mass']!=-1): 

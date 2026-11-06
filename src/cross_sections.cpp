@@ -48,7 +48,7 @@ namespace xsec{
         if(file.Contains("TTJets_Mtt-1000toInf")) xsec = 815.96*mtt_1000_eff;
 
         if(file.Contains("TTToSemiLeptonic")) xsec = 357.4;
-        if(file.Contains("TTJets_DiLept") || file.Contains("TTTo2L2Nu")) xsec = 831.8*0.105; //source: PDG XS*BR http://pdg.lbl.gov/2019/reviews/rpp2018-rev-top-quark.pdf ; 85.66 in Humboldtv3+earlier
+        if(file.Contains("TTJets_DiLept") || file.Contains("TTTo2L2Nu")) xsec = 833.9*WToLNu*WToLNu; //Updated 2026-11-05, XS from https://twiki.cern.ch/twiki/bin/view/LHCPhysics/TtbarNNLO
         if(file.Contains("TTJets_SingleLept")) xsec = 831.8*0.219; //source: PDG XS*BR http://pdg.lbl.gov/2019/reviews/rpp2018-rev-top-quark.pdf ; 178.7 in Humboldtv3+earlier
 
         if(file.Contains("TTJets_DiLept_genMET-150")) xsec = 3.638*1.627; //XSDB*XSDB/GenXSecAnalyzer K-Factor; 0.0676543*85.66 in Humboldtv3+earlier
@@ -167,7 +167,7 @@ namespace xsec{
         if(file.Contains("TTJets_Tune") || file.Contains("TT_"))  xsec = 815.96;
         if(file.Contains("TTJets_Tune") && file.Contains("amcatnloFXFX"))  xsec = 833.9;
 
-        if(file.Contains("TTJets_DiLept") || file.Contains("TTTo2L2Nu")) xsec = 831.8*0.105; //source: PDG XS*BR http://pdg.lbl.gov/2019/reviews/rpp2018-rev-top-quark.pdf ; 85.66 in Humboldtv3+earlier
+        if(file.Contains("TTJets_DiLept") || file.Contains("TTTo2L2Nu"))  xsec = 833.9*WToLNu*WToLNu; //Updated 2026-11-05, XS from https://twiki.cern.ch/twiki/bin/view/LHCPhysics/TtbarNNLO
         if(file.Contains("TTJets_SingleLept")) xsec = 831.8*0.219; //source: PDG XS*BR http://pdg.lbl.gov/2019/reviews/rpp2018-rev-top-quark.pdf ; 178.7 in Humboldtv3+earlier
 
         if(file.Contains("TTJets_DiLept_genMET-150")) xsec = 3.655*1.679; //XSDB*XSDB/GenXSecAnalyzer K-Factor; 0.0676543*85.66 in Humboldtv3+earlier
@@ -403,7 +403,7 @@ namespace xsec{
         if(file.Contains("DYGto2LG-1Jets_MLL-50_PTG-200_TuneCP5_13p6TeV"))      xsec = 0.04723;
     
         //tt
-        if(file.Contains("TTto2L2Nu_TuneCP5_13p6TeV"))    xsec = 762.1*WToLNu*WToLNu;
+        if(file.Contains("TTto2L2Nu_TuneCP5_13p6TeV"))    xsec = 923.6*WToLNu*WToLNu;//Updated 2026-11-05, XS from https://twiki.cern.ch/twiki/bin/view/LHCPhysics/TtbarNNLO
         if(file.Contains("TTtoLNu2Q_TuneCP5CR1_13p6TeV")) xsec = 762.1*2.0*WToLNu*WToQQ;
 
         if(file.Contains("TTLL_MLL-50_TuneCP5_13p6TeV_amcatnlo"))              xsec = 0.08646; //XSDB

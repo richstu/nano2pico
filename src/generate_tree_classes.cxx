@@ -367,6 +367,10 @@ void WriteNanoSource(const vector<Variable> &vars){
 
   file << "  intree_ = new TChain(\"Events\");\n";
   file << "  intree_->Add(infile);\n\n";
+  file << "  intree_->SetCacheSize(50*1024*1024);\n";
+  file << "  intree_->AddBranchToCache(\"*\", true);\n";
+  file << "  intree_->StopCacheLearningPhase();\n";
+
 
   for(vector<Variable>::const_iterator var = vars.begin(); var != vars.end(); ++var){
     if(Contains(var->type_, "vector")){

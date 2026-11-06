@@ -20,38 +20,38 @@ MuonProducer::MuonProducer(string year_, bool isData_, float nanoaod_version_, s
   run3(false){
   if (year=="2022") {
     cs_scare_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2022/muon_scalesmearing.json");
+        "data/zgamma/2022/muon_scalesmearing_VXBS.json");
     run3 = true;
   }
   else if (year=="2022EE") {
     cs_scare_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2022EE/muon_scalesmearing.json");
+        "data/zgamma/2022EE/muon_scalesmearing_VXBS.json");
     run3 = true;
   }
   else if (year=="2023") {
     cs_scare_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2023/muon_scalesmearing.json");
+        "data/zgamma/2023/muon_scalesmearing_VXBS.json");
     run3 = true;
   }
   else if (year=="2023BPix") {
     cs_scare_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2023BPix/muon_scalesmearing.json");
+        "data/zgamma/2023BPix/muon_scalesmearing_VXBS.json");
     run3 = true;
   }
   else if (year=="2024") {
     cs_scare_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2024/muon_scalesmearing.json");
+        "data/zgamma/2024/muon_scalesmearing_VXBS.json");
     run3 = true;
   }
   else if (year=="2025") {
     cs_scare_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2025/muon_scalesmearing.json");
+        "data/zgamma/2025/muon_scalesmearing_VXBS.json");
     run3 = true;
   }
   else if (year=="2026") {
     cout<<"WARNING: Muon SaS not implemented yet for 2026. Defaulting to 2025"<<std::endl;
     cs_scare_ = correction::CorrectionSet::from_file(
-        "data/zgamma/2025/muon_scalesmearing.json");
+        "data/zgamma/2025/muon_scalesmearing_VXBS.json");
     run3 = true;
   }
   else if(year=="2016" || year=="2016APV" || year=="2017" || year=="2018"){

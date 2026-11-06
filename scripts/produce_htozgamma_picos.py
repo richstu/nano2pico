@@ -21,6 +21,7 @@ def output_reader(process, log_file):
     output = line.decode('utf-8')
     print(output, end='')
     log_file.write(output)
+    log_file.flush()
 def runAndLogCommand(command, log_file):
   print("\nRunning command: "+command)
   log_file.write("\nRunning command: "+command+'\n')
@@ -120,8 +121,22 @@ def processSteps(process_commands, YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG
       print('Will run below command')
       print('  '+command)
       if NO_RUN: continue
-      #error += os.system(command)
-      error += runAndLogCommand(command, log_file)
+      return_code = runAndLogCommand(command, log_file)
+      if return_code != 0:
+        #telegram failure won't kill production
+        if command.startswith(notify_script):
+          print('[Warning] Telegram message failed, continuing: '+command)
+          continue
+        error = return_code
+        break
+      #Don't record in step file if fail.
+      if error != 0:
+        print("There was an error")
+        runAndLogCommand(notify_script+' "There was an error on step '+str(iStep)+' for '+tag+'"',log_file)
+        print('[Error] Step '+str(iStep)+' was NOT recorded in '+STEP_FILEBASENAME+'. Re-running this script will redo it.')
+        print('        To skip it instead (e.g. after fixing failed jobs by hand), append this line to the step file:')
+        print(commandList[iStep])
+        sys.exit(1)
     didCommandRun[iStep] = True
     # Log
     if NO_RUN: continue
@@ -149,18 +164,11 @@ def processSteps(process_commands, YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG
       for iLine in range(len(diskCommandList)):
         step_file.write(diskCommandList[iLine]+'\n')
 
-    # Check if there was an error
-    if error != 0:
-      print('There was an error')
-      #os.system(notify_script+' "There was an error on step '+str(iStep)+' for '+tag+'"')
-      runAndLogCommand(notify_script+' "There was an error on step '+str(iStep)+' for '+tag+'"',log_file)
-      sys.exit(1)
-
   if not NO_RUN: log_file.close()
 
   return FIRST_COMMAND
 
-def processMc(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, NANOAOD_VERSION, FIRST_COMMAND, MC_YEAR, notify_script, dataset_list=''):
+def processMc(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, NANOAOD_VERSION, FIRST_COMMAND, MCYEAR, JOBS, notify_script, dataset_list=''):
   print("[Info] pico dir: "+PICO_DIR)
   print("[Info] step file: "+STEP_FILEBASENAME)
   print("[Info] log file: "+LOG_FILENAME)
@@ -171,31 +179,32 @@ def processMc(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, 
   # Add mc commands
   if args.direct_to_skim:
     process_commands = [
+
     #0
-    [notify_script+' "Start process nano direct-to-skim_llg '+mc_tag+'"',
-    './scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/mc --production '+PRODUCTION_NAME+' --dataset_list '+dataset_list+' --tag '+mc_tag+' --mcyear '+ MCYEAR+' -s llg',
-    'auto_submit_jobs.py process_nano_cmds_skim_llg_'+mc_tag+'.json -c scripts/check_direct_to_skim.py -f',
-    notify_script+' "Finished process nano direct-to-skim_llg '+mc_tag+'"'],
-
-    #1                                                                                                                                              
-    [notify_script+' "Start merge llg '+mc_tag+'"',
-    './scripts/write_slim_and_merge_cmds.py -f --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/skim_llg/ --slim_name zgmc --tag '+mc_tag,
-    'auto_submit_jobs.py '+mc_tag+'_slim_zgmc_llg_cmds.json -f',
-    './scripts/confirm_slim.py '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/skim_llg '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/merged_zgmc_llg',
-    notify_script+' "Finished merge llg '+mc_tag+'"'],
-
-    #2
     [notify_script+' "Start process nano direct-to-skim_ll '+mc_tag+'"',
     './scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/mc --production '+PRODUCTION_NAME+' --dataset_list '+dataset_list+' --tag '+mc_tag+' --mcyear '+ MCYEAR+' -s ll',
-    'auto_submit_jobs.py process_nano_cmds_skim_ll_'+mc_tag+'.json -c scripts/check_direct_to_skim.py -f',
-    notify_script+' "Finished process nano direct-to-skim_ll'+mc_tag+'"'],
+    'auto_submit_jobs.py -r '+JOBS+' process_nano_cmds_skim_ll_'+mc_tag+'.json -c scripts/check_direct_to_skim.py -f',
+    notify_script+' "Finished process nano direct-to-skim ll'+mc_tag+'"'],
 
-    #3
+    #1
     [notify_script+' "Start merge ll '+mc_tag+'"',
     './scripts/write_slim_and_merge_cmds.py -f --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/skim_ll/ --slim_name zgmc --tag '+mc_tag,
-    'auto_submit_jobs.py '+mc_tag+'_slim_zgmc_ll_cmds.json -f',
+    'auto_submit_jobs.py -r '+JOBS+' '+mc_tag+'_slim_zgmc_ll_cmds.json -f',
     './scripts/confirm_slim.py '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/skim_ll '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/merged_zgmc_ll',
-    notify_script+' "Finished merge ll '+mc_tag+'"']
+    notify_script+' "Finished merge ll '+mc_tag+'"'],
+
+    #2
+    [notify_script+' "Start skim llg from ll'+mc_tag+'"',
+    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/skim_ll/ --skim_name llg --from_skim ll --tag '+mc_tag,
+    'auto_submit_jobs.py -r '+JOBS+' skim_llg_cmds_'+mc_tag+'.json -c scripts/check_derived_skim.py -f',
+    notify_script+' "Finished skim llg from ll'+mc_tag+'"'],
+
+    #3                                                                                                                                              
+    [notify_script+' "Start merge llg '+mc_tag+'"',
+    './scripts/write_slim_and_merge_cmds.py -f --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/skim_llg/ --slim_name zgmc --tag '+mc_tag,
+    'auto_submit_jobs.py -r '+JOBS+' '+mc_tag+'_slim_zgmc_llg_cmds.json -f',
+    './scripts/confirm_slim.py '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/skim_llg '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/merged_zgmc_llg',
+    notify_script+' "Finished merge llg '+mc_tag+'"']
     ]
     
   else:
@@ -203,39 +212,39 @@ def processMc(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, 
     #0
     [notify_script+' "Start process nano '+mc_tag+'"',
     './scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/mc --production '+PRODUCTION_NAME+' --dataset_list '+dataset_list+' --tag '+mc_tag+' --mcyear '+ MCYEAR,
-    'auto_submit_jobs.py process_nano_cmds_'+mc_tag+'.json -c scripts/check_process_nano_job.py -f',
+    'auto_submit_jobs.py -r '+JOBS+' process_nano_cmds_'+mc_tag+'.json -c scripts/check_process_nano_job.py -f',
     notify_script+' "Finished process nano '+mc_tag+'"'], 
     
     #1
     [notify_script+' "Start skim llg '+mc_tag+'"',
     './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/raw_pico/ --skim_name llg --tag '+mc_tag,
-    'auto_submit_jobs.py skim_llg_cmds_'+mc_tag+'.json -c scripts/check_skim.py -f',
+    'auto_submit_jobs.py -r '+JOBS+' skim_llg_cmds_'+mc_tag+'.json -c scripts/check_skim.py -f',
     notify_script+' "Finished skim llg '+mc_tag+'"'],
     
     #2
     [notify_script+' "Start merge llg '+mc_tag+'"',
     './scripts/write_slim_and_merge_cmds.py -f --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/skim_llg/ --slim_name zgmc --tag '+mc_tag,
-    'auto_submit_jobs.py '+mc_tag+'_slim_zgmc_llg_cmds.json -f',
+    'auto_submit_jobs.py -r '+JOBS+' '+mc_tag+'_slim_zgmc_llg_cmds.json -f',
     './scripts/confirm_slim.py '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/skim_llg '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/merged_zgmc_llg',
     notify_script+' "Finished merge llg '+mc_tag+'"'],
 
     #3
     [notify_script+' "Start skim ll '+mc_tag+'"',
     './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/raw_pico/ --skim_name ll --tag '+mc_tag,
-    'auto_submit_jobs.py skim_ll_cmds_'+mc_tag+'.json -c scripts/check_skim.py -f',
+    'auto_submit_jobs.py -r '+JOBS+' skim_ll_cmds_'+mc_tag+'.json -c scripts/check_skim.py -f',
     notify_script+' "Finished skim ll '+mc_tag+'"'],
     
     #4
     [notify_script+' "Start merge ll '+mc_tag+'"',
     './scripts/write_slim_and_merge_cmds.py -f --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/skim_ll/ --slim_name zgmc --tag '+mc_tag,
-    'auto_submit_jobs.py '+mc_tag+'_slim_zgmc_ll_cmds.json -f',
+    'auto_submit_jobs.py -r '+JOBS+' '+mc_tag+'_slim_zgmc_ll_cmds.json -f',
     './scripts/confirm_slim.py '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/skim_ll '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/mc/merged_zgmc_ll',
     notify_script+' "Finished merge ll '+mc_tag+'"'],
 
   ]
   return processSteps(process_commands, YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, NANOAOD_VERSION, FIRST_COMMAND, NO_RUN, mc_tag)
 
-def processData(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, NANOAOD_VERSION, FIRST_COMMAND, notify_script, dataset_list=''):
+def processData(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR, NANOAOD_VERSION, FIRST_COMMAND, JOBS, notify_script, dataset_list=''):
   YEAR = str(YEAR)
   # Add signal commands
   data_tag=PRODUCTION_NAME+'_'+YEAR+'_data'
@@ -246,62 +255,68 @@ def processData(YEAR, PRODUCTION_NAME, STEP_FILEBASENAME, LOG_FILENAME, PICO_DIR
     dataset_list = ('txt/datasets/'+NANOAOD_VERSION+'_htozgamma_'+YEAR+'_data_dataset_paths')
   if args.direct_to_skim:
     process_commands = [
-    #0                                                                                                                                                                                                                                          
-    [notify_script+' "Start process nano direct-to-skim_llg '+data_tag+'"',
-    './scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/data/ --production '+PRODUCTION_NAME+' --dataset_list '+dataset_list+' --data --tag '+data_tag+' -s llg',
-    'auto_submit_jobs.py process_nano_cmds_skim_llg_'+data_tag+'.json -c scripts/check_direct_to_skim.py -f',
-    notify_script+' "Finished process nano direct-to-skim_llg '+data_tag+'"'],
-    #1                                                                                                                                                                                                                                          
-    [notify_script+' "Start merge llg '+data_tag+'"',
-    './scripts/write_slim_and_merge_cmds.py -f --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/skim_llg/ --slim_name zgdata --tag '+data_tag,
-    'auto_submit_jobs.py '+data_tag+'_slim_zgdata_llg_cmds.json -f',
-    './scripts/confirm_slim.py '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/skim_llg '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/merged_zgdata_llg',
-    notify_script+' "Finished merge llg '+data_tag+'"'],
-    #2                                                                                                                                                                                                                                          
+
+    #0
     [notify_script+' "Start process nano direct-to-skim_ll '+data_tag+'"',
     './scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/data/ --production '+PRODUCTION_NAME+' --dataset_list '+dataset_list+' --data --tag '+data_tag+' -s ll',
-    'auto_submit_jobs.py process_nano_cmds_skim_ll_'+data_tag+'.json -c scripts/check_direct_to_skim.py -f',
+    'auto_submit_jobs.py -r '+JOBS+' process_nano_cmds_skim_ll_'+data_tag+'.json -c scripts/check_direct_to_skim.py -f',
     notify_script+' "Finished process nano direct-to-skim_ll'+data_tag+'"'],
-    #3                                                                                                                                                                                                                                          
+
+    #1
     [notify_script+' "Start merge ll '+data_tag+'"',
     './scripts/write_slim_and_merge_cmds.py -f --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/skim_ll/ --slim_name zgdata --tag '+data_tag,
-    'auto_submit_jobs.py '+data_tag+'_slim_zgdata_ll_cmds.json -f',
+    'auto_submit_jobs.py -r '+JOBS+' '+data_tag+'_slim_zgdata_ll_cmds.json -f',
     './scripts/confirm_slim.py '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/skim_ll '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/merged_zgdata_ll',
-    notify_script+' "Finished merge ll '+data_tag+'"']
+    notify_script+' "Finished merge ll '+data_tag+'"'],
+
+    #2
+    [notify_script+' "Started skim llg from ll'+data_tag+'"',
+    './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/skim_ll/ --skim_name llg --from_skim ll --tag '+data_tag,
+    'auto_submit_jobs.py -r '+JOBS+' skim_llg_cmds_'+data_tag+'.json -c scripts/check_derived_skim.py -f',
+    notify_script+' "Finished skim llg from ll'+data_tag+'"'],
+
+
+    #3
+    [notify_script+' "Start merge llg '+data_tag+'"',
+    './scripts/write_slim_and_merge_cmds.py -f --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/skim_llg/ --slim_name zgdata --tag '+data_tag,
+    'auto_submit_jobs.py -r '+JOBS+' '+data_tag+'_slim_zgdata_llg_cmds.json -f',
+    './scripts/confirm_slim.py '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/skim_llg '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/merged_zgdata_llg',
+    notify_script+' "Finished merge llg '+data_tag+'"'],
     ]
+
   else:
     process_commands = [
     # signal
     #0
     [notify_script+' "Started process nano '+data_tag+'"',
     './scripts/write_process_nano_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/nano/'+YEAR+'/data/ --production '+PRODUCTION_NAME+' --dataset_list '+dataset_list+' --data --tag '+data_tag,
-    'auto_submit_jobs.py process_nano_cmds_'+data_tag+'.json -c scripts/check_data_process_nano_job.py -f',
+    'auto_submit_jobs.py -r '+JOBS+' process_nano_cmds_'+data_tag+'.json -c scripts/check_data_process_nano_job.py -f',
     notify_script+' "Finished process nano '+data_tag+'"',
     'ln -s '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/raw_pico '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/unskimmed'],
     
     #1
     [notify_script+' "Started skim llg '+data_tag+'"',
     './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/raw_pico/ --skim_name llg --tag '+data_tag,
-    'auto_submit_jobs.py skim_llg_cmds_'+data_tag+'.json -c scripts/check_skim.py -f',
+    'auto_submit_jobs.py -r '+JOBS+' skim_llg_cmds_'+data_tag+'.json -c scripts/check_skim.py -f',
     notify_script+' "Finished skim llg '+data_tag+'"'],
     
     #2
     [notify_script+' "Started merge llg '+data_tag+'"',
     './scripts/write_slim_and_merge_cmds.py -f --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/skim_llg/ --slim_name zgdata --tag '+data_tag,
-    'auto_submit_jobs.py '+data_tag+'_slim_zgdata_llg_cmds.json -c scripts/check_slim_and_merge.py -f',
+    'auto_submit_jobs.py -r '+JOBS+' '+data_tag+'_slim_zgdata_llg_cmds.json -c scripts/check_slim_and_merge.py -f',
     './scripts/confirm_slim.py '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/skim_llg '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/merged_zgdata_llg',
     notify_script+' "Finished merge llg '+data_tag+'"'],
 
     #3
     [notify_script+' "Started skim ll '+data_tag+'"',
     './scripts/write_skim_cmds.py --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/raw_pico/ --skim_name ll --tag '+data_tag,
-    'auto_submit_jobs.py skim_ll_cmds_'+data_tag+'.json -c scripts/check_skim.py -f',
+    'auto_submit_jobs.py -r '+JOBS+' skim_ll_cmds_'+data_tag+'.json -c scripts/check_skim.py -f',
     notify_script+' "Finished skim ll '+data_tag+'"'],
     
     #4
     [notify_script+' "Started merge ll '+data_tag+'"',
     './scripts/write_slim_and_merge_cmds.py -f --in_dir '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/skim_ll/ --slim_name zgdata --tag '+data_tag,
-    'auto_submit_jobs.py '+data_tag+'_slim_zgdata_ll_cmds.json -c scripts/check_slim_and_merge.py -f',
+    'auto_submit_jobs.py -r '+JOBS+' '+data_tag+'_slim_zgdata_ll_cmds.json -c scripts/check_slim_and_merge.py -f',
     './scripts/confirm_slim.py '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/skim_ll '+PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/'+YEAR+'/data/merged_zgdata_ll',
     notify_script+' "Finished merge ll '+data_tag+'"'],
 
@@ -351,6 +366,7 @@ Pico files: BASE_FOLDERNAME/NANOAOD_VERSION/TAG_NAME/(2016,2017,2018)/(data,mc,s
   parser.add_argument('-f', '--fake_run', action="store_true", help='Do not run commands. Only print commands to run.')
   parser.add_argument('-u', '--untagged', action="store_true", help='Do not use git tag')
   parser.add_argument('-s','--direct_to_skim', action="store_true", help='Direct to skim')
+  parser.add_argument('-r','--num_jobs', default=20, help='Number of simultaneous jobs to run')
   parser.add_argument('--use_telegram', action="store_true", help='Uses telegram script to notify about steps. Requires telegram setup.')
   parser.add_argument('--email', help='Uses email to notify about steps. Type in your email.')
   
@@ -399,6 +415,7 @@ Pico files: BASE_FOLDERNAME/NANOAOD_VERSION/TAG_NAME/(2016,2017,2018)/(data,mc,s
     #if args.tag_name not in output:
     #  print("[Error] tag_name: "+args.tag_name+" does not exist on github. Exiting.")
     #  sys.exit()
+
     
     # Checkout tag
     output, error = runCommand('git checkout '+args.tag_name)
@@ -430,7 +447,7 @@ Pico files: BASE_FOLDERNAME/NANOAOD_VERSION/TAG_NAME/(2016,2017,2018)/(data,mc,s
   FIRST_COMMAND = True
 
   # Set notification script
-  if args.use_telegram: notify_script = 'sendTelegramMessage.py'
+  if args.use_telegram: notify_script = 'scripts/sendTelegramMessage3.py'
   else: 
     if args.email:
       notify_script = os.path.dirname(os.path.realpath(__file__))+'/sendEmail.sh '+args.email
@@ -447,11 +464,11 @@ Pico files: BASE_FOLDERNAME/NANOAOD_VERSION/TAG_NAME/(2016,2017,2018)/(data,mc,s
   # Step is the step that is running. Will run the next step.
   if 'mc' in datas:
     for year in years:
-      FIRST_COMMAND = processMc(YEAR=year, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.'+year+'.mc.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.'+year+'.mc.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, MCYEAR=args.mcyear, notify_script=notify_script,dataset_list=args.dataset_list)
+      FIRST_COMMAND = processMc(YEAR=year, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.'+year+'.mc.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.'+year+'.mc.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, MCYEAR=args.mcyear, JOBS=args.num_jobs, notify_script=notify_script,dataset_list=args.dataset_list)
 
   if 'data' in datas:
     for year in years:
-      FIRST_COMMAND = processData(YEAR=year, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.'+year+'.data.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.'+year+'.data.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, notify_script=notify_script,dataset_list=args.dataset_list)
+      FIRST_COMMAND = processData(YEAR=year, PRODUCTION_NAME=PRODUCTION_NAME, STEP_FILEBASENAME=PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.'+year+'.data.step', LOG_FILENAME= PICO_DIR+'/'+NANOAOD_VERSION+'/'+PRODUCTION_NAME+'/produce_zgamma_picos.py.'+PRODUCTION_NAME+'.'+year+'.data.log', PICO_DIR=PICO_DIR, NANOAOD_VERSION=NANOAOD_VERSION, FIRST_COMMAND=FIRST_COMMAND, JOBS=args.num_jobs, notify_script=notify_script,dataset_list=args.dataset_list)
 
   # Change permission of directories
   os.system("find "+PICO_DIR+"/"+NANOAOD_VERSION+'/'+PRODUCTION_NAME+" -type d -exec chmod 775 {} \;")
