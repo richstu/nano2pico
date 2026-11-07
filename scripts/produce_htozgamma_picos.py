@@ -370,7 +370,7 @@ Pico files: BASE_FOLDERNAME/NANOAOD_VERSION/TAG_NAME/(2016,2017,2018)/(data,mc,s
   parser.add_argument('-f', '--fake_run', action="store_true", help='Do not run commands. Only print commands to run.')
   parser.add_argument('-u', '--untagged', action="store_true", help='Do not use git tag')
   parser.add_argument('-s','--direct_to_skim', action="store_true", help='Direct to skim')
-  parser.add_argument('-r','--num_jobs', default=20, help='Number of simultaneous jobs to run')
+  parser.add_argument('-r','--num_jobs', default="20", help='Number of simultaneous jobs to run')
   parser.add_argument('--use_telegram', action="store_true", help='Uses telegram script to notify about steps. Requires telegram setup.')
   parser.add_argument('--email', help='Uses email to notify about steps. Type in your email.')
   
