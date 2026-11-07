@@ -13,6 +13,8 @@ parser.add_argument("-d","--dataset_list", default="",
                     help="File with the list of dataset names as they appear in DAS or the list of filenames (with wildcards). If not specified will run on all files in input folder")
 parser.add_argument('-t', '--tag', default='',
                     help='Optionally specify a tag to be used to differentiate helper files for batch submission.')
+parser.add_argument('--nano_year', default='',
+                    help='Read the NanoAOD from the nano/<nano_year>/ folder instead of the year in --in_dir. Outputs still go to the folder of the year in --in_dir.')
 parser.add_argument('-m','--mcyear', default="2024", help="Optional year for 2024 MC to be converted to. Only affects 2024 input mc")
 parser.add_argument("-l","--list_format", default="DAS", choices=["DAS","filename"],
                     help="Sets whether the dataset list is in DAS format or filename format.")
@@ -24,6 +26,12 @@ args = vars(parser.parse_args())
 
 in_dir = args['in_dir']
 out_base_dir = args['in_dir'].replace('/mnt/hadoop/','/net/cms29/cms29r0/').replace('/nano/','/'+args['production']+'/')
+
+if args['nano_year']!='':
+  in_dir, n_year_replaced = re.subn(r'(/nano/)\d{4}(/|$)', r'\g<1>'+args['nano_year']+r'\2', in_dir, count=1)
+  if n_year_replaced==0:
+    print('[Error] --nano_year given, but --in_dir has no /nano/<year>/ folder: '+in_dir)
+    sys.exit(1)
 
 if not os.path.exists(out_base_dir): 
   os.makedirs(out_base_dir)
