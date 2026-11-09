@@ -440,11 +440,13 @@ namespace xsec{
 
         //triboson using method from https://arxiv.org/pdf/2006.11191.pdf, with values from https://twiki.cern.ch/twiki/bin/view/LHCPhysics/HiggsXSBR and xsdb combined
         if(file.Contains("WWW_4F"))                       xsec = 0.2328 + (xs_wph+xs_wmh)*HToWW; // xsdb value (LO)+ (pp->VH)*BR(H->VV)
+        if(file.Contains("WWW-4F"))                       xsec = 0.2328 + (xs_wph+xs_wmh)*HToWW;
         if(file.Contains("WWZ_4F"))                       xsec = 0.1851 + (xs_z_h)*HToZZ;
+        if(file.Contains("WWZ-4F"))                       xsec = 0.1851 + (xs_z_h)*HToZZ;
         if(file.Contains("WZZ_Tune"))                     xsec = 0.06206 + (xs_wph+xs_wmh)*HToZZ;
         if(file.Contains("WZZ-5F_Tune"))                  xsec = 0.06206 + (xs_wph+xs_wmh)*HToZZ;
         if(file.Contains("ZZZ_Tune"))                     xsec = 0.01591 + (xs_z_h)*HToZZ;
-        if(file.Contains("ZZZ-5f_Tune"))                  xsec = 0.01591 + (xs_z_h)*HToZZ;
+        if(file.Contains("ZZZ-5F_Tune"))                  xsec = 0.01591 + (xs_z_h)*HToZZ;
     }
 
     if(file.Contains("ttHTobb_M125")) xsec = 0.2934;
