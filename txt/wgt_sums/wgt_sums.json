@@ -6197,16 +6197,16 @@
       "LHEScaleSumw8": 121.77307834512595
     },
     "VBFH-HtoZGto2LG_Par-M-125_TuneCP5_13p6TeV_powheg-pythia8": {
-      "genEventSumw": 5851101.8136,
-      "LHEScaleSumw0": 40.74323301363747,
-      "LHEScaleSumw1": 40.859800730536705,
-      "LHEScaleSumw2": 41.21474076006165,
-      "LHEScaleSumw3": 40.96591560578245,
-      "LHEScaleSumw4": 41.0003919450512,
-      "LHEScaleSumw5": 41.23486759464389,
-      "LHEScaleSumw6": 41.145040090674584,
-      "LHEScaleSumw7": 41.11273783521327,
-      "LHEScaleSumw8": 41.25105800261254
+      "genEventSumw": 26746961.512800016,
+      "LHEScaleSumw0": 113.2891101336069,
+      "LHEScaleSumw1": 113.60719952700177,
+      "LHEScaleSumw2": 114.58754933954485,
+      "LHEScaleSumw3": 113.9112852096183,
+      "LHEScaleSumw4": 114.00108979843534,
+      "LHEScaleSumw5": 114.64686294151335,
+      "LHEScaleSumw6": 114.41175996008256,
+      "LHEScaleSumw7": 114.31586536982869,
+      "LHEScaleSumw8": 114.69457801857573
     },
     "WminusH-HtoZGto2LG_Par-M-125_TuneCP5_13p6TeV_powhegMINLO-pythia8": {
       "genEventSumw": 811911.657384,
@@ -6245,16 +6245,16 @@
       "LHEScaleSumw8": 3045.3422262646086
     },
     "DYto2Mu-2Jets_Bin-MLL-50_TuneCP5_13p6TeV_amcatnloFXFX-pythia8": {
-      "genEventSumw": 0.0,
-      "LHEScaleSumw0": 0.0,
-      "LHEScaleSumw1": 0.0,
-      "LHEScaleSumw2": 0.0,
-      "LHEScaleSumw3": 0.0,
-      "LHEScaleSumw4": 0.0,
-      "LHEScaleSumw5": 0.0,
-      "LHEScaleSumw6": 0.0,
-      "LHEScaleSumw7": 0.0,
-      "LHEScaleSumw8": 0.0
+      "genEventSumw": 8752983373231.524,
+      "LHEScaleSumw0": 2922.6605170234284,
+      "LHEScaleSumw1": 3015.47690515873,
+      "LHEScaleSumw2": 3061.4351428602454,
+      "LHEScaleSumw3": 2854.69451282227,
+      "LHEScaleSumw4": 2975.0,
+      "LHEScaleSumw5": 3049.244481547836,
+      "LHEScaleSumw6": 2792.8680315650904,
+      "LHEScaleSumw7": 2934.005974683374,
+      "LHEScaleSumw8": 3030.1542578258795
     },
     "ZH-HtoZGto2LG_Par-M-125_TuneCP5_13p6TeV_powhegMINLO-pythia8": {
       "genEventSumw": 5949403.230948002,
