@@ -6221,16 +6221,16 @@
       "LHEScaleSumw8": 28.10826791060123
     },
     "WplusH-HtoZGto2LG_Par-M-125_TuneCP5_13p6TeV_powheg-pythia8": {
-      "genEventSumw": 1290904.2723080004,
-      "LHEScaleSumw0": 39.27479262004451,
-      "LHEScaleSumw1": 39.03036920110982,
-      "LHEScaleSumw2": 38.54642509454257,
-      "LHEScaleSumw3": 36.74012869949916,
-      "LHEScaleSumw4": 38.00003888745048,
-      "LHEScaleSumw5": 38.90977039485934,
-      "LHEScaleSumw6": 35.01205394004457,
-      "LHEScaleSumw7": 36.698524046383135,
-      "LHEScaleSumw8": 38.00698380201659
+      "genEventSumw": 5815081.807773001,
+      "LHEScaleSumw0": 108.71927864242939,
+      "LHEScaleSumw1": 107.95431814088751,
+      "LHEScaleSumw2": 106.63499006718934,
+      "LHEScaleSumw3": 101.55570380137482,
+      "LHEScaleSumw4": 105.00010745216579,
+      "LHEScaleSumw5": 107.51803804528097,
+      "LHEScaleSumw6": 96.77420448908404,
+      "LHEScaleSumw7": 101.41021671642801,
+      "LHEScaleSumw8": 105.03088750626073
     },
     "DYto2E-2Jets_Bin-MLL-50_TuneCP5_13p6TeV_amcatnloFXFX-pythia8": {
       "genEventSumw": 8687530720822.493,
@@ -6413,16 +6413,16 @@
       "LHEScaleSumw8": 29.98512443683851
     },
     "TTG-1Jets_TuneCP5_13p6TeV_amcatnloFXFXold-pythia8": {
-      "genEventSumw": 329571879.9722439,
-      "LHEScaleSumw0": 306.1522388869591,
-      "LHEScaleSumw1": 307.5078096417445,
-      "LHEScaleSumw2": 309.40928015220857,
-      "LHEScaleSumw3": 290.68059103633664,
-      "LHEScaleSumw4": 286.0,
-      "LHEScaleSumw5": 282.3906079905029,
-      "LHEScaleSumw6": 265.2409183753698,
-      "LHEScaleSumw7": 257.92714817314067,
-      "LHEScaleSumw8": 251.86348081188697
+      "genEventSumw": 164785939.98612204,
+      "LHEScaleSumw0": 153.0761194434797,
+      "LHEScaleSumw1": 153.7539048208723,
+      "LHEScaleSumw2": 154.70464007610437,
+      "LHEScaleSumw3": 145.34029551816826,
+      "LHEScaleSumw4": 143.0,
+      "LHEScaleSumw5": 141.19530399525138,
+      "LHEScaleSumw6": 132.62045918768493,
+      "LHEScaleSumw7": 128.9635740865703,
+      "LHEScaleSumw8": 125.93174040594356
     },
     "WminusH-HtoZGto2LG_Par-M-125_TuneCP5_13p6TeV_powheg-pythia8": {
       "genEventSumw": 2898203.074175998,
@@ -6605,16 +6605,16 @@
       "LHEScaleSumw8": 47.044413969446786
     },
     "TTto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8": {
-      "genEventSumw": 75640224339.7413,
-      "LHEScaleSumw0": 1756.6043201166365,
-      "LHEScaleSumw1": 1726.8831547212558,
-      "LHEScaleSumw2": 1708.0246087951411,
-      "LHEScaleSumw3": 1596.926712146657,
-      "LHEScaleSumw4": 1560.001923458623,
-      "LHEScaleSumw5": 1531.772995450645,
-      "LHEScaleSumw6": 1444.5677991866646,
-      "LHEScaleSumw7": 1404.843105767193,
-      "LHEScaleSumw8": 1372.2539828086728
+      "genEventSumw": 37820112169.87075,
+      "LHEScaleSumw0": 878.3021600583181,
+      "LHEScaleSumw1": 863.4415773606277,
+      "LHEScaleSumw2": 854.0123043975706,
+      "LHEScaleSumw3": 798.4633560733281,
+      "LHEScaleSumw4": 780.0009617293258,
+      "LHEScaleSumw5": 765.8864977253228,
+      "LHEScaleSumw6": 722.2838995933307,
+      "LHEScaleSumw7": 702.421552883597,
+      "LHEScaleSumw8": 686.126991404336
     }
   },
   "/net/cms18/cms18r1/pico/NanoAODv15/nano/2025/mc/": {
