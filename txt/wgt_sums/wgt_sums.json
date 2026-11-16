@@ -6615,6 +6615,18 @@
       "LHEScaleSumw6": 722.2838995933307,
       "LHEScaleSumw7": 702.421552883597,
       "LHEScaleSumw8": 686.126991404336
+    },
+    "VBFto2L_Bin-MLL-50_TuneCP5_13p6TeV_madgraph-pythia8": {
+      "genEventSumw": 300362415.5598001,
+      "LHEScaleSumw0": 184.13502154980338,
+      "LHEScaleSumw1": 207.0,
+      "LHEScaleSumw2": 215.80449660191428,
+      "LHEScaleSumw3": 184.13502154980338,
+      "LHEScaleSumw4": 207.0,
+      "LHEScaleSumw5": 215.80449660191428,
+      "LHEScaleSumw6": 184.13502154980338,
+      "LHEScaleSumw7": 207.0,
+      "LHEScaleSumw8": 215.80449660191428
     }
   },
   "/net/cms18/cms18r1/pico/NanoAODv15/nano/2025/mc/": {
