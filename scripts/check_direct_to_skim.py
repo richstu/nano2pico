@@ -6,7 +6,7 @@ import sys
 import os
 import re
 import zlib
-from ROOT import TChain
+from pico_count import count_entries
 
 
 # Decompress string for passed things through posix
@@ -14,7 +14,6 @@ from ROOT import TChain
 # reimplementation for now
 def decompress_string(compressed_string):
   return zlib.decompress(bytes.fromhex(compressed_string)).decode('utf-8')
-
 
 job_log_string = decompress_string(sys.argv[1])
 job_argument_string = decompress_string(sys.argv[2])
@@ -34,6 +33,11 @@ out_dir = tmp[6]
 
 infile_path = os.path.join(in_dir, infile_name)
 outfile_path = os.path.join(out_dir,'skim_'+skim_type,'pico_'+skim_type+'_'+infile_name)
+# process_nano can give the output a different name than the input (2024 MC written as 2025 or
+# 2026 MC), and prints where it writes. Use that path when the log has it.
+written_match = re.search(r'Writing output to:\s*(\S+)', job_log_string)
+if written_match is not None:
+  outfile_path = written_match.group(1)
 print("infile: ", infile_path)
 print("outfile: ", outfile_path)
 
@@ -53,10 +57,7 @@ in_nent = int(match.group(1))
 
 # Check output file
 if os.path.exists(outfile_path):
-  outfile = TChain("tree")
-  outfile.Add(outfile_path)
-  out_nent = outfile.GetEntries()
-  nbranches = outfile.GetNbranches()
+  out_nent, nbranches = count_entries(outfile_path, "tree")
 else:
     out_nent = 0
     nbranches = 0

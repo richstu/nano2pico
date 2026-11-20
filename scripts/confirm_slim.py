@@ -16,7 +16,10 @@ slimmed_events = slimmed.GetEntries()
 print(unslimmed_dir+' has '+str(unslimmed_events)+' events')
 print(slimmed_dir+' has '+str(slimmed_events)+' events')
 
-if unslimmed_events != slimmed_events:
+if unslimmed_events == 0:
+  print('[Error] no events found in '+unslimmed_dir+' (wrong path or empty directory?)')
+  sys.exit(1)
+elif unslimmed_events != slimmed_events:
   print('[Error] unslimmed and slimmed do not have same number of events')
   sys.exit(1)
 else:

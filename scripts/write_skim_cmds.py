@@ -12,6 +12,7 @@ if __name__ == '__main__':
                       help='Directory where the raw pico files are')
   parser.add_argument('-k','--skim_name', required=True, default='',
                       help='Plain text name for the skim. Output folder name will be named according to this.')
+  parser.add_argument('--from_skim', default='', help='Derive skim llg from skim ll')
   parser.add_argument("--overwrite", action='store_true',
                     help="Process all input files regardless whether output exists.")
   parser.add_argument('-t', '--tag', default='',
@@ -40,7 +41,14 @@ if __name__ == '__main__':
   cmdfile.write('#!/bin/env python\n')
   nexisting=0
   for ifile_path in in_file_paths:
-    if "raw_pico" in ifile_path:
+    if args['from_skim']!='':
+      from_prefix = 'pico_'+args['from_skim']+'_'
+      in_base = os.path.basename(ifile_path)
+      if not in_base.startswith(from_prefix):
+        print('[Warning] skipping '+ifile_path+', name does not start with '+from_prefix)
+        continue
+      out_file_path = os.path.join(out_dir, 'pico_'+skim_name+'_'+in_base[len(from_prefix):])
+    elif "raw_pico" in ifile_path:
       out_file_path = ifile_path.replace(in_dir,out_dir).replace('raw_pico_','pico_'+skim_name+'_')
     else: 
       out_file_path = ifile_path.replace(in_dir,out_dir).replace('pico_','pico_'+skim_name+'_')
@@ -49,6 +57,7 @@ if __name__ == '__main__':
       if not args['overwrite']: 
         continue
     cmd = '{}/scripts/skim_file.py -k {} -i {} -o {}'.format(os.getcwd(), skim_name, ifile_path, out_dir)
+    if args['from_skim']!='': cmd += ' --from_skim '+args['from_skim']
     cmdfile.write('print(\''+cmd+'\')\n')
 
   cmdfile.close()

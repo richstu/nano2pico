@@ -5,6 +5,7 @@ from __future__ import print_function
 import sys
 import argparse
 import fnmatch
+import glob
 import os
 
 from ROOT import TChain, TFile
@@ -18,7 +19,7 @@ def getRules(slim_rules_file_name):
     bad_rules = [ rule for rule in rules if rule not in good_rules ]
     good_rules = [ rule for rule in good_rules if len(rule)>=2 ]
     for rule in bad_rules:
-        utilities.ePrint("Invalid rule:",rule,"\n")
+        print("Invalid rule:",rule,"\n",file=sys.stderr)
     return good_rules
 
 def passRules(branch, rules):
@@ -34,8 +35,24 @@ def sortInputFilesBySize(input_file_paths):
 
     return input_file_paths
 
+def expandInputFiles(input_patterns):
+    # Wildcards are expanded here: with tens of thousands of files, the expanded
+    # command line is longer than the kernel allows
+    input_file_paths = []
+    for pattern in input_patterns:
+        matches = sorted(glob.glob(pattern))
+        if len(matches)==0:
+            print("[Error] No input files match",pattern)
+            sys.exit(1)
+        input_file_paths.extend(matches)
+    return input_file_paths
+
+
 def slimFile(slim_rules_file_name, out_file_path, input_file_paths, test_mode):
-    print("     INPUT FILES:",input_file_paths,"\n")
+    if len(input_file_paths) <= 10:
+        print("     INPUT FILES:",input_file_paths,"\n")
+    else: # do not write tens of thousands of names in the job log
+        print("     INPUT FILES:",len(input_file_paths),"files, first",input_file_paths[:3],"last",input_file_paths[-3:],"\n")
     print("     OUTPUT FILE:",out_file_path,"\n")
     print("      RULES FILE:",slim_rules_file_name,"\n")
 
@@ -78,4 +95,4 @@ if __name__ == "__main__":
                         help="Files containing ntuples to be slimmed and merged.")
     args = parser.parse_args()
 
-    slimFile(args.slim_rules_file, args.out_file_path, args.input_file_paths, args.test)
+    slimFile(args.slim_rules_file, args.out_file_path, expandInputFiles(args.input_file_paths), args.test)

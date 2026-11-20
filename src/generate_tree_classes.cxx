@@ -121,7 +121,7 @@ int GetArrayLength(const std::string var_name){
   else if (var_type == "Muon") return 60;
   else if (var_type == "Tau") return 30;
   else if (var_type == "IsoTrack") return 80;
-  else if (var_type == "Photon") return 220;
+  else if (var_type == "Photon") return 350;
   else if (var_type == "FsrPhoton") return 200;
   else if (var_type == "Jet") return 200;
   else if (var_type == "SoftActivityJet") return 30;
@@ -367,6 +367,10 @@ void WriteNanoSource(const vector<Variable> &vars){
 
   file << "  intree_ = new TChain(\"Events\");\n";
   file << "  intree_->Add(infile);\n\n";
+  file << "  intree_->SetCacheSize(50*1024*1024);\n";
+  file << "  intree_->AddBranchToCache(\"*\", true);\n";
+  file << "  intree_->StopCacheLearningPhase();\n";
+
 
   for(vector<Variable>::const_iterator var = vars.begin(); var != vars.end(); ++var){
     if(Contains(var->type_, "vector")){

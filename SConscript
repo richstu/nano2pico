@@ -37,7 +37,8 @@ envClone.Depends(run_tree_generator, tree_variable_files)
 envClone.Depends(run_tree_generator, tree_generator)
 
 # Make binaries for every directory
-exclude_files = [tree_generator_file] + tree_generated_files
+count_entries_file = 'src/count_entries.cxx' # built below with a lean environment
+exclude_files = [tree_generator_file, count_entries_file] + tree_generated_files
 for source_directory in source_directories: # source_directories = 'core'
   library_objects = []
   # Build baby objects
@@ -60,3 +61,10 @@ for source_directory in source_directories: # source_directories = 'core'
     source_script_path = 'run/'+source_directory+'/'+source_basename+'.exe'
     source_script_path_mark = "#/"+source_script_path
     envClone.Command(source_script_path_mark, program, './scripts/make_run_scripts.py '+source_script_path)
+
+leanEnv = exportEnv.Clone()
+leanEnv.Replace(LINKFLAGS = Split('`root-config --ldflags` `root-config --libs` -lTreePlayer'))
+count_entries_object = leanEnv.Object(count_entries_file)
+count_entries_program = leanEnv.Program('#/kernel/'+leanEnv['kernel']+'/run/count_entries.exe', [count_entries_object])
+leanEnv.Command('#/run/count_entries.exe', count_entries_program, './scripts/make_run_scripts.py run/count_entries.exe')
+

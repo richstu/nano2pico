@@ -2,7 +2,7 @@
 # The ./jobscript_check.py should return 'success' or 'fail' or 'to_submit' or 'submitted' for a job_log_string
 # The input is given as sys.argv[1] = queue_system.compress_string(job_log_string) sys.argv[2] = queue_system.compress_string(job_argument_string)
 import sys
-import ROOT
+from pico_count import count_entries
 import argparse
 import shlex
 import zlib
@@ -35,20 +35,15 @@ if __name__ == "__main__":
   
   unslimmed_path = command_args['i']
   slimmed_path = command_args['o']
-  
-  unslimmed = ROOT.TChain("tree")
-  unslimmed.Add(unslimmed_path)
-  unslimmed_events = unslimmed.GetEntries()
-  
-  slimmed = ROOT.TChain("tree")
-  slimmed.Add(slimmed_path)
-  slimmed_events = slimmed.GetEntries()
+
+  unslimmed_events, unslimmed_branches = count_entries(unslimmed_path, "tree")
+  slimmed_events, slimmed_branches = count_entries(slimmed_path, "tree")  
   
   print(unslimmed_path+' has '+str(unslimmed_events)+' events')
   print(slimmed_path+' has '+str(slimmed_events)+' events')
   
   if unslimmed_events != slimmed_events:
     print('[For queue_system] fail: unslimmed and slimmed do not have same number of events')
-    sys.exit(1)
+    sys.exit(0)
   else:
     print('[For queue_system] success')

@@ -129,8 +129,9 @@ if __name__ == '__main__':
       nexisting +=1
       if not args['overwrite']: 
         continue
-    cmd = '{}/scripts/slim_and_merge.py -s {} -o {} -i {}'.format(os.getcwd(), slim_rules, out_file_path, in_file_paths)
-    cmdfile.write('print(\''+cmd+'\')\n')
+    cmd = "{}/scripts/slim_and_merge.py -s {} -o {} -i '{}'".format(os.getcwd(), slim_rules, out_file_path, in_file_paths)
+    cmdfile.write('print('+repr(cmd)+')\n')
+
 
   cmdfile.close()
   os.chmod(cmdfile_name, 0o755)

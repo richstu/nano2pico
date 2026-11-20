@@ -13,6 +13,8 @@ parser.add_argument("-d","--dataset_list", default="",
                     help="File with the list of dataset names as they appear in DAS or the list of filenames (with wildcards). If not specified will run on all files in input folder")
 parser.add_argument('-t', '--tag', default='',
                     help='Optionally specify a tag to be used to differentiate helper files for batch submission.')
+parser.add_argument('--nano_year', default='',
+                    help='Read the NanoAOD from the nano/<nano_year>/ folder instead of the year in --in_dir. Outputs still go to the folder of the year in --in_dir.')
 parser.add_argument('-m','--mcyear', default="2024", help="Optional year for 2024 MC to be converted to. Only affects 2024 input mc")
 parser.add_argument("-l","--list_format", default="DAS", choices=["DAS","filename"],
                     help="Sets whether the dataset list is in DAS format or filename format.")
@@ -24,6 +26,12 @@ args = vars(parser.parse_args())
 
 in_dir = args['in_dir']
 out_base_dir = args['in_dir'].replace('/mnt/hadoop/','/net/cms29/cms29r0/').replace('/nano/','/'+args['production']+'/')
+
+if args['nano_year']!='':
+  in_dir, n_year_replaced = re.subn(r'(/nano/)\d{4}(/|$)', r'\g<1>'+args['nano_year']+r'\2', in_dir, count=1)
+  if n_year_replaced==0:
+    print('[Error] --nano_year given, but --in_dir has no /nano/<year>/ folder: '+in_dir)
+    sys.exit(1)
 
 if not os.path.exists(out_base_dir): 
   os.makedirs(out_base_dir)
@@ -40,6 +48,9 @@ list_format = args['list_format']
 in_file_paths = []
 all_file_paths = glob(os.path.join(in_dir,'*.root'))
 if args['dataset_list']!='':
+  if not os.path.isfile(args['dataset_list']):
+    print('[Error] dataset list does not exist: '+args['dataset_list']+' (path is relative to the current directory)')
+    sys.exit(1)
   datasets = []
   with open(args['dataset_list']) as f:
     datasets = f.readlines()
@@ -48,10 +59,15 @@ if args['dataset_list']!='':
     wanted_file_substr = []
     if args['data']:
       for ds in datasets:
+        if ds[0:1]!="/": # in case of empty lines or comments
+          continue
         ds_split = ds.split("/")
         dataset = ds_split[1]
         run_condition = ds_split[2]
-        run, condition =  re.search('(Run.+?)-(.*)', run_condition).groups()
+        run_match = re.search('(Run.+?)-(.*)', run_condition)
+        if run_match is None:
+          print("[Warning] Could not parse run/condition, skipping: " + ds.strip())
+        run, condition = run_match.groups()
         wanted_file_substr.append(dataset+"__"+run+"__"+condition)
     else:
       for ds in datasets: 
@@ -79,6 +95,9 @@ else:
   in_file_paths = all_file_paths
 
 print("Found {} input files.\n".format(len(in_file_paths)))
+if len(in_file_paths)==0:
+  print("[Error] No input files found in "+in_dir+". Check the input directory, year and dataset list.")
+  sys.exit(1)
 
 cmdfile_name = 'process_nano_cmds.py'
 if (args['skim']=='ll'): cmdfile_name = cmdfile_name.replace('.py', '_skim_ll'+'.py')
@@ -97,7 +116,9 @@ cmdfile.close()
 os.chmod(cmdfile_name, 0o755)
 
 json_name = cmdfile_name.replace('.py','.json')
-os.system('convert_cl_to_jobs_info.py -f '+cmdfile_name+' '+json_name)
+if os.system('convert_cl_to_jobs_info.py -f '+cmdfile_name+' '+json_name) != 0:
+  print("[Error] convert_cl_to_jobs_info.py failed")
+  sys.exit(1)
 
 print("To generate job json and submit jobs do: ")
 print('auto_submit_jobs.py '+json_name+' -c scripts/check_process_nano_job.py')
