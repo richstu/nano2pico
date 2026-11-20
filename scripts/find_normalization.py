@@ -11,6 +11,13 @@ import os
 import re
 import ROOT
 
+TAG_ALIASES = {
+    # 2024: the v2 sample is named powhegMINLO; the ext1 sample
+    # (named powheg) is its statistical extension
+    "WminusH-HtoZGto2LG_Par-M-125_TuneCP5_13p6TeV_powhegMINLO-pythia8":
+    "WminusH-HtoZGto2LG_Par-M-125_TuneCP5_13p6TeV_powheg-pythia8",
+}
+
 def full_path(path: str) -> str:
   """Expands path including symlinks
 
@@ -33,7 +40,9 @@ def get_tag(path: str) -> str:
   """
   tag = path.split("/")[-1]
   tag = re.findall('(.*?)__',tag)[0]
+  
   return tag
+
 
 def find_normalization(nano_dir: str, output_name: str, overwrite: bool, 
                        dataset_list: str, verbose: bool):
@@ -79,7 +88,7 @@ def find_normalization(nano_dir: str, output_name: str, overwrite: bool,
       for line in lines:
         if len(line) > 0:
           dataset_info = line.split("/")
-          tag = dataset_info[1]
+          tag = TAG_ALIASES.get(dataset_info[1], dataset_info[1])
           wildcard = (dataset_info[1]+"__"+dataset_info[2].replace("-","__",1)
                       +"*.root")
           if tag in tags:
@@ -91,7 +100,7 @@ def find_normalization(nano_dir: str, output_name: str, overwrite: bool,
     input_files = [os.path.join(nano_dir,f) for f in os.listdir(nano_dir)
                    if os.path.isfile(os.path.join(nano_dir, f))
                    and os.path.splitext(f)[1] == ".root"]
-    tags = list(set([get_tag(f) for f in input_files]))
+    tags = list(set([TAG_ALIASES.get(get_tag(f), get_tag(f)) for f in input_files]))
   if verbose:
     print(f"Found {len(tags)} tags")
 
@@ -104,6 +113,8 @@ def find_normalization(nano_dir: str, output_name: str, overwrite: bool,
       tag_files = tag_filelist[tag]
     else:
       tag_files = glob(os.path.join(nano_dir, tag)+"*.root")
+      for alias in [a for a in TAG_ALIASES if TAG_ALIASES[a] == tag]:
+        tag_files += glob(os.path.join(nano_dir, alias)+"*.root")
     gen_event_sumw = 0.0
     lhe_scale_sumw = [0.0 for imurf in range(9)]
     for tag_file in tag_files:
@@ -116,13 +127,18 @@ def find_normalization(nano_dir: str, output_name: str, overwrite: bool,
           try:
             if len(event.LHEScaleSumw) == 9:
               for imurf in range(9):
-                lhe_scale_sumw[imurf] += event.LHEScaleSumw[imurf]
+                lhe_scale_sumw[imurf] += event.LHEScaleSumw[imurf]*event.genEventSumw
           except:
             print(f"WARNING: LHEScaleSumw not set in {tag_file}")
     wgt_sums[nano_dir][tag]['genEventSumw'] = gen_event_sumw
     for imurf in range(9):
-      wgt_sums[nano_dir][tag][f'LHEScaleSumw{imurf}'] = lhe_scale_sumw[imurf]
-  
+      wgt_sums[nano_dir][tag][f'LHEScaleSumw{imurf}'] = lhe_scale_sumw[imurf]/gen_event_sumw if gen_event_sumw != 0.0 else 1.0
+
+  # aliased tags get the same entry as the tag they are merged into
+  for alias, tag in TAG_ALIASES.items():
+    if tag in wgt_sums[nano_dir]:
+      wgt_sums[nano_dir][alias] = wgt_sums[nano_dir][tag]  
+
   # save output
   with open(output_filename,"w") as output_file:
     output_file.write(json.dumps(wgt_sums, indent=2))

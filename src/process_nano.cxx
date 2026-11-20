@@ -362,9 +362,6 @@ int main(int argc, char *argv[]){
     double event_fraction = (static_cast<double>(nent_test)
                              /static_cast<double>(nano.GetEntries()));
     mc_metadata.gen_event_sumw *= event_fraction;
-    for (int imurf = 0; imurf < MURF_VARIATIONS; imurf++) {
-      mc_metadata.lhe_scale_sumw[imurf] *= event_fraction;
-    }
   }
 
   pico_tree pico("", out_path);
@@ -600,8 +597,9 @@ int main(int argc, char *argv[]){
       if (isSignal) {
         pico.out_sys_murf().resize(MURF_VARIATIONS,1.); 
         for (int imurf = 0; imurf < MURF_VARIATIONS; imurf++) {
-          pico.out_sys_murf()[imurf] = nano.LHEScaleWeight()[imurf]
-              /(mc_metadata.lhe_scale_sumw[imurf]*mc_metadata.gen_event_sumw);
+          
+          pico.out_sys_murf()[imurf] = (mc_metadata.lhe_scale_sumw[imurf] != 0.0) ? (nano.LHEScaleWeight()[imurf]
+              /mc_metadata.lhe_scale_sumw[imurf]) : 1.0;
         }
       }
       // PDF weights negligible in HtoZgamma and large disk usage
