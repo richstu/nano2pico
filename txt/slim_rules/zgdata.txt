@@ -28,6 +28,7 @@ keep met_*
 
 keep njet
 keep nbdf*
+keep nbupt*
 keep nlep
 keep nll
 keep nllphoton
